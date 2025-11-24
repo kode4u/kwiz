@@ -1,0 +1,35 @@
+# Alternative Docker Compose configuration
+# Use this if bitnami/moodle image doesn't work
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.alternative.yml up -d
+
+services:
+  moodle:
+    # Alternative: Use official Moodle image with manual setup
+    image: php:8.1-apache
+    container_name: jica-moodle
+    environment:
+      MOODLE_DATABASE_HOST: db
+      MOODLE_DATABASE_PORT_NUMBER: 3306
+      MOODLE_DATABASE_USER: ${MYSQL_USER:-moodle}
+      MOODLE_DATABASE_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
+      MOODLE_DATABASE_NAME: ${MYSQL_DATABASE:-moodle}
+    ports:
+      - "8080:80"
+    volumes:
+      - moodle_data:/var/www/html
+      - ./moodle-plugin/mod/gamifiedquiz:/var/www/html/mod/gamifiedquiz
+    networks:
+      - jica-network
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      bash -c "
+        apt-get update && 
+        apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev libzip-dev unzip git &&
+        docker-php-ext-configure gd --with-freetype --with-jpeg &&
+        docker-php-ext-install -j$(nproc) gd mysqli pdo pdo_mysql zip &&
+        a2enmod rewrite &&
+        apache2-foreground
+      "
+

@@ -1,5 +1,34 @@
 # Troubleshooting Guide
 
+## Docker Image Issues
+
+### Moodle Image Not Found
+
+**Error**: `failed to resolve reference "docker.io/bitnami/moodle:4": not found`
+
+**Solutions**:
+
+1. **Use valid tag** (already fixed in docker-compose.yml):
+   - Changed from `bitnami/moodle:4` to `bitnami/moodle:4.3`
+   - Or use `bitnami/moodle:latest`
+
+2. **Pull image manually**:
+   ```powershell
+   docker pull bitnami/moodle:4.3
+   docker-compose up -d
+   ```
+
+3. **Check available tags**:
+   - Visit: https://hub.docker.com/r/bitnami/moodle/tags
+   - Use a valid tag in docker-compose.yml
+
+4. **Use alternative image**:
+   ```powershell
+   docker-compose -f docker-compose.yml -f docker-compose.alternative.yml up -d
+   ```
+
+See [MOODLE_IMAGE_FIX.md](MOODLE_IMAGE_FIX.md) for detailed solutions.
+
 ## Windows-Specific Issues
 
 ### Docker Daemon Not Running

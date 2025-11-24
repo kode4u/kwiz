@@ -90,8 +90,9 @@ services:
       retries: 3
 
   # Moodle with Plugin
+  # Note: If bitnami/moodle doesn't work, try: bitnami/moodle:4.3 or use official moodle image
   moodle:
-    image: bitnami/moodle:4
+    image: bitnami/moodle:4.3
     container_name: jica-moodle
     environment:
       MOODLE_DATABASE_HOST: db
