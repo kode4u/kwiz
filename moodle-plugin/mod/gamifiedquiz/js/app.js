@@ -130,21 +130,34 @@
                     throw new Error('HTTP error! status: ' + response.status);
                 }
                 
-                const data = await response.json();
-                console.log('Generate questions response:', data);
+                let data;
+                try {
+                    const text = await response.text();
+                    console.log('Generate questions raw response:', text);
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Failed to parse JSON response:', parseError);
+                    throw new Error('Invalid response from server. Check browser console for details.');
+                }
                 
-                if (data.success && data.questions && data.questions.length > 0) {
+                console.log('Generate questions parsed response:', data);
+                
+                if (data.success && data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
                     questions = data.questions;
+                    console.log('Questions received:', questions);
                     displayQuestions(questions);
                     document.getElementById('start-session-btn').disabled = false;
                     document.getElementById('session-status').style.display = 'block';
-                    document.getElementById('session-status').textContent = 'Questions generated successfully! (' + data.count + ' questions) Ready to start session.';
+                    document.getElementById('session-status').textContent = 'Questions generated successfully! (' + (data.count || questions.length) + ' questions) Ready to start session.';
                     document.getElementById('session-status').style.background = '#d4edda';
                     document.getElementById('session-status').style.borderColor = '#28a745';
                 } else {
                     const errorMsg = data.error || 'Failed to generate questions. Please check LLM API configuration.';
-                    alert('Error: ' + errorMsg);
                     console.error('Generate questions error:', data);
+                    alert('Error: ' + errorMsg.replace(/\\n/g, '\n'));
+                    if (data.api_url) {
+                        console.log('API URL:', data.api_url);
+                    }
                 }
             } catch (error) {
                 console.error('Error generating questions:', error);
@@ -237,30 +250,66 @@
         // Display questions
         function displayQuestions(qs) {
             const container = document.getElementById('questions-container');
-            container.innerHTML = '<h3>Generated Questions Preview</h3>' + qs.map((q, i) => {
-                const choices = Array.isArray(q.choices) 
-                    ? q.choices.map(c => typeof c === 'string' ? {text: c, is_correct: false} : c)
-                    : JSON.parse(q.choices || '[]').map(c => typeof c === 'string' ? {text: c, is_correct: false} : c);
+            if (!container) {
+                console.error('Questions container not found!');
+                return;
+            }
+            
+            if (!Array.isArray(qs) || qs.length === 0) {
+                container.innerHTML = '<p>No questions to display.</p>';
+                return;
+            }
+            
+            try {
+                container.innerHTML = '<h3>Generated Questions Preview</h3>' + qs.map((q, i) => {
+                    const questionText = q.question || q.question_text || 'No question text';
+                    let choices = [];
+                    
+                    if (Array.isArray(q.choices)) {
+                        choices = q.choices.map(c => {
+                            if (typeof c === 'string') {
+                                return {text: c, is_correct: false};
+                            }
+                            return c;
+                        });
+                    } else if (typeof q.choices === 'string') {
+                        try {
+                            const parsed = JSON.parse(q.choices);
+                            choices = Array.isArray(parsed) 
+                                ? parsed.map(c => typeof c === 'string' ? {text: c, is_correct: false} : c)
+                                : [];
+                        } catch (e) {
+                            console.error('Failed to parse choices:', e);
+                            choices = [];
+                        }
+                    }
+                    
+                    // Mark correct answer
+                    const correctIndex = q.correct_index !== undefined ? parseInt(q.correct_index) : -1;
+                    if (correctIndex >= 0 && correctIndex < choices.length) {
+                        choices[correctIndex].is_correct = true;
+                    }
+                    
+                    return `
+                        <div class="question-preview">
+                            <h4>Question ${i + 1}</h4>
+                            <p>${questionText}</p>
+                            <ul>
+                                ${choices.map((c, idx) => `
+                                    <li class="${c.is_correct ? 'correct' : ''}">
+                                        ${idx === correctIndex ? '✓ ' : ''}${c.text || c}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }).join('');
                 
-                // Mark correct answer
-                if (q.correct_index !== undefined && choices[q.correct_index]) {
-                    choices[q.correct_index].is_correct = true;
-                }
-                
-                return `
-                    <div class="question-preview">
-                        <h4>Question ${i + 1}</h4>
-                        <p>${q.question || q.question_text}</p>
-                        <ul>
-                            ${choices.map((c, idx) => `
-                                <li class="${c.is_correct ? 'correct' : ''}">
-                                    ${idx === q.correct_index ? '✓ ' : ''}${typeof c === 'string' ? c : c.text}
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                `;
-            }).join('');
+                console.log('Questions displayed successfully');
+            } catch (error) {
+                console.error('Error displaying questions:', error);
+                container.innerHTML = '<p>Error displaying questions. Check console for details.</p>';
+            }
         }
 
         // Listen for session events

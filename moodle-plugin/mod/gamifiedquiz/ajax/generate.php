@@ -31,6 +31,11 @@ if ($cmid) {
 
 // Generate questions
 try {
+    $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
+    if (empty($api_url)) {
+        $api_url = 'http://localhost:5000';
+    }
+    
     $questions = gamifiedquiz_generate_questions(
         $gamifiedquiz->topic,
         $gamifiedquiz->difficulty,
@@ -42,9 +47,17 @@ try {
 
     if ($questions === false || empty($questions)) {
         http_response_code(500);
+        $error_msg = 'Failed to generate questions. ';
+        $error_msg .= 'Please check:\n';
+        $error_msg .= '1. LLM API is running at: ' . $api_url . '\n';
+        $error_msg .= '2. LLM API URL is correct in plugin settings\n';
+        $error_msg .= '3. OpenAI API key is configured (if using OpenAI backend)\n';
+        $error_msg .= '4. Check Moodle error logs for details';
+        
         echo json_encode(array(
             'success' => false,
-            'error' => 'Failed to generate questions. Please check LLM API configuration and ensure the API is running at: ' . get_config('mod_gamifiedquiz', 'llmapi_url')
+            'error' => $error_msg,
+            'api_url' => $api_url
         ));
         exit;
     }

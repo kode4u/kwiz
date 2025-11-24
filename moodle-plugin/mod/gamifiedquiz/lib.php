@@ -139,16 +139,40 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 60); // 60 second timeout
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 second connection timeout
 
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
     curl_close($ch);
+
+    if ($curl_error) {
+        error_log("Gamified Quiz: cURL error: " . $curl_error);
+        return false;
+    }
 
     if ($http_code === 200) {
         $result = json_decode($response, true);
-        return $result['questions'] ?? false;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("Gamified Quiz: JSON decode error: " . json_last_error_msg());
+            error_log("Gamified Quiz: Response: " . substr($response, 0, 500));
+            return false;
+        }
+        
+        // Handle both response formats
+        if (isset($result['questions']) && is_array($result['questions'])) {
+            return $result['questions'];
+        } elseif (isset($result['error'])) {
+            error_log("Gamified Quiz API error: " . $result['error']);
+            return false;
+        } else {
+            error_log("Gamified Quiz: Unexpected response format: " . print_r($result, true));
+            return false;
+        }
+    } else {
+        error_log("Gamified Quiz: HTTP error " . $http_code . ": " . substr($response, 0, 500));
+        return false;
     }
-
-    return false;
 }
 
