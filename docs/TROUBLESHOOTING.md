@@ -1,5 +1,29 @@
 # Troubleshooting Guide
 
+## Docker Build Issues
+
+### npm ci Error - Missing package-lock.json
+
+**Error**: `The npm ci command can only install with an existing package-lock.json`
+
+**Solutions**:
+
+1. **Generate package-lock.json** (already done):
+   ```powershell
+   cd websocket-server
+   npm install
+   ```
+
+2. **Rebuild the image**:
+   ```powershell
+   docker-compose build websocket-server
+   docker-compose up -d
+   ```
+
+3. **Alternative**: Change Dockerfile to use `npm install` instead of `npm ci`
+
+See [NPM_BUILD_FIX.md](NPM_BUILD_FIX.md) for details.
+
 ## Docker Image Issues
 
 ### Moodle Image Not Found

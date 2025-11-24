@@ -9,7 +9,8 @@ RUN apk add --no-cache curl
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+# Note: package-lock.json should be committed to repo for reproducible builds
+RUN npm ci --omit=dev
 
 # Copy application code
 COPY . .

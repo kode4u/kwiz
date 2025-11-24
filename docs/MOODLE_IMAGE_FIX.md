@@ -4,7 +4,22 @@
 
 Error: `failed to resolve reference "docker.io/bitnami/moodle:4": not found`
 
-The `bitnami/moodle:4` tag doesn't exist in Docker Hub.
+The Bitnami Moodle images are not available on Docker Hub. **This has been fixed by creating a custom Moodle Dockerfile.**
+
+## ✅ Solution: Custom Moodle Dockerfile (Already Implemented)
+
+The project now uses a custom Dockerfile that builds Moodle from source. This is already configured in `docker-compose.yml`.
+
+**No action needed** - just run:
+```powershell
+docker-compose up -d
+```
+
+The Dockerfile will:
+- Download and install Moodle 4.3
+- Set up all required PHP extensions
+- Configure Apache
+- Mount your plugin automatically
 
 ## Solution 1: Use Available Bitnami Tag (Recommended)
 

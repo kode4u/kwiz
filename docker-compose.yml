@@ -90,9 +90,11 @@ services:
       retries: 3
 
   # Moodle with Plugin
-  # Note: If bitnami/moodle doesn't work, try: bitnami/moodle:4.3 or use official moodle image
+  # Using custom Dockerfile since bitnami/moodle image is not available
   moodle:
-    image: bitnami/moodle:4.3
+    build:
+      context: ./docker/moodle
+      dockerfile: Dockerfile
     container_name: jica-moodle
     environment:
       MOODLE_DATABASE_HOST: db
@@ -101,15 +103,12 @@ services:
       MOODLE_DATABASE_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
       MOODLE_DATABASE_NAME: ${MYSQL_DATABASE:-moodle}
       MOODLE_HOST: ${MOODLE_URL:-http://localhost:8080}
-      MOODLE_USERNAME: ${MOODLE_ADMIN_USER:-admin}
-      MOODLE_PASSWORD: ${MOODLE_ADMIN_PASS:-Admin@123}
-      MOODLE_EMAIL: ${MOODLE_ADMIN_EMAIL:-admin@example.com}
     ports:
-      - "8080:8080"
-      - "8443:8443"
+      - "8080:80"
     volumes:
-      - moodle_data:/bitnami/moodle
-      - ./moodle-plugin/mod/gamifiedquiz:/bitnami/moodle/moodle/mod/gamifiedquiz
+      - moodle_data:/var/www/html
+      - moodle_data_dir:/var/moodledata
+      - ./moodle-plugin/mod/gamifiedquiz:/var/www/html/mod/gamifiedquiz
     networks:
       - jica-network
     depends_on:
@@ -125,6 +124,7 @@ volumes:
   mysql_data:
   redis_data:
   moodle_data:
+  moodle_data_dir:
 
 networks:
   jica-network:
