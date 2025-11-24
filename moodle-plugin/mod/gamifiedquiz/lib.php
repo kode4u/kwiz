@@ -9,6 +9,66 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Auto-sync JWT secret from .env file on first load
+ * This ensures the secret is always in sync
+ */
+function mod_gamifiedquiz_auto_sync_jwt_secret() {
+    global $CFG;
+    
+    // Only sync if config is empty or matches default
+    $current_secret = get_config('mod_gamifiedquiz', 'jwt_secret');
+    $default_secret = 'change-me-in-production-use-strong-random-key';
+    
+    // If empty or still using default, try to sync from .env
+    if (empty($current_secret) || $current_secret === 'change-me-in-production' || $current_secret === $default_secret) {
+        $env_secret = null;
+        
+        // Try environment variable first
+        $env_secret = getenv('JWT_SECRET');
+        
+        // Try root .env file
+        if (empty($env_secret)) {
+            $env_file = $CFG->dirroot . '/../.env';
+            if (file_exists($env_file)) {
+                $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (strpos($line, '#') === 0) continue;
+                    if (strpos($line, 'JWT_SECRET=') === 0) {
+                        $env_secret = trim(substr($line, strlen('JWT_SECRET=')));
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Try docker/.env file
+        if (empty($env_secret)) {
+            $env_file = $CFG->dirroot . '/../docker/.env';
+            if (file_exists($env_file)) {
+                $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (strpos($line, '#') === 0) continue;
+                    if (strpos($line, 'JWT_SECRET=') === 0) {
+                        $env_secret = trim(substr($line, strlen('JWT_SECRET=')));
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // If found, save to config
+        if (!empty($env_secret)) {
+            set_config('jwt_secret', $env_secret, 'mod_gamifiedquiz');
+            return $env_secret;
+        }
+    }
+    
+    return $current_secret;
+}
+
+/**
  * Returns the information on whether the module supports a feature
  *
  * @param string $feature FEATURE_xx constant for requested feature
@@ -86,7 +146,10 @@ function gamifiedquiz_delete_instance($id) {
  * @return string JWT token
  */
 function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
-    $secret = get_config('mod_gamifiedquiz', 'jwt_secret');
+    // Auto-sync JWT secret from .env file
+    $secret = mod_gamifiedquiz_auto_sync_jwt_secret();
+    
+    // If still empty, use default
     if (empty($secret)) {
         $secret = 'change-me-in-production-use-strong-random-key';
     }
