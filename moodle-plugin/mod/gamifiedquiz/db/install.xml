@@ -78,7 +78,7 @@
         <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="session_user" FIELDS="session_id, userid"/>
+        <INDEX NAME="session_user" UNIQUE="false" FIELDS="session_id, userid"/>
       </INDEXES>
     </TABLE>
   </TABLES>
