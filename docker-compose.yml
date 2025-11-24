@@ -107,7 +107,7 @@ services:
       - "8080:80"
     volumes:
       - moodle_data:/var/www/html
-      - moodle_data_dir:/var/moodledata
+      - moodle_data_dir:/var/www/moodledata
       - ./moodle-plugin/mod/gamifiedquiz:/var/www/html/mod/gamifiedquiz
     networks:
       - jica-network
