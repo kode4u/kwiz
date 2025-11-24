@@ -88,7 +88,7 @@ function gamifiedquiz_delete_instance($id) {
 function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
     $secret = get_config('mod_gamifiedquiz', 'jwt_secret');
     if (empty($secret)) {
-        $secret = 'default-secret-change-me';
+        $secret = 'change-me-in-production';
     }
 
     $payload = array(
@@ -98,11 +98,16 @@ function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
         'exp' => time() + 3600 // 1 hour
     );
 
-    // Simple JWT encoding (in production, use a proper JWT library)
-    $header = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
-    $payload_encoded = base64_encode(json_encode($payload));
+    // JWT encoding with URL-safe base64 (required for JWT standard)
+    // Convert standard base64 to URL-safe base64
+    function base64url_encode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    $header = base64url_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
+    $payload_encoded = base64url_encode(json_encode($payload));
     $signature = hash_hmac('sha256', "$header.$payload_encoded", $secret, true);
-    $signature_encoded = base64_encode($signature);
+    $signature_encoded = base64url_encode($signature);
 
     return "$header.$payload_encoded.$signature_encoded";
 }

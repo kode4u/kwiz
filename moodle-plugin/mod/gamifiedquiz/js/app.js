@@ -6,44 +6,91 @@
 (function() {
     'use strict';
 
-    const config = window.GAMIFIED_QUIZ_CONFIG;
-    if (!config) {
-        console.error('Gamified Quiz config not found');
-        return;
+    // Wait for config to be available
+    function initApp() {
+        const config = window.GAMIFIED_QUIZ_CONFIG;
+        if (!config) {
+            console.error('Gamified Quiz config not found. Retrying...');
+            setTimeout(initApp, 100);
+            return;
+        }
+        
+        console.log('Gamified Quiz config loaded:', config);
+        startApp(config);
     }
+    
+    function startApp(config) {
 
-    // Initialize Socket.IO connection
-    const socket = io(config.wsUrl, {
-        auth: {
-            token: config.jwtToken
-        },
-        transports: ['websocket', 'polling']
-    });
+        // Initialize Socket.IO connection (declare at function scope)
+        let socket = null;
+        
+        try {
+            if (typeof io === 'undefined') {
+                console.error('Socket.IO not loaded. Please check if the library is available.');
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.style.cssText = 'padding: 15px; margin: 10px; background: #f8d7da; border: 1px solid #dc3545; border-radius: 4px; color: #721c24;';
+                errorDiv.textContent = 'WebSocket library not loaded. Please refresh the page.';
+                const container = document.querySelector('.gamifiedquiz-container') || document.body;
+                container.insertBefore(errorDiv, container.firstChild);
+            } else {
+                socket = io(config.wsUrl, {
+                auth: {
+                    token: config.jwtToken
+                },
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: 5
+            });
 
-    // Connection handlers
-    socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
-    });
+            // Connection handlers
+            socket.on('connect', () => {
+                console.log('Connected to WebSocket server');
+            });
 
-    socket.on('disconnect', () => {
-        console.log('Disconnected from WebSocket server');
-    });
+            socket.on('disconnect', () => {
+                console.log('Disconnected from WebSocket server');
+            });
 
-    socket.on('error', (error) => {
-        console.error('WebSocket error:', error);
-    });
+            socket.on('connect_error', (error) => {
+                console.error('WebSocket connection error:', error);
+                if (config.role === 'teacher') {
+                    const status = document.getElementById('session-status');
+                    if (status) {
+                        status.style.display = 'block';
+                        status.textContent = 'Warning: WebSocket connection failed. Some features may not work.';
+                        status.style.background = '#fff3cd';
+                        status.style.borderColor = '#ffc107';
+                    }
+                }
+            });
 
-    // Initialize app based on role
-    if (config.role === 'teacher') {
-        initTeacherApp();
-    } else {
-        initStudentApp();
+            socket.on('error', (error) => {
+                console.error('WebSocket error:', error);
+            });
+            }
+        } catch (error) {
+            console.error('Error initializing Socket.IO:', error);
+            socket = null;
+        }
+        
+        // Make socket available globally for this module
+        window.gamifiedQuizSocket = socket;
+        
+        // Initialize app based on role
+        if (config.role === 'teacher') {
+            initTeacherApp(config, socket);
+        } else {
+            initStudentApp(config, socket);
+        }
     }
-
+    
     /**
      * Teacher Application
      */
-    function initTeacherApp() {
+    function initTeacherApp(config, socket) {
         const container = document.getElementById('gamifiedquiz-teacher-app');
         if (!container) return;
 
@@ -64,29 +111,76 @@
 
         // Generate questions
         document.getElementById('generate-questions-btn').addEventListener('click', async () => {
-            const response = await fetch('/mod/gamifiedquiz/ajax/generate.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    quizid: config.quizId,
-                    topic: 'Default Topic' // Get from config
-                })
-            });
-            const data = await response.json();
-            if (data.success) {
-                questions = data.questions;
-                displayQuestions(questions);
-                document.getElementById('start-session-btn').disabled = false;
+            const btn = document.getElementById('generate-questions-btn');
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            
+            try {
+                const wwwroot = config.wwwroot || (typeof M !== 'undefined' && M.cfg && M.cfg.wwwroot) || '';
+                const sesskey = config.sesskey || (typeof M !== 'undefined' && M.cfg && M.cfg.sesskey) || '';
+                const url = wwwroot + '/mod/gamifiedquiz/ajax/generate.php';
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'quizid=' + config.quizId + '&cmid=' + config.cmId + '&sesskey=' + sesskey
+                });
+                
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                
+                const data = await response.json();
+                console.log('Generate questions response:', data);
+                
+                if (data.success && data.questions && data.questions.length > 0) {
+                    questions = data.questions;
+                    displayQuestions(questions);
+                    document.getElementById('start-session-btn').disabled = false;
+                    document.getElementById('session-status').style.display = 'block';
+                    document.getElementById('session-status').textContent = 'Questions generated successfully! (' + data.count + ' questions) Ready to start session.';
+                    document.getElementById('session-status').style.background = '#d4edda';
+                    document.getElementById('session-status').style.borderColor = '#28a745';
+                } else {
+                    const errorMsg = data.error || 'Failed to generate questions. Please check LLM API configuration.';
+                    alert('Error: ' + errorMsg);
+                    console.error('Generate questions error:', data);
+                }
+            } catch (error) {
+                console.error('Error generating questions:', error);
+                alert('Error generating questions: ' + error.message + '\n\nPlease check:\n1. LLM API is running\n2. LLM API URL is correct in plugin settings\n3. Browser console for details');
+                document.getElementById('session-status').style.display = 'block';
+                document.getElementById('session-status').textContent = 'Error: ' + error.message;
+                document.getElementById('session-status').style.background = '#f8d7da';
+                document.getElementById('session-status').style.borderColor = '#dc3545';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate Questions';
             }
         });
 
         // Start session
         document.getElementById('start-session-btn').addEventListener('click', () => {
-            socket.emit('teacher:create_session', {});
+            if (questions.length === 0) {
+                alert('Please generate questions first!');
+                return;
+            }
+            if (!socket || !socket.connected) {
+                alert('WebSocket not connected. Please check your connection and refresh the page.');
+                return;
+            }
+            socket.emit('teacher:create_session', {
+                session_id: config.sessionId,
+                quiz_id: config.quizId
+            });
             document.getElementById('start-session-btn').disabled = true;
             document.getElementById('end-session-btn').disabled = false;
+            document.getElementById('next-question-btn').disabled = false;
             currentQuestionIndex = 0;
-            pushNextQuestion();
+            document.getElementById('session-status').style.display = 'block';
+            document.getElementById('session-status').textContent = 'Session started! Students can now join.';
+            document.getElementById('session-status').style.background = '#d1ecf1';
+            document.getElementById('session-status').style.borderColor = '#0c5460';
         });
 
         // End session
@@ -94,58 +188,125 @@
             socket.emit('teacher:end_session');
         });
 
+        // Next question button
+        document.getElementById('next-question-btn').addEventListener('click', () => {
+            pushNextQuestion();
+        });
+
         // Push question
         function pushNextQuestion() {
+            if (!socket || !socket.connected) {
+                alert('WebSocket not connected. Cannot push question.');
+                return;
+            }
             if (currentQuestionIndex >= questions.length) {
-                alert('No more questions');
+                alert('No more questions! Ending session.');
+                socket.emit('teacher:end_session');
                 return;
             }
 
             const question = questions[currentQuestionIndex];
-            socket.emit('teacher:push_question', {
+            const questionData = {
                 question: {
                     id: 'q' + (currentQuestionIndex + 1),
-                    text: question.question,
-                    choices: question.choices.map(c => c.text),
+                    text: question.question || question.question_text,
+                    choices: Array.isArray(question.choices) 
+                        ? question.choices.map(c => typeof c === 'string' ? c : c.text)
+                        : JSON.parse(question.choices || '[]').map(c => typeof c === 'string' ? c : c.text),
                     correct_index: question.correct_index
                 },
                 timer: 60,
                 questionNumber: currentQuestionIndex + 1
-            });
+            };
+            
+            socket.emit('teacher:push_question', questionData);
+            
+            // Display current question
+            document.getElementById('current-question-display').style.display = 'block';
+            document.getElementById('current-question-text').innerHTML = `
+                <strong>Question ${currentQuestionIndex + 1} of ${questions.length}</strong><br>
+                ${questionData.question.text}
+            `;
+            
             currentQuestionIndex++;
+            if (currentQuestionIndex >= questions.length) {
+                document.getElementById('next-question-btn').textContent = 'End Session';
+            }
         }
 
         // Display questions
         function displayQuestions(qs) {
             const container = document.getElementById('questions-container');
-            container.innerHTML = qs.map((q, i) => `
-                <div class="question-preview">
-                    <h4>Question ${i + 1}</h4>
-                    <p>${q.question}</p>
-                    <ul>
-                        ${q.choices.map((c, idx) => `
-                            <li class="${c.is_correct ? 'correct' : ''}">${c.text}</li>
-                        `).join('')}
-                    </ul>
-                </div>
-            `).join('');
+            container.innerHTML = '<h3>Generated Questions Preview</h3>' + qs.map((q, i) => {
+                const choices = Array.isArray(q.choices) 
+                    ? q.choices.map(c => typeof c === 'string' ? {text: c, is_correct: false} : c)
+                    : JSON.parse(q.choices || '[]').map(c => typeof c === 'string' ? {text: c, is_correct: false} : c);
+                
+                // Mark correct answer
+                if (q.correct_index !== undefined && choices[q.correct_index]) {
+                    choices[q.correct_index].is_correct = true;
+                }
+                
+                return `
+                    <div class="question-preview">
+                        <h4>Question ${i + 1}</h4>
+                        <p>${q.question || q.question_text}</p>
+                        <ul>
+                            ${choices.map((c, idx) => `
+                                <li class="${c.is_correct ? 'correct' : ''}">
+                                    ${idx === q.correct_index ? '✓ ' : ''}${typeof c === 'string' ? c : c.text}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Listen for session events
         socket.on('session:created', (data) => {
-            document.getElementById('session-status').textContent = 'Session active';
+            document.getElementById('session-status').textContent = 'Session active - Students can join';
+            document.getElementById('session-status').style.background = '#d1ecf1';
         });
 
         socket.on('session:ended', (data) => {
             document.getElementById('session-status').textContent = 'Session ended';
+            document.getElementById('session-status').style.background = '#f8d7da';
             document.getElementById('end-session-btn').disabled = true;
+            document.getElementById('next-question-btn').disabled = true;
+            document.getElementById('current-question-display').style.display = 'none';
         });
+
+        // Listen for leaderboard updates
+        socket.on('leaderboard:update', (data) => {
+            updateLeaderboard(data.leaderboard || []);
+        });
+
+        function updateLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboard-container');
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
+                return;
+            }
+            container.innerHTML = `
+                <h3>Leaderboard</h3>
+                <ol>
+                    ${leaderboard.map((entry, index) => `
+                        <li>
+                            <strong>${entry.username || 'User ' + entry.userId}</strong>: 
+                            ${entry.score || 0} points
+                            ${index < 3 ? ' 🏆' : ''}
+                        </li>
+                    `).join('')}
+                </ol>
+            `;
+        }
     }
 
     /**
      * Student Application
      */
-    function initStudentApp() {
+    function initStudentApp(config, socket) {
         const container = document.getElementById('gamifiedquiz-student-app');
         if (!container) return;
 
@@ -171,10 +332,13 @@
         socket.on('question:new', (data) => {
             currentQuestion = data.question;
             selectedAnswer = null;
-            displayQuestion(data.question, data.timer);
+            const questionNumber = data.questionNumber || 1;
+            document.getElementById('question-number').textContent = `Question ${questionNumber}`;
+            displayQuestion(data.question, data.timer || 60);
             document.getElementById('waiting-message').style.display = 'none';
             document.getElementById('question-container').style.display = 'block';
             document.getElementById('result-container').style.display = 'none';
+            document.getElementById('submit-btn').disabled = true;
         });
 
         // Display question
@@ -182,29 +346,41 @@
             document.getElementById('question-text').textContent = question.text;
             
             const choicesContainer = document.getElementById('choices');
-            choicesContainer.innerHTML = question.choices.map((choice, index) => `
-                <label class="choice-option">
+            const choices = Array.isArray(question.choices) ? question.choices : [];
+            choicesContainer.innerHTML = choices.map((choice, index) => `
+                <label class="choice-option" data-index="${index}">
                     <input type="radio" name="answer" value="${index}">
-                    ${choice}
+                    ${typeof choice === 'string' ? choice : choice.text || choice}
                 </label>
             `).join('');
 
             // Handle choice selection
-            choicesContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    selectedAnswer = parseInt(e.target.value);
+            choicesContainer.querySelectorAll('label.choice-option').forEach(label => {
+                label.addEventListener('click', (e) => {
+                    // Remove previous selection
+                    choicesContainer.querySelectorAll('label.choice-option').forEach(l => {
+                        l.classList.remove('selected');
+                    });
+                    // Select this one
+                    label.classList.add('selected');
+                    const radio = label.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    selectedAnswer = parseInt(radio.value);
                     document.getElementById('submit-btn').disabled = false;
                 });
             });
 
             // Start timer
-            let remaining = timer;
-            document.getElementById('timer').textContent = `Time: ${remaining}s`;
+            let remaining = timer || 60;
+            document.getElementById('timer').textContent = `Time remaining: ${remaining}s`;
             
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 remaining--;
-                document.getElementById('timer').textContent = `Time: ${remaining}s`;
+                document.getElementById('timer').textContent = `Time remaining: ${remaining}s`;
+                if (remaining <= 10) {
+                    document.getElementById('timer').style.color = '#dc3545';
+                }
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
                     submitAnswer();
@@ -214,14 +390,22 @@
 
         // Submit answer
         function submitAnswer() {
+            if (!socket || !socket.connected) {
+                alert('WebSocket not connected. Cannot submit answer.');
+                return;
+            }
             if (selectedAnswer === null) {
                 selectedAnswer = -1; // No answer selected
             }
+            
+            const timerText = document.getElementById('timer').textContent;
+            const timeMatch = timerText.match(/\d+/);
+            const timeSpent = timeMatch ? 60 - parseInt(timeMatch[0]) : 0;
 
             socket.emit('student:submit_answer', {
                 questionId: currentQuestion.id,
                 answerIndex: selectedAnswer,
-                timeSpent: 60 - parseInt(document.getElementById('timer').textContent.match(/\d+/)[0])
+                timeSpent: timeSpent
             });
 
             document.getElementById('submit-btn').disabled = true;
@@ -244,11 +428,20 @@
         // Listen for leaderboard updates
         socket.on('leaderboard:update', (data) => {
             const container = document.getElementById('leaderboard-container');
+            const leaderboard = data.leaderboard || [];
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
+                return;
+            }
             container.innerHTML = `
                 <h3>Leaderboard</h3>
                 <ol>
-                    ${data.leaderboard.map(entry => `
-                        <li>User ${entry.userId}: ${entry.score} points</li>
+                    ${leaderboard.map((entry, index) => `
+                        <li>
+                            <strong>${entry.username || 'User ' + entry.userId}</strong>: 
+                            ${entry.score || 0} points
+                            ${index < 3 ? ' 🏆' : ''}
+                        </li>
                     `).join('')}
                 </ol>
             `;
@@ -259,6 +452,13 @@
             document.getElementById('waiting-message').textContent = 'Quiz session ended';
             document.getElementById('question-container').style.display = 'none';
         });
+    }
+    
+    // Start initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
     }
 })();
 
