@@ -55,7 +55,17 @@ def generate_with_openai(topic: str, level: str, n_questions: int, language: str
     """Generate questions using OpenAI API"""
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        
+        # Initialize client
+        # Note: If using a proxy service, you may need to set base_url
+        # For standard OpenAI keys (starting with sk-), use default initialization
+        if OPENAI_API_KEY.startswith('sk-'):
+            # Standard OpenAI API key
+            client = OpenAI(api_key=OPENAI_API_KEY)
+        else:
+            # Non-standard key format - might be proxy service
+            # Try with default initialization first
+            client = OpenAI(api_key=OPENAI_API_KEY)
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
 

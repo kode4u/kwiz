@@ -65,7 +65,18 @@ try {
         $gamifiedquiz->language
     );
 
-    if ($questions === false || empty($questions)) {
+    // Check if result contains an error
+    if (is_array($questions) && isset($questions['error'])) {
+        http_response_code(500);
+        echo json_encode(array(
+            'success' => false,
+            'error' => $questions['error'],
+            'api_url' => $api_url
+        ));
+        exit;
+    }
+    
+    if ($questions === false || empty($questions) || !is_array($questions)) {
         http_response_code(500);
         $error_msg = 'Failed to generate questions. ';
         $error_msg .= 'Please check:\n';

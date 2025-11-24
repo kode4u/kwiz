@@ -50,8 +50,12 @@ const sessions = new Map();
  */
 function verifyToken(token) {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return decoded;
   } catch (err) {
+    console.error('JWT verification error:', err.message);
+    console.error('Token (first 50 chars):', token ? token.substring(0, 50) : 'null');
+    console.error('JWT_SECRET (first 20 chars):', JWT_SECRET ? JWT_SECRET.substring(0, 20) : 'null');
     return null;
   }
 }
@@ -107,14 +111,18 @@ io.use((socket, next) => {
   const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
   
   if (!token) {
+    console.error('No token provided in handshake');
     return next(new Error('Authentication error: No token provided'));
   }
   
+  console.log('Verifying token, JWT_SECRET length:', JWT_SECRET ? JWT_SECRET.length : 0);
   const decoded = verifyToken(token);
   if (!decoded) {
+    console.error('Token verification failed');
     return next(new Error('Authentication error: Invalid token'));
   }
   
+  console.log('Token verified successfully:', { userId: decoded.user_id, role: decoded.role, sessionId: decoded.session_id });
   socket.userId = decoded.user_id;
   socket.role = decoded.role;
   socket.sessionId = decoded.session_id;

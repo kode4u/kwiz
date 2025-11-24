@@ -88,7 +88,7 @@ function gamifiedquiz_delete_instance($id) {
 function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
     $secret = get_config('mod_gamifiedquiz', 'jwt_secret');
     if (empty($secret)) {
-        $secret = 'change-me-in-production';
+        $secret = 'change-me-in-production-use-strong-random-key';
     }
 
     $payload = array(
@@ -167,7 +167,7 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log("Gamified Quiz: JSON decode error: " . json_last_error_msg());
             error_log("Gamified Quiz: Response: " . substr($response, 0, 500));
-            return false;
+            return array('error' => 'Invalid JSON response from LLM API');
         }
         
         // Handle both response formats
@@ -175,14 +175,21 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
             return $result['questions'];
         } elseif (isset($result['error'])) {
             error_log("Gamified Quiz API error: " . $result['error']);
-            return false;
+            return array('error' => $result['error']);
         } else {
             error_log("Gamified Quiz: Unexpected response format: " . print_r($result, true));
-            return false;
+            return array('error' => 'Unexpected response format from LLM API');
         }
     } else {
-        error_log("Gamified Quiz: HTTP error " . $http_code . ": " . substr($response, 0, 500));
-        return false;
+        $error_msg = "HTTP error " . $http_code;
+        $error_data = json_decode($response, true);
+        if (isset($error_data['error'])) {
+            $error_msg .= ": " . $error_data['error'];
+        } else {
+            $error_msg .= ": " . substr($response, 0, 200);
+        }
+        error_log("Gamified Quiz: " . $error_msg);
+        return array('error' => $error_msg);
     }
 }
 

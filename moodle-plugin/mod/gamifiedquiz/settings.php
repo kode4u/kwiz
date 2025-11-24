@@ -35,7 +35,7 @@ if ($hassiteconfig) {
         'mod_gamifiedquiz/jwt_secret',
         get_string('jwt_secret', 'mod_gamifiedquiz'),
         get_string('jwt_secret_desc', 'mod_gamifiedquiz'),
-        'change-me-in-production',
+        'change-me-in-production-use-strong-random-key',
         PARAM_TEXT
     ));
 }
