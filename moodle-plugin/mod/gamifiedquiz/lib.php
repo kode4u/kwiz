@@ -1,0 +1,149 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Returns the information on whether the module supports a feature
+ *
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed true if the feature is supported, null if unknown
+ */
+function gamifiedquiz_supports($feature) {
+    switch($feature) {
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        default:
+            return null;
+    }
+}
+
+/**
+ * Saves a new instance of the gamifiedquiz into the database
+ *
+ * @param stdClass $gamifiedquiz An object from the form in mod_form.php
+ * @param mod_gamifiedquiz_mod_form $mform
+ * @return int id of newly inserted record
+ */
+function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
+    global $DB;
+
+    $gamifiedquiz->timecreated = time();
+    $gamifiedquiz->timemodified = $gamifiedquiz->timecreated;
+
+    $id = $DB->insert_record('gamifiedquiz', $gamifiedquiz);
+    return $id;
+}
+
+/**
+ * Updates an instance of the gamifiedquiz in the database
+ *
+ * @param stdClass $gamifiedquiz An object from the form in mod_form.php
+ * @param mod_gamifiedquiz_mod_form $mform
+ * @return boolean Success/Fail
+ */
+function gamifiedquiz_update_instance($gamifiedquiz, $mform = null) {
+    global $DB;
+
+    $gamifiedquiz->timemodified = time();
+    $gamifiedquiz->id = $gamifiedquiz->instance;
+
+    return $DB->update_record('gamifiedquiz', $gamifiedquiz);
+}
+
+/**
+ * Removes an instance of the gamifiedquiz from the database
+ *
+ * @param int $id Id of the module instance
+ * @return boolean Success/Fail
+ */
+function gamifiedquiz_delete_instance($id) {
+    global $DB;
+
+    if (!$gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $id))) {
+        return false;
+    }
+
+    $DB->delete_records('gamifiedquiz', array('id' => $gamifiedquiz->id));
+    return true;
+}
+
+/**
+ * Generate JWT token for WebSocket authentication
+ *
+ * @param int $userid User ID
+ * @param int $sessionid Session ID
+ * @param string $role 'teacher' or 'student'
+ * @return string JWT token
+ */
+function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
+    $secret = get_config('mod_gamifiedquiz', 'jwt_secret');
+    if (empty($secret)) {
+        $secret = 'default-secret-change-me';
+    }
+
+    $payload = array(
+        'user_id' => $userid,
+        'session_id' => $sessionid,
+        'role' => $role,
+        'exp' => time() + 3600 // 1 hour
+    );
+
+    // Simple JWT encoding (in production, use a proper JWT library)
+    $header = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
+    $payload_encoded = base64_encode(json_encode($payload));
+    $signature = hash_hmac('sha256', "$header.$payload_encoded", $secret, true);
+    $signature_encoded = base64_encode($signature);
+
+    return "$header.$payload_encoded.$signature_encoded";
+}
+
+/**
+ * Call LLM API to generate questions
+ *
+ * @param string $topic Topic for questions
+ * @param string $level Difficulty level
+ * @param int $n_questions Number of questions
+ * @param string $language Language code
+ * @return array|false Generated questions or false on error
+ */
+function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en') {
+    $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
+    if (empty($api_url)) {
+        $api_url = 'http://localhost:5000';
+    }
+
+    $data = array(
+        'topic' => $topic,
+        'level' => $level,
+        'n_questions' => $n_questions,
+        'language' => $language
+    );
+
+    $ch = curl_init($api_url . '/generate');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_code === 200) {
+        $result = json_decode($response, true);
+        return $result['questions'] ?? false;
+    }
+
+    return false;
+}
+

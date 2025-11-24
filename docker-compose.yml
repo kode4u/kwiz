@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # MySQL Database for Moodle
+  db:
+    image: mysql:8.0
+    container_name: jica-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-moodle}
+      MYSQL_USER: ${MYSQL_USER:-moodle}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - jica-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: jica-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - jica-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # LLM API Service
+  llmapi:
+    build:
+      context: ./llmapi
+      dockerfile: Dockerfile
+    container_name: jica-llmapi
+    environment:
+      FLASK_PORT: ${LLM_API_PORT:-5000}
+      LLM_BACKEND: ${LLM_BACKEND:-openai}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      MAX_QUESTIONS: 10
+      DEFAULT_LANGUAGE: en
+    ports:
+      - "${LLM_API_PORT:-5000}:5000"
+    networks:
+      - jica-network
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # WebSocket Server
+  websocket-server:
+    build:
+      context: ./websocket-server
+      dockerfile: Dockerfile
+    container_name: jica-websocket
+    environment:
+      PORT: ${WS_PORT:-3001}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      NODE_ENV: production
+    ports:
+      - "${WS_PORT:-3001}:3001"
+    networks:
+      - jica-network
+    depends_on:
+      redis:
+        condition: service_healthy
+      llmapi:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Moodle with Plugin
+  moodle:
+    image: bitnami/moodle:4
+    container_name: jica-moodle
+    environment:
+      MOODLE_DATABASE_HOST: db
+      MOODLE_DATABASE_PORT_NUMBER: 3306
+      MOODLE_DATABASE_USER: ${MYSQL_USER:-moodle}
+      MOODLE_DATABASE_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
+      MOODLE_DATABASE_NAME: ${MYSQL_DATABASE:-moodle}
+      MOODLE_HOST: ${MOODLE_URL:-http://localhost:8080}
+      MOODLE_USERNAME: ${MOODLE_ADMIN_USER:-admin}
+      MOODLE_PASSWORD: ${MOODLE_ADMIN_PASS:-Admin@123}
+      MOODLE_EMAIL: ${MOODLE_ADMIN_EMAIL:-admin@example.com}
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - moodle_data:/bitnami/moodle
+      - ./moodle-plugin/mod/gamifiedquiz:/bitnami/moodle/moodle/mod/gamifiedquiz
+    networks:
+      - jica-network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  mysql_data:
+  redis_data:
+  moodle_data:
+
+networks:
+  jica-network:
+    driver: bridge
+
