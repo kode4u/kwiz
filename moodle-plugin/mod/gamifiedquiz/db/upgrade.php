@@ -17,32 +17,17 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Sync JWT secret from .env file to Moodle config
+ * Sync JWT secret from docker/.env file to Moodle config
+ * Uses docker/.env as the single source of truth
  */
 function mod_gamifiedquiz_sync_jwt_secret() {
     global $CFG;
     
-    // Try to read JWT_SECRET from .env file
+    // Try to read JWT_SECRET from docker/.env file (single source of truth)
     $env_secret = null;
     
-    // Try environment variable first
+    // Try environment variable first (set by Docker)
     $env_secret = getenv('JWT_SECRET');
-    
-    // Try root .env file
-    if (empty($env_secret)) {
-        $env_file = $CFG->dirroot . '/../.env';
-        if (file_exists($env_file)) {
-            $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (strpos($line, '#') === 0) continue; // Skip comments
-                if (strpos($line, 'JWT_SECRET=') === 0) {
-                    $env_secret = trim(substr($line, strlen('JWT_SECRET=')));
-                    break;
-                }
-            }
-        }
-    }
     
     // Try docker/.env file
     if (empty($env_secret)) {
@@ -78,14 +63,14 @@ function mod_gamifiedquiz_sync_jwt_secret() {
  * This runs automatically when plugin is installed
  */
 function xmldb_gamifiedquiz_install() {
-    // Sync JWT secret from .env on installation
+    // Sync JWT secret from docker/.env on installation
     mod_gamifiedquiz_sync_jwt_secret();
     return true;
 }
 
 /**
  * Upgrade hook - runs on every plugin upgrade
- * This ensures JWT secret stays in sync with .env file
+ * This ensures JWT secret stays in sync with docker/.env file
  * 
  * @param int $oldversion The old version number
  * @return bool True on success
@@ -95,7 +80,7 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
     
     $dbman = $DB->get_manager();
     
-    // Sync JWT secret from .env on every upgrade
+    // Sync JWT secret from docker/.env on every upgrade
     mod_gamifiedquiz_sync_jwt_secret();
     
     // Return true to indicate upgrade was successful

@@ -9,7 +9,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Auto-sync JWT secret from .env file on first load
+ * Auto-sync JWT secret from docker/.env file on first load
+ * Uses docker/.env as the single source of truth
  * This ensures the secret is always in sync
  */
 function mod_gamifiedquiz_auto_sync_jwt_secret() {
@@ -23,33 +24,17 @@ function mod_gamifiedquiz_auto_sync_jwt_secret() {
     if (empty($current_secret) || $current_secret === 'change-me-in-production' || $current_secret === $default_secret) {
         $env_secret = null;
         
-        // Try environment variable first
+        // Try environment variable first (set by Docker)
         $env_secret = getenv('JWT_SECRET');
         
-        // Try root .env file
-        if (empty($env_secret)) {
-            $env_file = $CFG->dirroot . '/../.env';
-            if (file_exists($env_file)) {
-                $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (strpos($line, '#') === 0) continue;
-                    if (strpos($line, 'JWT_SECRET=') === 0) {
-                        $env_secret = trim(substr($line, strlen('JWT_SECRET=')));
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // Try docker/.env file
+        // Try docker/.env file (single source of truth)
         if (empty($env_secret)) {
             $env_file = $CFG->dirroot . '/../docker/.env';
             if (file_exists($env_file)) {
                 $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                 foreach ($lines as $line) {
                     $line = trim($line);
-                    if (strpos($line, '#') === 0) continue;
+                    if (strpos($line, '#') === 0) continue; // Skip comments
                     if (strpos($line, 'JWT_SECRET=') === 0) {
                         $env_secret = trim(substr($line, strlen('JWT_SECRET=')));
                         break;

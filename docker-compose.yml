@@ -1,3 +1,6 @@
+# Docker Compose configuration
+# Uses docker/.env as the single source for all environment variables
+
 services:
   # MySQL Database for Moodle
   db:
