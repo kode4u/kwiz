@@ -124,7 +124,17 @@ function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
 function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en') {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
-        $api_url = 'http://localhost:5000';
+        // Default: use Docker service name when running in Docker, localhost otherwise
+        $api_url = 'http://llmapi:5000';
+    }
+    
+    // If URL contains localhost and we're in Docker, try to use service name
+    // This handles cases where user sets localhost in settings
+    if (strpos($api_url, 'localhost') !== false || strpos($api_url, '127.0.0.1') !== false) {
+        // Try Docker service name first
+        $docker_url = str_replace(['localhost', '127.0.0.1'], 'llmapi', $api_url);
+        // Fallback to original if Docker URL doesn't work
+        $api_url = $docker_url;
     }
 
     $data = array(

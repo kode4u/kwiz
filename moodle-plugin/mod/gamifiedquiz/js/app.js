@@ -91,29 +91,33 @@
      * Teacher Application
      */
     function initTeacherApp(config, socket) {
-        const container = document.getElementById('gamifiedquiz-teacher-app');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="gamifiedquiz-teacher">
-                <div class="controls">
-                    <button id="generate-questions-btn" class="btn btn-primary">Generate Questions</button>
-                    <button id="start-session-btn" class="btn btn-success" disabled>Start Session</button>
-                    <button id="end-session-btn" class="btn btn-danger" disabled>End Session</button>
-                </div>
-                <div id="questions-container" class="questions-container"></div>
-                <div id="session-status" class="session-status"></div>
-            </div>
-        `;
+        // Don't overwrite HTML - buttons are already in view.php
+        // Just attach event listeners to existing elements
+        
+        const generateBtn = document.getElementById('generate-questions-btn');
+        const startBtn = document.getElementById('start-session-btn');
+        const endBtn = document.getElementById('end-session-btn');
+        const nextBtn = document.getElementById('next-question-btn');
+        
+        if (!generateBtn) {
+            console.error('Generate questions button not found!');
+            return;
+        }
 
         let questions = [];
         let currentQuestionIndex = 0;
 
         // Generate questions
-        document.getElementById('generate-questions-btn').addEventListener('click', async () => {
+        generateBtn.addEventListener('click', async () => {
+            console.log('Generate Questions button clicked!');
             const btn = document.getElementById('generate-questions-btn');
+            if (!btn) {
+                console.error('Button not found after click!');
+                return;
+            }
             btn.disabled = true;
             btn.textContent = 'Generating...';
+            console.log('Starting question generation...');
             
             try {
                 const wwwroot = config.wwwroot || (typeof M !== 'undefined' && M.cfg && M.cfg.wwwroot) || '';
@@ -126,31 +130,65 @@
                     body: 'quizid=' + config.quizId + '&cmid=' + config.cmId + '&sesskey=' + sesskey
                 });
                 
+                let responseText = '';
+                let data;
+                
+                // Get response text first
+                responseText = await response.text();
+                console.log('Generate questions raw response (status ' + response.status + '):', responseText);
+                
                 if (!response.ok) {
-                    throw new Error('HTTP error! status: ' + response.status);
+                    // Try to parse error response
+                    let errorMessage = 'HTTP error! status: ' + response.status;
+                    try {
+                        if (responseText) {
+                            data = JSON.parse(responseText);
+                            if (data.error) {
+                                errorMessage = data.error;
+                                console.error('Server error details:', data);
+                            }
+                        }
+                    } catch (parseErr) {
+                        console.error('Failed to parse error response:', parseErr);
+                        if (responseText) {
+                            errorMessage += '. Response: ' + responseText.substring(0, 500);
+                        }
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                let data;
                 try {
-                    const text = await response.text();
-                    console.log('Generate questions raw response:', text);
-                    data = JSON.parse(text);
+                    
+                    if (!responseText || responseText.trim() === '') {
+                        throw new Error('Empty response from server');
+                    }
+                    
+                    data = JSON.parse(responseText);
                 } catch (parseError) {
                     console.error('Failed to parse JSON response:', parseError);
-                    throw new Error('Invalid response from server. Check browser console for details.');
+                    console.error('Response text was:', responseText);
+                    throw new Error('Invalid response from server: ' + parseError.message + '. Response: ' + responseText.substring(0, 200));
                 }
                 
                 console.log('Generate questions parsed response:', data);
+                
+                // If there's an error in the response, show it
+                if (data.error) {
+                    console.error('Server error details:', data);
+                }
                 
                 if (data.success && data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
                     questions = data.questions;
                     console.log('Questions received:', questions);
                     displayQuestions(questions);
-                    document.getElementById('start-session-btn').disabled = false;
-                    document.getElementById('session-status').style.display = 'block';
-                    document.getElementById('session-status').textContent = 'Questions generated successfully! (' + (data.count || questions.length) + ' questions) Ready to start session.';
-                    document.getElementById('session-status').style.background = '#d4edda';
-                    document.getElementById('session-status').style.borderColor = '#28a745';
+                    if (startBtn) startBtn.disabled = false;
+                    const statusEl = document.getElementById('session-status');
+                    if (statusEl) {
+                        statusEl.style.display = 'block';
+                        statusEl.textContent = 'Questions generated successfully! (' + (data.count || questions.length) + ' questions) Ready to start session.';
+                        statusEl.style.background = '#d4edda';
+                        statusEl.style.borderColor = '#28a745';
+                    }
                 } else {
                     const errorMsg = data.error || 'Failed to generate questions. Please check LLM API configuration.';
                     console.error('Generate questions error:', data);
@@ -162,10 +200,13 @@
             } catch (error) {
                 console.error('Error generating questions:', error);
                 alert('Error generating questions: ' + error.message + '\n\nPlease check:\n1. LLM API is running\n2. LLM API URL is correct in plugin settings\n3. Browser console for details');
-                document.getElementById('session-status').style.display = 'block';
-                document.getElementById('session-status').textContent = 'Error: ' + error.message;
-                document.getElementById('session-status').style.background = '#f8d7da';
-                document.getElementById('session-status').style.borderColor = '#dc3545';
+                const statusEl = document.getElementById('session-status');
+                if (statusEl) {
+                    statusEl.style.display = 'block';
+                    statusEl.textContent = 'Error: ' + error.message;
+                    statusEl.style.background = '#f8d7da';
+                    statusEl.style.borderColor = '#dc3545';
+                }
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Generate Questions';
@@ -173,7 +214,7 @@
         });
 
         // Start session
-        document.getElementById('start-session-btn').addEventListener('click', () => {
+        startBtn.addEventListener('click', () => {
             if (questions.length === 0) {
                 alert('Please generate questions first!');
                 return;
@@ -186,25 +227,32 @@
                 session_id: config.sessionId,
                 quiz_id: config.quizId
             });
-            document.getElementById('start-session-btn').disabled = true;
-            document.getElementById('end-session-btn').disabled = false;
-            document.getElementById('next-question-btn').disabled = false;
+            if (startBtn) startBtn.disabled = true;
+            if (endBtn) endBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
             currentQuestionIndex = 0;
-            document.getElementById('session-status').style.display = 'block';
-            document.getElementById('session-status').textContent = 'Session started! Students can now join.';
-            document.getElementById('session-status').style.background = '#d1ecf1';
-            document.getElementById('session-status').style.borderColor = '#0c5460';
+            const statusEl = document.getElementById('session-status');
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.textContent = 'Session started! Students can now join.';
+                statusEl.style.background = '#d1ecf1';
+                statusEl.style.borderColor = '#0c5460';
+            }
         });
 
         // End session
-        document.getElementById('end-session-btn').addEventListener('click', () => {
-            socket.emit('teacher:end_session');
-        });
+        if (endBtn) {
+            endBtn.addEventListener('click', () => {
+                socket.emit('teacher:end_session');
+            });
+        }
 
         // Next question button
-        document.getElementById('next-question-btn').addEventListener('click', () => {
-            pushNextQuestion();
-        });
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                pushNextQuestion();
+            });
+        }
 
         // Push question
         function pushNextQuestion() {
@@ -242,8 +290,8 @@
             `;
             
             currentQuestionIndex++;
-            if (currentQuestionIndex >= questions.length) {
-                document.getElementById('next-question-btn').textContent = 'End Session';
+            if (currentQuestionIndex >= questions.length && nextBtn) {
+                nextBtn.textContent = 'End Session';
             }
         }
 
@@ -314,16 +362,23 @@
 
         // Listen for session events
         socket.on('session:created', (data) => {
-            document.getElementById('session-status').textContent = 'Session active - Students can join';
-            document.getElementById('session-status').style.background = '#d1ecf1';
+            const statusEl = document.getElementById('session-status');
+            if (statusEl) {
+                statusEl.textContent = 'Session active - Students can join';
+                statusEl.style.background = '#d1ecf1';
+            }
         });
 
         socket.on('session:ended', (data) => {
-            document.getElementById('session-status').textContent = 'Session ended';
-            document.getElementById('session-status').style.background = '#f8d7da';
-            document.getElementById('end-session-btn').disabled = true;
-            document.getElementById('next-question-btn').disabled = true;
-            document.getElementById('current-question-display').style.display = 'none';
+            const statusEl = document.getElementById('session-status');
+            if (statusEl) {
+                statusEl.textContent = 'Session ended';
+                statusEl.style.background = '#f8d7da';
+            }
+            if (endBtn) endBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = true;
+            const currentQEl = document.getElementById('current-question-display');
+            if (currentQEl) currentQEl.style.display = 'none';
         });
 
         // Listen for leaderboard updates

@@ -25,9 +25,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'mod_gamifiedquiz/llmapi_url',
         get_string('llmapi_url', 'mod_gamifiedquiz'),
-        get_string('llmapi_url_desc', 'mod_gamifiedquiz'),
-        'http://localhost:5000',
-        PARAM_URL
+        get_string('llmapi_url_desc', 'mod_gamifiedquiz') . ' (Use http://llmapi:5000 for Docker, http://localhost:5000 for local)',
+        'http://llmapi:5000',
+        PARAM_TEXT
     ));
 
     // JWT Secret

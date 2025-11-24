@@ -6,8 +6,30 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-require_once('../../../config.php');
-require_once($CFG->dirroot . '/mod/gamifiedquiz/lib.php');
+// Enable error reporting for debugging (remove in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display, but log
+ini_set('log_errors', 1);
+
+// Set JSON header early to ensure proper output
+header('Content-Type: application/json');
+
+try {
+    require_once('../../../config.php');
+    require_once($CFG->dirroot . '/mod/gamifiedquiz/lib.php');
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Failed to load Moodle config: ' . $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine()
+    ));
+    exit;
+}
+
+// Ensure we have database access
+global $DB, $CFG, $USER;
 
 // Get parameters
 $quizid = required_param('quizid', PARAM_INT);
@@ -42,8 +64,6 @@ try {
         5, // Number of questions
         $gamifiedquiz->language
     );
-
-    header('Content-Type: application/json');
 
     if ($questions === false || empty($questions)) {
         http_response_code(500);
@@ -97,9 +117,47 @@ try {
 } catch (Exception $e) {
     http_response_code(500);
     header('Content-Type: application/json');
+    
+    // Log the full error for debugging
+    $error_msg = 'Gamified Quiz AJAX Error: ' . $e->getMessage();
+    $error_msg .= ' in ' . $e->getFile() . ':' . $e->getLine();
+    error_log($error_msg);
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    
+    // Return detailed error (for debugging - remove sensitive info in production)
     echo json_encode(array(
         'success' => false,
-        'error' => 'Error generating questions: ' . $e->getMessage()
+        'error' => 'Error generating questions: ' . $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine(),
+        'trace' => explode("\n", $e->getTraceAsString())
+    ));
+} catch (Error $e) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    
+    $error_msg = 'Gamified Quiz Fatal Error: ' . $e->getMessage();
+    $error_msg .= ' in ' . $e->getFile() . ':' . $e->getLine();
+    error_log($error_msg);
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Fatal error: ' . $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine(),
+        'trace' => explode("\n", $e->getTraceAsString())
+    ));
+} catch (Throwable $e) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    
+    error_log('Gamified Quiz Throwable: ' . $e->getMessage());
+    
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Error: ' . $e->getMessage(),
+        'type' => get_class($e)
     ));
 }
 
