@@ -18,7 +18,7 @@ if ($hassiteconfig) {
         get_string('websocket_url', 'mod_gamifiedquiz'),
         get_string('websocket_url_desc', 'mod_gamifiedquiz'),
         'ws://localhost:3001',
-        PARAM_URL
+        PARAM_TEXT
     ));
 
     // LLM API URL
