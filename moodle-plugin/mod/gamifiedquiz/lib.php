@@ -131,6 +131,8 @@ function gamifiedquiz_delete_instance($id) {
  * @return string JWT token
  */
 function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
+    global $DB;
+    
     // Auto-sync JWT secret from .env file
     $secret = mod_gamifiedquiz_auto_sync_jwt_secret();
     
@@ -139,10 +141,21 @@ function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
         $secret = 'change-me-in-production-use-strong-random-key';
     }
 
+    // Get user's full name
+    $user = $DB->get_record('user', array('id' => $userid), 'firstname, lastname, username');
+    $username = '';
+    if ($user) {
+        $username = trim($user->firstname . ' ' . $user->lastname);
+        if (empty($username)) {
+            $username = $user->username;
+        }
+    }
+
     $payload = array(
         'user_id' => $userid,
         'session_id' => $sessionid,
         'role' => $role,
+        'username' => $username,
         'exp' => time() + 3600 // 1 hour
     );
 

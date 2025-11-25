@@ -1017,16 +1017,22 @@
         }
         
         function displayLeaderboard(leaderboard) {
+            console.log('displayLeaderboard called with:', leaderboard);
             const container = document.getElementById('leaderboard-container');
-            if (!container) return;
+            if (!container) {
+                console.log('Leaderboard container not found');
+                return;
+            }
             
             if (!Array.isArray(leaderboard) || leaderboard.length === 0) {
-                container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
+                container.innerHTML = '<h3>🏆 Current Leaderboard</h3><p>No scores yet.</p>';
                 return;
             }
             
             const topN = config.leaderboardTopN || 5;
             const topPlayers = leaderboard.slice(0, topN);
+            
+            console.log('Displaying top players:', topPlayers);
             
             container.innerHTML = `
                 <h3>🏆 Current Leaderboard</h3>
@@ -1034,6 +1040,7 @@
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                        console.log('Leaderboard entry:', entry);
                         return `
                             <li style="padding: 10px; margin: 8px 0; background: ${rank <= 3 ? '#fff3cd' : '#f8f9fa'}; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-weight: bold;">${medal} ${entry.username || 'User ' + entry.userId}</span>
@@ -1213,16 +1220,14 @@
                 `;
             }).join('');
 
-            // Handle choice selection
+            // Handle choice selection - auto submit when selected, no changes allowed
             choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(choiceEl => {
                 choiceEl.addEventListener('click', (e) => {
-                    // Allow changing selection before submission
-                    // Remove previous selection
-                    choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(el => {
-                        el.style.transform = 'scale(1)';
-                        el.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-                        el.classList.remove('selected');
-                    });
+                    // Check if already submitted
+                    if (selectedAnswer !== null) {
+                        return; // Already selected, can't change
+                    }
+                    
                     // Select this one
                     const index = parseInt(choiceEl.getAttribute('data-index'));
                     const color = kahootColors[index % 4];
@@ -1231,31 +1236,18 @@
                     choiceEl.classList.add('selected');
                     selectedAnswer = index;
                     
-                    // Show submit button or auto-submit after delay
-                    // For now, let's add a submit button that appears after selection
-                    let submitBtn = document.getElementById('student-submit-btn');
-                    if (!submitBtn) {
-                        submitBtn = document.createElement('button');
-                        submitBtn.id = 'student-submit-btn';
-                        submitBtn.textContent = 'Submit Answer';
-                        submitBtn.style.cssText = `
-                            margin-top: 20px; 
-                            padding: 15px 30px; 
-                            background: #007bff; 
-                            color: white; 
-                            border: none; 
-                            border-radius: 8px; 
-                            font-size: 18px; 
-                            font-weight: bold; 
-                            cursor: pointer;
-                            display: block;
-                            margin-left: auto;
-                            margin-right: auto;
-                        `;
-                        submitBtn.addEventListener('click', submitAnswer);
-                        choicesContainer.parentNode.appendChild(submitBtn);
-                    }
-                    submitBtn.style.display = 'block';
+                    // Disable all choices immediately after selection
+                    choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(el => {
+                        el.style.pointerEvents = 'none';
+                        if (el !== choiceEl) {
+                            el.style.opacity = '0.5';
+                        }
+                    });
+                    
+                    // Auto-submit after selection with a short delay
+                    setTimeout(() => {
+                        submitAnswer();
+                    }, 500);
                 });
             });
 
@@ -1341,69 +1333,14 @@
         let previousScore = 0;
         let currentTotalScore = 0;
 
-        // Listen for answer result
+        // Listen for answer result - just update score silently, keep same UI
         socket.on('answer:result', (data) => {
-            document.getElementById('question-container').style.display = 'none';
-            document.getElementById('result-container').style.display = 'block';
-            
-            const isCorrect = data.isCorrect || false;
             const questionScore = data.questionScore || 0;
             currentTotalScore = data.totalScore || currentTotalScore;
-            const scoreChange = currentTotalScore - previousScore;
-            
-            // Build result HTML with comparison
-            let resultHTML = `
-                <div class="result ${isCorrect ? 'correct' : 'incorrect'}" style="padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 20px; background: ${isCorrect ? '#d4edda' : '#f8d7da'}; border: 3px solid ${isCorrect ? '#28a745' : '#dc3545'};">
-                    <div style="font-size: 48px; margin-bottom: 15px;">${isCorrect ? '✓' : '✗'}</div>
-                    <h2 style="margin: 0 0 10px 0; color: ${isCorrect ? '#155724' : '#721c24'};">
-                        ${isCorrect ? 'Correct!' : 'Incorrect'}
-                    </h2>
-                    <div style="font-size: 24px; font-weight: bold; color: ${isCorrect ? '#155724' : '#721c24'}; margin-bottom: 20px;">
-                        +${questionScore} points
-                    </div>
-                </div>
-            `;
-            
-            // Add comparison to previous question
-            if (previousScore > 0 || currentTotalScore > 0) {
-                const comparisonContainer = document.getElementById('question-comparison-container');
-                if (comparisonContainer) {
-                    comparisonContainer.style.display = 'block';
-                    comparisonContainer.innerHTML = `
-                        <h3 style="margin-top: 0;">Score Comparison</h3>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
-                            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; text-align: center;">
-                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Previous Score</div>
-                                <div style="font-size: 28px; font-weight: bold; color: #0056b3;">${previousScore}</div>
-                            </div>
-                            <div style="background: ${scoreChange >= 0 ? '#d4edda' : '#f8d7da'}; padding: 15px; border-radius: 8px; text-align: center;">
-                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Score Change</div>
-                                <div style="font-size: 28px; font-weight: bold; color: ${scoreChange >= 0 ? '#155724' : '#721c24'};">
-                                    ${scoreChange >= 0 ? '+' : ''}${scoreChange}
-                                </div>
-                            </div>
-                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">
-                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Current Total</div>
-                                <div style="font-size: 28px; font-weight: bold; color: #856404;">${currentTotalScore}</div>
-                            </div>
-                        </div>
-                        ${scoreChange > 0 ? `
-                            <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 6px; text-align: center; color: #155724;">
-                                🎉 Great job! You improved by ${scoreChange} points!
-                            </div>
-                        ` : scoreChange === 0 ? `
-                            <div style="margin-top: 15px; padding: 10px; background: #d1ecf1; border-radius: 6px; text-align: center; color: #0c5460;">
-                                Keep going! Your score remains the same.
-                            </div>
-                        ` : ''}
-                    `;
-                }
-            }
-            
-            document.getElementById('result-container').innerHTML = resultHTML;
-            
-            // Update previous score for next comparison
             previousScore = currentTotalScore;
+            
+            // Don't change UI - student stays on the same question view
+            // Just silently update the score for internal tracking
         });
         
         // Listen for final leaderboard

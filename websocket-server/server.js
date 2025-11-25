@@ -72,6 +72,7 @@ async function getSession(sessionId) {
     id: sessionId,
     teacher: null,
     students: new Set(),
+    users: new Map(), // Store user info including usernames
     currentQuestion: null,
     leaderboard: new Map(),
     timer: null,
@@ -91,10 +92,28 @@ async function updateLeaderboard(sessionId, userId, score) {
   
   // Get top 10
   const top = await redisClient.zRangeWithScores(key, 0, 9, { REV: true });
-  return top.map(item => ({
-    userId: item.value,
-    score: item.score
-  }));
+  
+  // Get session to fetch usernames
+  const session = sessions.get(sessionId);
+  
+  return top.map(item => {
+    const userId = parseInt(item.value);
+    let username = `User ${userId}`;
+    
+    // Try to get username from session users
+    if (session && session.users) {
+      const user = session.users.get(userId);
+      if (user && user.username) {
+        username = user.username;
+      }
+    }
+    
+    return {
+      userId: userId,
+      username: username,
+      score: Math.round(item.score)
+    };
+  });
 }
 
 /**
@@ -122,10 +141,11 @@ io.use((socket, next) => {
     return next(new Error('Authentication error: Invalid token'));
   }
   
-  console.log('Token verified successfully:', { userId: decoded.user_id, role: decoded.role, sessionId: decoded.session_id });
+  console.log('Token verified successfully:', { userId: decoded.user_id, role: decoded.role, sessionId: decoded.session_id, username: decoded.username });
   socket.userId = decoded.user_id;
   socket.role = decoded.role;
   socket.sessionId = decoded.session_id;
+  socket.username = decoded.username || `User ${decoded.user_id}`;
   
   next();
 });
@@ -146,6 +166,13 @@ io.on('connection', async (socket) => {
     session.students.add(socket.id);
     await redisClient.sAdd(`session:${socket.sessionId}:students`, socket.userId.toString());
   }
+  
+  // Store user info in session
+  session.users.set(socket.userId, {
+    id: socket.userId,
+    username: socket.username,
+    role: socket.role
+  });
   
   // Emit session joined
   socket.emit('session:joined', {

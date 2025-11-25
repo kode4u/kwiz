@@ -184,7 +184,7 @@ if ($is_teacher) {
     echo '</div>';
     echo '<div id="result-container" class="result-container" style="display:none;"></div>';
     echo '<div id="question-comparison-container" style="display:none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;"></div>';
-    echo '<div id="leaderboard-container" class="leaderboard-container"></div>';
+    // No leaderboard container for students - only teachers see it
     echo '</div>';
     echo '</div>';
 }
