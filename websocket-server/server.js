@@ -203,10 +203,21 @@ io.on('connection', async (socket) => {
     
     session.started = false;
     
-    // Clear any existing leaderboard data for fresh start
-    const key = `session:${socket.sessionId}:leaderboard`;
-    await redisClient.del(key);
-    console.log(`Cleared leaderboard for session ${socket.sessionId}`);
+    // Clear any existing leaderboard data for fresh start (reset scores)
+    const leaderboardKey = `session:${socket.sessionId}:leaderboard`;
+    const answersKey = `session:${socket.sessionId}:answers`;
+    const studentsKey = `session:${socket.sessionId}:students`;
+    
+    await redisClient.del(leaderboardKey);
+    await redisClient.del(answersKey);
+    await redisClient.del(studentsKey);
+    
+    console.log(`Reset all session data for ${socket.sessionId} - scores cleared for new session`);
+    
+    // Reset session data
+    session.questionResponses = [];
+    session.currentQuestion = null;
+    session.questionNumber = 0;
     
     io.to(room).emit('session:created', {
       sessionId: socket.sessionId,
@@ -404,8 +415,20 @@ io.on('connection', async (socket) => {
       };
     }));
     
+    // Save session results to database (emit to Moodle for storage)
+    const sessionData = {
+      sessionId: socket.sessionId,
+      teacherId: socket.userId,
+      participantsCount: finalLeaderboard.length,
+      finalLeaderboard: finalLeaderboard,
+      endedAt: Math.floor(Date.now() / 1000)
+    };
+    
+    console.log('Session ended, saving results:', sessionData);
+    
     io.to(room).emit('session:ended', {
-      finalLeaderboard: finalLeaderboard
+      finalLeaderboard: finalLeaderboard,
+      sessionData: sessionData
     });
     
     // Emit final leaderboard

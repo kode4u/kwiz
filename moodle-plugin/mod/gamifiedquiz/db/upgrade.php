@@ -157,6 +157,43 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010105, 'gamifiedquiz');
     }
     
+    // Add session results storage
+    if ($oldversion < 2025010106) {
+        $table = new xmldb_table('gamifiedquiz_sessions');
+        
+        // Add session_name field
+        $field = new xmldb_field('session_name', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'teacherid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add questions_data field
+        $field = new xmldb_field('questions_data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'session_name');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add participants_count field
+        $field = new xmldb_field('participants_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'questions_data');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add total_questions field
+        $field = new xmldb_field('total_questions', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'participants_count');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add session_results field
+        $field = new xmldb_field('session_results', XMLDB_TYPE_TEXT, null, null, null, null, null, 'total_questions');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010106, 'gamifiedquiz');
+    }
+    
     // Return true to indicate upgrade was successful
     return true;
 }

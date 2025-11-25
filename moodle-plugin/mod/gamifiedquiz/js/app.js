@@ -886,6 +886,11 @@
             if (nextBtn) nextBtn.disabled = true;
             const currentQEl = document.getElementById('current-question-display');
             if (currentQEl) currentQEl.style.display = 'none';
+            
+            // Save session results to database
+            if (data.sessionData) {
+                saveSessionResults(data.sessionData, data.finalLeaderboard);
+            }
         });
 
         // Track previous scores for comparison
@@ -929,9 +934,18 @@
             socket.emit('debug:populate_leaderboard');
         });
         
+        // Add View Past Sessions button
+        const viewSessionsBtn = document.createElement('button');
+        viewSessionsBtn.textContent = 'View Past Sessions';
+        viewSessionsBtn.style.cssText = 'margin: 10px; padding: 5px 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        viewSessionsBtn.addEventListener('click', () => {
+            showSessionsDialog();
+        });
+        
         const controlsDiv = document.querySelector('.controls');
         if (controlsDiv) {
             controlsDiv.appendChild(debugBtn);
+            controlsDiv.appendChild(viewSessionsBtn);
         }
         
         // Listen for final leaderboard
@@ -1444,6 +1458,237 @@
         });
     }
     
+    // Save session start data to database
+    async function saveSessionStartData(sessionStartData) {
+        try {
+            const formData = new FormData();
+            formData.append('quizid', quizId);
+            formData.append('sessionid', sessionStartData.sessionId);
+            formData.append('questionsdata', sessionStartData.questionsData);
+            formData.append('totalquestions', sessionStartData.totalQuestions);
+            formData.append('startedat', sessionStartData.startedAt);
+            
+            const response = await fetch('ajax/save_session.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                console.log('Session start data saved successfully');
+            } else {
+                console.error('Failed to save session start data:', result.error);
+            }
+        } catch (error) {
+            console.error('Error saving session start data:', error);
+        }
+    }
+
+    // Save session results to database
+    async function saveSessionResults(sessionData, leaderboard) {
+        try {
+            const questionsData = JSON.stringify(currentQuestions || []);
+            const sessionResults = JSON.stringify(leaderboard || []);
+            
+            const formData = new FormData();
+            formData.append('quizid', quizId);
+            formData.append('sessionid', sessionData.sessionId);
+            formData.append('questionsdata', questionsData);
+            formData.append('participantscount', sessionData.participantsCount);
+            formData.append('totalquestions', currentQuestions ? currentQuestions.length : 0);
+            formData.append('sessionresults', sessionResults);
+            formData.append('endedat', sessionData.endedAt);
+            
+            const response = await fetch('ajax/save_session.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                console.log('Session results saved successfully');
+            } else {
+                console.error('Failed to save session results:', result.error);
+            }
+        } catch (error) {
+            console.error('Error saving session results:', error);
+        }
+    }
+
+    // Show sessions dialog
+    async function showSessionsDialog() {
+        try {
+            const response = await fetch(`ajax/get_sessions.php?quizid=${quizId}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                displaySessionsDialog(result.sessions);
+            } else {
+                console.error('Failed to load sessions:', result.error);
+                alert('Failed to load session history');
+            }
+        } catch (error) {
+            console.error('Error loading sessions:', error);
+            alert('Error loading session history');
+        }
+    }
+
+    // Display sessions dialog
+    function displaySessionsDialog(sessions) {
+        // Remove existing dialog if any
+        const existingDialog = document.getElementById('sessions-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+        
+        // Create dialog
+        const dialog = document.createElement('div');
+        dialog.id = 'sessions-dialog';
+        dialog.className = 'question-editor-modal';
+        dialog.style.display = 'block';
+        
+        let sessionsHtml = `
+            <div class="question-editor-content" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
+                <span class="sessions-close" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>
+                <h2>Past Quiz Sessions</h2>
+                <div class="sessions-list">
+        `;
+        
+        if (sessions.length === 0) {
+            sessionsHtml += '<p>No past sessions found.</p>';
+        } else {
+            sessionsHtml += `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background-color: #f5f5f5;">
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Session Name</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Teacher</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Participants</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Questions</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Started</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Ended</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            sessions.forEach(session => {
+                const statusBadge = session.started ? 
+                    (session.timeended ? '<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">Completed</span>' : 
+                     '<span style="background: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 12px;">In Progress</span>') :
+                    '<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">Not Started</span>';
+                
+                sessionsHtml += `
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            ${session.session_name}
+                            <br><small style="color: #666;">${statusBadge}</small>
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${session.teacher_name}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${session.participants_count}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${session.total_questions}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${session.created_formatted}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${session.ended_formatted || '-'}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            ${session.session_results && session.session_results.length > 0 ? 
+                              `<button class="btn btn-sm btn-primary" onclick="showSessionResults('${session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;')})">View Results</button>` : 
+                              '<span style="color: #999;">No Results</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            sessionsHtml += '</tbody></table>';
+        }
+        
+        sessionsHtml += `
+                </div>
+            </div>
+        `;
+        
+        dialog.innerHTML = sessionsHtml;
+        document.body.appendChild(dialog);
+        
+        // Add close event listener
+        const closeBtn = dialog.querySelector('.sessions-close');
+        closeBtn.addEventListener('click', () => {
+            dialog.remove();
+        });
+        
+        // Close on outside click
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    // Show session results - make it global so it can be called from onclick
+    window.showSessionResults = function(sessionId, results) {
+        // Remove existing results dialog if any
+        const existingDialog = document.getElementById('session-results-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+        
+        // Create results dialog
+        const dialog = document.createElement('div');
+        dialog.id = 'session-results-dialog';
+        dialog.className = 'question-editor-modal';
+        dialog.style.display = 'block';
+        
+        let resultsHtml = `
+            <div class="question-editor-content" style="max-width: 600px;">
+                <span class="results-close" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>
+                <h2>Session Results</h2>
+                <div class="results-content">
+        `;
+        
+        if (results && results.length > 0) {
+            resultsHtml += `
+                <div class="leaderboard-display" style="margin-top: 20px;">
+                    <h3>Final Leaderboard</h3>
+            `;
+            
+            results.forEach((participant, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                resultsHtml += `
+                    <div style="display: flex; align-items: center; padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 5px; border-left: 4px solid ${index < 3 ? '#ffd700' : '#ddd'};">
+                        <span style="font-size: 1.2em; margin-right: 10px;">${medal}</span>
+                        <span style="flex: 1; font-weight: bold;">${participant.username}</span>
+                        <span style="font-size: 1.1em; color: #007bff; font-weight: bold;">${participant.score}pts</span>
+                    </div>
+                `;
+            });
+            
+            resultsHtml += '</div>';
+        } else {
+            resultsHtml += '<p>No results available for this session.</p>';
+        }
+        
+        resultsHtml += `
+                </div>
+            </div>
+        `;
+        
+        dialog.innerHTML = resultsHtml;
+        document.body.appendChild(dialog);
+        
+        // Add close event listener
+        const closeBtn = dialog.querySelector('.results-close');
+        closeBtn.addEventListener('click', () => {
+            dialog.remove();
+        });
+        
+        // Close on outside click
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    };
+
     // Start initialization
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initApp);
