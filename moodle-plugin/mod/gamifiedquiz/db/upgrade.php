@@ -85,6 +85,44 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
     
     // Add new fields for LLM backend, template, color palette, etc.
     if ($oldversion < 2025010104) {
+        $table = new xmldb_table('gamifiedquiz');
+        
+        // Add llm_backend field if it doesn't exist
+        $field = new xmldb_field('llm_backend', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'openai', 'language');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add template field
+        $field = new xmldb_field('template', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'default', 'llm_backend');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add color_palette field
+        $field = new xmldb_field('color_palette', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'kahoot', 'template');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add use_predefined field
+        $field = new xmldb_field('use_predefined', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'color_palette');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add predefined_data field
+        $field = new xmldb_field('predefined_data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'use_predefined');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add questions_data field
+        $field = new xmldb_field('questions_data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'predefined_data');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
         upgrade_mod_savepoint(true, 2025010104, 'gamifiedquiz');
     }
     
@@ -92,8 +130,20 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
     if ($oldversion < 2025010105) {
         $table = new xmldb_table('gamifiedquiz');
         
+        // Find the last existing field to use as reference
+        $reference_field = 'language'; // Default fallback
+        $possible_fields = ['questions_data', 'predefined_data', 'use_predefined', 'color_palette', 'template', 'llm_backend'];
+        
+        foreach ($possible_fields as $field_name) {
+            $check_field = new xmldb_field($field_name);
+            if ($dbman->field_exists($table, $check_field)) {
+                $reference_field = $field_name;
+                break;
+            }
+        }
+        
         // Add time_limit_per_question field
-        $field = new xmldb_field('time_limit_per_question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '60', 'questions_data');
+        $field = new xmldb_field('time_limit_per_question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '60', $reference_field);
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }

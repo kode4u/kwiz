@@ -1133,7 +1133,10 @@
         function displayQuestion(question, timer) {
             // Handle different question formats
             const questionText = question.text || question.question || question.question_text || '';
-            document.getElementById('question-text').textContent = questionText;
+            const questionTextEl = document.getElementById('question-text');
+            if (questionTextEl) {
+                questionTextEl.textContent = questionText;
+            }
             
             const choicesContainer = document.getElementById('choices');
             if (!choicesContainer) {
@@ -1247,10 +1250,17 @@
                 timeSpent: timeSpent
             });
 
-            document.getElementById('submit-btn').disabled = true;
+            const submitBtn = document.getElementById('submit-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+            }
         }
 
-        document.getElementById('submit-btn').addEventListener('click', submitAnswer);
+        // Add submit button event listener only if it exists
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', submitAnswer);
+        }
 
         // Track student's previous score for comparison
         let previousScore = 0;
