@@ -446,6 +446,7 @@
                 const prompt = document.getElementById('generate-prompt').value.trim();
                 const predefinedData = document.getElementById('generate-data').value.trim();
                 const difficulty = document.getElementById('generate-difficulty').value;
+                const questionCount = document.getElementById('generate-count').value;
                 
                 if (!prompt) {
                     alert('Please enter a prompt/topic for question generation.');
@@ -909,8 +910,29 @@
         // Listen for leaderboard updates
         socket.on('leaderboard:update', (data) => {
             console.log('Leaderboard update received:', data);
-            displayLeaderboard(data.leaderboard || []);
+            console.log('Leaderboard data:', data.leaderboard);
+            if (data.leaderboard && data.leaderboard.length > 0) {
+                displayLeaderboard(data.leaderboard);
+            } else {
+                console.log('No leaderboard data to display');
+                // Show empty leaderboard
+                displayLeaderboard([]);
+            }
         });
+        
+        // Add debug button to populate test leaderboard
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = 'Add Test Users';
+        debugBtn.style.cssText = 'margin: 10px; padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        debugBtn.addEventListener('click', () => {
+            console.log('Adding test users to leaderboard');
+            socket.emit('debug:populate_leaderboard');
+        });
+        
+        const controlsDiv = document.querySelector('.controls');
+        if (controlsDiv) {
+            controlsDiv.appendChild(debugBtn);
+        }
         
         // Listen for final leaderboard
         socket.on('leaderboard:final', (data) => {
@@ -1368,7 +1390,7 @@
                                     <div style="font-size: 24px; font-weight: bold; color: white;">${entry.score || 0} pts</div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: white;">#${rank}</div>
-                            </div>
+                </div>
                         `;
                     }).join('')}
                 </div>

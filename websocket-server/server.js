@@ -90,13 +90,17 @@ async function updateLeaderboard(sessionId, userId, score) {
   const key = `session:${sessionId}:leaderboard`;
   await redisClient.zIncrBy(key, score, userId.toString());
   
-  // Get top 10
-  const top = await redisClient.zRangeWithScores(key, 0, 9, { REV: true });
+  // Get ALL users from leaderboard (not just top 10)
+  const top = await redisClient.zRangeWithScores(key, 0, -1, { REV: true });
   
   // Get session to fetch usernames
   const session = sessions.get(sessionId);
   
-  return top.map(item => {
+  console.log(`updateLeaderboard: sessionId=${sessionId}, userId=${userId}, score=${score}`);
+  console.log(`Redis leaderboard data (ALL users):`, top);
+  console.log(`Session users:`, session ? Array.from(session.users.entries()) : 'No session');
+  
+  const leaderboard = top.map(item => {
     const userId = parseInt(item.value);
     let username = `User ${userId}`;
     
@@ -105,6 +109,9 @@ async function updateLeaderboard(sessionId, userId, score) {
       const user = session.users.get(userId);
       if (user && user.username) {
         username = user.username;
+        console.log(`Found username for user ${userId}: ${username}`);
+      } else {
+        console.log(`No username found for user ${userId}, using default`);
       }
     }
     
@@ -114,6 +121,9 @@ async function updateLeaderboard(sessionId, userId, score) {
       score: Math.round(item.score)
     };
   });
+  
+  console.log(`Final leaderboard being returned:`, leaderboard);
+  return leaderboard;
 }
 
 /**
@@ -151,7 +161,7 @@ io.use((socket, next) => {
 });
 
 io.on('connection', async (socket) => {
-  console.log(`User connected: ${socket.userId} (${socket.role}) in session ${socket.sessionId}`);
+  console.log(`User connected: ${socket.userId} (${socket.role}) "${socket.username}" in session ${socket.sessionId}`);
   
   const session = await getSession(socket.sessionId);
   const room = `session:${socket.sessionId}`;
@@ -162,9 +172,11 @@ io.on('connection', async (socket) => {
   // Register user in session
   if (socket.role === 'teacher') {
     session.teacher = socket.id;
+    console.log(`Teacher registered: ${socket.userId} "${socket.username}"`);
   } else {
     session.students.add(socket.id);
     await redisClient.sAdd(`session:${socket.sessionId}:students`, socket.userId.toString());
+    console.log(`Student registered: ${socket.userId} "${socket.username}"`);
   }
   
   // Store user info in session
@@ -173,6 +185,8 @@ io.on('connection', async (socket) => {
     username: socket.username,
     role: socket.role
   });
+  
+  console.log(`Session users now:`, Array.from(session.users.entries()));
   
   // Emit session joined
   socket.emit('session:joined', {
@@ -188,10 +202,39 @@ io.on('connection', async (socket) => {
     }
     
     session.started = false;
+    
+    // Clear any existing leaderboard data for fresh start
+    const key = `session:${socket.sessionId}:leaderboard`;
+    await redisClient.del(key);
+    console.log(`Cleared leaderboard for session ${socket.sessionId}`);
+    
     io.to(room).emit('session:created', {
       sessionId: socket.sessionId,
       teacherId: socket.userId
     });
+  });
+  
+  // Debug: Add test users to leaderboard (for testing purposes)
+  socket.on('debug:populate_leaderboard', async () => {
+    if (socket.role !== 'teacher') return;
+    
+    const key = `session:${socket.sessionId}:leaderboard`;
+    
+    // Add some test users
+    await redisClient.zAdd(key, { score: 150, value: '1' });
+    await redisClient.zAdd(key, { score: 200, value: '2' });
+    await redisClient.zAdd(key, { score: 100, value: '3' });
+    
+    // Add test users to session
+    session.users.set(1, { id: 1, username: 'Alice Johnson', role: 'student' });
+    session.users.set(2, { id: 2, username: 'Bob Smith', role: 'student' });
+    session.users.set(3, { id: 3, username: 'Charlie Brown', role: 'student' });
+    
+    console.log('Added test users to leaderboard');
+    
+    // Send updated leaderboard
+    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, 0);
+    io.to(room).emit('leaderboard:update', { leaderboard });
   });
   
   // Teacher: Push question
@@ -261,11 +304,15 @@ io.on('connection', async (socket) => {
       return;
     }
     
+    console.log(`Student ${socket.userId} "${socket.username}" submitted answer ${answerIndex}`);
+    
     // Calculate score
     const isCorrect = answerIndex === currentQuestion.correct_index;
     const baseScore = isCorrect ? 100 : 0;
     const timeBonus = timeSpent < 10 ? Math.max(0, 50 - timeSpent * 5) : 0;
     const questionScore = baseScore + timeBonus;
+    
+    console.log(`Score calculation: base=${baseScore}, timeBonus=${timeBonus}, total=${questionScore}`);
     
     // Get current total score
     const currentScore = await redisClient.zScore(
@@ -274,8 +321,11 @@ io.on('connection', async (socket) => {
     ) || 0;
     const totalScore = currentScore + questionScore;
     
+    console.log(`User ${socket.userId} score: current=${currentScore}, new total=${totalScore}`);
+    
     // Update leaderboard
     const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, questionScore);
+    console.log(`Updated leaderboard:`, leaderboard);
     
     // Store answer
     const answerData = {
@@ -314,6 +364,7 @@ io.on('connection', async (socket) => {
     });
     
     // Broadcast updated leaderboard
+    console.log(`Broadcasting leaderboard update to room ${room}:`, leaderboard);
     io.to(room).emit('leaderboard:update', {
       leaderboard: leaderboard,
       questionId: questionId
@@ -369,7 +420,37 @@ io.on('connection', async (socket) => {
   
   // Get current leaderboard
   socket.on('leaderboard:get', async () => {
-    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, 0);
+    console.log(`Manual leaderboard request from user ${socket.userId}`);
+    
+    // Get all users from Redis leaderboard
+    const key = `session:${socket.sessionId}:leaderboard`;
+    const allUsers = await redisClient.zRangeWithScores(key, 0, -1, { REV: true });
+    
+    console.log(`All users in Redis leaderboard:`, allUsers);
+    
+    // Get session to fetch usernames
+    const session = sessions.get(socket.sessionId);
+    console.log(`Session users for leaderboard:`, session ? Array.from(session.users.entries()) : 'No session');
+    
+    const leaderboard = allUsers.map(item => {
+      const userId = parseInt(item.value);
+      let username = `User ${userId}`;
+      
+      if (session && session.users) {
+        const user = session.users.get(userId);
+        if (user && user.username) {
+          username = user.username;
+        }
+      }
+      
+      return {
+        userId: userId,
+        username: username,
+        score: Math.round(item.score)
+      };
+    });
+    
+    console.log(`Sending leaderboard:`, leaderboard);
     socket.emit('leaderboard:update', { leaderboard });
   });
   
