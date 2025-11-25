@@ -207,16 +207,14 @@ io.on('connection', async (socket) => {
         clearInterval(timerInterval);
         io.to(room).emit('question:timeout');
         
-        // Send question results to teacher after timeout
-        setTimeout(async () => {
-          const responses = session.questionResponses || [];
-          io.to(room).emit('question:results', {
-            questionNumber: session.questionNumber,
-            responses: responses,
-            correctCount: responses.filter(r => r.isCorrect).length,
-            totalCount: responses.length
-          });
-        }, 1000);
+        // Send question results to teacher after timeout (immediately)
+        const responses = session.questionResponses || [];
+        io.to(room).emit('question:results', {
+          questionNumber: session.questionNumber,
+          responses: responses,
+          correctCount: responses.filter(r => r.isCorrect).length,
+          totalCount: responses.length
+        });
       }
     }, 1000);
   });

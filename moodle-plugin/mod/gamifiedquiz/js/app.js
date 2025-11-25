@@ -530,6 +530,11 @@
                 statusEl.style.background = '#d1ecf1';
                 statusEl.style.borderColor = '#0c5460';
             }
+            
+            // Automatically push first question when session starts
+            setTimeout(() => {
+                pushNextQuestion();
+            }, 1000); // Small delay to ensure session is created
         });
 
         // End session
@@ -697,19 +702,29 @@
             // Increment index AFTER pushing
             currentQuestionIndex++;
             
-            // Update button state
-            if (currentQuestionIndex >= questions.length) {
-                if (nextBtn) {
+            // Disable next button until timer expires (results will enable it)
+            if (nextBtn) {
+                nextBtn.disabled = true;
+                if (currentQuestionIndex >= questions.length) {
                     nextBtn.textContent = 'End Quiz';
-                    nextBtn.disabled = false;
-                }
-            } else {
-                if (nextBtn) {
+                } else {
                     nextBtn.textContent = 'Next Question';
-                    nextBtn.disabled = false;
                 }
             }
         }
+        
+        // Listen for question timeout to enable next button
+        socket.on('question:timeout', () => {
+            console.log('Question timeout - enabling next button');
+            if (nextBtn) {
+                nextBtn.disabled = false;
+                if (currentQuestionIndex >= questions.length) {
+                    nextBtn.textContent = 'End Quiz';
+                } else {
+                    nextBtn.textContent = 'Next Question';
+                }
+            }
+        });
 
         // Display questions
         function displayQuestions(qs) {
@@ -803,7 +818,17 @@
         
         // Listen for question results
         socket.on('question:results', (data) => {
+            console.log('Question results received:', data);
             displayQuestionResults(data);
+            // Enable next button when results are shown
+            if (nextBtn) {
+                nextBtn.disabled = false;
+                if (currentQuestionIndex >= questions.length) {
+                    nextBtn.textContent = 'End Quiz';
+                } else {
+                    nextBtn.textContent = 'Next Question';
+                }
+            }
         });
         
         // Listen for final leaderboard
