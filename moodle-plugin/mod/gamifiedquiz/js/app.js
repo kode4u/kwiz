@@ -360,6 +360,8 @@
                     questions = edited;
                     displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
+                    // Reset question index
+                    currentQuestionIndex = 0;
                 }
             } catch (e) {
                 console.error('Error parsing questions data:', e);
@@ -464,12 +466,14 @@
                 }
                 
                 if (data.success && data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
-                questions = data.questions;
+                    questions = data.questions;
                     console.log('Questions received:', questions);
                     // Store questions globally for editor
                     window.currentQuestions = questions;
-                displayQuestions(questions);
+                    displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
+                    // Reset question index
+                    currentQuestionIndex = 0;
                     const statusEl = document.getElementById('session-status');
                     if (statusEl) {
                         statusEl.style.display = 'block';
@@ -537,13 +541,24 @@
 
         // Next question button
         if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
+            nextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Next Question button clicked');
                 pushNextQuestion();
             });
+        } else {
+            console.error('Next Question button not found!');
         }
 
         // Push question
         function pushNextQuestion() {
+            console.log('pushNextQuestion called', {
+                socketConnected: socket && socket.connected,
+                currentQuestionIndex,
+                questionsLength: questions.length,
+                questions: questions
+            });
+            
             if (!socket || !socket.connected) {
                 alert('WebSocket not connected. Cannot push question.');
                 return;
@@ -553,57 +568,146 @@
                 socket.emit('teacher:end_session');
                 return;
             }
+            if (!questions || questions.length === 0) {
+                alert('No questions available. Please generate questions first.');
+                return;
+            }
 
             const question = questions[currentQuestionIndex];
+            if (!question) {
+                console.error('Question at index', currentQuestionIndex, 'is undefined');
+                alert('Error: Question not found. Please try again.');
+                return;
+            }
+            
             const timeLimit = config.timeLimitPerQuestion || 60;
+            
+            // Parse choices properly
+            let choicesArray = [];
+            if (Array.isArray(question.choices)) {
+                choicesArray = question.choices.map(c => typeof c === 'string' ? c : (c.text || c));
+            } else if (typeof question.choices === 'string') {
+                try {
+                    const parsed = JSON.parse(question.choices);
+                    choicesArray = Array.isArray(parsed) 
+                        ? parsed.map(c => typeof c === 'string' ? c : (c.text || c))
+                        : [];
+                } catch (e) {
+                    console.error('Error parsing choices:', e);
+                    choicesArray = [];
+                }
+            }
+            
             const questionData = {
                 question: {
                     id: 'q' + (currentQuestionIndex + 1),
-                    text: question.question || question.question_text,
-                    choices: Array.isArray(question.choices) 
-                        ? question.choices.map(c => typeof c === 'string' ? c : c.text)
-                        : JSON.parse(question.choices || '[]').map(c => typeof c === 'string' ? c : c.text),
-                    correct_index: question.correct_index
+                    text: question.question || question.question_text || '',
+                    choices: choicesArray,
+                    correct_index: parseInt(question.correct_index) || 0
                 },
                 timer: timeLimit,
                 questionNumber: currentQuestionIndex + 1,
                 totalQuestions: questions.length
             };
             
+            console.log('Pushing question:', questionData);
             socket.emit('teacher:push_question', questionData);
             
-            // Show active question display for teacher
+            // Show active question display for teacher (Kahoot-style)
             const activeQEl = document.getElementById('active-question-display');
             const activeQNum = document.getElementById('active-question-number');
             const activeQText = document.getElementById('active-question-text');
             const activeQTimer = document.getElementById('active-question-timer');
             const activeQChoices = document.getElementById('active-question-choices');
             
+            // Kahoot colors: red, blue, yellow, green
+            const kahootColors = [
+                { bg: '#DB524D', border: '#C73E39', text: 'white' }, // Red
+                { bg: '#4A90E2', border: '#357ABD', text: 'white' }, // Blue
+                { bg: '#F5A623', border: '#D68910', text: 'white' }, // Yellow
+                { bg: '#7ED321', border: '#6BB01A', text: 'white' }  // Green
+            ];
+            
             if (activeQEl) {
                 activeQEl.style.display = 'block';
                 if (activeQNum) activeQNum.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
                 if (activeQText) activeQText.textContent = questionData.question.text;
                 if (activeQTimer) {
-                    activeQTimer.textContent = `Time Limit: ${timeLimit} seconds`;
+                    activeQTimer.textContent = `${timeLimit}s`;
                     activeQTimer.style.color = '#007bff';
                 }
                 if (activeQChoices) {
-                    activeQChoices.innerHTML = '<div style="margin-top: 10px;"><strong>Choices:</strong></div>' +
-                        questionData.question.choices.map((c, i) => 
-                            `<div style="padding: 8px; margin: 5px 0; background: ${i === question.correct_index ? '#d4edda' : '#f8f9fa'}; border-radius: 4px; border-left: 4px solid ${i === question.correct_index ? '#28a745' : '#dee2e6'};">
-                                ${i === question.correct_index ? '✓ ' : ''}${c}
-                            </div>`
-                        ).join('');
+                    activeQChoices.innerHTML = questionData.question.choices.map((c, i) => {
+                        const color = kahootColors[i % 4];
+                        const isCorrect = i === question.correct_index;
+                        return `
+                            <div class="kahoot-choice" 
+                                 style="background: ${color.bg}; 
+                                        border: 4px solid ${color.border}; 
+                                        color: ${color.text}; 
+                                        padding: 30px 20px; 
+                                        border-radius: 12px; 
+                                        font-size: 24px; 
+                                        font-weight: bold; 
+                                        text-align: center; 
+                                        cursor: default;
+                                        position: relative;
+                                        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                                        transition: transform 0.2s;">
+                                ${isCorrect ? '<span style="position: absolute; top: 10px; right: 10px; font-size: 32px;">✓</span>' : ''}
+                                <div style="font-size: 48px; margin-bottom: 10px;">${String.fromCharCode(65 + i)}</div>
+                                <div>${c}</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
             }
+            
+            // Start timer countdown for teacher view
+            let remaining = timeLimit;
+            const teacherTimerInterval = setInterval(() => {
+                remaining--;
+                if (activeQTimer) {
+                    activeQTimer.textContent = `${remaining}s`;
+                    if (remaining <= 10) {
+                        activeQTimer.style.color = '#dc3545';
+                        activeQTimer.style.background = '#f8d7da';
+                    }
+                }
+                if (remaining <= 0) {
+                    clearInterval(teacherTimerInterval);
+                    if (activeQTimer) {
+                        activeQTimer.textContent = 'Time\'s Up!';
+                        activeQTimer.style.color = '#721c24';
+                        activeQTimer.style.background = '#f8d7da';
+                    }
+                }
+            }, 1000);
+            
+            // Store timer interval to clear if needed
+            if (window.teacherTimerInterval) {
+                clearInterval(window.teacherTimerInterval);
+            }
+            window.teacherTimerInterval = teacherTimerInterval;
             
             // Hide previous results
             const resultsEl = document.getElementById('question-results-display');
             if (resultsEl) resultsEl.style.display = 'none';
             
+            // Increment index AFTER pushing
             currentQuestionIndex++;
-            if (currentQuestionIndex >= questions.length && nextBtn) {
-                nextBtn.textContent = 'End Quiz';
+            
+            // Update button state
+            if (currentQuestionIndex >= questions.length) {
+                if (nextBtn) {
+                    nextBtn.textContent = 'End Quiz';
+                    nextBtn.disabled = false;
+                }
+            } else {
+                if (nextBtn) {
+                    nextBtn.textContent = 'Next Question';
+                    nextBtn.disabled = false;
+                }
             }
         }
 
@@ -721,21 +825,91 @@
             const correctCount = responses.filter(r => r.is_correct).length;
             const totalCount = responses.length;
             
+            // Get current question to show answer distribution
+            const questionIndex = questionNum - 1;
+            const currentQuestion = questions[questionIndex];
+            if (!currentQuestion) return;
+            
+            // Parse choices
+            let choices = [];
+            if (Array.isArray(currentQuestion.choices)) {
+                choices = currentQuestion.choices.map(c => typeof c === 'string' ? c : (c.text || c));
+            } else if (typeof currentQuestion.choices === 'string') {
+                try {
+                    const parsed = JSON.parse(currentQuestion.choices);
+                    choices = Array.isArray(parsed) 
+                        ? parsed.map(c => typeof c === 'string' ? c : (c.text || c))
+                        : [];
+                } catch (e) {
+                    choices = [];
+                }
+            }
+            
+            // Count answers per choice
+            const answerCounts = {};
+            responses.forEach(r => {
+                const answerIndex = r.answerIndex !== undefined ? r.answerIndex : -1;
+                answerCounts[answerIndex] = (answerCounts[answerIndex] || 0) + 1;
+            });
+            
+            // Kahoot colors
+            const kahootColors = [
+                { bg: '#DB524D', border: '#C73E39', text: 'white' }, // Red
+                { bg: '#4A90E2', border: '#357ABD', text: 'white' }, // Blue
+                { bg: '#F5A623', border: '#D68910', text: 'white' }, // Yellow
+                { bg: '#7ED321', border: '#6BB01A', text: 'white' }  // Green
+            ];
+            
             resultsEl.style.display = 'block';
             resultsEl.innerHTML = `
-                <h3 style="margin-top: 0;">Question ${questionNum} Results</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
-                    <div style="background: #d4edda; padding: 15px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #155724;">${correctCount}</div>
-                        <div style="color: #155724;">Correct Answers</div>
+                <h3 style="margin-top: 0; font-size: 28px; margin-bottom: 20px;">Question ${questionNum} Results</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                    <div style="background: #d4edda; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="font-size: 36px; font-weight: bold; color: #155724;">${correctCount}</div>
+                        <div style="color: #155724; font-size: 16px; margin-top: 5px;">Correct</div>
                     </div>
-                    <div style="background: #f8d7da; padding: 15px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div>
-                        <div style="color: #721c24;">Incorrect Answers</div>
+                    <div style="background: #f8d7da; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="font-size: 36px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div>
+                        <div style="color: #721c24; font-size: 16px; margin-top: 5px;">Incorrect</div>
                     </div>
-                    <div style="background: #d1ecf1; padding: 15px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #0c5460;">${totalCount}</div>
-                        <div style="color: #0c5460;">Total Responses</div>
+                    <div style="background: #d1ecf1; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="font-size: 36px; font-weight: bold; color: #0c5460;">${totalCount}</div>
+                        <div style="color: #0c5460; font-size: 16px; margin-top: 5px;">Total</div>
+                    </div>
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="font-size: 36px; font-weight: bold; color: #856404;">${totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0}%</div>
+                        <div style="color: #856404; font-size: 16px; margin-top: 5px;">Accuracy</div>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; font-size: 20px;">Answer Distribution</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        ${choices.map((c, i) => {
+                            const count = answerCounts[i] || 0;
+                            const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+                            const color = kahootColors[i % 4];
+                            const isCorrect = i === currentQuestion.correct_index;
+                            const choiceText = typeof c === 'string' ? c : (c.text || c);
+                            return `
+                                <div style="background: ${color.bg}; 
+                                            border: 4px solid ${color.border}; 
+                                            color: ${color.text}; 
+                                            padding: 20px; 
+                                            border-radius: 12px; 
+                                            position: relative;
+                                            ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                        <div style="font-size: 24px; font-weight: bold;">${String.fromCharCode(65 + i)}</div>
+                                        ${isCorrect ? '<span style="font-size: 32px;">✓</span>' : ''}
+                                    </div>
+                                    <div style="font-size: 18px; margin-bottom: 10px;">${choiceText}</div>
+                                    <div style="background: rgba(255,255,255,0.3); padding: 10px; border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 28px; font-weight: bold;">${count}</div>
+                                        <div style="font-size: 14px;">${percentage}%</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             `;
@@ -808,41 +982,58 @@
      * Student Application
      */
     function initStudentApp(config, socket) {
-        const container = document.getElementById('gamifiedquiz-student-app');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="gamifiedquiz-student">
-                <div id="waiting-message" class="waiting">Waiting for question...</div>
-                <div id="question-container" class="question-container" style="display:none;">
-                    <div id="question-text" class="question-text"></div>
-                    <div id="timer" class="timer"></div>
-                    <div id="choices" class="choices"></div>
-                    <button id="submit-btn" class="btn btn-primary" disabled>Submit Answer</button>
-                </div>
-                <div id="result-container" class="result-container" style="display:none;"></div>
-                <div id="leaderboard-container" class="leaderboard-container"></div>
-            </div>
-        `;
-
+        // Don't overwrite HTML - elements are already in view.php
+        // Just attach event listeners to existing elements
+        
+        console.log('Initializing student app...');
+        
+        // Student automatically joins session when connecting
+        // The WebSocket server handles this in the connection handler
+        
         let currentQuestion = null;
         let selectedAnswer = null;
         let timerInterval = null;
+        
+        // Update waiting message
+        const waitingMsg = document.getElementById('waiting-message');
+        if (waitingMsg) {
+            waitingMsg.textContent = 'Waiting for teacher to start quiz session...';
+        }
 
+        // Listen for session created
+        socket.on('session:created', (data) => {
+            console.log('Session created, waiting for questions...');
+            const waitingMsg = document.getElementById('waiting-message');
+            if (waitingMsg) {
+                waitingMsg.textContent = 'Session started! Waiting for question...';
+                waitingMsg.style.background = '#d1ecf1';
+                waitingMsg.style.color = '#0c5460';
+            }
+        });
+        
         // Listen for new questions
         socket.on('question:new', (data) => {
+            console.log('New question received:', data);
             currentQuestion = data.question;
             selectedAnswer = null;
             const questionNumber = data.questionNumber || 1;
-            document.getElementById('question-number').textContent = `Question ${questionNumber}`;
+            
+            const questionNumEl = document.getElementById('question-number');
+            const waitingMsg = document.getElementById('waiting-message');
+            const questionContainer = document.getElementById('question-container');
+            const resultContainer = document.getElementById('result-container');
+            const comparisonContainer = document.getElementById('question-comparison-container');
+            
+            if (questionNumEl) questionNumEl.textContent = `Question ${questionNumber}`;
+            if (waitingMsg) waitingMsg.style.display = 'none';
+            if (questionContainer) questionContainer.style.display = 'block';
+            if (resultContainer) resultContainer.style.display = 'none';
+            if (comparisonContainer) comparisonContainer.style.display = 'none';
+            
             displayQuestion(data.question, data.timer || 60);
-            document.getElementById('waiting-message').style.display = 'none';
-            document.getElementById('question-container').style.display = 'block';
-            document.getElementById('result-container').style.display = 'none';
-            document.getElementById('submit-btn').disabled = true;
         });
 
-        // Display question
+        // Display question (Kahoot-style for students)
         function displayQuestion(question, timer) {
             // Handle different question formats
             const questionText = question.text || question.question || question.question_text || '';
@@ -850,43 +1041,81 @@
             
             const choicesContainer = document.getElementById('choices');
             const choices = Array.isArray(question.choices) ? question.choices : [];
-            choicesContainer.innerHTML = choices.map((choice, index) => `
-                <label class="choice-option" data-index="${index}">
-                    <input type="radio" name="answer" value="${index}">
-                    ${typeof choice === 'string' ? choice : (choice.text || choice)}
-                </label>
-            `).join('');
+            
+            // Kahoot colors: red, blue, yellow, green
+            const kahootColors = [
+                { bg: '#DB524D', border: '#C73E39', hover: '#E86560', text: 'white' }, // Red
+                { bg: '#4A90E2', border: '#357ABD', hover: '#5BA0F2', text: 'white' }, // Blue
+                { bg: '#F5A623', border: '#D68910', hover: '#FFB633', text: 'white' }, // Yellow
+                { bg: '#7ED321', border: '#6BB01A', hover: '#8EE331', text: 'white' }  // Green
+            ];
+            
+            choicesContainer.innerHTML = choices.map((choice, index) => {
+                const color = kahootColors[index % 4];
+                const choiceText = typeof choice === 'string' ? choice : (choice.text || choice);
+                return `
+                    <div class="kahoot-choice-student" 
+                         data-index="${index}"
+                         style="background: ${color.bg}; 
+                                border: 4px solid ${color.border}; 
+                                color: ${color.text}; 
+                                padding: 30px 20px; 
+                                border-radius: 12px; 
+                                font-size: 24px; 
+                                font-weight: bold; 
+                                text-align: center; 
+                                cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                                transition: all 0.2s;
+                                position: relative;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">${String.fromCharCode(65 + index)}</div>
+                        <div>${choiceText}</div>
+                    </div>
+                `;
+            }).join('');
 
             // Handle choice selection
-            choicesContainer.querySelectorAll('label.choice-option').forEach(label => {
-                label.addEventListener('click', (e) => {
+            choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(choiceEl => {
+                choiceEl.addEventListener('click', (e) => {
                     // Remove previous selection
-                    choicesContainer.querySelectorAll('label.choice-option').forEach(l => {
-                        l.classList.remove('selected');
+                    choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(el => {
+                        el.style.transform = 'scale(1)';
+                        el.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
                     });
                     // Select this one
-                    label.classList.add('selected');
-                    const radio = label.querySelector('input[type="radio"]');
-                    radio.checked = true;
-                    selectedAnswer = parseInt(radio.value);
-                    document.getElementById('submit-btn').disabled = false;
+                    const index = parseInt(choiceEl.getAttribute('data-index'));
+                    const color = kahootColors[index % 4];
+                    choiceEl.style.transform = 'scale(1.05)';
+                    choiceEl.style.boxShadow = `0 6px 12px rgba(0,0,0,0.3), 0 0 0 4px ${color.border}`;
+                    selectedAnswer = index;
+                    // Auto-submit after selection (or enable submit button if you want manual submit)
+                    setTimeout(() => {
+                        submitAnswer();
+                    }, 300);
                 });
             });
 
             // Start timer with config time limit
             const timeLimit = config.timeLimitPerQuestion || timer || 60;
             let remaining = timeLimit;
-            document.getElementById('timer').textContent = `Time remaining: ${remaining}s`;
+            const timerEl = document.getElementById('timer');
+            timerEl.textContent = `${remaining}s`;
+            timerEl.style.color = '#007bff';
+            timerEl.style.background = '#e7f3ff';
             
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 remaining--;
-                document.getElementById('timer').textContent = `Time remaining: ${remaining}s`;
+                timerEl.textContent = `${remaining}s`;
                 if (remaining <= 10) {
-                    document.getElementById('timer').style.color = '#dc3545';
+                    timerEl.style.color = '#dc3545';
+                    timerEl.style.background = '#f8d7da';
                 }
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
+                    timerEl.textContent = 'Time\'s Up!';
+                    timerEl.style.color = '#721c24';
+                    timerEl.style.background = '#f8d7da';
                     submitAnswer();
                 }
             }, 1000);

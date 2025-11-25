@@ -273,6 +273,7 @@ io.on('connection', async (socket) => {
       session.questionResponses.push({
         userId: socket.userId,
         username: socket.username || `User ${socket.userId}`,
+        answerIndex: answerIndex,
         isCorrect,
         questionScore,
         totalScore
