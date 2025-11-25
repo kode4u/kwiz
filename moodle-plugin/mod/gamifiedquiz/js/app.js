@@ -1040,7 +1040,13 @@
             document.getElementById('question-text').textContent = questionText;
             
             const choicesContainer = document.getElementById('choices');
+            if (!choicesContainer) {
+                console.error('choices container not found!');
+                return;
+            }
+            
             const choices = Array.isArray(question.choices) ? question.choices : [];
+            console.log('Choices:', choices);
             
             // Kahoot colors: red, blue, yellow, green
             const kahootColors = [
@@ -1099,24 +1105,28 @@
             const timeLimit = config.timeLimitPerQuestion || timer || 60;
             let remaining = timeLimit;
             const timerEl = document.getElementById('timer');
-            timerEl.textContent = `${remaining}s`;
-            timerEl.style.color = '#007bff';
-            timerEl.style.background = '#e7f3ff';
+            if (timerEl) {
+                timerEl.textContent = `${remaining}s`;
+                timerEl.style.color = '#007bff';
+                timerEl.style.background = '#e7f3ff';
+            }
             
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 remaining--;
-                timerEl.textContent = `${remaining}s`;
-                if (remaining <= 10) {
-                    timerEl.style.color = '#dc3545';
-                    timerEl.style.background = '#f8d7da';
-                }
-                if (remaining <= 0) {
-                    clearInterval(timerInterval);
-                    timerEl.textContent = 'Time\'s Up!';
-                    timerEl.style.color = '#721c24';
-                    timerEl.style.background = '#f8d7da';
-                    submitAnswer();
+                if (timerEl) {
+                    timerEl.textContent = `${remaining}s`;
+                    if (remaining <= 10) {
+                        timerEl.style.color = '#dc3545';
+                        timerEl.style.background = '#f8d7da';
+                    }
+                    if (remaining <= 0) {
+                        clearInterval(timerInterval);
+                        timerEl.textContent = 'Time\'s Up!';
+                        timerEl.style.color = '#721c24';
+                        timerEl.style.background = '#f8d7da';
+                        submitAnswer();
+                    }
                 }
             }, 1000);
         }
