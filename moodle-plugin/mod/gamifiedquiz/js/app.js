@@ -289,7 +289,8 @@
                     document.getElementById('question-editor-modal').style.display = 'none';
                     questions = data.questions || questions;
                     window.currentQuestions = questions;
-                    displayQuestions(questions);
+                    // Don't display questions preview
+                    // displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
                 } else {
                     alert('Error saving questions: ' + (data.error || 'Unknown error'));
@@ -344,7 +345,8 @@
                 const predefined = JSON.parse(config.predefinedData);
                 if (Array.isArray(predefined) && predefined.length > 0) {
                     questions = predefined;
-                    displayQuestions(questions);
+                    // Don't display questions preview
+                    // displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
                 }
             } catch (e) {
@@ -358,7 +360,8 @@
                 const edited = JSON.parse(config.questionsData);
                 if (Array.isArray(edited) && edited.length > 0) {
                     questions = edited;
-                    displayQuestions(questions);
+                    // Don't display questions preview
+                    // displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
                     // Reset question index
                     currentQuestionIndex = 0;
@@ -395,115 +398,183 @@
             }
         }
 
-        // Generate questions
-        generateBtn.addEventListener('click', async () => {
-            console.log('Generate Questions button clicked!');
-            const btn = document.getElementById('generate-questions-btn');
-            if (!btn) {
-                console.error('Button not found after click!');
-                return;
+        // Generate questions dialog elements
+        const generateModal = document.getElementById('generate-questions-modal');
+        const generateForm = document.getElementById('generate-questions-form');
+        const generateCloseBtn = document.querySelector('.generate-questions-close');
+        const cancelGenerateBtn = document.getElementById('cancel-generate-btn');
+        const loadingModal = document.getElementById('loading-modal');
+        
+        // Show generate questions dialog
+        generateBtn.addEventListener('click', () => {
+            if (generateModal) {
+                generateModal.style.display = 'flex';
             }
-            btn.disabled = true;
-            btn.textContent = 'Generating...';
-            console.log('Starting question generation...');
-            
-            try {
-                const wwwroot = config.wwwroot || (typeof M !== 'undefined' && M.cfg && M.cfg.wwwroot) || '';
-                const sesskey = config.sesskey || (typeof M !== 'undefined' && M.cfg && M.cfg.sesskey) || '';
-                const url = wwwroot + '/mod/gamifiedquiz/ajax/generate.php';
-                
-                const response = await fetch(url, {
-                method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'quizid=' + config.quizId + '&cmid=' + config.cmId + '&sesskey=' + sesskey
-                });
-                
-                let responseText = '';
-                let data;
-                
-                // Get response text first
-                responseText = await response.text();
-                console.log('Generate questions raw response (status ' + response.status + '):', responseText);
-                
-                if (!response.ok) {
-                    // Try to parse error response
-                    let errorMessage = 'HTTP error! status: ' + response.status;
-                    try {
-                        if (responseText) {
-                            data = JSON.parse(responseText);
-                            if (data.error) {
-                                errorMessage = data.error;
-                                console.error('Server error details:', data);
-                            }
-                        }
-                    } catch (parseErr) {
-                        console.error('Failed to parse error response:', parseErr);
-                        if (responseText) {
-                            errorMessage += '. Response: ' + responseText.substring(0, 500);
-                        }
-                    }
-                    throw new Error(errorMessage);
+        });
+        
+        // Close generate dialog
+        if (generateCloseBtn) {
+            generateCloseBtn.addEventListener('click', () => {
+                if (generateModal) {
+                    generateModal.style.display = 'none';
                 }
+            });
+        }
+        
+        if (cancelGenerateBtn) {
+            cancelGenerateBtn.addEventListener('click', () => {
+                if (generateModal) {
+                    generateModal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Close modal when clicking outside
+        if (generateModal) {
+            generateModal.addEventListener('click', (e) => {
+                if (e.target === generateModal) {
+                    generateModal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Handle generate form submission
+        if (generateForm) {
+            generateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const prompt = document.getElementById('generate-prompt').value.trim();
+                const predefinedData = document.getElementById('generate-data').value.trim();
+                const difficulty = document.getElementById('generate-difficulty').value;
+                
+                if (!prompt) {
+                    alert('Please enter a prompt/topic for question generation.');
+                    return;
+                }
+                
+                // Hide generate dialog and show loading dialog
+                if (generateModal) {
+                    generateModal.style.display = 'none';
+                }
+                if (loadingModal) {
+                    loadingModal.style.display = 'flex';
+                }
+                
+                console.log('Starting question generation with:', { prompt, predefinedData, difficulty });
                 
                 try {
+                    const wwwroot = config.wwwroot || (typeof M !== 'undefined' && M.cfg && M.cfg.wwwroot) || '';
+                    const sesskey = config.sesskey || (typeof M !== 'undefined' && M.cfg && M.cfg.sesskey) || '';
+                    const url = wwwroot + '/mod/gamifiedquiz/ajax/generate.php';
                     
-                    if (!responseText || responseText.trim() === '') {
-                        throw new Error('Empty response from server');
+                    // Build form data
+                    const formData = new URLSearchParams();
+                    formData.append('quizid', config.quizId);
+                    formData.append('cmid', config.cmId);
+                    formData.append('sesskey', sesskey);
+                    formData.append('prompt', prompt);
+                    formData.append('data', predefinedData);
+                    formData.append('difficulty', difficulty);
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
+                    });
+                    
+                    let responseText = '';
+                    let responseData;
+                    
+                    // Get response text first
+                    responseText = await response.text();
+                    console.log('Generate questions raw response (status ' + response.status + '):', responseText);
+                    
+                    if (!response.ok) {
+                        // Try to parse error response
+                        let errorMessage = 'HTTP error! status: ' + response.status;
+                        try {
+                            if (responseText) {
+                                responseData = JSON.parse(responseText);
+                                if (responseData.error) {
+                                    errorMessage = responseData.error;
+                                    console.error('Server error details:', responseData);
+                                }
+                            }
+                        } catch (parseErr) {
+                            console.error('Failed to parse error response:', parseErr);
+                            if (responseText) {
+                                errorMessage += '. Response: ' + responseText.substring(0, 500);
+                            }
+                        }
+                        throw new Error(errorMessage);
                     }
                     
-                    data = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error('Failed to parse JSON response:', parseError);
-                    console.error('Response text was:', responseText);
-                    throw new Error('Invalid response from server: ' + parseError.message + '. Response: ' + responseText.substring(0, 200));
-                }
-                
-                console.log('Generate questions parsed response:', data);
-                
-                // If there's an error in the response, show it
-                if (data.error) {
-                    console.error('Server error details:', data);
-                }
-                
-                if (data.success && data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
-                    questions = data.questions;
-                    console.log('Questions received:', questions);
-                    // Store questions globally for editor
-                    window.currentQuestions = questions;
-                    displayQuestions(questions);
-                    if (startBtn) startBtn.disabled = false;
-                    // Reset question index
-                    currentQuestionIndex = 0;
+                    try {
+                        if (!responseText || responseText.trim() === '') {
+                            throw new Error('Empty response from server');
+                        }
+                        
+                        responseData = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('Failed to parse JSON response:', parseError);
+                        console.error('Response text was:', responseText);
+                        throw new Error('Invalid response from server: ' + parseError.message + '. Response: ' + responseText.substring(0, 200));
+                    }
+                    
+                    console.log('Generate questions parsed response:', responseData);
+                    
+                    // Hide loading dialog
+                    if (loadingModal) {
+                        loadingModal.style.display = 'none';
+                    }
+                    
+                    // If there's an error in the response, show it
+                    if (responseData.error) {
+                        console.error('Server error details:', responseData);
+                    }
+                    
+                    if (responseData.success && responseData.questions && Array.isArray(responseData.questions) && responseData.questions.length > 0) {
+                        questions = responseData.questions;
+                        console.log('Questions received:', questions);
+                        // Store questions globally for editor
+                        window.currentQuestions = questions;
+                        // Don't display questions preview - just show status
+                        // displayQuestions(questions);
+                        if (startBtn) startBtn.disabled = false;
+                        // Reset question index
+                        currentQuestionIndex = 0;
+                        const statusEl = document.getElementById('session-status');
+                        if (statusEl) {
+                            statusEl.style.display = 'block';
+                            statusEl.textContent = 'Questions generated successfully! (' + (responseData.count || questions.length) + ' questions) Ready to start session.';
+                            statusEl.style.background = '#d4edda';
+                            statusEl.style.borderColor = '#28a745';
+                        }
+                    } else {
+                        const errorMsg = responseData.error || 'Failed to generate questions. Please check LLM API configuration.';
+                        console.error('Generate questions error:', responseData);
+                        alert('Error: ' + errorMsg.replace(/\\n/g, '\n'));
+                        if (responseData.api_url) {
+                            console.log('API URL:', responseData.api_url);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error generating questions:', error);
+                    // Hide loading dialog
+                    if (loadingModal) {
+                        loadingModal.style.display = 'none';
+                    }
+                    alert('Error generating questions: ' + error.message + '\n\nPlease check:\n1. LLM API is running\n2. LLM API URL is correct in plugin settings\n3. Browser console for details');
                     const statusEl = document.getElementById('session-status');
                     if (statusEl) {
                         statusEl.style.display = 'block';
-                        statusEl.textContent = 'Questions generated successfully! (' + (data.count || questions.length) + ' questions) Ready to start session.';
-                        statusEl.style.background = '#d4edda';
-                        statusEl.style.borderColor = '#28a745';
-                    }
-                } else {
-                    const errorMsg = data.error || 'Failed to generate questions. Please check LLM API configuration.';
-                    console.error('Generate questions error:', data);
-                    alert('Error: ' + errorMsg.replace(/\\n/g, '\n'));
-                    if (data.api_url) {
-                        console.log('API URL:', data.api_url);
+                        statusEl.textContent = 'Error: ' + error.message;
+                        statusEl.style.background = '#f8d7da';
+                        statusEl.style.borderColor = '#dc3545';
                     }
                 }
-            } catch (error) {
-                console.error('Error generating questions:', error);
-                alert('Error generating questions: ' + error.message + '\n\nPlease check:\n1. LLM API is running\n2. LLM API URL is correct in plugin settings\n3. Browser console for details');
-                const statusEl = document.getElementById('session-status');
-                if (statusEl) {
-                    statusEl.style.display = 'block';
-                    statusEl.textContent = 'Error: ' + error.message;
-                    statusEl.style.background = '#f8d7da';
-                    statusEl.style.borderColor = '#dc3545';
-                }
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Generate Questions';
-            }
-        });
+            });
+        }
 
         // Start session
         startBtn.addEventListener('click', () => {

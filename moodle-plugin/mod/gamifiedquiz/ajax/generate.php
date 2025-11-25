@@ -34,6 +34,9 @@ global $DB, $CFG, $USER;
 // Get parameters
 $quizid = required_param('quizid', PARAM_INT);
 $cmid = optional_param('cmid', 0, PARAM_INT);
+$prompt = optional_param('prompt', '', PARAM_TEXT);
+$data = optional_param('data', '', PARAM_TEXT);
+$difficulty = optional_param('difficulty', '', PARAM_TEXT);
 
 // Get quiz instance
 $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $quizid), '*', MUST_EXIST);
@@ -61,12 +64,18 @@ try {
     // Get LLM backend from quiz instance, default to 'openai'
     $backend = isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai';
     
+    // Use provided prompt/data/difficulty, or fall back to quiz instance values
+    $topic = !empty($prompt) ? $prompt : $gamifiedquiz->topic;
+    $level = !empty($difficulty) ? $difficulty : $gamifiedquiz->difficulty;
+    $predefined_data = !empty($data) ? $data : (isset($gamifiedquiz->predefined_data) ? $gamifiedquiz->predefined_data : '');
+    
     $questions = gamifiedquiz_generate_questions(
-        $gamifiedquiz->topic,
-        $gamifiedquiz->difficulty,
+        $topic,
+        $level,
         5, // Number of questions
         $gamifiedquiz->language,
-        $backend
+        $backend,
+        $predefined_data
     );
 
     // Check if result contains an error

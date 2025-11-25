@@ -102,6 +102,10 @@ echo '<style>
 .leaderboard-container li { padding: 8px; margin: 5px 0; background: #f8f9fa; border-radius: 4px; }
 .quiz-info { background: #e7f3ff; padding: 15px; border-radius: 4px; margin: 15px 0; }
 .quiz-info strong { color: #0056b3; }
+.question-editor-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+.question-editor-content { background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; border-radius: 8px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.question-editor-close, .generate-questions-close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.question-editor-close:hover, .question-editor-close:focus, .generate-questions-close:hover, .generate-questions-close:focus { color: #000; text-decoration: none; }
 </style>';
 
 // Set config before loading JS - use inline script to ensure it's available
@@ -150,7 +154,7 @@ if ($is_teacher) {
     echo '<button id="next-question-btn" class="btn btn-secondary" disabled>Next Question</button>';
     echo '</div>';
     echo '<div id="session-status" class="session-status" style="display:none;"></div>';
-    echo '<div id="questions-container" class="questions-container"></div>';
+    echo '<div id="questions-container" class="questions-container" style="display:none;"></div>';
     echo '<div id="active-question-display" style="display:none; background: white; padding: 30px; border-radius: 12px; margin: 20px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-height: 400px;">';
     echo '<div id="active-question-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">';
     echo '<div id="active-question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
@@ -200,6 +204,55 @@ if ($is_teacher) {
     echo '</div>';
     echo '</div>';
     echo '</div>';
+    
+    // Generate Questions Dialog Modal
+    echo '<div id="generate-questions-modal" class="question-editor-modal" style="display:none;">';
+    echo '<div class="question-editor-content" style="max-width: 600px;">';
+    echo '<span class="generate-questions-close" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>';
+    echo '<h2>Generate Questions</h2>';
+    echo '<form id="generate-questions-form">';
+    echo '<div style="margin-bottom: 20px;">';
+    echo '<label for="generate-prompt" style="display: block; margin-bottom: 5px; font-weight: bold;">Prompt/Topic:</label>';
+    echo '<textarea id="generate-prompt" name="prompt" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" placeholder="Enter topic or prompt for question generation (e.g., \'Mathematics: Algebra\')">' . s($gamifiedquiz->topic) . '</textarea>';
+    echo '</div>';
+    echo '<div style="margin-bottom: 20px;">';
+    echo '<label for="generate-data" style="display: block; margin-bottom: 5px; font-weight: bold;">Data/Context (Optional):</label>';
+    echo '<textarea id="generate-data" name="data" rows="5" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" placeholder="Enter additional context or predefined data for question generation"></textarea>';
+    echo '</div>';
+    echo '<div style="margin-bottom: 20px;">';
+    echo '<label for="generate-difficulty" style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty Level:</label>';
+    echo '<select id="generate-difficulty" name="difficulty" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">';
+    echo '<option value="easy"' . ($gamifiedquiz->difficulty === 'easy' ? ' selected' : '') . '>Easy</option>';
+    echo '<option value="medium"' . ($gamifiedquiz->difficulty === 'medium' ? ' selected' : '') . '>Medium</option>';
+    echo '<option value="hard"' . ($gamifiedquiz->difficulty === 'hard' ? ' selected' : '') . '>Hard</option>';
+    echo '</select>';
+    echo '</div>';
+    echo '<div style="margin-top: 20px; text-align: right;">';
+    echo '<button type="button" id="cancel-generate-btn" class="btn btn-secondary" style="margin-right: 10px;">Cancel</button>';
+    echo '<button type="submit" id="submit-generate-btn" class="btn btn-primary">Generate</button>';
+    echo '</div>';
+    echo '</form>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Loading Dialog Modal
+    echo '<div id="loading-modal" class="question-editor-modal" style="display:none;">';
+    echo '<div class="question-editor-content" style="max-width: 400px; text-align: center;">';
+    echo '<div style="margin: 20px 0;">';
+    echo '<div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div>';
+    echo '</div>';
+    echo '<h3 style="margin: 20px 0;">Generating Questions...</h3>';
+    echo '<p style="color: #666;">Please wait while we generate your questions.</p>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Add spinner animation CSS
+    echo '<style>
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    </style>';
 }
 
 // Include Socket.IO from CDN if not available
