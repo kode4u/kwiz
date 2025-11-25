@@ -37,6 +37,29 @@ $string['language'] = 'Language';
 $string['language_en'] = 'English';
 $string['language_km'] = 'Khmer';
 
+// New fields
+$string['llm_backend'] = 'LLM Backend';
+$string['llm_backend_help'] = 'Select the AI model to use for question generation';
+$string['use_predefined'] = 'Use Predefined Questions';
+$string['use_predefined_desc'] = 'Check to use predefined questions instead of generating with AI';
+$string['predefined_data'] = 'Predefined Questions';
+$string['predefined_data_help'] = 'Enter questions in JSON format or use the question editor';
+$string['template'] = 'Template';
+$string['template_help'] = 'Select a visual template for the quiz';
+$string['template_default'] = 'Default';
+$string['template_kahoot'] = 'Kahoot Style';
+$string['template_minimal'] = 'Minimal';
+$string['template_modern'] = 'Modern';
+$string['color_palette'] = 'Color Palette';
+$string['color_palette_help'] = 'Select a color scheme for the quiz';
+$string['palette_kahoot'] = 'Kahoot (Blue/Red)';
+$string['palette_blue'] = 'Blue';
+$string['palette_green'] = 'Green';
+$string['palette_purple'] = 'Purple';
+$string['palette_orange'] = 'Orange';
+$string['palette_red'] = 'Red';
+$string['palette_custom'] = 'Custom';
+
 // View
 $string['start_session'] = 'Start Quiz Session';
 $string['generate_questions'] = 'Generate Questions';

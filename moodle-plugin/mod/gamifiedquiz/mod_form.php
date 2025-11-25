@@ -44,6 +44,50 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         ));
         $mform->setDefault('language', 'en');
 
+        // LLM Backend Selection
+        $mform->addElement('select', 'llm_backend', get_string('llm_backend', 'mod_gamifiedquiz'), array(
+            'openai' => 'OpenAI',
+            'gemini' => 'Google Gemini',
+            'local' => 'Local LLM'
+        ));
+        $mform->setDefault('llm_backend', 'openai');
+        $mform->addHelpButton('llm_backend', 'llm_backend', 'mod_gamifiedquiz');
+
+        // Use Predefined Data
+        $mform->addElement('advcheckbox', 'use_predefined', get_string('use_predefined', 'mod_gamifiedquiz'), 
+            get_string('use_predefined_desc', 'mod_gamifiedquiz'), array('group' => 1), array(0, 1));
+        $mform->setDefault('use_predefined', 0);
+
+        // Predefined Data (textarea)
+        $mform->addElement('textarea', 'predefined_data', get_string('predefined_data', 'mod_gamifiedquiz'), 
+            array('rows' => 5, 'cols' => 60));
+        $mform->setType('predefined_data', PARAM_TEXT);
+        $mform->addHelpButton('predefined_data', 'predefined_data', 'mod_gamifiedquiz');
+        $mform->hideIf('predefined_data', 'use_predefined', 'eq', 0);
+
+        // Template Selection
+        $mform->addElement('select', 'template', get_string('template', 'mod_gamifiedquiz'), array(
+            'default' => get_string('template_default', 'mod_gamifiedquiz'),
+            'kahoot' => get_string('template_kahoot', 'mod_gamifiedquiz'),
+            'minimal' => get_string('template_minimal', 'mod_gamifiedquiz'),
+            'modern' => get_string('template_modern', 'mod_gamifiedquiz')
+        ));
+        $mform->setDefault('template', 'default');
+        $mform->addHelpButton('template', 'template', 'mod_gamifiedquiz');
+
+        // Color Palette
+        $mform->addElement('select', 'color_palette', get_string('color_palette', 'mod_gamifiedquiz'), array(
+            'kahoot' => get_string('palette_kahoot', 'mod_gamifiedquiz'),
+            'blue' => get_string('palette_blue', 'mod_gamifiedquiz'),
+            'green' => get_string('palette_green', 'mod_gamifiedquiz'),
+            'purple' => get_string('palette_purple', 'mod_gamifiedquiz'),
+            'orange' => get_string('palette_orange', 'mod_gamifiedquiz'),
+            'red' => get_string('palette_red', 'mod_gamifiedquiz'),
+            'custom' => get_string('palette_custom', 'mod_gamifiedquiz')
+        ));
+        $mform->setDefault('color_palette', 'kahoot');
+        $mform->addHelpButton('color_palette', 'color_palette', 'mod_gamifiedquiz');
+
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }

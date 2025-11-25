@@ -48,6 +48,9 @@ $PAGE->set_title($gamifiedquiz->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_context($context);
 
+// Include CSS file BEFORE header is printed
+$PAGE->requires->css('/mod/gamifiedquiz/styles.css');
+
 // Output starts here
 echo $OUTPUT->header();
 
@@ -55,6 +58,13 @@ echo $OUTPUT->header();
 if (!empty($gamifiedquiz->intro)) {
     echo $OUTPUT->box(format_module_intro('gamifiedquiz', $gamifiedquiz, $cm->id), 'generalbox', 'intro');
 }
+
+// Get template and color palette
+$template = isset($gamifiedquiz->template) ? $gamifiedquiz->template : 'default';
+$color_palette = isset($gamifiedquiz->color_palette) ? $gamifiedquiz->color_palette : 'kahoot';
+
+// Apply template and color palette classes
+$container_class = 'gamifiedquiz-container gq-template-' . $template . ' gq-palette-' . $color_palette;
 
 // Include CSS
 echo '<style>
@@ -108,7 +118,13 @@ window.GAMIFIED_QUIZ_CONFIG = {
     language: ' . json_encode($gamifiedquiz->language) . ',
     quizName: ' . json_encode($gamifiedquiz->name) . ',
     wwwroot: ' . json_encode($CFG->wwwroot) . ',
-    sesskey: ' . json_encode(sesskey()) . '
+    sesskey: ' . json_encode(sesskey()) . ',
+    template: ' . json_encode(isset($gamifiedquiz->template) ? $gamifiedquiz->template : 'default') . ',
+    colorPalette: ' . json_encode(isset($gamifiedquiz->color_palette) ? $gamifiedquiz->color_palette : 'kahoot') . ',
+    llmBackend: ' . json_encode(isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai') . ',
+    usePredefined: ' . (isset($gamifiedquiz->use_predefined) && $gamifiedquiz->use_predefined ? 'true' : 'false') . ',
+    predefinedData: ' . json_encode(isset($gamifiedquiz->predefined_data) ? $gamifiedquiz->predefined_data : '') . ',
+    questionsData: ' . json_encode(isset($gamifiedquiz->questions_data) ? $gamifiedquiz->questions_data : '') . '
 };
 </script>';
 
@@ -121,11 +137,12 @@ echo '</div>';
 
 if ($is_teacher) {
     // Teacher view
-    echo '<div class="gamifiedquiz-container">';
+    echo '<div class="' . $container_class . '">';
     echo '<div class="gamifiedquiz-teacher">';
     echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
     echo '<div class="controls">';
     echo '<button id="generate-questions-btn" class="btn btn-primary">' . get_string('generate_questions', 'mod_gamifiedquiz') . '</button>';
+    echo '<button id="edit-questions-btn" class="btn btn-secondary">Edit Questions</button>';
     echo '<button id="start-session-btn" class="btn btn-success" disabled>' . get_string('start_session', 'mod_gamifiedquiz') . '</button>';
     echo '<button id="end-session-btn" class="btn btn-danger" disabled>End Session</button>';
     echo '<button id="next-question-btn" class="btn btn-secondary" disabled>Next Question</button>';
@@ -141,7 +158,7 @@ if ($is_teacher) {
     echo '</div>';
 } else {
     // Student view
-    echo '<div class="gamifiedquiz-container">';
+    echo '<div class="' . $container_class . '">';
     echo '<div class="gamifiedquiz-student">';
     echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
     echo '<div id="waiting-message" class="waiting">Waiting for teacher to start quiz session...</div>';
@@ -154,6 +171,23 @@ if ($is_teacher) {
     echo '</div>';
     echo '<div id="result-container" class="result-container" style="display:none;"></div>';
     echo '<div id="leaderboard-container" class="leaderboard-container"></div>';
+    echo '</div>';
+    echo '</div>';
+}
+
+// Question Editor Modal
+if ($is_teacher) {
+    echo '<div id="question-editor-modal" class="question-editor-modal">';
+    echo '<div class="question-editor-content">';
+    echo '<span class="question-editor-close">&times;</span>';
+    echo '<h2>Edit Questions</h2>';
+    echo '<div id="question-editor-form" class="question-editor-form">';
+    echo '<p>Question editor will be populated here</p>';
+    echo '</div>';
+    echo '<div style="margin-top: 20px;">';
+    echo '<button id="save-questions-btn" class="btn btn-primary">Save Questions</button>';
+    echo '<button id="cancel-edit-btn" class="btn btn-secondary">Cancel</button>';
+    echo '</div>';
     echo '</div>';
     echo '</div>';
 }

@@ -167,9 +167,10 @@ function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
  * @param string $level Difficulty level
  * @param int $n_questions Number of questions
  * @param string $language Language code
+ * @param string $backend LLM backend (openai, gemini, local)
  * @return array|false Generated questions or false on error
  */
-function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en') {
+function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai') {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
         // Default: use Docker service name when running in Docker, localhost otherwise
@@ -189,7 +190,8 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
         'topic' => $topic,
         'level' => $level,
         'n_questions' => $n_questions,
-        'language' => $language
+        'language' => $language,
+        'backend' => $backend
     );
 
     $ch = curl_init($api_url . '/generate');

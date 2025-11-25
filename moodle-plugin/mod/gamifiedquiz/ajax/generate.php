@@ -58,11 +58,15 @@ try {
         $api_url = 'http://localhost:5000';
     }
     
+    // Get LLM backend from quiz instance, default to 'openai'
+    $backend = isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai';
+    
     $questions = gamifiedquiz_generate_questions(
         $gamifiedquiz->topic,
         $gamifiedquiz->difficulty,
         5, // Number of questions
-        $gamifiedquiz->language
+        $gamifiedquiz->language,
+        $backend
     );
 
     // Check if result contains an error
