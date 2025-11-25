@@ -37,6 +37,7 @@ $cmid = optional_param('cmid', 0, PARAM_INT);
 $prompt = optional_param('prompt', '', PARAM_TEXT);
 $data = optional_param('data', '', PARAM_TEXT);
 $difficulty = optional_param('difficulty', '', PARAM_TEXT);
+$count = optional_param('count', 5, PARAM_INT);
 
 // Get quiz instance
 $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $quizid), '*', MUST_EXIST);
@@ -72,7 +73,7 @@ try {
     $questions = gamifiedquiz_generate_questions(
         $topic,
         $level,
-        5, // Number of questions
+        $count, // Number of questions from form
         $gamifiedquiz->language,
         $backend,
         $predefined_data

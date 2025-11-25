@@ -227,6 +227,16 @@ if ($is_teacher) {
     echo '<option value="hard"' . ($gamifiedquiz->difficulty === 'hard' ? ' selected' : '') . '>Hard</option>';
     echo '</select>';
     echo '</div>';
+    echo '<div style="margin-bottom: 20px;">';
+    echo '<label for="generate-count" style="display: block; margin-bottom: 5px; font-weight: bold;">Number of Questions:</label>';
+    echo '<select id="generate-count" name="count" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">';
+    echo '<option value="3">3 Questions</option>';
+    echo '<option value="5" selected>5 Questions</option>';
+    echo '<option value="10">10 Questions</option>';
+    echo '<option value="15">15 Questions</option>';
+    echo '<option value="20">20 Questions</option>';
+    echo '</select>';
+    echo '</div>';
     echo '<div style="margin-top: 20px; text-align: right;">';
     echo '<button type="button" id="cancel-generate-btn" class="btn btn-secondary" style="margin-right: 10px;">Cancel</button>';
     echo '<button type="submit" id="submit-generate-btn" class="btn btn-primary">Generate</button>';

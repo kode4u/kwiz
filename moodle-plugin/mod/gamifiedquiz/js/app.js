@@ -65,7 +65,7 @@
                         status.style.borderColor = '#ffc107';
                     }
                 }
-            });
+    });
 
     socket.on('error', (error) => {
         console.error('WebSocket error:', error);
@@ -107,7 +107,7 @@
 
         let questions = [];
         let currentQuestionIndex = 0;
-        
+
         // Question Editor Functions (define early for hoisting)
         function openQuestionEditor(questionsList, config) {
             const modal = document.getElementById('question-editor-modal');
@@ -277,14 +277,14 @@
                 const url = wwwroot + '/mod/gamifiedquiz/ajax/save_questions.php';
                 
                 const response = await fetch(url, {
-                    method: 'POST',
+                method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `quizid=${config.quizId}&cmid=${config.cmId}&sesskey=${sesskey}&questions=${encodeURIComponent(JSON.stringify(questions))}`
                 });
                 
-                const data = await response.json();
+            const data = await response.json();
                 
-                if (data.success) {
+            if (data.success) {
                     alert('Questions saved successfully!');
                     document.getElementById('question-editor-modal').style.display = 'none';
                     questions = data.questions || questions;
@@ -387,9 +387,9 @@
                 const data = await response.json();
                 
                 if (data.success && data.questions && data.questions.length > 0) {
-                    questions = data.questions;
+                questions = data.questions;
                     window.currentQuestions = questions;
-                    displayQuestions(questions);
+                displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
                     console.log('Loaded ' + questions.length + ' questions from ' + (data.source || 'database'));
                 }
@@ -460,7 +460,7 @@
                     loadingModal.style.display = 'flex';
                 }
                 
-                console.log('Starting question generation with:', { prompt, predefinedData, difficulty });
+                console.log('Starting question generation with:', { prompt, predefinedData, difficulty, questionCount });
                 
                 try {
                     const wwwroot = config.wwwroot || (typeof M !== 'undefined' && M.cfg && M.cfg.wwwroot) || '';
@@ -475,6 +475,7 @@
                     formData.append('prompt', prompt);
                     formData.append('data', predefinedData);
                     formData.append('difficulty', difficulty);
+                    formData.append('count', questionCount);
                     
                     const response = await fetch(url, {
                         method: 'POST',
@@ -604,7 +605,7 @@
             
             // Automatically push first question when session starts
             setTimeout(() => {
-                pushNextQuestion();
+            pushNextQuestion();
             }, 1000); // Small delay to ensure session is created
         });
 
@@ -784,9 +785,9 @@
             }
         }
         
-        // Listen for question timeout to enable next button
+        // Listen for question timeout to enable next button and show results
         socket.on('question:timeout', () => {
-            console.log('Question timeout - enabling next button');
+            console.log('Question timeout - enabling next button and showing results');
             if (nextBtn) {
                 nextBtn.disabled = false;
                 if (currentQuestionIndex >= questions.length) {
@@ -795,6 +796,9 @@
                     nextBtn.textContent = 'Next Question';
                 }
             }
+            
+            // Auto-show results when time is up
+            displayQuestionResults();
         });
 
         // Display questions
@@ -902,14 +906,15 @@
             }
         });
         
+        // Listen for leaderboard updates
+        socket.on('leaderboard:update', (data) => {
+            console.log('Leaderboard update received:', data);
+            displayLeaderboard(data.leaderboard || []);
+        });
+        
         // Listen for final leaderboard
         socket.on('leaderboard:final', (data) => {
             displayFinalLeaderboard(data.leaderboard || []);
-        });
-
-        // Listen for leaderboard updates
-        socket.on('leaderboard:update', (data) => {
-            updateLeaderboard(data.leaderboard || []);
         });
         
         function displayQuestionResults(data) {
@@ -1011,15 +1016,44 @@
             `;
         }
         
-        function displayFinalLeaderboard(leaderboard) {
-            const container = document.getElementById('final-leaderboard-container');
+        function displayLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboard-container');
             if (!container) return;
             
+            if (!Array.isArray(leaderboard) || leaderboard.length === 0) {
+                container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
+                return;
+            }
+            
+            const topN = config.leaderboardTopN || 5;
+            const topPlayers = leaderboard.slice(0, topN);
+            
+            container.innerHTML = `
+                <h3>🏆 Current Leaderboard</h3>
+                <ol style="padding-left: 20px;">
+                    ${topPlayers.map((entry, index) => {
+                        const rank = index + 1;
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                        return `
+                            <li style="padding: 10px; margin: 8px 0; background: ${rank <= 3 ? '#fff3cd' : '#f8f9fa'}; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: bold;">${medal} ${entry.username || 'User ' + entry.userId}</span>
+                                <span style="font-size: 18px; font-weight: bold; color: #007bff;">${entry.score || 0} pts</span>
+                            </li>
+                        `;
+                    }).join('')}
+                </ol>
+            `;
+        }
+        
+        function displayFinalLeaderboard(leaderboard) {
+            const container = document.getElementById('final-leaderboard-container');
+        if (!container) return;
+
             const topN = config.leaderboardTopN || 3;
             const topPlayers = leaderboard.slice(0, topN);
             
             container.style.display = 'block';
-            container.innerHTML = `
+        container.innerHTML = `
                 <h2 style="margin-top: 0; text-align: center; font-size: 32px;">🏆 Final Leaderboard 🏆</h2>
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
                     ${topPlayers.map((entry, index) => {
@@ -1032,10 +1066,10 @@
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
                                     <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${entry.username || 'User ' + entry.userId}</div>
                                     <div style="font-size: 24px; font-weight: bold;">${entry.score || 0} pts</div>
-                                </div>
+                </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold;">#${rank}</div>
-                            </div>
-                        `;
+            </div>
+        `;
                     }).join('')}
                 </div>
                 ${leaderboard.length > topN ? `
@@ -1085,7 +1119,7 @@
         
         // Student automatically joins session when connecting
         // The WebSocket server handles this in the connection handler
-        
+
         let currentQuestion = null;
         let selectedAnswer = null;
         let timerInterval = null;
@@ -1106,7 +1140,7 @@
                 waitingMsg.style.color = '#0c5460';
             }
         });
-        
+
         // Listen for new questions
         socket.on('question:new', (data) => {
             console.log('New question received:', data);
@@ -1182,21 +1216,46 @@
             // Handle choice selection
             choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(choiceEl => {
                 choiceEl.addEventListener('click', (e) => {
+                    // Allow changing selection before submission
                     // Remove previous selection
                     choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(el => {
                         el.style.transform = 'scale(1)';
                         el.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                        el.classList.remove('selected');
                     });
                     // Select this one
                     const index = parseInt(choiceEl.getAttribute('data-index'));
                     const color = kahootColors[index % 4];
                     choiceEl.style.transform = 'scale(1.05)';
                     choiceEl.style.boxShadow = `0 6px 12px rgba(0,0,0,0.3), 0 0 0 4px ${color.border}`;
+                    choiceEl.classList.add('selected');
                     selectedAnswer = index;
-                    // Auto-submit after selection (or enable submit button if you want manual submit)
-                    setTimeout(() => {
-                        submitAnswer();
-                    }, 300);
+                    
+                    // Show submit button or auto-submit after delay
+                    // For now, let's add a submit button that appears after selection
+                    let submitBtn = document.getElementById('student-submit-btn');
+                    if (!submitBtn) {
+                        submitBtn = document.createElement('button');
+                        submitBtn.id = 'student-submit-btn';
+                        submitBtn.textContent = 'Submit Answer';
+                        submitBtn.style.cssText = `
+                            margin-top: 20px; 
+                            padding: 15px 30px; 
+                            background: #007bff; 
+                            color: white; 
+                            border: none; 
+                            border-radius: 8px; 
+                            font-size: 18px; 
+                            font-weight: bold; 
+                            cursor: pointer;
+                            display: block;
+                            margin-left: auto;
+                            margin-right: auto;
+                        `;
+                        submitBtn.addEventListener('click', submitAnswer);
+                        choicesContainer.parentNode.appendChild(submitBtn);
+                    }
+                    submitBtn.style.display = 'block';
                 });
             });
 
@@ -1219,12 +1278,12 @@
                         timerEl.style.color = '#dc3545';
                         timerEl.style.background = '#f8d7da';
                     }
-                    if (remaining <= 0) {
-                        clearInterval(timerInterval);
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
                         timerEl.textContent = 'Time\'s Up!';
                         timerEl.style.color = '#721c24';
                         timerEl.style.background = '#f8d7da';
-                        submitAnswer();
+                    submitAnswer();
                     }
                 }
             }, 1000);
@@ -1240,7 +1299,8 @@
                 selectedAnswer = -1; // No answer selected
             }
             
-            const timerText = document.getElementById('timer').textContent;
+            const timerEl = document.getElementById('timer');
+            const timerText = timerEl ? timerEl.textContent : '0s';
             const timeMatch = timerText.match(/\d+/);
             const timeSpent = timeMatch ? 60 - parseInt(timeMatch[0]) : 0;
 
@@ -1250,9 +1310,24 @@
                 timeSpent: timeSpent
             });
 
-            const submitBtn = document.getElementById('submit-btn');
+            // Disable choices after submission
+            const choicesContainer = document.getElementById('choices');
+            if (choicesContainer) {
+                choicesContainer.querySelectorAll('.kahoot-choice-student').forEach(el => {
+                    el.style.pointerEvents = 'none';
+                    el.style.opacity = '0.7';
+                });
+            }
+            
+            // Hide submit button after submission
+            const submitBtn = document.getElementById('student-submit-btn');
             if (submitBtn) {
-                submitBtn.disabled = true;
+                submitBtn.style.display = 'none';
+            }
+            
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
             }
         }
 
@@ -1265,7 +1340,7 @@
         // Track student's previous score for comparison
         let previousScore = 0;
         let currentTotalScore = 0;
-        
+
         // Listen for answer result
         socket.on('answer:result', (data) => {
             document.getElementById('question-container').style.display = 'none';
