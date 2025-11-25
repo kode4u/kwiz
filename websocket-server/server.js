@@ -180,6 +180,8 @@ io.on('connection', async (socket) => {
     session.currentQuestion = question;
     session.timer = timer;
     session.started = true;
+    session.questionResponses = [];
+    session.questionNumber = data.questionNumber || 1;
     
     // Store in Redis
     await redisClient.setEx(
@@ -204,6 +206,17 @@ io.on('connection', async (socket) => {
       if (remaining <= 0) {
         clearInterval(timerInterval);
         io.to(room).emit('question:timeout');
+        
+        // Send question results to teacher after timeout
+        setTimeout(async () => {
+          const responses = session.questionResponses || [];
+          io.to(room).emit('question:results', {
+            questionNumber: session.questionNumber,
+            responses: responses,
+            correctCount: responses.filter(r => r.isCorrect).length,
+            totalCount: responses.length
+          });
+        }, 1000);
       }
     }, 1000);
   });
@@ -227,28 +240,50 @@ io.on('connection', async (socket) => {
     const isCorrect = answerIndex === currentQuestion.correct_index;
     const baseScore = isCorrect ? 100 : 0;
     const timeBonus = timeSpent < 10 ? Math.max(0, 50 - timeSpent * 5) : 0;
-    const score = baseScore + timeBonus;
+    const questionScore = baseScore + timeBonus;
+    
+    // Get current total score
+    const currentScore = await redisClient.zScore(
+      `session:${socket.sessionId}:leaderboard`,
+      socket.userId.toString()
+    ) || 0;
+    const totalScore = currentScore + questionScore;
     
     // Update leaderboard
-    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, score);
+    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, questionScore);
     
     // Store answer
+    const answerData = {
+      userId: socket.userId,
+      questionId,
+      answerIndex,
+      isCorrect,
+      questionScore,
+      totalScore,
+      timestamp: Date.now()
+    };
+    
     await redisClient.lPush(
       `session:${socket.sessionId}:answers`,
-      JSON.stringify({
-        userId: socket.userId,
-        questionId,
-        answerIndex,
-        isCorrect,
-        score,
-        timestamp: Date.now()
-      })
+      JSON.stringify(answerData)
     );
     
-    // Emit result to student
+    // Add to session responses for question results
+    if (session.questionResponses) {
+      session.questionResponses.push({
+        userId: socket.userId,
+        username: socket.username || `User ${socket.userId}`,
+        isCorrect,
+        questionScore,
+        totalScore
+      });
+    }
+    
+    // Emit result to student with total score
     socket.emit('answer:result', {
       isCorrect,
-      score,
+      questionScore,
+      totalScore,
       correctAnswer: currentQuestion.correct_index
     });
     
@@ -273,11 +308,32 @@ io.on('connection', async (socket) => {
       { REV: true }
     );
     
+    // Get usernames for leaderboard
+    const finalLeaderboard = await Promise.all(leaderboard.map(async (item) => {
+      const userId = parseInt(item.value);
+      // Try to get username from session or use default
+      const session = sessions.get(socket.sessionId);
+      let username = `User ${userId}`;
+      if (session && session.users) {
+        const user = session.users.get(userId);
+        if (user && user.username) {
+          username = user.username;
+        }
+      }
+      return {
+        userId: userId,
+        username: username,
+        score: Math.round(item.score)
+      };
+    }));
+    
     io.to(room).emit('session:ended', {
-      finalLeaderboard: leaderboard.map(item => ({
-        userId: item.value,
-        score: item.score
-      }))
+      finalLeaderboard: finalLeaderboard
+    });
+    
+    // Emit final leaderboard
+    io.to(room).emit('leaderboard:final', {
+      leaderboard: finalLeaderboard
     });
     
     // Cleanup

@@ -555,6 +555,7 @@
             }
 
             const question = questions[currentQuestionIndex];
+            const timeLimit = config.timeLimitPerQuestion || 60;
             const questionData = {
                 question: {
                     id: 'q' + (currentQuestionIndex + 1),
@@ -564,44 +565,45 @@
                         : JSON.parse(question.choices || '[]').map(c => typeof c === 'string' ? c : c.text),
                     correct_index: question.correct_index
                 },
-                timer: 60,
-                questionNumber: currentQuestionIndex + 1
+                timer: timeLimit,
+                questionNumber: currentQuestionIndex + 1,
+                totalQuestions: questions.length
             };
             
             socket.emit('teacher:push_question', questionData);
             
-            // Update display
-            const currentQEl = document.getElementById('current-question-display');
-            const currentQText = document.getElementById('current-question-text');
-            if (currentQEl && currentQText) {
-                currentQEl.style.display = 'block';
-                const qText = question.question || question.question_text || '';
-                const choices = Array.isArray(question.choices) 
-                    ? question.choices 
-                    : (typeof question.choices === 'string' ? JSON.parse(question.choices || '[]') : []);
-                currentQText.innerHTML = `
-                    <p><strong>Question ${currentQuestionIndex + 1}:</strong> ${qText}</p>
-                    <ul>
-                        ${choices.map((c, i) => `<li ${i === question.correct_index ? 'style="color: green; font-weight: bold;"' : ''}>${typeof c === 'string' ? c : (c.text || '')}</li>`).join('')}
-                    </ul>
-                `;
+            // Show active question display for teacher
+            const activeQEl = document.getElementById('active-question-display');
+            const activeQNum = document.getElementById('active-question-number');
+            const activeQText = document.getElementById('active-question-text');
+            const activeQTimer = document.getElementById('active-question-timer');
+            const activeQChoices = document.getElementById('active-question-choices');
+            
+            if (activeQEl) {
+                activeQEl.style.display = 'block';
+                if (activeQNum) activeQNum.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+                if (activeQText) activeQText.textContent = questionData.question.text;
+                if (activeQTimer) {
+                    activeQTimer.textContent = `Time Limit: ${timeLimit} seconds`;
+                    activeQTimer.style.color = '#007bff';
+                }
+                if (activeQChoices) {
+                    activeQChoices.innerHTML = '<div style="margin-top: 10px;"><strong>Choices:</strong></div>' +
+                        questionData.question.choices.map((c, i) => 
+                            `<div style="padding: 8px; margin: 5px 0; background: ${i === question.correct_index ? '#d4edda' : '#f8f9fa'}; border-radius: 4px; border-left: 4px solid ${i === question.correct_index ? '#28a745' : '#dee2e6'};">
+                                ${i === question.correct_index ? '✓ ' : ''}${c}
+                            </div>`
+                        ).join('');
+                }
             }
             
-            currentQuestionIndex++;
-            if (currentQuestionIndex >= questions.length) {
-                if (nextBtn) nextBtn.disabled = true;
-            }
-            
-            // Display current question
-            document.getElementById('current-question-display').style.display = 'block';
-            document.getElementById('current-question-text').innerHTML = `
-                <strong>Question ${currentQuestionIndex + 1} of ${questions.length}</strong><br>
-                ${questionData.question.text}
-            `;
+            // Hide previous results
+            const resultsEl = document.getElementById('question-results-display');
+            if (resultsEl) resultsEl.style.display = 'none';
             
             currentQuestionIndex++;
             if (currentQuestionIndex >= questions.length && nextBtn) {
-                nextBtn.textContent = 'End Session';
+                nextBtn.textContent = 'End Quiz';
             }
         }
 
@@ -691,10 +693,95 @@
             if (currentQEl) currentQEl.style.display = 'none';
         });
 
+        // Track previous scores for comparison
+        let previousScores = {};
+        let questionResults = [];
+        
+        // Listen for question results
+        socket.on('question:results', (data) => {
+            displayQuestionResults(data);
+        });
+        
+        // Listen for final leaderboard
+        socket.on('leaderboard:final', (data) => {
+            displayFinalLeaderboard(data.leaderboard || []);
+        });
+
         // Listen for leaderboard updates
         socket.on('leaderboard:update', (data) => {
             updateLeaderboard(data.leaderboard || []);
         });
+        
+        function displayQuestionResults(data) {
+            const resultsEl = document.getElementById('question-results-display');
+            if (!resultsEl) return;
+            
+            const questionNum = data.questionNumber || currentQuestionIndex;
+            const responses = data.responses || [];
+            const correctCount = responses.filter(r => r.is_correct).length;
+            const totalCount = responses.length;
+            
+            resultsEl.style.display = 'block';
+            resultsEl.innerHTML = `
+                <h3 style="margin-top: 0;">Question ${questionNum} Results</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="background: #d4edda; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #155724;">${correctCount}</div>
+                        <div style="color: #155724;">Correct Answers</div>
+                    </div>
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div>
+                        <div style="color: #721c24;">Incorrect Answers</div>
+                    </div>
+                    <div style="background: #d1ecf1; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #0c5460;">${totalCount}</div>
+                        <div style="color: #0c5460;">Total Responses</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayFinalLeaderboard(leaderboard) {
+            const container = document.getElementById('final-leaderboard-container');
+            if (!container) return;
+            
+            const topN = config.leaderboardTopN || 3;
+            const topPlayers = leaderboard.slice(0, topN);
+            
+            container.style.display = 'block';
+            container.innerHTML = `
+                <h2 style="margin-top: 0; text-align: center; font-size: 32px;">🏆 Final Leaderboard 🏆</h2>
+                <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
+                    ${topPlayers.map((entry, index) => {
+                        const rank = index + 1;
+                        const height = rank === 1 ? '120px' : rank === 2 ? '100px' : '80px';
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                        return `
+                            <div style="text-align: center; flex: 1; max-width: 200px;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
+                                <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${entry.username || 'User ' + entry.userId}</div>
+                                    <div style="font-size: 24px; font-weight: bold;">${entry.score || 0} pts</div>
+                                </div>
+                                <div style="margin-top: 10px; font-size: 18px; font-weight: bold;">#${rank}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                ${leaderboard.length > topN ? `
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+                        <h3 style="text-align: center;">Other Participants</h3>
+                        <ol style="list-style: none; padding: 0;">
+                            ${leaderboard.slice(topN).map((entry, index) => `
+                                <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                                    #${topN + index + 1} - ${entry.username || 'User ' + entry.userId}: ${entry.score || 0} pts
+                                </li>
+                            `).join('')}
+                        </ol>
+                    </div>
+                ` : ''}
+            `;
+        }
 
         function updateLeaderboard(leaderboard) {
             const container = document.getElementById('leaderboard-container');
@@ -703,7 +790,7 @@
                 return;
             }
             container.innerHTML = `
-                <h3>Leaderboard</h3>
+                <h3>Current Leaderboard</h3>
                 <ol>
                     ${leaderboard.map((entry, index) => `
                         <li>
@@ -786,8 +873,9 @@
                 });
             });
 
-            // Start timer
-            let remaining = timer || 60;
+            // Start timer with config time limit
+            const timeLimit = config.timeLimitPerQuestion || timer || 60;
+            let remaining = timeLimit;
             document.getElementById('timer').textContent = `Time remaining: ${remaining}s`;
             
             if (timerInterval) clearInterval(timerInterval);
@@ -829,15 +917,116 @@
 
         document.getElementById('submit-btn').addEventListener('click', submitAnswer);
 
+        // Track student's previous score for comparison
+        let previousScore = 0;
+        let currentTotalScore = 0;
+        
         // Listen for answer result
         socket.on('answer:result', (data) => {
             document.getElementById('question-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
-            document.getElementById('result-container').innerHTML = `
-                <div class="result ${data.isCorrect ? 'correct' : 'incorrect'}">
-                    <h3>${data.isCorrect ? 'Correct!' : 'Incorrect'}</h3>
-                    <p>Your score: ${data.score} points</p>
+            
+            const isCorrect = data.isCorrect || false;
+            const questionScore = data.questionScore || 0;
+            currentTotalScore = data.totalScore || currentTotalScore;
+            const scoreChange = currentTotalScore - previousScore;
+            
+            // Build result HTML with comparison
+            let resultHTML = `
+                <div class="result ${isCorrect ? 'correct' : 'incorrect'}" style="padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 20px; background: ${isCorrect ? '#d4edda' : '#f8d7da'}; border: 3px solid ${isCorrect ? '#28a745' : '#dc3545'};">
+                    <div style="font-size: 48px; margin-bottom: 15px;">${isCorrect ? '✓' : '✗'}</div>
+                    <h2 style="margin: 0 0 10px 0; color: ${isCorrect ? '#155724' : '#721c24'};">
+                        ${isCorrect ? 'Correct!' : 'Incorrect'}
+                    </h2>
+                    <div style="font-size: 24px; font-weight: bold; color: ${isCorrect ? '#155724' : '#721c24'}; margin-bottom: 20px;">
+                        +${questionScore} points
+                    </div>
                 </div>
+            `;
+            
+            // Add comparison to previous question
+            if (previousScore > 0 || currentTotalScore > 0) {
+                const comparisonContainer = document.getElementById('question-comparison-container');
+                if (comparisonContainer) {
+                    comparisonContainer.style.display = 'block';
+                    comparisonContainer.innerHTML = `
+                        <h3 style="margin-top: 0;">Score Comparison</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Previous Score</div>
+                                <div style="font-size: 28px; font-weight: bold; color: #0056b3;">${previousScore}</div>
+                            </div>
+                            <div style="background: ${scoreChange >= 0 ? '#d4edda' : '#f8d7da'}; padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Score Change</div>
+                                <div style="font-size: 28px; font-weight: bold; color: ${scoreChange >= 0 ? '#155724' : '#721c24'};">
+                                    ${scoreChange >= 0 ? '+' : ''}${scoreChange}
+                                </div>
+                            </div>
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Current Total</div>
+                                <div style="font-size: 28px; font-weight: bold; color: #856404;">${currentTotalScore}</div>
+                            </div>
+                        </div>
+                        ${scoreChange > 0 ? `
+                            <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 6px; text-align: center; color: #155724;">
+                                🎉 Great job! You improved by ${scoreChange} points!
+                            </div>
+                        ` : scoreChange === 0 ? `
+                            <div style="margin-top: 15px; padding: 10px; background: #d1ecf1; border-radius: 6px; text-align: center; color: #0c5460;">
+                                Keep going! Your score remains the same.
+                            </div>
+                        ` : ''}
+                    `;
+                }
+            }
+            
+            document.getElementById('result-container').innerHTML = resultHTML;
+            
+            // Update previous score for next comparison
+            previousScore = currentTotalScore;
+        });
+        
+        // Listen for final leaderboard
+        socket.on('leaderboard:final', (data) => {
+            const container = document.getElementById('final-leaderboard-container');
+            if (!container) return;
+            
+            const leaderboard = data.leaderboard || [];
+            const topN = config.leaderboardTopN || 3;
+            const topPlayers = leaderboard.slice(0, topN);
+            
+            container.style.display = 'block';
+            container.innerHTML = `
+                <h2 style="margin-top: 0; text-align: center; font-size: 32px; color: white;">🏆 Final Leaderboard 🏆</h2>
+                <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
+                    ${topPlayers.map((entry, index) => {
+                        const rank = index + 1;
+                        const height = rank === 1 ? '120px' : rank === 2 ? '100px' : '80px';
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                        return `
+                            <div style="text-align: center; flex: 1; max-width: 200px;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
+                                <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${entry.username || 'User ' + entry.userId}</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: white;">${entry.score || 0} pts</div>
+                                </div>
+                                <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: white;">#${rank}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                ${leaderboard.length > topN ? `
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+                        <h3 style="text-align: center; color: white;">Other Participants</h3>
+                        <ol style="list-style: none; padding: 0;">
+                            ${leaderboard.slice(topN).map((entry, index) => `
+                                <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px; color: white;">
+                                    #${topN + index + 1} - ${entry.username || 'User ' + entry.userId}: ${entry.score || 0} pts
+                                </li>
+                            `).join('')}
+                        </ol>
+                    </div>
+                ` : ''}
             `;
         });
 

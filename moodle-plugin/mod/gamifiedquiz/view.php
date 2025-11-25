@@ -124,7 +124,9 @@ window.GAMIFIED_QUIZ_CONFIG = {
     llmBackend: ' . json_encode(isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai') . ',
     usePredefined: ' . (isset($gamifiedquiz->use_predefined) && $gamifiedquiz->use_predefined ? 'true' : 'false') . ',
     predefinedData: ' . json_encode(isset($gamifiedquiz->predefined_data) ? $gamifiedquiz->predefined_data : '') . ',
-    questionsData: ' . json_encode(isset($gamifiedquiz->questions_data) ? $gamifiedquiz->questions_data : '') . '
+    questionsData: ' . json_encode(isset($gamifiedquiz->questions_data) ? $gamifiedquiz->questions_data : '') . ',
+    timeLimitPerQuestion: ' . (isset($gamifiedquiz->time_limit_per_question) ? intval($gamifiedquiz->time_limit_per_question) : 60) . ',
+    leaderboardTopN: ' . (isset($gamifiedquiz->leaderboard_top_n) ? intval($gamifiedquiz->leaderboard_top_n) : 3) . '
 };
 </script>';
 
@@ -149,11 +151,16 @@ if ($is_teacher) {
     echo '</div>';
     echo '<div id="session-status" class="session-status" style="display:none;"></div>';
     echo '<div id="questions-container" class="questions-container"></div>';
-    echo '<div id="current-question-display" style="display:none; background: white; padding: 15px; border-radius: 4px; margin: 15px 0;">';
-    echo '<h3>Current Question</h3>';
-    echo '<div id="current-question-text"></div>';
+    echo '<div id="active-question-display" style="display:none; background: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">';
+    echo '<h3 style="margin-top: 0; color: #333;">Active Question</h3>';
+    echo '<div id="active-question-number" style="font-size: 14px; color: #666; margin-bottom: 10px;"></div>';
+    echo '<div id="active-question-text" style="font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;"></div>';
+    echo '<div id="active-question-timer" style="font-size: 16px; color: #007bff; margin-bottom: 10px;"></div>';
+    echo '<div id="active-question-choices" style="margin-top: 15px;"></div>';
     echo '</div>';
+    echo '<div id="question-results-display" style="display:none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;"></div>';
     echo '<div id="leaderboard-container" class="leaderboard-container"></div>';
+    echo '<div id="final-leaderboard-container" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; margin: 30px 0; color: white;"></div>';
     echo '</div>';
     echo '</div>';
 } else {
@@ -170,6 +177,7 @@ if ($is_teacher) {
     echo '<button id="submit-btn" class="btn btn-primary" disabled>' . get_string('submit_answer', 'mod_gamifiedquiz') . '</button>';
     echo '</div>';
     echo '<div id="result-container" class="result-container" style="display:none;"></div>';
+    echo '<div id="question-comparison-container" style="display:none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;"></div>';
     echo '<div id="leaderboard-container" class="leaderboard-container"></div>';
     echo '</div>';
     echo '</div>';

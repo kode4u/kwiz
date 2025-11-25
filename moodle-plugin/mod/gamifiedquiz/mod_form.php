@@ -88,6 +88,23 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->setDefault('color_palette', 'kahoot');
         $mform->addHelpButton('color_palette', 'color_palette', 'mod_gamifiedquiz');
 
+        // Time Limit Per Question
+        $mform->addElement('text', 'time_limit_per_question', get_string('time_limit_per_question', 'mod_gamifiedquiz'), array('size' => '10'));
+        $mform->setType('time_limit_per_question', PARAM_INT);
+        $mform->setDefault('time_limit_per_question', 60);
+        $mform->addRule('time_limit_per_question', null, 'required', null, 'client');
+        $mform->addRule('time_limit_per_question', null, 'numeric', null, 'client');
+        $mform->addHelpButton('time_limit_per_question', 'time_limit_per_question', 'mod_gamifiedquiz');
+
+        // Leaderboard Top N
+        $mform->addElement('select', 'leaderboard_top_n', get_string('leaderboard_top_n', 'mod_gamifiedquiz'), array(
+            '3' => '3',
+            '5' => '5',
+            '10' => '10'
+        ));
+        $mform->setDefault('leaderboard_top_n', 3);
+        $mform->addHelpButton('leaderboard_top_n', 'leaderboard_top_n', 'mod_gamifiedquiz');
+
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }

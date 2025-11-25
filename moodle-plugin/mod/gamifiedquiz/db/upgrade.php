@@ -85,13 +85,26 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
     
     // Add new fields for LLM backend, template, color palette, etc.
     if ($oldversion < 2025010104) {
-        // Note: For new installations, these fields are added via install.xml
-        // This upgrade is for existing installations only
-        // Fields will be added automatically on next install.xml update
-        
-        // For now, we'll just mark the upgrade as complete
-        // The fields will be added when install.xml is updated
         upgrade_mod_savepoint(true, 2025010104, 'gamifiedquiz');
+    }
+    
+    // Add time_limit_per_question and leaderboard_top_n fields
+    if ($oldversion < 2025010105) {
+        $table = new xmldb_table('gamifiedquiz');
+        
+        // Add time_limit_per_question field
+        $field = new xmldb_field('time_limit_per_question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '60', 'questions_data');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Add leaderboard_top_n field
+        $field = new xmldb_field('leaderboard_top_n', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '3', 'time_limit_per_question');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010105, 'gamifiedquiz');
     }
     
     // Return true to indicate upgrade was successful
