@@ -796,20 +796,14 @@
             }
         }
         
-        // Listen for question timeout to enable next button and show results
+        // Listen for question timeout to auto-move to next question
         socket.on('question:timeout', () => {
-            console.log('Question timeout - enabling next button and showing results');
-            if (nextBtn) {
-                nextBtn.disabled = false;
-                if (currentQuestionIndex >= questions.length) {
-                    nextBtn.textContent = 'End Quiz';
-                } else {
-                    nextBtn.textContent = 'Next Question';
-                }
-            }
+            console.log('Question timeout - auto-moving to next question');
             
-            // Auto-show results when time is up
-            displayQuestionResults();
+            // Auto-move to next question after a short delay to show results
+            setTimeout(() => {
+                pushNextQuestion();
+            }, 3000); // 3 second delay to show results before moving on
         });
 
         // Display questions
