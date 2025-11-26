@@ -588,6 +588,9 @@
             });
         }
 
+        // Current session instance ID
+        let currentSessionInstanceId = null;
+        
         // Start session
         startBtn.addEventListener('click', () => {
             if (questions.length === 0) {
@@ -598,9 +601,15 @@
                 alert('WebSocket not connected. Please check your connection and refresh the page.');
                 return;
             }
+            
+            // Generate unique session instance ID
+            currentSessionInstanceId = `${config.quizId}_${Date.now()}`;
+            
             socket.emit('teacher:create_session', {
                 session_id: config.sessionId,
-                quiz_id: config.quizId
+                instance_id: currentSessionInstanceId,
+                quiz_id: config.quizId,
+                questions: questions
             });
             if (startBtn) startBtn.disabled = true;
             if (endBtn) endBtn.disabled = false;
@@ -609,22 +618,70 @@
             const statusEl = document.getElementById('session-status');
             if (statusEl) {
                 statusEl.style.display = 'block';
-                statusEl.textContent = 'Session started! Students can now join.';
+                statusEl.textContent = `Session started! ID: ${currentSessionInstanceId.slice(-8)}`;
                 statusEl.style.background = '#d1ecf1';
                 statusEl.style.borderColor = '#0c5460';
             }
             
+            // Clear leaderboard display
+            const leaderboardContainer = document.getElementById('leaderboard-container');
+            if (leaderboardContainer) {
+                leaderboardContainer.innerHTML = '<h3>Current Leaderboard</h3><p>Waiting for students to answer...</p>';
+            }
+            
+            // Save session start to database
+            saveSessionToDatabase({
+                instanceId: currentSessionInstanceId,
+                quizId: config.quizId,
+                questions: questions,
+                startedAt: Math.floor(Date.now() / 1000)
+            });
+            
             // Automatically push first question when session starts
             setTimeout(() => {
-            pushNextQuestion();
-            }, 1000); // Small delay to ensure session is created
+                pushNextQuestion();
+            }, 1000);
         });
 
         // End session
         if (endBtn) {
             endBtn.addEventListener('click', () => {
-            socket.emit('teacher:end_session');
-        });
+                socket.emit('teacher:end_session', {
+                    instance_id: currentSessionInstanceId
+                });
+                
+                // Re-enable start button for new session
+                if (startBtn) startBtn.disabled = false;
+                if (endBtn) endBtn.disabled = true;
+                if (nextBtn) nextBtn.disabled = true;
+            });
+        }
+        
+        // Save session to database
+        async function saveSessionToDatabase(sessionData) {
+            try {
+                const formData = new FormData();
+                formData.append('quizid', config.quizId);
+                formData.append('sessionid', sessionData.instanceId);
+                formData.append('sessionname', `Session ${new Date().toLocaleString()}`);
+                formData.append('questionsdata', JSON.stringify(sessionData.questions || []));
+                formData.append('totalquestions', (sessionData.questions || []).length);
+                formData.append('startedat', sessionData.startedAt);
+                
+                const response = await fetch('ajax/save_session.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Session saved to database:', sessionData.instanceId);
+                } else {
+                    console.error('Failed to save session:', result.error);
+                }
+            } catch (error) {
+                console.error('Error saving session:', error);
+            }
         }
 
         // Next question button
@@ -636,6 +693,32 @@
             });
         } else {
             console.error('Next Question button not found!');
+        }
+        
+        // Update session in database (for ending session with results)
+        async function updateSessionInDatabase(sessionData) {
+            try {
+                const formData = new FormData();
+                formData.append('quizid', config.quizId);
+                formData.append('sessionid', sessionData.instanceId);
+                formData.append('participantscount', sessionData.participantsCount);
+                formData.append('sessionresults', JSON.stringify(sessionData.sessionResults || []));
+                formData.append('endedat', sessionData.endedAt);
+                
+                const response = await fetch('ajax/save_session.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Session results saved:', sessionData.instanceId);
+                } else {
+                    console.error('Failed to save session results:', result.error);
+                }
+            } catch (error) {
+                console.error('Error saving session results:', error);
+            }
         }
 
         // Push question
@@ -883,13 +966,24 @@
         socket.on('session:ended', (data) => {
             const statusEl = document.getElementById('session-status');
             if (statusEl) {
-                statusEl.textContent = 'Session ended';
-                statusEl.style.background = '#f8d7da';
+                statusEl.textContent = 'Session ended - Results saved';
+                statusEl.style.background = '#d4edda';
             }
             if (endBtn) endBtn.disabled = true;
             if (nextBtn) nextBtn.disabled = true;
+            if (startBtn) startBtn.disabled = false; // Re-enable for new session
             const currentQEl = document.getElementById('current-question-display');
             if (currentQEl) currentQEl.style.display = 'none';
+            
+            // Save final session results to database
+            if (data.sessionData && currentSessionInstanceId) {
+                updateSessionInDatabase({
+                    instanceId: currentSessionInstanceId,
+                    participantsCount: data.sessionData.participantsCount || 0,
+                    sessionResults: data.finalLeaderboard || [],
+                    endedAt: data.sessionData.endedAt || Math.floor(Date.now() / 1000)
+                });
+            }
             
             // Save session results to database
             if (data.sessionData) {
@@ -942,8 +1036,21 @@
         const viewSessionsBtn = document.createElement('button');
         viewSessionsBtn.textContent = 'View Past Sessions';
         viewSessionsBtn.style.cssText = 'margin: 10px; padding: 5px 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;';
-        viewSessionsBtn.addEventListener('click', () => {
-            showSessionsDialog();
+        viewSessionsBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`ajax/get_sessions.php?quizid=${config.quizId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displaySessionsDialog(result.sessions);
+                } else {
+                    console.error('Failed to load sessions:', result.error);
+                    alert('Failed to load session history: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                alert('Error loading session history: ' + error.message);
+            }
         });
         
         const controlsDiv = document.querySelector('.controls');
@@ -1498,13 +1605,15 @@
             const questionsData = JSON.stringify(currentQuestions || []);
             const sessionResults = JSON.stringify(leaderboard || []);
             
-        const formData = new FormData();
-        formData.append('quizid', config.quizId);
-        formData.append('sessionid', sessionData.sessionId);
+            const formData = new FormData();
+            formData.append('quizid', config.quizId);
+            formData.append('sessionid', sessionData.instanceId || sessionData.sessionId);
+            formData.append('sessionname', `Session ${new Date().toLocaleString()}`);
             formData.append('questionsdata', questionsData);
             formData.append('participantscount', sessionData.participantsCount);
             formData.append('totalquestions', currentQuestions ? currentQuestions.length : 0);
             formData.append('sessionresults', sessionResults);
+            formData.append('startedat', sessionData.startedAt || Math.floor(Date.now() / 1000));
             formData.append('endedat', sessionData.endedAt);
             
             const response = await fetch('ajax/save_session.php', {

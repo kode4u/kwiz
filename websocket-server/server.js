@@ -87,14 +87,15 @@ async function getSession(sessionId) {
  * Update leaderboard in Redis
  */
 async function updateLeaderboard(sessionId, userId, score) {
-  const key = `session:${sessionId}:leaderboard`;
+  // Get session to use instance ID
+  const session = sessions.get(sessionId);
+  const instanceId = session?.instanceId || sessionId;
+  
+  const key = `session:${instanceId}:leaderboard`;
   await redisClient.zIncrBy(key, score, userId.toString());
   
   // Get ALL users from leaderboard (not just top 10)
   const top = await redisClient.zRangeWithScores(key, 0, -1, { REV: true });
-  
-  // Get session to fetch usernames
-  const session = sessions.get(sessionId);
   
   console.log(`updateLeaderboard: sessionId=${sessionId}, userId=${userId}, score=${score}`);
   console.log(`Redis leaderboard data (ALL users):`, top);
@@ -179,9 +180,10 @@ io.on('connection', async (socket) => {
     console.log(`Student registered: ${socket.userId} "${socket.username}"`);
   }
   
-  // Store user info in session
-  session.users.set(socket.userId, {
-    id: socket.userId,
+  // Store user info in session (ensure numeric key for consistency)
+  const numericUserId = parseInt(socket.userId);
+  session.users.set(numericUserId, {
+    id: numericUserId,
     username: socket.username,
     role: socket.role
   });
@@ -201,18 +203,34 @@ io.on('connection', async (socket) => {
       return;
     }
     
-    session.started = false;
+    // Use instance ID from client or generate one
+    const sessionInstanceId = data.instance_id || `${socket.sessionId}_${Date.now()}`;
+    session.instanceId = sessionInstanceId;
+    session.started = true;
+    session.startedAt = Date.now();
+    session.questions = data.questions || [];
     
     // Clear any existing leaderboard data for fresh start (reset scores)
-    const leaderboardKey = `session:${socket.sessionId}:leaderboard`;
-    const answersKey = `session:${socket.sessionId}:answers`;
-    const studentsKey = `session:${socket.sessionId}:students`;
+    const leaderboardKey = `session:${sessionInstanceId}:leaderboard`;
+    const answersKey = `session:${sessionInstanceId}:answers`;
+    const studentsKey = `session:${sessionInstanceId}:students`;
     
     await redisClient.del(leaderboardKey);
     await redisClient.del(answersKey);
     await redisClient.del(studentsKey);
     
-    console.log(`Reset all session data for ${socket.sessionId} - scores cleared for new session`);
+    // Clear session users map to reset usernames
+    session.users.clear();
+    // Re-add teacher
+    const numericUserId = parseInt(socket.userId);
+    session.users.set(numericUserId, {
+      id: numericUserId,
+      username: socket.username,
+      role: socket.role
+    });
+    
+    console.log(`Created new session instance: ${sessionInstanceId} - ALL scores reset to 0`);
+    console.log(`Session questions: ${session.questions.length}`);
     
     // Reset session data
     session.questionResponses = [];
@@ -221,7 +239,14 @@ io.on('connection', async (socket) => {
     
     io.to(room).emit('session:created', {
       sessionId: socket.sessionId,
+      instanceId: sessionInstanceId,
       teacherId: socket.userId
+    });
+    
+    // Notify all students that a new session has started
+    io.to(room).emit('session:reset', {
+      instanceId: sessionInstanceId,
+      message: 'New session started - scores reset'
     });
   });
   
@@ -391,8 +416,10 @@ io.on('connection', async (socket) => {
       return;
     }
     
+    const instanceId = session.instanceId || socket.sessionId;
+    
     const leaderboard = await redisClient.zRangeWithScores(
-      `session:${socket.sessionId}:leaderboard`,
+      `session:${instanceId}:leaderboard`,
       0,
       -1,
       { REV: true }
@@ -401,8 +428,6 @@ io.on('connection', async (socket) => {
     // Get usernames for leaderboard
     const finalLeaderboard = await Promise.all(leaderboard.map(async (item) => {
       const userId = parseInt(item.value);
-      // Try to get username from session or use default
-      const session = sessions.get(socket.sessionId);
       let username = `User ${userId}`;
       if (session && session.users) {
         const user = session.users.get(userId);
@@ -420,9 +445,11 @@ io.on('connection', async (socket) => {
     // Save session results to database (emit to Moodle for storage)
     const sessionData = {
       sessionId: socket.sessionId,
+      instanceId: instanceId,
       teacherId: socket.userId,
       participantsCount: finalLeaderboard.length,
       finalLeaderboard: finalLeaderboard,
+      startedAt: session.startedAt ? Math.floor(session.startedAt / 1000) : null,
       endedAt: Math.floor(Date.now() / 1000)
     };
     
