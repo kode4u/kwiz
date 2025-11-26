@@ -315,15 +315,17 @@ io.on('connection', async (socket) => {
       return;
     }
     
-    console.log(`Student ${socket.userId} "${socket.username}" submitted answer ${answerIndex}`);
+    console.log(`Student ${socket.userId} "${socket.username}" submitted answer ${answerIndex}, timeSpent=${timeSpent}s`);
     
-    // Calculate score
+    // Calculate score: 400 base for correct, + (remaining seconds * 20) as speed bonus
     const isCorrect = answerIndex === currentQuestion.correct_index;
-    const baseScore = isCorrect ? 100 : 0;
-    const timeBonus = timeSpent < 10 ? Math.max(0, 50 - timeSpent * 5) : 0;
-    const questionScore = baseScore + timeBonus;
+    const timerDuration = session.timer || 60;
+    const remainingSeconds = Math.max(0, timerDuration - (timeSpent || 0));
+    const baseScore = isCorrect ? 400 : 0;
+    const speedBonus = isCorrect ? Math.round(remainingSeconds * 20) : 0;
+    const questionScore = baseScore + speedBonus;
     
-    console.log(`Score calculation: base=${baseScore}, timeBonus=${timeBonus}, total=${questionScore}`);
+    console.log(`Score calculation: correct=${isCorrect}, base=${baseScore}, remainingSec=${remainingSeconds}, speedBonus=${speedBonus}, total=${questionScore}`);
     
     // Get current total score
     const currentScore = await redisClient.zScore(

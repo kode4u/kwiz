@@ -775,9 +775,9 @@
             // Increment index AFTER pushing
             currentQuestionIndex++;
             
-            // Disable next button until timer expires (results will enable it)
+            // Keep next button enabled so teacher can proceed anytime
             if (nextBtn) {
-                nextBtn.disabled = true;
+                nextBtn.disabled = false;
                 if (currentQuestionIndex >= questions.length) {
                     nextBtn.textContent = 'End Quiz';
                 } else {
@@ -1166,6 +1166,7 @@
         let currentQuestion = null;
         let selectedAnswer = null;
         let timerInterval = null;
+        let currentTimerDuration = 60;
         
         // Update waiting message
         const waitingMsg = document.getElementById('waiting-message');
@@ -1289,6 +1290,7 @@
 
             // Start timer with config time limit
             const timeLimit = config.timeLimitPerQuestion || timer || 60;
+            currentTimerDuration = timeLimit; // Store for score calculation
             let remaining = timeLimit;
             const timerEl = document.getElementById('timer');
             if (timerEl) {
@@ -1330,7 +1332,9 @@
             const timerEl = document.getElementById('timer');
             const timerText = timerEl ? timerEl.textContent : '0s';
             const timeMatch = timerText.match(/\d+/);
-            const timeSpent = timeMatch ? 60 - parseInt(timeMatch[0]) : 0;
+            const remainingTime = timeMatch ? parseInt(timeMatch[0]) : 0;
+            const timerDuration = currentTimerDuration || config.timeLimitPerQuestion || 60;
+            const timeSpent = timerDuration - remainingTime;
 
             socket.emit('student:submit_answer', {
                 questionId: currentQuestion.id,
