@@ -1461,9 +1461,9 @@
     // Save session start data to database
     async function saveSessionStartData(sessionStartData) {
         try {
-            const formData = new FormData();
-            formData.append('quizid', quizId);
-            formData.append('sessionid', sessionStartData.sessionId);
+        const formData = new FormData();
+        formData.append('quizid', config.quizId);
+        formData.append('sessionid', sessionStartData.sessionId);
             formData.append('questionsdata', sessionStartData.questionsData);
             formData.append('totalquestions', sessionStartData.totalQuestions);
             formData.append('startedat', sessionStartData.startedAt);
@@ -1490,9 +1490,9 @@
             const questionsData = JSON.stringify(currentQuestions || []);
             const sessionResults = JSON.stringify(leaderboard || []);
             
-            const formData = new FormData();
-            formData.append('quizid', quizId);
-            formData.append('sessionid', sessionData.sessionId);
+        const formData = new FormData();
+        formData.append('quizid', config.quizId);
+        formData.append('sessionid', sessionData.sessionId);
             formData.append('questionsdata', questionsData);
             formData.append('participantscount', sessionData.participantsCount);
             formData.append('totalquestions', currentQuestions ? currentQuestions.length : 0);
@@ -1518,7 +1518,7 @@
     // Show sessions dialog
     async function showSessionsDialog() {
         try {
-            const response = await fetch(`ajax/get_sessions.php?quizid=${quizId}`);
+            const response = await fetch(`ajax/get_sessions.php?quizid=${config.quizId}`);
             const result = await response.json();
             
             if (result.success) {
