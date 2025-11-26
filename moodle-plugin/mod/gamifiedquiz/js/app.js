@@ -282,27 +282,30 @@
             saveQuestionsToServer(savedQuestions, config);
         }
         
-        async function saveQuestionsToServer(questions, config) {
+        async function saveQuestionsToServer(questionsToSave, config) {
             try {
                 const wwwroot = config.wwwroot || '';
                 const sesskey = config.sesskey || '';
                 const url = wwwroot + '/mod/gamifiedquiz/ajax/save_questions.php';
                 
+                console.log('Saving to server:', questionsToSave);
+                
                 const response = await fetch(url, {
-                method: 'POST',
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `quizid=${config.quizId}&cmid=${config.cmId}&sesskey=${sesskey}&questions=${encodeURIComponent(JSON.stringify(questions))}`
+                    body: `quizid=${config.quizId}&cmid=${config.cmId}&sesskey=${sesskey}&questions=${encodeURIComponent(JSON.stringify(questionsToSave))}`
                 });
                 
-            const data = await response.json();
+                const data = await response.json();
+                console.log('Server response:', data);
                 
-            if (data.success) {
+                if (data.success) {
                     alert('Questions saved successfully!');
                     document.getElementById('question-editor-modal').style.display = 'none';
-                    questions = data.questions || questions;
+                    // Update the outer questions array
+                    questions.length = 0;
+                    (data.questions || questionsToSave).forEach(q => questions.push(q));
                     window.currentQuestions = questions;
-                    // Don't display questions preview
-                    // displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;
                 } else {
                     alert('Error saving questions: ' + (data.error || 'Unknown error'));
@@ -592,6 +595,8 @@
 
         // Current session instance ID
         let currentSessionInstanceId = null;
+        // Track leaderboard for saving
+        let currentLeaderboard = [];
         
         // Start session
         startBtn.addEventListener('click', async () => {
@@ -695,9 +700,6 @@
                 if (nextBtn) nextBtn.disabled = true;
             });
         }
-        
-        // Track leaderboard for saving
-        let currentLeaderboard = [];
         
         // Save session to database
         async function saveSessionToDatabase(sessionData) {
@@ -1102,15 +1104,6 @@
             }
         });
         
-        // Add debug button to populate test leaderboard
-        const debugBtn = document.createElement('button');
-        debugBtn.textContent = 'Add Test Users';
-        debugBtn.style.cssText = 'margin: 10px; padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
-        debugBtn.addEventListener('click', () => {
-            console.log('Adding test users to leaderboard');
-            socket.emit('debug:populate_leaderboard');
-        });
-        
         // Add View Past Sessions button
         const viewSessionsBtn = document.createElement('button');
         viewSessionsBtn.textContent = 'View Past Sessions';
@@ -1349,6 +1342,10 @@
         // Just attach event listeners to existing elements
         
         console.log('Initializing student app...');
+        console.log('Student config:', config);
+        console.log('Student userId:', config.userId);
+        console.log('Student userName:', config.userName);
+        console.log('Student fullName:', config.fullName);
         
         // Student automatically joins session when connecting
         // The WebSocket server handles this in the connection handler
@@ -1542,11 +1539,15 @@
             const timerDuration = currentTimerDuration || config.timeLimitPerQuestion || 60;
             const timeSpent = timerDuration - remainingTime;
 
-            socket.emit('student:submit_answer', {
+            const submitData = {
                 questionId: currentQuestion.id,
                 answerIndex: selectedAnswer,
-                timeSpent: timeSpent
-            });
+                timeSpent: timeSpent,
+                userId: config.userId,
+                fullName: config.fullName || config.userName || 'Unknown'
+            };
+            console.log('Submitting answer to WebSocket:', submitData);
+            socket.emit('student:submit_answer', submitData);
 
             // Disable choices after submission
             const choicesContainer = document.getElementById('choices');
@@ -1633,9 +1634,11 @@
             `;
         });
 
-        // Listen for leaderboard updates
+        // Listen for leaderboard updates (students don't see leaderboard during quiz)
         socket.on('leaderboard:update', (data) => {
             const container = document.getElementById('leaderboard-container');
+            if (!container) return; // Students don't have leaderboard container
+            
             const leaderboard = data.leaderboard || [];
             if (leaderboard.length === 0) {
                 container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
@@ -1657,6 +1660,12 @@
 
         // Listen for session end
         socket.on('session:ended', (data) => {
+            // Clear any running timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
             const waitingMsg = document.getElementById('waiting-message');
             if (waitingMsg) {
                 waitingMsg.style.display = 'block';

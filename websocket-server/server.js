@@ -162,7 +162,9 @@ io.use((socket, next) => {
   socket.userId = decoded.user_id;
   socket.role = decoded.role;
   socket.sessionId = decoded.session_id;
-  socket.username = decoded.username || `User ${decoded.user_id}`;
+  socket.username = decoded.username && decoded.username.trim() ? decoded.username.trim() : `User ${decoded.user_id}`;
+  
+  console.log(`JWT decoded - userId: ${decoded.user_id}, username: "${decoded.username}", using: "${socket.username}"`);
   
   next();
 });
@@ -265,28 +267,6 @@ io.on('connection', async (socket) => {
     });
   });
   
-  // Debug: Add test users to leaderboard (for testing purposes)
-  socket.on('debug:populate_leaderboard', async () => {
-    if (socket.role !== 'teacher') return;
-    
-    const key = `session:${socket.sessionId}:leaderboard`;
-    
-    // Add some test users
-    await redisClient.zAdd(key, { score: 150, value: '1' });
-    await redisClient.zAdd(key, { score: 200, value: '2' });
-    await redisClient.zAdd(key, { score: 100, value: '3' });
-    
-    // Add test users to session
-    session.users.set(1, { id: 1, username: 'Alice Johnson', role: 'student' });
-    session.users.set(2, { id: 2, username: 'Bob Smith', role: 'student' });
-    session.users.set(3, { id: 3, username: 'Charlie Brown', role: 'student' });
-    
-    console.log('Added test users to leaderboard');
-    
-    // Send updated leaderboard
-    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, 0);
-    io.to(room).emit('leaderboard:update', { leaderboard });
-  });
   
   // Teacher: Push question
   socket.on('teacher:push_question', async (data) => {
@@ -348,23 +328,48 @@ io.on('connection', async (socket) => {
   
   // Student: Submit answer
   socket.on('student:submit_answer', async (data) => {
+    console.log('=== STUDENT SUBMIT ANSWER ===');
+    console.log('Received data:', JSON.stringify(data));
+    console.log('Socket role:', socket.role, 'userId:', socket.userId);
+    
     if (socket.role !== 'student') {
+      console.log('Rejected: not a student');
       socket.emit('error', { message: 'Unauthorized' });
       return;
     }
     
-    const { questionId, answerIndex, timeSpent } = data;
+    const { questionId, answerIndex, timeSpent, userId, fullName } = data;
     const currentQuestion = session.currentQuestion;
     
+    // Update socket username if fullName provided from client
+    if (fullName && fullName !== 'Unknown') {
+      socket.username = fullName;
+      // Also update in session users map
+      const numericUserId = parseInt(socket.userId);
+      if (session.users.has(numericUserId)) {
+        session.users.get(numericUserId).username = fullName;
+      } else {
+        session.users.set(numericUserId, { id: numericUserId, username: fullName, role: 'student' });
+      }
+      console.log(`Updated username for user ${socket.userId} to "${fullName}"`);
+    }
+    
     if (!currentQuestion || currentQuestion.id !== questionId) {
+      console.log('Question mismatch! currentQuestion:', currentQuestion ? currentQuestion.id : 'null', 'submitted:', questionId);
       socket.emit('error', { message: 'Invalid question' });
       return;
     }
     
     console.log(`Student ${socket.userId} "${socket.username}" submitted answer ${answerIndex}, timeSpent=${timeSpent}s`);
+    console.log(`Current question correct_index: ${currentQuestion.correct_index} (type: ${typeof currentQuestion.correct_index})`);
+    console.log(`Submitted answerIndex: ${answerIndex} (type: ${typeof answerIndex})`);
     
     // Calculate score: 400 base for correct, + (remaining seconds * 20) as speed bonus
-    const isCorrect = answerIndex === currentQuestion.correct_index;
+    // Ensure both are integers for comparison
+    const correctIdx = parseInt(currentQuestion.correct_index);
+    const submittedIdx = parseInt(answerIndex);
+    const isCorrect = submittedIdx === correctIdx;
+    console.log(`Comparison: ${submittedIdx} === ${correctIdx} = ${isCorrect}`);
     const timerDuration = session.timer || 60;
     const remainingSeconds = Math.max(0, timerDuration - (timeSpent || 0));
     const baseScore = isCorrect ? 400 : 0;

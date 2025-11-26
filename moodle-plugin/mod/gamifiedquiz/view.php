@@ -108,6 +108,9 @@ echo '<style>
 .question-editor-close:hover, .question-editor-close:focus, .generate-questions-close:hover, .generate-questions-close:focus { color: #000; text-decoration: none; }
 </style>';
 
+// Get user's full name for display
+$user_fullname = fullname($USER);
+
 // Set config before loading JS - use inline script to ensure it's available
 echo '<script>
 window.GAMIFIED_QUIZ_CONFIG = {
@@ -115,6 +118,9 @@ window.GAMIFIED_QUIZ_CONFIG = {
     jwtToken: ' . json_encode($jwt_token) . ',
     sessionId: ' . json_encode($session_id) . ',
     role: ' . json_encode($role) . ',
+    userId: ' . $USER->id . ',
+    userName: ' . json_encode($USER->username) . ',
+    fullName: ' . json_encode($user_fullname) . ',
     quizId: ' . $gamifiedquiz->id . ',
     cmId: ' . $cm->id . ',
     topic: ' . json_encode($gamifiedquiz->topic) . ',
