@@ -594,7 +594,7 @@
         let currentSessionInstanceId = null;
         
         // Start session
-        startBtn.addEventListener('click', () => {
+        startBtn.addEventListener('click', async () => {
             if (questions.length === 0) {
                 alert('Please generate questions first!');
                 return;
@@ -604,13 +604,35 @@
                 return;
             }
             
-            // Generate unique session instance ID
-            currentSessionInstanceId = `${config.quizId}_${Date.now()}`;
+            // Create session in database first
+            try {
+                const formData = new FormData();
+                formData.append('quizid', config.quizId);
+                formData.append('questionsdata', JSON.stringify(questions));
+                
+                const response = await fetch('ajax/session_start.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (!result.success) {
+                    alert('Failed to create session: ' + result.error);
+                    return;
+                }
+                
+                currentSessionInstanceId = result.sessionId;
+                console.log('Session created in DB:', currentSessionInstanceId);
+            } catch (error) {
+                console.error('Failed to create session:', error);
+                alert('Failed to create session');
+                return;
+            }
             
             socket.emit('teacher:create_session', {
                 session_id: config.sessionId,
                 instance_id: currentSessionInstanceId,
-                quiz_id: config.quizId,
+                quizId: config.quizId,
                 questions: questions
             });
             if (startBtn) startBtn.disabled = true;
@@ -647,7 +669,22 @@
 
         // End session
         if (endBtn) {
-            endBtn.addEventListener('click', () => {
+            endBtn.addEventListener('click', async () => {
+                // End session in database
+                try {
+                    const formData = new FormData();
+                    formData.append('sessionid', currentSessionInstanceId);
+                    formData.append('resultsdata', JSON.stringify(currentLeaderboard || []));
+                    
+                    await fetch('ajax/session_end.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    console.log('Session ended in DB');
+                } catch (error) {
+                    console.error('Failed to end session in DB:', error);
+                }
+                
                 socket.emit('teacher:end_session', {
                     instance_id: currentSessionInstanceId
                 });
@@ -658,6 +695,9 @@
                 if (nextBtn) nextBtn.disabled = true;
             });
         }
+        
+        // Track leaderboard for saving
+        let currentLeaderboard = [];
         
         // Save session to database
         async function saveSessionToDatabase(sessionData) {
@@ -1022,10 +1062,11 @@
             console.log('Leaderboard update received:', data);
             console.log('Leaderboard data:', data.leaderboard);
             if (data.leaderboard && data.leaderboard.length > 0) {
+                currentLeaderboard = data.leaderboard;
                 displayLeaderboard(data.leaderboard);
             } else {
                 console.log('No leaderboard data to display');
-                // Show empty leaderboard
+                currentLeaderboard = [];
                 displayLeaderboard([]);
             }
         });
@@ -1324,8 +1365,24 @@
         }
 
         // Listen for session created
-        socket.on('session:created', (data) => {
-            console.log('Session created, waiting for questions...');
+        socket.on('session:created', async (data) => {
+            console.log('Session created, waiting for questions...', data);
+            
+            // Update participant count in database
+            if (data.instanceId) {
+                try {
+                    const formData = new FormData();
+                    formData.append('sessionid', data.instanceId);
+                    await fetch('ajax/session_join.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    console.log('Joined session in DB');
+                } catch (error) {
+                    console.error('Failed to join session in DB:', error);
+                }
+            }
+            
             const waitingMsg = document.getElementById('waiting-message');
             if (waitingMsg) {
                 waitingMsg.textContent = 'Session started! Waiting for question...';

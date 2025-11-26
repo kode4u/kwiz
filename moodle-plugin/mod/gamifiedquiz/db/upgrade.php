@@ -194,6 +194,32 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010106, 'gamifiedquiz');
     }
     
+    // Add participant_count and results_data to sessions, username to responses
+    if ($oldversion < 2025010108) {
+        // Sessions table updates
+        $table = new xmldb_table('gamifiedquiz_sessions');
+        
+        $field = new xmldb_field('participant_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'started');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        $field = new xmldb_field('results_data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'questions_data');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Responses table updates
+        $table = new xmldb_table('gamifiedquiz_responses');
+        
+        $field = new xmldb_field('username', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'userid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010108, 'gamifiedquiz');
+    }
+    
     // Return true to indicate upgrade was successful
     return true;
 }

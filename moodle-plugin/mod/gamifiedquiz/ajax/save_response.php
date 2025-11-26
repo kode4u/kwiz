@@ -30,6 +30,7 @@ try {
     $response->session_id = $sessionid;
     $response->questionid = $questionid;
     $response->userid = $userid;
+    $response->username = $username;
     $response->answer_index = $answerindex;
     $response->is_correct = $iscorrect;
     $response->score = $score;
