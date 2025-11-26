@@ -175,14 +175,14 @@
                 <label>Question Text:</label>
                 <textarea class="question-text-input" rows="3" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">${qText}</textarea>
                 <label>Choices:</label>
-                <div class="choices-container-${index}"></div>
+                <div class="choices-container" data-question-index="${index}"></div>
                 <button type="button" class="add-choice-btn" data-index="${index}" style="margin-top: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Add Choice</button>
                 <button type="button" class="remove-question-btn" data-index="${index}" style="margin-top: 10px; margin-left: 10px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove Question</button>
             `;
             
             form.appendChild(questionDiv);
             
-            const choicesContainer = questionDiv.querySelector(`.choices-container-${index}`);
+            const choicesContainer = questionDiv.querySelector('.choices-container');
             
             // Add existing choices
             choices.forEach((choice, cIndex) => {
@@ -236,8 +236,8 @@
                 if (!qText) return;
                 
                 const choices = [];
-                // Find choices container by class prefix instead of exact index
-                const choicesContainer = item.querySelector('[class^="choices-container-"]');
+                // Find choices container
+                const choicesContainer = item.querySelector('.choices-container');
                 if (!choicesContainer) {
                     console.error('Choices container not found for question', qIndex);
                     return;
