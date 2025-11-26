@@ -303,14 +303,20 @@ io.on('connection', async (socket) => {
       questionNumber: data.questionNumber || 1
     });
     
+    // Clear any existing timer
+    if (session.timerInterval) {
+      clearInterval(session.timerInterval);
+    }
+    
     // Start timer countdown
     let remaining = timer;
-    const timerInterval = setInterval(() => {
+    session.timerInterval = setInterval(() => {
       remaining--;
       io.to(room).emit('timer:update', { remaining });
       
       if (remaining <= 0) {
-        clearInterval(timerInterval);
+        clearInterval(session.timerInterval);
+        session.timerInterval = null;
         io.to(room).emit('question:timeout');
         
         // Send question results to teacher after timeout (immediately)
@@ -468,6 +474,12 @@ io.on('connection', async (socket) => {
     // Cleanup
     session.started = false;
     session.currentQuestion = null;
+    
+    // Clear timer if running
+    if (session.timerInterval) {
+      clearInterval(session.timerInterval);
+      session.timerInterval = null;
+    }
   });
   
   // Get current leaderboard

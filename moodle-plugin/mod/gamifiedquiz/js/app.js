@@ -1564,12 +1564,33 @@
         socket.on('session:ended', (data) => {
             const waitingMsg = document.getElementById('waiting-message');
             if (waitingMsg) {
-                waitingMsg.textContent = 'Quiz session ended';
+                waitingMsg.style.display = 'block';
+                waitingMsg.textContent = 'Quiz session ended. Thank you for participating!';
             }
             const questionContainer = document.getElementById('question-container');
             if (questionContainer) {
                 questionContainer.style.display = 'none';
             }
+            // Reset student score for this session
+            currentTotalScore = 0;
+            previousScore = 0;
+        });
+        
+        // Listen for session reset (new session started)
+        socket.on('session:reset', (data) => {
+            console.log('New session started:', data);
+            const waitingMsg = document.getElementById('waiting-message');
+            if (waitingMsg) {
+                waitingMsg.style.display = 'block';
+                waitingMsg.textContent = 'New quiz session started! Waiting for first question...';
+            }
+            const questionContainer = document.getElementById('question-container');
+            if (questionContainer) {
+                questionContainer.style.display = 'none';
+            }
+            // Reset student score for new session
+            currentTotalScore = 0;
+            previousScore = 0;
         });
     }
     
