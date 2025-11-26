@@ -223,6 +223,10 @@
         function saveQuestions(config) {
             const modal = document.getElementById('question-editor-modal');
             const form = document.getElementById('question-editor-form');
+            if (!form) {
+                alert('Error: Question editor form not found');
+                return;
+            }
             const questionItems = form.querySelectorAll('.question-editor-item');
             
             const savedQuestions = [];
@@ -232,9 +236,15 @@
                 if (!qText) return;
                 
                 const choices = [];
-                const choicesContainer = item.querySelector(`.choices-container-${qIndex}`);
+                // Find choices container by class prefix instead of exact index
+                const choicesContainer = item.querySelector('[class^="choices-container-"]');
+                if (!choicesContainer) {
+                    console.error('Choices container not found for question', qIndex);
+                    return;
+                }
                 const choiceInputs = choicesContainer.querySelectorAll('.choice-text-input');
-                const correctRadio = item.querySelector(`input[name="correct-${qIndex}"]:checked`);
+                // Find checked radio by looking for any checked correct radio in this item
+                const correctRadio = item.querySelector('input[type="radio"]:checked');
                 
                 let correctIndex = 0;
                 choiceInputs.forEach((input, cIndex) => {
