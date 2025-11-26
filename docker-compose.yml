@@ -123,6 +123,21 @@ services:
       timeout: 10s
       retries: 5
 
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: jica-phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: moodle
+      PMA_PASSWORD: moodlepass
+    ports:
+      - "8081:80"
+    networks:
+      - jica-network
+    depends_on:
+      - db
+
 volumes:
   mysql_data:
   redis_data:

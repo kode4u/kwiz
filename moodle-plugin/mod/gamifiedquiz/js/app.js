@@ -272,10 +272,12 @@
             });
             
             if (savedQuestions.length === 0) {
-                alert('Please add at least one question with at least 2 choices');
-                return;
+                if (!confirm('No valid questions found. Save empty question list?')) {
+                    return;
+                }
             }
             
+            console.log('Saving questions:', savedQuestions);
             // Save via AJAX
             saveQuestionsToServer(savedQuestions, config);
         }
@@ -961,6 +963,11 @@
                 statusEl.textContent = 'Session active - Students can join';
                 statusEl.style.background = '#d1ecf1';
             }
+            // Clear leaderboard for new session
+            displayLeaderboard([]);
+            // Store new instance ID
+            currentSessionInstanceId = data.instanceId;
+            console.log('New session created with instanceId:', currentSessionInstanceId);
         });
 
         socket.on('session:ended', (data) => {
@@ -1020,6 +1027,37 @@
                 console.log('No leaderboard data to display');
                 // Show empty leaderboard
                 displayLeaderboard([]);
+            }
+        });
+        
+        // Listen for student responses to save to database
+        socket.on('response:save', async (data) => {
+            console.log('Saving student response to database:', data);
+            try {
+                const formData = new FormData();
+                formData.append('sessionid', data.sessionId);
+                formData.append('userid', data.userId);
+                formData.append('username', data.username);
+                formData.append('questionid', data.questionId);
+                formData.append('questiontext', data.questionText || '');
+                formData.append('answerindex', data.answerIndex);
+                formData.append('iscorrect', data.isCorrect ? 1 : 0);
+                formData.append('score', data.score);
+                formData.append('timespent', data.timeSpent || 0);
+                formData.append('quizid', config.quizId);
+                
+                const response = await fetch('ajax/save_response.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Response saved to database:', result.responseid);
+                } else {
+                    console.error('Failed to save response:', result.error);
+                }
+            } catch (error) {
+                console.error('Error saving response to database:', error);
             }
         });
         

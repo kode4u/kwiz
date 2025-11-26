@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3001;
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production';
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:8080';
+const MOODLE_URL = process.env.MOODLE_URL || 'http://moodle:80';
 
 // Middleware
 app.use(cors({ origin: CORS_ORIGIN }));
@@ -91,7 +92,12 @@ async function updateLeaderboard(sessionId, userId, score) {
   const session = sessions.get(sessionId);
   const instanceId = session?.instanceId || sessionId;
   
+  console.log('=== UPDATE LEADERBOARD ===');
+  console.log(`sessionId: ${sessionId}, instanceId: ${instanceId}, userId: ${userId}, score: ${score}`);
+  
   const key = `session:${instanceId}:leaderboard`;
+  console.log(`Redis key being used: ${key}`);
+  
   await redisClient.zIncrBy(key, score, userId.toString());
   
   // Get ALL users from leaderboard (not just top 10)
@@ -206,6 +212,7 @@ io.on('connection', async (socket) => {
     // Use instance ID from client or generate one
     const sessionInstanceId = data.instance_id || `${socket.sessionId}_${Date.now()}`;
     session.instanceId = sessionInstanceId;
+    session.quizId = data.quizId; // Store quiz ID for database saves
     session.started = true;
     session.startedAt = Date.now();
     session.questions = data.questions || [];
@@ -215,9 +222,17 @@ io.on('connection', async (socket) => {
     const answersKey = `session:${sessionInstanceId}:answers`;
     const studentsKey = `session:${sessionInstanceId}:students`;
     
+    console.log('=== CREATING NEW SESSION ===');
+    console.log(`New instanceId: ${sessionInstanceId}`);
+    console.log(`Deleting Redis keys: ${leaderboardKey}, ${answersKey}, ${studentsKey}`);
+    
     await redisClient.del(leaderboardKey);
     await redisClient.del(answersKey);
     await redisClient.del(studentsKey);
+    
+    // Verify deletion
+    const checkScore = await redisClient.zRangeWithScores(leaderboardKey, 0, -1);
+    console.log(`After deletion, leaderboard contents: ${JSON.stringify(checkScore)}`);
     
     // Clear session users map to reset usernames
     session.users.clear();
@@ -358,14 +373,17 @@ io.on('connection', async (socket) => {
     
     console.log(`Score calculation: correct=${isCorrect}, base=${baseScore}, remainingSec=${remainingSeconds}, speedBonus=${speedBonus}, total=${questionScore}`);
     
+    // Use instanceId for session-specific scores
+    const instanceId = session.instanceId || socket.sessionId;
+    
     // Get current total score
     const currentScore = await redisClient.zScore(
-      `session:${socket.sessionId}:leaderboard`,
+      `session:${instanceId}:leaderboard`,
       socket.userId.toString()
     ) || 0;
     const totalScore = currentScore + questionScore;
     
-    console.log(`User ${socket.userId} score: current=${currentScore}, new total=${totalScore}`);
+    console.log(`User ${socket.userId} score: current=${currentScore}, new total=${totalScore}, instanceId=${instanceId}`);
     
     // Update leaderboard
     const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, questionScore);
@@ -383,14 +401,14 @@ io.on('connection', async (socket) => {
     };
     
     await redisClient.lPush(
-      `session:${socket.sessionId}:answers`,
+      `session:${instanceId}:answers`,
       JSON.stringify(answerData)
     );
     
     // Add to session responses for question results
     if (session.questionResponses) {
       session.questionResponses.push({
-        userId: socket.userId,
+        userId: parseInt(socket.userId),
         username: socket.username || `User ${socket.userId}`,
         answerIndex: answerIndex,
         isCorrect,
@@ -412,6 +430,21 @@ io.on('connection', async (socket) => {
     io.to(room).emit('leaderboard:update', {
       leaderboard: leaderboard,
       questionId: questionId
+    });
+    
+    // Also emit to teacher to save to Moodle database
+    io.to(room).emit('response:save', {
+      sessionId: instanceId,
+      quizId: session.quizId,
+      userId: parseInt(socket.userId),
+      username: socket.username || `User ${socket.userId}`,
+      questionId: questionId,
+      questionText: currentQuestion.question || currentQuestion.text,
+      answerIndex: answerIndex,
+      isCorrect: isCorrect,
+      score: questionScore,
+      totalScore: totalScore,
+      timeSpent: timeSpent
     });
   });
   
