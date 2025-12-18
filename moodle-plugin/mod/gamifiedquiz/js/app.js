@@ -1127,7 +1127,6 @@
         
         const controlsDiv = document.querySelector('.controls');
         if (controlsDiv) {
-            controlsDiv.appendChild(debugBtn);
             controlsDiv.appendChild(viewSessionsBtn);
         }
         

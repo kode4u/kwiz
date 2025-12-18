@@ -87,49 +87,56 @@ async function getSession(sessionId) {
 /**
  * Update leaderboard in Redis
  */
-async function updateLeaderboard(sessionId, userId, score) {
+async function updateLeaderboard(sessionId, visitorUserId, score, visitorUsername = null) {
   // Get session to use instance ID
   const session = sessions.get(sessionId);
   const instanceId = session?.instanceId || sessionId;
   
   console.log('=== UPDATE LEADERBOARD ===');
-  console.log(`sessionId: ${sessionId}, instanceId: ${instanceId}, userId: ${userId}, score: ${score}`);
+  console.log(`sessionId: ${sessionId}, instanceId: ${instanceId}, visitorUserId: ${visitorUserId}, score: ${score}, visitorUsername: ${visitorUsername}`);
   
-  const key = `session:${instanceId}:leaderboard`;
-  console.log(`Redis key being used: ${key}`);
+  const leaderboardKey = `session:${instanceId}:leaderboard`;
+  const usernamesKey = `session:${instanceId}:usernames`;
   
-  await redisClient.zIncrBy(key, score, userId.toString());
+  // Store score
+  await redisClient.zIncrBy(leaderboardKey, score, visitorUserId.toString());
   
-  // Get ALL users from leaderboard (not just top 10)
-  const top = await redisClient.zRangeWithScores(key, 0, -1, { REV: true });
+  // Store username in Redis hash if provided
+  if (visitorUsername) {
+    await redisClient.hSet(usernamesKey, visitorUserId.toString(), visitorUsername);
+  }
   
-  console.log(`updateLeaderboard: sessionId=${sessionId}, userId=${userId}, score=${score}`);
-  console.log(`Redis leaderboard data (ALL users):`, top);
-  console.log(`Session users:`, session ? Array.from(session.users.entries()) : 'No session');
+  // Get ALL users from leaderboard
+  const top = await redisClient.zRangeWithScores(leaderboardKey, 0, -1, { REV: true });
+  
+  // Get all usernames from Redis
+  const usernames = await redisClient.hGetAll(usernamesKey);
+  console.log('Stored usernames in Redis:', usernames);
   
   const leaderboard = top.map(item => {
-    const userId = parseInt(item.value);
-    let username = `User ${userId}`;
+    const odUserId = item.value;
+    let username = `User ${odUserId}`;
     
-    // Try to get username from session users
-    if (session && session.users) {
-      const user = session.users.get(userId);
+    // First try Redis stored username
+    if (usernames[odUserId]) {
+      username = usernames[odUserId];
+    }
+    // Then try session users
+    else if (session && session.users) {
+      const user = session.users.get(parseInt(odUserId));
       if (user && user.username) {
         username = user.username;
-        console.log(`Found username for user ${userId}: ${username}`);
-      } else {
-        console.log(`No username found for user ${userId}, using default`);
       }
     }
     
     return {
-      userId: userId,
+      userId: odUserId,
       username: username,
       score: Math.round(item.score)
     };
   });
   
-  console.log(`Final leaderboard being returned:`, leaderboard);
+  console.log(`Final leaderboard:`, leaderboard);
   return leaderboard;
 }
 
@@ -171,6 +178,11 @@ io.use((socket, next) => {
 
 io.on('connection', async (socket) => {
   console.log(`User connected: ${socket.userId} (${socket.role}) "${socket.username}" in session ${socket.sessionId}`);
+  
+  // Log all incoming events for debugging
+  socket.onAny((eventName, ...args) => {
+    console.log(`[EVENT] ${socket.userId} (${socket.role}): ${eventName}`, JSON.stringify(args).substring(0, 200));
+  });
   
   const session = await getSession(socket.sessionId);
   const room = `session:${socket.sessionId}`;
@@ -390,8 +402,8 @@ io.on('connection', async (socket) => {
     
     console.log(`User ${socket.userId} score: current=${currentScore}, new total=${totalScore}, instanceId=${instanceId}`);
     
-    // Update leaderboard
-    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, questionScore);
+    // Update leaderboard with username
+    const leaderboard = await updateLeaderboard(socket.sessionId, socket.userId, questionScore, socket.username);
     console.log(`Updated leaderboard:`, leaderboard);
     
     // Store answer
