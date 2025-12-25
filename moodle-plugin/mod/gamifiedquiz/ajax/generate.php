@@ -62,8 +62,8 @@ try {
         $api_url = 'http://localhost:5000';
     }
     
-    // Get LLM backend from quiz instance, default to 'openai'
-    $backend = isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai';
+    // Get LLM backend from quiz instance, default to 'local' (Ollama)
+    $backend = isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'local';
     
     // Use provided prompt/data/difficulty, or fall back to quiz instance values
     $topic = !empty($prompt) ? $prompt : $gamifiedquiz->topic;

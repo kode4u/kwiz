@@ -77,6 +77,8 @@ For each question, provide:
 3. The index (0-3) of the correct answer
 4. A brief explanation
 
+CRITICAL: Return ONLY valid JSON array. No markdown, no code blocks, no explanations outside JSON.
+
 Format as JSON array:
 [
   {{
@@ -94,7 +96,11 @@ Format as JSON array:
   }}
 ]
 
-Return ONLY valid JSON, no markdown formatting."""
+IMPORTANT: 
+- Ensure all strings are properly escaped
+- No trailing commas
+- Valid JSON syntax only
+- Return the array directly, nothing else."""
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -168,6 +174,8 @@ For each question, provide:
 3. The index (0-3) of the correct answer
 4. A brief explanation
 
+CRITICAL: Return ONLY valid JSON array. No markdown, no code blocks, no explanations outside JSON.
+
 Format as JSON array:
 [
   {{
@@ -185,7 +193,11 @@ Format as JSON array:
   }}
 ]
 
-Return ONLY valid JSON, no markdown formatting."""
+IMPORTANT: 
+- Ensure all strings are properly escaped
+- No trailing commas
+- Valid JSON syntax only
+- Return the array directly, nothing else."""
         
         response = model.generate_content(prompt)
         content = response.text.strip()
@@ -238,6 +250,8 @@ For each question, provide:
 3. The index (0-3) of the correct answer
 4. A brief explanation
 
+CRITICAL: Return ONLY valid JSON array. No markdown, no code blocks, no explanations outside JSON.
+
 Format as JSON array:
 [
   {{
@@ -255,13 +269,17 @@ Format as JSON array:
   }}
 ]
 
-Return ONLY valid JSON, no markdown formatting."""
+IMPORTANT: 
+- Ensure all strings are properly escaped
+- No trailing commas
+- Valid JSON syntax only
+- Return the array directly, nothing else."""
         
         # Use Ollama API
         response = requests.post(
             f"{LOCAL_LLM_URL}/api/generate",
             json={
-                "model": "llama2",  # Default model, can be configured
+                "model": os.getenv('OLLAMA_MODEL', 'llama3.2:latest'),  # Default model, can be configured
                 "prompt": prompt,
                 "stream": False
             },
@@ -281,7 +299,69 @@ Return ONLY valid JSON, no markdown formatting."""
                 content = content[4:]
             content = content.strip()
         
-        questions_data = json.loads(content)
+        # Try to extract JSON from the response if it contains extra text
+        # Look for JSON array or object patterns
+        import re
+        json_match = re.search(r'(\[[\s\S]*\]|\{[\s\S]*\})', content)
+        if json_match:
+            content = json_match.group(1)
+        
+        # Try to parse JSON with better error handling
+        try:
+            questions_data = json.loads(content)
+        except json.JSONDecodeError as e:
+            # Try to fix common JSON issues
+            # Remove trailing commas before closing brackets/braces
+            content = re.sub(r',\s*}', '}', content)
+            content = re.sub(r',\s*]', ']', content)
+            # Fix unescaped quotes in strings (basic attempt)
+            # Remove any text before first [ or {
+            content = re.sub(r'^[^[{]*', '', content)
+            # Remove any text after last ] or }
+            content = re.sub(r'[^}\]]*$', '', content)
+            # Try parsing again
+            try:
+                questions_data = json.loads(content)
+            except json.JSONDecodeError as e2:
+                # Try to extract just the array/object part more aggressively
+                # Find the first complete JSON structure
+                bracket_count = 0
+                brace_count = 0
+                start_idx = -1
+                for i, char in enumerate(content):
+                    if char in '[{':
+                        if start_idx == -1:
+                            start_idx = i
+                        if char == '[':
+                            bracket_count += 1
+                        else:
+                            brace_count += 1
+                    elif char in ']}':
+                        if char == ']':
+                            bracket_count -= 1
+                        else:
+                            brace_count -= 1
+                        if start_idx != -1 and bracket_count == 0 and brace_count == 0:
+                            # Found complete structure
+                            content = content[start_idx:i+1]
+                            try:
+                                questions_data = json.loads(content)
+                                break
+                            except:
+                                pass
+                
+                # Final attempt
+                try:
+                    questions_data = json.loads(content)
+                except json.JSONDecodeError as e3:
+                    # Log the problematic content for debugging
+                    error_msg = f"Invalid JSON from LLM: {str(e3)}. Position: line {e3.lineno}, col {e3.colno}. Response preview: {content[max(0, e3.pos-100):e3.pos+100]}"
+                    raise Exception(error_msg)
+        
+        # Handle both single object and array responses
+        if not isinstance(questions_data, list):
+            questions_data = [questions_data]
+        
         questions = []
         
         for q_data in questions_data:

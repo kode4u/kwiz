@@ -218,7 +218,7 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 60); // 60 second timeout
+    curl_setopt($ch, CURLOPT_TIMEOUT, 180); // 180 second timeout (local LLM can be slow)
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 second connection timeout
 
     $response = curl_exec($ch);
@@ -227,8 +227,9 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     curl_close($ch);
 
     if ($curl_error) {
-        error_log("Gamified Quiz: cURL error: " . $curl_error);
-        return false;
+        $error_msg = "cURL error: " . $curl_error;
+        error_log("Gamified Quiz: " . $error_msg);
+        return array('error' => $error_msg . ". Please check if LLM API is accessible at " . $api_url);
     }
 
     if ($http_code === 200) {
@@ -257,7 +258,7 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
         } else {
             $error_msg .= ": " . substr($response, 0, 200);
         }
-        error_log("Gamified Quiz: " . $error_msg);
+        error_log("Gamified Quiz: " . $error_msg . " (API URL: " . $api_url . ")");
         return array('error' => $error_msg);
     }
 }
