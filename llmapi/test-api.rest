@@ -1,0 +1,235 @@
+### LLM API Test Suite
+### Use REST Client extension in VS Code to run these requests
+###
+### For Local LLM (DeepSeek-Coder V2) tests:
+### 1. Make sure Ollama is running: ollama serve
+### 2. Pull the model: ollama pull deepseek-coder:latest
+### 3. Set LLM_BACKEND=local in your environment (or use backend: "local" in request)
+###
+### Note: The API automatically detects if you're running locally vs in Docker
+### and will try localhost as fallback if the configured URL fails
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### Variables
+@topic = Python programming
+@level = medium
+@nQuestions = 2
+@language = en
+
+###############################################
+### Health Check
+###############################################
+
+### Health Check
+GET {{baseUrl}}/health
+
+###############################################
+### Question Generation Tests
+###############################################
+
+### Generate Questions - Basic (OpenAI default)
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "{{topic}}",
+  "level": "{{level}}",
+  "n_questions": {{nQuestions}},
+  "language": "{{language}}"
+}
+
+### Generate Questions - Easy Level
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "JavaScript basics",
+  "level": "easy",
+  "n_questions": 1,
+  "language": "en"
+}
+
+### Generate Questions - Hard Level
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Machine Learning algorithms",
+  "level": "hard",
+  "n_questions": 3,
+  "language": "en"
+}
+
+### Generate Questions - With Bloom's Taxonomy
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Data structures",
+  "level": "medium",
+  "n_questions": 2,
+  "language": "en",
+  "bloom_level": "application"
+}
+
+### Generate Questions - With Context
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "REST API design",
+  "level": "medium",
+  "n_questions": 1,
+  "language": "en",
+  "context": "Focus on HTTP methods and status codes"
+}
+
+### Generate Questions - Using OpenAI Backend
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Flask framework",
+  "level": "medium",
+  "n_questions": 2,
+  "language": "en",
+  "backend": "openai"
+}
+
+### Generate Questions - Using Gemini Backend
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Database normalization",
+  "level": "medium",
+  "n_questions": 1,
+  "language": "en",
+  "backend": "gemini"
+}
+
+### Generate Questions - Using Local LLM Backend (DeepSeek-Coder V2)
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Python programming",
+  "level": "medium",
+  "n_questions": 2,
+  "language": "en",
+  "backend": "local"
+}
+
+### Generate Questions - Local LLM with Code Topic
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "JavaScript async/await",
+  "level": "medium",
+  "n_questions": 1,
+  "language": "en",
+  "backend": "local",
+  "context": "Focus on practical examples"
+}
+
+### Generate Questions - Khmer Language
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Programming fundamentals",
+  "level": "medium",
+  "n_questions": 1,
+  "language": "km"
+}
+
+### Generate Questions - Maximum Questions
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Web development",
+  "level": "medium",
+  "n_questions": 10,
+  "language": "en"
+}
+
+### Generate Questions - All Parameters
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Object-oriented programming",
+  "level": "hard",
+  "n_questions": 3,
+  "language": "en",
+  "bloom_level": "analysis",
+  "context": "Focus on inheritance and polymorphism",
+  "backend": "openai"
+}
+
+###############################################
+### Error Cases
+###############################################
+
+### Missing Required Field (topic)
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "level": "medium",
+  "n_questions": 1
+}
+
+### Invalid Difficulty Level
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Test topic",
+  "level": "invalid",
+  "n_questions": 1
+}
+
+### Exceeding Max Questions
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Test topic",
+  "level": "medium",
+  "n_questions": 20
+}
+
+### Invalid Backend
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Test topic",
+  "level": "medium",
+  "n_questions": 1,
+  "backend": "invalid_backend"
+}
+
+###############################################
+### Question Validation
+###############################################
+
+### Validate Question
+POST {{baseUrl}}/validate
+Content-Type: {{contentType}}
+
+{
+  "question": "What is Python?",
+  "choices": [
+    {"text": "A programming language", "is_correct": true},
+    {"text": "A snake", "is_correct": false},
+    {"text": "A framework", "is_correct": false},
+    {"text": "A database", "is_correct": false}
+  ],
+  "difficulty": "easy"
+}
