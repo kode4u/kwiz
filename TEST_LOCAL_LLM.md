@@ -57,7 +57,7 @@ The LLM API is configured to use Ollama via `host.docker.internal:11434` (Window
 
 **Available models in Ollama:**
 - Check available models: `curl http://localhost:11434/api/tags`
-- Current default: `llama3.2` (can be changed via `OLLAMA_MODEL` env var)
+- Current default: `deepseek-coder:latest` (can be changed via `OLLAMA_MODEL` env var)
 
 ### Update Model
 

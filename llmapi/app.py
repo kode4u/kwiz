@@ -6,10 +6,15 @@ Generates structured MCQ questions using LLM backends
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import logging
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import json
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -236,6 +241,9 @@ def generate_with_local_llm(topic: str, level: str, n_questions: int, language: 
     try:
         import requests
         
+        ollama_model = os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+        logger.info(f"Connecting to Ollama at {LOCAL_LLM_URL} with model {ollama_model}")
+        
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
 
 Requirements:
@@ -279,15 +287,19 @@ IMPORTANT:
         response = requests.post(
             f"{LOCAL_LLM_URL}/api/generate",
             json={
-                "model": os.getenv('OLLAMA_MODEL', 'llama3.2:latest'),  # Default model, can be configured
+                "model": ollama_model,
                 "prompt": prompt,
                 "stream": False
             },
-            timeout=120
+            timeout=180  # Increased timeout for local LLMs
         )
         
         if response.status_code != 200:
-            raise Exception(f"Local LLM API error: {response.status_code}")
+            error_detail = response.text if hasattr(response, 'text') else 'Unknown error'
+            logger.error(f"Ollama API error: {response.status_code} - {error_detail}")
+            raise Exception(f"Local LLM API error: {response.status_code} - {error_detail}")
+        
+        logger.info("Successfully received response from Ollama")
         
         result = response.json()
         content = result.get('response', '').strip()
@@ -377,9 +389,19 @@ IMPORTANT:
             )
             questions.append(question)
         
+        logger.info(f"Successfully generated {len(questions)} questions")
         return questions
         
+    except requests.exceptions.ConnectionError as e:
+        error_msg = f"Cannot connect to Ollama at {LOCAL_LLM_URL}. Make sure Ollama is running and accessible from Docker container."
+        logger.error(error_msg)
+        raise Exception(f"Local LLM generation error: {error_msg} - {str(e)}")
+    except requests.exceptions.Timeout as e:
+        error_msg = f"Ollama request timed out after 180 seconds"
+        logger.error(error_msg)
+        raise Exception(f"Local LLM generation error: {error_msg}")
     except Exception as e:
+        logger.error(f"Local LLM generation error: {str(e)}", exc_info=True)
         raise Exception(f"Local LLM generation error: {str(e)}")
 
 
@@ -436,9 +458,10 @@ def generate_questions():
             }
         )
         
-        return jsonify(response.dict()), 200
+        return jsonify(response.model_dump()), 200
         
     except Exception as e:
+        logger.error(f"Error generating questions: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 

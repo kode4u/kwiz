@@ -73,11 +73,24 @@ try {
     }
 } catch {
     Write-Host "   [ERROR] Error: $($_.Exception.Message)" -ForegroundColor Red
+    
+    # Try to get more details from the error response
+    if ($_.Exception.Response) {
+        try {
+            $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+            $responseBody = $reader.ReadToEnd()
+            Write-Host "   Response: $responseBody" -ForegroundColor Yellow
+        } catch {
+            # Ignore if we can't read the response
+        }
+    }
+    
     Write-Host ""
     Write-Host "   Troubleshooting:" -ForegroundColor Yellow
-    Write-Host "   1. Check if LOCAL_LLM_URL is set correctly in .env" -ForegroundColor Gray
-    Write-Host "   2. Ensure Ollama container can be reached from LLM API container" -ForegroundColor Gray
-    Write-Host "   3. Check LLM API logs: docker-compose logs llmapi" -ForegroundColor Gray
+    Write-Host "   1. Check if LOCAL_LLM_URL is set correctly in docker/.env (should be http://host.docker.internal:11434 for Windows)" -ForegroundColor Gray
+    Write-Host "   2. Ensure Ollama is running on Windows host (not in Docker)" -ForegroundColor Gray
+    Write-Host "   3. Check LLM API logs: docker-compose logs llmapi --tail 50" -ForegroundColor Gray
+    Write-Host "   4. Restart LLM API container: docker-compose restart llmapi" -ForegroundColor Gray
     exit 1
 }
 
