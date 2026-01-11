@@ -53,17 +53,31 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->setDefault('llm_backend', 'openai');
         $mform->addHelpButton('llm_backend', 'llm_backend', 'mod_gamifiedquiz');
 
-        // Use Predefined Data
-        $mform->addElement('advcheckbox', 'use_predefined', get_string('use_predefined', 'mod_gamifiedquiz'), 
-            get_string('use_predefined_desc', 'mod_gamifiedquiz'), array('group' => 1), array(0, 1));
-        $mform->setDefault('use_predefined', 0);
-
-        // Predefined Data (textarea)
-        $mform->addElement('textarea', 'predefined_data', get_string('predefined_data', 'mod_gamifiedquiz'), 
-            array('rows' => 5, 'cols' => 60));
-        $mform->setType('predefined_data', PARAM_TEXT);
-        $mform->addHelpButton('predefined_data', 'predefined_data', 'mod_gamifiedquiz');
-        $mform->hideIf('predefined_data', 'use_predefined', 'eq', 0);
+        // Question Bank Category Selector
+        $mform->addElement('header', 'questionbankheader', get_string('questionbank', 'mod_gamifiedquiz'));
+        $mform->setExpanded('questionbankheader', false);
+        
+        // Get course context for question categories
+        if (!empty($this->_cm)) {
+            $context = context_module::instance($this->_cm->id);
+            $coursecontext = context_course::instance($this->_course->id);
+        } else {
+            $coursecontext = context_course::instance($this->_course->id);
+            $context = $coursecontext;
+        }
+        
+        // Get question categories for this context
+        global $DB;
+        $categories = array(0 => get_string('defaultcategory', 'mod_gamifiedquiz'));
+        $catrecords = $DB->get_records('question_categories', array('contextid' => $coursecontext->id), 'name ASC');
+        foreach ($catrecords as $cat) {
+            $categories[$cat->id] = $cat->name;
+        }
+        
+        $mform->addElement('select', 'question_category', get_string('questioncategory', 'mod_gamifiedquiz'), $categories);
+        $mform->setType('question_category', PARAM_INT);
+        $mform->addHelpButton('question_category', 'questioncategory', 'mod_gamifiedquiz');
+        $mform->setDefault('question_category', 0);
 
         // Template Selection
         $mform->addElement('select', 'template', get_string('template', 'mod_gamifiedquiz'), array(

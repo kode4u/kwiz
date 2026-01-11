@@ -68,7 +68,7 @@ try {
     // Use provided prompt/data/difficulty, or fall back to quiz instance values
     $topic = !empty($prompt) ? $prompt : $gamifiedquiz->topic;
     $level = !empty($difficulty) ? $difficulty : $gamifiedquiz->difficulty;
-    $predefined_data = !empty($data) ? $data : (isset($gamifiedquiz->predefined_data) ? $gamifiedquiz->predefined_data : '');
+    $predefined_data = !empty($data) ? $data : '';
     
     $questions = gamifiedquiz_generate_questions(
         $topic,
@@ -107,29 +107,70 @@ try {
         exit;
     }
 
-    // Save questions to database
+    // Include question bank libraries
+    require_once($CFG->dirroot . '/question/engine/bank.php');
+    require_once($CFG->dirroot . '/question/editlib.php');
+    
+    // Get question category - use selected category or create default
+    $categoryid = 0;
+    if (isset($gamifiedquiz->question_category) && $gamifiedquiz->question_category > 0) {
+        $categoryid = $gamifiedquiz->question_category;
+    } else {
+        // Get or create question category for this quiz
+        $categoryid = gamifiedquiz_get_question_category($course->id, $gamifiedquiz->id);
+    }
+    
+    // Save questions to question bank and get question IDs
+    $question_ids = array();
     $session_id = 'session_' . $gamifiedquiz->id . '_' . ($cmid ?: time());
     
     foreach ($questions as $index => $question) {
         // Handle different question formats
         $question_text = $question['question'] ?? $question['question_text'] ?? '';
         $choices = $question['choices'] ?? array();
-        $correct_index = $question['correct_index'] ?? 0;
         
         if (empty($question_text) || empty($choices)) {
             continue; // Skip invalid questions
         }
         
-        $record = new stdClass();
-        $record->gamifiedquizid = $gamifiedquiz->id;
-        $record->session_id = $session_id;
-        $record->question_text = $question_text;
-        $record->choices = json_encode($choices);
-        $record->correct_index = $correct_index;
-        $record->difficulty = $gamifiedquiz->difficulty;
-        $record->timecreated = time();
+        // Create question in question bank
+        $questionid = gamifiedquiz_create_question_bank_question(
+            $question_text,
+            $choices,
+            $categoryid,
+            $course->id,
+            $gamifiedquiz->difficulty
+        );
         
-        $DB->insert_record('gamifiedquiz_questions', $record);
+        if ($questionid) {
+            $question_ids[] = $questionid;
+            
+            // Also save to gamifiedquiz_questions for backward compatibility
+            // Auto-calculate correct_index from is_correct if not provided
+            $correct_index = $question['correct_index'] ?? null;
+            if ($correct_index === null) {
+                foreach ($choices as $idx => $choice) {
+                    if (is_array($choice) && isset($choice['is_correct']) && $choice['is_correct'] === true) {
+                        $correct_index = $idx;
+                        break;
+                    }
+                }
+                if ($correct_index === null) {
+                    $correct_index = 0;
+                }
+            }
+            
+            $record = new stdClass();
+            $record->gamifiedquizid = $gamifiedquiz->id;
+            $record->session_id = $session_id;
+            $record->question_text = $question_text;
+            $record->choices = json_encode($choices);
+            $record->correct_index = $correct_index;
+            $record->difficulty = $gamifiedquiz->difficulty;
+            $record->timecreated = time();
+            
+            $DB->insert_record('gamifiedquiz_questions', $record);
+        }
     }
     
     echo json_encode(array(

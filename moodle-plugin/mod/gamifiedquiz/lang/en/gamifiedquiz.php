@@ -43,7 +43,7 @@ $string['llm_backend_help'] = 'Select the AI model to use for question generatio
 $string['use_predefined'] = 'Use Predefined Questions';
 $string['use_predefined_desc'] = 'Check to use predefined questions instead of generating with AI';
 $string['predefined_data'] = 'Predefined Questions';
-$string['predefined_data_help'] = 'Enter questions in JSON format or use the question editor';
+$string['predefined_data_help'] = 'Enter questions as a JSON array. Each question must have: question (text), choices (array with text and is_correct boolean). The correct_index will be auto-calculated from is_correct. Optional fields: difficulty, explanation. See the format example above.';
 $string['template'] = 'Template';
 $string['template_help'] = 'Select a visual template for the quiz';
 $string['template_default'] = 'Default';
@@ -85,4 +85,8 @@ $string['rank'] = 'Rank';
 $string['score'] = 'Score';
 $string['next_question'] = 'Next Question';
 $string['end_quiz'] = 'End Quiz';
+$string['questionbank'] = 'Question Bank';
+$string['questioncategory'] = 'Question Category';
+$string['questioncategory_help'] = 'Select a question category to use questions from the question bank. Questions generated will be added to this category.';
+$string['defaultcategory'] = 'Use default category (Gamified Quiz #X)';
 

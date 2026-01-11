@@ -92,8 +92,6 @@ window.GAMIFIED_QUIZ_CONFIG = {
     template: ' . json_encode(isset($gamifiedquiz->template) ? $gamifiedquiz->template : 'default') . ',
     colorPalette: ' . json_encode(isset($gamifiedquiz->color_palette) ? $gamifiedquiz->color_palette : 'kahoot') . ',
     llmBackend: ' . json_encode(isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai') . ',
-    usePredefined: ' . (isset($gamifiedquiz->use_predefined) && $gamifiedquiz->use_predefined ? 'true' : 'false') . ',
-    predefinedData: ' . json_encode(isset($gamifiedquiz->predefined_data) ? $gamifiedquiz->predefined_data : '') . ',
     questionsData: ' . json_encode(isset($gamifiedquiz->questions_data) ? $gamifiedquiz->questions_data : '') . ',
     timeLimitPerQuestion: ' . (isset($gamifiedquiz->time_limit_per_question) ? intval($gamifiedquiz->time_limit_per_question) : 60) . ',
     leaderboardTopN: ' . (isset($gamifiedquiz->leaderboard_top_n) ? intval($gamifiedquiz->leaderboard_top_n) : 3) . '

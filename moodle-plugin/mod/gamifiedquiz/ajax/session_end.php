@@ -26,9 +26,29 @@ try {
     $session->results_data = $resultsdata;
     $DB->update_record('gamifiedquiz_sessions', $session);
     
+    // Calculate and update grades for all participants
+    $grades = gamifiedquiz_get_session_grades($sessionid, $session->gamifiedquizid);
+    $updated_count = 0;
+    
+    foreach ($grades as $grade_data) {
+        try {
+            gamifiedquiz_update_gradebook(
+                $session->gamifiedquizid,
+                $grade_data['userid'],
+                $grade_data['percentage'],
+                $cm->id
+            );
+            $updated_count++;
+        } catch (Exception $e) {
+            error_log("Gamified Quiz: Error updating grade for user {$grade_data['userid']}: " . $e->getMessage());
+        }
+    }
+    
     echo json_encode([
         'success' => true,
-        'message' => 'Session ended'
+        'message' => 'Session ended',
+        'grades_updated' => $updated_count,
+        'total_participants' => count($grades)
     ]);
     
 } catch (Exception $e) {

@@ -54,20 +54,23 @@ try {
         }
     }
     
-    // Then check predefined_data
-    if (!empty($gamifiedquiz->predefined_data) && $gamifiedquiz->use_predefined) {
-        $questions = json_decode($gamifiedquiz->predefined_data, true);
-        if (is_array($questions) && count($questions) > 0) {
-            echo json_encode(array(
-                'success' => true,
-                'questions' => $questions,
-                'source' => 'predefined_data'
-            ));
-            exit;
-        }
+    // Try to load from question bank
+    require_once($CFG->dirroot . '/question/engine/bank.php');
+    require_once($CFG->dirroot . '/question/editlib.php');
+    $categoryid = gamifiedquiz_get_question_category($course->id, $gamifiedquiz->id);
+    $bank_questions = gamifiedquiz_load_question_bank_questions($categoryid);
+    
+    if (!empty($bank_questions)) {
+        echo json_encode(array(
+            'success' => true,
+            'questions' => $bank_questions,
+            'source' => 'question_bank',
+            'count' => count($bank_questions)
+        ));
+        exit;
     }
     
-    // Finally, load from database (gamifiedquiz_questions table)
+    // Fallback: load from database (gamifiedquiz_questions table)
     $session_id = 'session_' . $gamifiedquiz->id . '_' . ($cmid ?: 0);
     $db_questions = $DB->get_records('gamifiedquiz_questions', 
         array('gamifiedquizid' => $gamifiedquiz->id),

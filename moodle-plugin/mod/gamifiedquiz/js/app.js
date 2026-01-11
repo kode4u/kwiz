@@ -352,19 +352,23 @@
             });
         }
         
-        // Check for predefined questions
-        if (config.usePredefined && config.predefinedData) {
-            try {
-                const predefined = JSON.parse(config.predefinedData);
-                if (Array.isArray(predefined) && predefined.length > 0) {
-                    questions = predefined;
-                    // Don't display questions preview
-                    // displayQuestions(questions);
-                    if (startBtn) startBtn.disabled = false;
+        // Helper function to auto-calculate correct_index from is_correct
+        function normalizeQuestion(q) {
+            if (!q.correct_index && q.choices && Array.isArray(q.choices)) {
+                // Find the index of the choice with is_correct = true
+                for (let i = 0; i < q.choices.length; i++) {
+                    const choice = q.choices[i];
+                    if (typeof choice === 'object' && choice.is_correct === true) {
+                        q.correct_index = i;
+                        break;
+                    }
                 }
-            } catch (e) {
-                console.error('Error parsing predefined data:', e);
+                // Default to 0 if no correct answer found
+                if (q.correct_index === undefined) {
+                    q.correct_index = 0;
+                }
             }
+            return q;
         }
         
         // Check for edited questions
@@ -372,7 +376,8 @@
             try {
                 const edited = JSON.parse(config.questionsData);
                 if (Array.isArray(edited) && edited.length > 0) {
-                    questions = edited;
+                    // Normalize questions to ensure correct_index is set
+                    questions = edited.map(normalizeQuestion);
                     // Don't display questions preview
                     // displayQuestions(questions);
                     if (startBtn) startBtn.disabled = false;

@@ -44,11 +44,26 @@ try {
     } else {
         $responseid = $DB->insert_record('gamifiedquiz_responses', $response);
     }
-
-    echo json_encode(array(
-        'success' => true,
-        'responseid' => $responseid
-    ));
+    
+    // Calculate and update grade after saving response
+    try {
+        $cm = get_coursemodule_from_instance('gamifiedquiz', $quizid, 0, false, MUST_EXIST);
+        $grade = gamifiedquiz_calculate_grade($quizid, $userid, $sessionid, $cm->id);
+        
+        echo json_encode(array(
+            'success' => true,
+            'responseid' => $responseid,
+            'grade' => $grade
+        ));
+    } catch (Exception $grade_error) {
+        // If grade calculation fails, still return success for the response save
+        error_log("Gamified Quiz: Error calculating grade: " . $grade_error->getMessage());
+        echo json_encode(array(
+            'success' => true,
+            'responseid' => $responseid,
+            'grade_error' => $grade_error->getMessage()
+        ));
+    }
 
 } catch (Exception $e) {
     http_response_code(500);

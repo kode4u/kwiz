@@ -67,6 +67,10 @@ function gamifiedquiz_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
         default:
             return null;
     }
@@ -86,6 +90,11 @@ function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
     $gamifiedquiz->timemodified = $gamifiedquiz->timecreated;
 
     $id = $DB->insert_record('gamifiedquiz', $gamifiedquiz);
+    
+    // Create grade item
+    $gamifiedquiz->id = $id;
+    gamifiedquiz_grade_item_update($gamifiedquiz);
+    
     return $id;
 }
 
@@ -112,14 +121,55 @@ function gamifiedquiz_update_instance($gamifiedquiz, $mform = null) {
  * @return boolean Success/Fail
  */
 function gamifiedquiz_delete_instance($id) {
-    global $DB;
+    global $DB, $CFG;
+    
+    require_once($CFG->dirroot . '/lib/gradelib.php');
 
     if (!$gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $id))) {
         return false;
     }
 
+    // Delete grade item
+    gamifiedquiz_grade_item_delete($gamifiedquiz);
+    
     $DB->delete_records('gamifiedquiz', array('id' => $gamifiedquiz->id));
     return true;
+}
+
+/**
+ * Update/create grade item for quiz
+ *
+ * @param stdClass $gamifiedquiz Quiz instance
+ * @return int Grade item ID
+ */
+function gamifiedquiz_grade_item_update($gamifiedquiz) {
+    global $CFG;
+    
+    require_once($CFG->dirroot . '/lib/gradelib.php');
+    
+    $params = array(
+        'itemname' => $gamifiedquiz->name,
+        'idnumber' => $gamifiedquiz->id,
+        'gradetype' => GRADE_TYPE_VALUE,
+        'grademax' => 100,
+        'grademin' => 0
+    );
+    
+    return grade_update('mod/gamifiedquiz', $gamifiedquiz->course, 'mod', 'gamifiedquiz', $gamifiedquiz->id, 0, null, $params);
+}
+
+/**
+ * Delete grade item for quiz
+ *
+ * @param stdClass $gamifiedquiz Quiz instance
+ * @return bool Success
+ */
+function gamifiedquiz_grade_item_delete($gamifiedquiz) {
+    global $CFG;
+    
+    require_once($CFG->dirroot . '/lib/gradelib.php');
+    
+    return grade_update('mod/gamifiedquiz', $gamifiedquiz->course, 'mod', 'gamifiedquiz', $gamifiedquiz->id, 0, null, array('deleted' => 1));
 }
 
 /**
@@ -263,3 +313,422 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     }
 }
 
+/**
+ * Create a question in Moodle's question bank
+ *
+ * @param string $questiontext Question text
+ * @param array $choices Array of choices with text and is_correct
+ * @param int $categoryid Question category ID
+ * @param int $courseid Course ID
+ * @param string $difficulty Difficulty level
+ * @return int|false Question ID on success, false on failure
+ */
+function gamifiedquiz_create_question_bank_question($questiontext, $choices, $categoryid, $courseid, $difficulty = 'medium') {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/question/type/multichoice/questiontype.php');
+    require_once($CFG->dirroot . '/question/engine/bank.php');
+    require_once($CFG->dirroot . '/question/editlib.php');
+    
+    // Get or create question category
+    if (empty($categoryid)) {
+        // Get default category for course
+        $context = context_course::instance($courseid);
+        $category = $DB->get_record_sql(
+            "SELECT * FROM {question_categories} 
+             WHERE contextid = ? AND parent = 0 
+             ORDER BY sortorder ASC 
+             LIMIT 1",
+            array($context->id)
+        );
+        if (!$category) {
+            // Create default category if it doesn't exist
+            $category = new stdClass();
+            $category->name = 'Default';
+            $category->contextid = $context->id;
+            $category->info = '';
+            $category->infoformat = FORMAT_HTML;
+            $category->stamp = make_unique_id_code();
+            $category->parent = 0;
+            $category->sortorder = 999;
+            $category->idnumber = null;
+            $category->id = $DB->insert_record('question_categories', $category);
+        }
+        $categoryid = $category->id;
+    }
+    
+    // Get category to ensure it exists
+    $category = $DB->get_record('question_categories', array('id' => $categoryid), '*', MUST_EXIST);
+    
+    // Create question object
+    $question = new stdClass();
+    $question->category = $categoryid;
+    $question->parent = 0;
+    $question->name = shorten_text(strip_tags($questiontext), 80);
+    $question->questiontext = $questiontext;
+    $question->questiontextformat = FORMAT_HTML;
+    $question->generalfeedback = '';
+    $question->generalfeedbackformat = FORMAT_HTML;
+    $question->defaultmark = 1.0;
+    $question->penalty = 0.3333333;
+    $question->qtype = 'multichoice';
+    $question->length = 1;
+    $question->stamp = make_unique_id_code();
+    $question->version = make_unique_id_code();
+    $question->hidden = 0;
+    $question->timecreated = time();
+    $question->timemodified = $question->timecreated;
+    $question->createdby = $USER->id;
+    $question->modifiedby = $USER->id;
+    $question->idnumber = null;
+    
+    // Insert question
+    $question->id = $DB->insert_record('question', $question);
+    
+    if (!$question->id) {
+        error_log("Gamified Quiz: Failed to insert question into question table");
+        return false;
+    }
+    
+    // Check if question_bank_entries table exists (Moodle 4.0+)
+    $tablemanager = $DB->get_manager();
+    if ($tablemanager->table_exists('question_bank_entries')) {
+        try {
+            $entry = new stdClass();
+            $entry->questioncategoryid = $categoryid;
+            $entry->idnumber = null;
+            $entry->ownerid = $USER->id;
+            $entry->id = $DB->insert_record('question_bank_entries', $entry);
+            
+            if ($entry->id) {
+                // Link question to entry
+                $version = new stdClass();
+                $version->questionbankentryid = $entry->id;
+                $version->questionid = $question->id;
+                $version->version = 1;
+                $version->status = 'ready';
+                $version->id = $DB->insert_record('question_versions', $version);
+            }
+        } catch (Exception $e) {
+            error_log("Gamified Quiz: Error creating question bank entry: " . $e->getMessage());
+            // Continue anyway - question is still created
+        }
+    }
+    
+    // Create multichoice options
+    $mc = new stdClass();
+    $mc->questionid = $question->id;
+    $mc->layout = 0; // Vertical layout
+    $mc->single = 1; // Single answer
+    $mc->shuffleanswers = 1;
+    $mc->correctfeedback = get_string('correctansweris', 'qtype_multichoice');
+    $mc->correctfeedbackformat = FORMAT_HTML;
+    $mc->partiallycorrectfeedback = '';
+    $mc->partiallycorrectfeedbackformat = FORMAT_HTML;
+    $mc->incorrectfeedback = get_string('incorrectansweris', 'qtype_multichoice');
+    $mc->incorrectfeedbackformat = FORMAT_HTML;
+    $mc->answernumbering = 'abc';
+    $mc->showstandardinstruction = 0;
+    
+    $DB->insert_record('qtype_multichoice_options', $mc);
+    
+    // Find correct answer index
+    $correctindex = 0;
+    foreach ($choices as $idx => $choice) {
+        if (is_array($choice) && isset($choice['is_correct']) && $choice['is_correct']) {
+            $correctindex = $idx;
+            break;
+        }
+    }
+    
+    // Create answer options
+    foreach ($choices as $idx => $choice) {
+        $answer = new stdClass();
+        $answer->question = $question->id;
+        $answer->answer = is_array($choice) ? $choice['text'] : $choice;
+        $answer->answerformat = FORMAT_HTML;
+        $answer->fraction = ($idx == $correctindex) ? 1.0 : 0.0;
+        $answer->feedback = '';
+        $answer->feedbackformat = FORMAT_HTML;
+        
+        $DB->insert_record('question_answers', $answer);
+    }
+    
+    return $question->id;
+}
+
+/**
+ * Load questions from Moodle's question bank
+ *
+ * @param int $categoryid Question category ID
+ * @param int $limit Limit number of questions
+ * @return array Array of questions
+ */
+function gamifiedquiz_load_question_bank_questions($categoryid, $limit = 0) {
+    global $DB, $CFG;
+    
+    require_once($CFG->dirroot . '/question/engine/bank.php');
+    
+    if (empty($categoryid)) {
+        return array();
+    }
+    
+    // Get questions from category
+    $sql = "SELECT q.*, qc.name as categoryname
+            FROM {question} q
+            JOIN {question_categories} qc ON q.category = qc.id
+            WHERE q.category = ? AND q.hidden = 0 AND q.qtype = 'multichoice'
+            ORDER BY q.timecreated DESC";
+    
+    $params = array($categoryid);
+    if ($limit > 0) {
+        $sql .= " LIMIT ?";
+        $params[] = $limit;
+    }
+    
+    $questions = $DB->get_records_sql($sql, $params);
+    $result = array();
+    
+    foreach ($questions as $q) {
+        // Get answers
+        $answers = $DB->get_records('question_answers', array('question' => $q->id), 'id ASC');
+        
+        $choices = array();
+        $correctindex = 0;
+        foreach ($answers as $idx => $answer) {
+            $choices[] = array(
+                'text' => $answer->answer,
+                'is_correct' => ($answer->fraction > 0)
+            );
+            if ($answer->fraction > 0) {
+                $correctindex = $idx;
+            }
+        }
+        
+        $result[] = array(
+            'id' => $q->id,
+            'question' => $q->questiontext,
+            'question_text' => $q->questiontext,
+            'choices' => $choices,
+            'correct_index' => $correctindex,
+            'difficulty' => 'medium' // Default, could be stored in question tags
+        );
+    }
+    
+    return $result;
+}
+
+/**
+ * Get or create question category for gamified quiz
+ *
+ * @param int $courseid Course ID
+ * @param int $quizid Quiz instance ID
+ * @return int Category ID
+ */
+function gamifiedquiz_get_question_category($courseid, $quizid) {
+    global $DB, $CFG;
+    
+    require_once($CFG->dirroot . '/question/engine/bank.php');
+    require_once($CFG->dirroot . '/question/editlib.php');
+    
+    $context = context_course::instance($courseid);
+    $categoryname = "Gamified Quiz #{$quizid}";
+    
+    // Try to find existing category
+    $category = $DB->get_record('question_categories', array(
+        'contextid' => $context->id,
+        'name' => $categoryname
+    ));
+    
+    if ($category) {
+        return $category->id;
+    }
+    
+    // Get default category for the context
+    // Try to get the top-level category for this context
+    $defaultcategory = $DB->get_record_sql(
+        "SELECT * FROM {question_categories} 
+         WHERE contextid = ? AND parent = 0 
+         ORDER BY sortorder ASC 
+         LIMIT 1",
+        array($context->id)
+    );
+    
+    if (!$defaultcategory) {
+        // If no default category exists, create one
+        $defaultcategory = new stdClass();
+        $defaultcategory->name = 'Default';
+        $defaultcategory->contextid = $context->id;
+        $defaultcategory->info = '';
+        $defaultcategory->infoformat = FORMAT_HTML;
+        $defaultcategory->stamp = make_unique_id_code();
+        $defaultcategory->parent = 0;
+        $defaultcategory->sortorder = 999;
+        $defaultcategory->idnumber = null;
+        $defaultcategory->id = $DB->insert_record('question_categories', $defaultcategory);
+    }
+    
+    // Create new category
+    $category = new stdClass();
+    $category->name = $categoryname;
+    $category->contextid = $context->id;
+    $category->info = '';
+    $category->infoformat = FORMAT_HTML;
+    $category->stamp = make_unique_id_code();
+    $category->parent = $defaultcategory->id;
+    $category->sortorder = 999;
+    $category->idnumber = null;
+    
+    return $DB->insert_record('question_categories', $category);
+}
+
+/**
+ * Calculate and store grade for a student's quiz attempt
+ *
+ * @param int $quizid Quiz instance ID
+ * @param int $userid User ID
+ * @param string $sessionid Session ID
+ * @param int $cmid Course module ID
+ * @return float Grade (0-100)
+ */
+function gamifiedquiz_calculate_grade($quizid, $userid, $sessionid, $cmid) {
+    global $DB;
+    
+    // Get all responses for this user in this session
+    $responses = $DB->get_records('gamifiedquiz_responses', array(
+        'userid' => $userid,
+        'session_id' => $sessionid
+    ));
+    
+    if (empty($responses)) {
+        return 0.0;
+    }
+    
+    $total_questions = count($responses);
+    $correct_answers = 0;
+    $total_score = 0;
+    
+    foreach ($responses as $response) {
+        if ($response->is_correct) {
+            $correct_answers++;
+        }
+        $total_score += $response->score;
+    }
+    
+    // Calculate percentage grade (0-100)
+    $percentage = ($correct_answers / $total_questions) * 100;
+    
+    // Store grade in gradebook
+    gamifiedquiz_update_gradebook($quizid, $userid, $percentage, $cmid);
+    
+    return $percentage;
+}
+
+/**
+ * Update Moodle gradebook with quiz grade
+ *
+ * @param int $quizid Quiz instance ID
+ * @param int $userid User ID
+ * @param float $grade Grade (0-100)
+ * @param int $cmid Course module ID
+ * @return bool Success
+ */
+function gamifiedquiz_update_gradebook($quizid, $userid, $grade, $cmid) {
+    global $CFG, $DB;
+    
+    require_once($CFG->dirroot . '/lib/gradelib.php');
+    require_once($CFG->dirroot . '/mod/gamifiedquiz/lib.php');
+    
+    // Get quiz instance
+    $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $quizid), '*', MUST_EXIST);
+    
+    // Get course module
+    if (empty($cmid)) {
+        $cm = get_coursemodule_from_instance('gamifiedquiz', $quizid, $gamifiedquiz->course, false, MUST_EXIST);
+        $cmid = $cm->id;
+    }
+    
+    // Prepare grade data
+    $grade_data = new stdClass();
+    $grade_data->userid = $userid;
+    $grade_data->rawgrade = $grade;
+    $grade_data->rawgrademax = 100;
+    $grade_data->rawgrademin = 0;
+    $grade_data->dategraded = time();
+    $grade_data->datesubmitted = time();
+    
+    // Update gradebook
+    $result = grade_update('mod/gamifiedquiz', $gamifiedquiz->course, 'mod', 'gamifiedquiz', $quizid, 0, $grade_data);
+    
+    return ($result == GRADE_UPDATE_OK);
+}
+
+/**
+ * Get student's grade for a quiz
+ *
+ * @param int $quizid Quiz instance ID
+ * @param int $userid User ID
+ * @return float|null Grade or null if not found
+ */
+function gamifiedquiz_get_student_grade($quizid, $userid) {
+    global $CFG, $DB;
+    
+    require_once($CFG->dirroot . '/lib/gradelib.php');
+    
+    // Get quiz instance
+    $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $quizid), '*', MUST_EXIST);
+    
+    // Get grade from gradebook
+    $grades = grade_get_grades($gamifiedquiz->course, 'mod', 'gamifiedquiz', $quizid, array($userid));
+    
+    if (isset($grades->items[0]->grades[$userid])) {
+        $grade_item = $grades->items[0]->grades[$userid];
+        if ($grade_item->grade !== null) {
+            return (float)$grade_item->grade;
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Get all student grades for a quiz session
+ *
+ * @param string $sessionid Session ID
+ * @param int $quizid Quiz instance ID
+ * @return array Array of grades with userid and grade
+ */
+function gamifiedquiz_get_session_grades($sessionid, $quizid) {
+    global $DB;
+    
+    // Get all unique users who responded in this session
+    $sql = "SELECT DISTINCT userid, username, 
+            SUM(score) as total_score,
+            SUM(is_correct) as correct_count,
+            COUNT(*) as total_questions
+            FROM {gamifiedquiz_responses}
+            WHERE session_id = ?
+            GROUP BY userid, username
+            ORDER BY total_score DESC";
+    
+    $results = $DB->get_records_sql($sql, array($sessionid));
+    $grades = array();
+    
+    foreach ($results as $result) {
+        // Calculate percentage
+        $percentage = $result->total_questions > 0 
+            ? ($result->correct_count / $result->total_questions) * 100 
+            : 0;
+        
+        $grades[] = array(
+            'userid' => $result->userid,
+            'username' => $result->username,
+            'score' => $result->total_score,
+            'correct' => $result->correct_count,
+            'total' => $result->total_questions,
+            'percentage' => round($percentage, 2)
+        );
+    }
+    
+    return $grades;
+}

@@ -220,6 +220,18 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010108, 'gamifiedquiz');
     }
     
+    // Add question_category field for question bank integration
+    if ($oldversion < 2025010109) {
+        $table = new xmldb_table('gamifiedquiz');
+        
+        $field = new xmldb_field('question_category', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'leaderboard_top_n');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010109, 'gamifiedquiz');
+    }
+    
     // Return true to indicate upgrade was successful
     return true;
 }
