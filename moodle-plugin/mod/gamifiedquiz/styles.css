@@ -612,6 +612,7 @@
     border-radius: 8px;
 }
 
+/* Legacy quiz-info - keeping for backward compatibility */
 .quiz-info {
     background: #e7f3ff;
     padding: 15px;
@@ -622,6 +623,91 @@
 
 .quiz-info strong {
     color: #0056b3;
+}
+
+/* Modern Quiz Info Design - Flat and Fancy */
+.quiz-info-modern {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 0;
+}
+
+.quiz-info-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 25px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+    transition: all 0.3s ease;
+    flex: 0 1 auto;
+    min-width: fit-content;
+}
+
+.quiz-info-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+
+.quiz-info-icon {
+    font-size: 18px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.quiz-info-label {
+    font-size: 12px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.quiz-info-value {
+    font-size: 14px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Topic Badge */
+.quiz-info-topic {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Difficulty Badges - Different colors for each level */
+.quiz-info-difficulty-easy {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+}
+
+.quiz-info-difficulty-medium {
+    background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+}
+
+.quiz-info-difficulty-hard {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+}
+
+/* Language Badge */
+.quiz-info-language {
+    background: linear-gradient(135deg, #3494e6 0%, #ec6ead 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .quiz-info-modern {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .quiz-info-badge {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Ensure all dynamically created containers use standard styles */
