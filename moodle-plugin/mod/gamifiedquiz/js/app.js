@@ -29,8 +29,8 @@
                 console.error('Socket.IO not loaded. Please check if the library is available.');
                 // Show error message
                 const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger';
-                errorDiv.style.cssText = 'padding: 15px; margin: 10px; background: #f8d7da; border: 1px solid #dc3545; border-radius: 4px; color: #721c24;';
+                errorDiv.className = 'alert alert-danger gq-container';
+                errorDiv.style.cssText = 'background: #f8d7da; border: 1px solid #dc3545; color: #721c24; margin: 10px;';
                 errorDiv.textContent = 'WebSocket library not loaded. Please refresh the page.';
                 const container = document.querySelector('.gamifiedquiz-container') || document.body;
                 container.insertBefore(errorDiv, container.firstChild);
@@ -132,9 +132,8 @@
             // Add "Add Question" button
             const addBtn = document.createElement('button');
             addBtn.type = 'button';
-            addBtn.className = 'btn btn-secondary';
+            addBtn.className = 'btn btn-secondary gq-btn gq-btn-secondary';
             addBtn.textContent = 'Add New Question';
-            addBtn.style.cssText = 'margin-top: 20px; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;';
             addBtn.onclick = () => addQuestionToEditor(form, null, qList.length);
             form.appendChild(addBtn);
             
@@ -163,8 +162,8 @@
         
         function addQuestionToEditor(form, question, index) {
             const questionDiv = document.createElement('div');
-            questionDiv.className = 'question-editor-item';
-            questionDiv.style.cssText = 'border: 2px solid #ddd; padding: 20px; margin: 15px 0; border-radius: 8px; background: #f9f9f9;';
+            questionDiv.className = 'question-editor-item gq-container';
+            questionDiv.style.margin = '15px 0';
             
             const qText = question ? (question.question || question.question_text || '') : '';
             const choices = question ? (question.choices || []) : [];
@@ -173,11 +172,11 @@
             questionDiv.innerHTML = `
                 <h4>Question ${index + 1}</h4>
                 <label>Question Text:</label>
-                <textarea class="question-text-input" rows="3" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">${qText}</textarea>
+                <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;">${qText}</textarea>
                 <label>Choices:</label>
                 <div class="choices-container" data-question-index="${index}"></div>
-                <button type="button" class="add-choice-btn" data-index="${index}" style="margin-top: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Add Choice</button>
-                <button type="button" class="remove-question-btn" data-index="${index}" style="margin-top: 10px; margin-left: 10px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove Question</button>
+                <button type="button" class="add-choice-btn gq-btn gq-btn-sm gq-btn-primary" data-index="${index}">Add Choice</button>
+                <button type="button" class="remove-question-btn gq-btn gq-btn-sm gq-btn-danger" data-index="${index}">Remove Question</button>
             `;
             
             form.appendChild(questionDiv);
@@ -207,11 +206,10 @@
         function addChoiceToEditor(container, qIndex, cIndex, text, isCorrect) {
             const choiceDiv = document.createElement('div');
             choiceDiv.className = 'choice-input-group';
-            choiceDiv.style.cssText = 'display: flex; align-items: center; margin: 8px 0; gap: 10px;';
             choiceDiv.innerHTML = `
-                <input type="radio" name="correct-${qIndex}" ${isCorrect ? 'checked' : ''} value="${cIndex}" style="width: 20px; height: 20px;">
-                <input type="text" class="choice-text-input" value="${text}" placeholder="Choice text" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="button" class="remove-choice-btn" style="padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove</button>
+                <input type="radio" name="correct-${qIndex}" ${isCorrect ? 'checked' : ''} value="${cIndex}">
+                <input type="text" class="choice-text-input" value="${text}" placeholder="Choice text">
+                <button type="button" class="remove-choice-btn gq-btn gq-btn-sm gq-btn-danger">Remove</button>
             `;
             
             const removeBtn = choiceDiv.querySelector('.remove-choice-btn');
@@ -1106,8 +1104,9 @@
         
         // Add View Past Sessions button
         const viewSessionsBtn = document.createElement('button');
+        viewSessionsBtn.className = 'btn btn-secondary gq-btn gq-btn-secondary';
+        viewSessionsBtn.style.marginLeft = '10px';
         viewSessionsBtn.textContent = 'View Past Sessions';
-        viewSessionsBtn.style.cssText = 'margin: 10px; padding: 5px 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;';
         viewSessionsBtn.addEventListener('click', async () => {
             try {
                 const response = await fetch(`ajax/get_sessions.php?quizid=${config.quizId}`);
@@ -1833,7 +1832,7 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">${session.ended_formatted || '-'}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
                             ${session.session_results && session.session_results.length > 0 ? 
-                              `<button class="btn btn-sm btn-primary" onclick="showSessionResults('${session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;')})">View Results</button>` : 
+                              `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="showSessionResults('${session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;')})">View Results</button>` : 
                               '<span style="color: #999;">No Results</span>'}
                         </td>
                     </tr>

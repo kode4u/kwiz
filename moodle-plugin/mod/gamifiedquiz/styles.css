@@ -1,9 +1,171 @@
 /**
  * Gamified Quiz Styles
  * Supports templates and color palettes
+ * Utility classes for consistent styling
  */
 
-/* Color Palette Variables */
+/* ============================================
+   UTILITY CLASSES - Use throughout the plugin
+   ============================================ */
+
+/* Standard Container Styles */
+.gq-container {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    background: white;
+}
+
+.gq-container-lg {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    background: white;
+}
+
+.gq-container-sm {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    background: white;
+}
+
+/* Standard Button Styles - All buttons use these */
+.gq-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    text-align: center;
+    min-width: 120px;
+    margin: 5px 10px 5px 0;
+}
+
+.gq-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gq-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.gq-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Variants */
+.gq-btn-primary {
+    background: var(--gq-primary, #007bff);
+    color: white;
+}
+
+.gq-btn-secondary {
+    background: var(--gq-secondary, #6c757d);
+    color: white;
+}
+
+.gq-btn-success {
+    background: var(--gq-success, #28a745);
+    color: white;
+}
+
+.gq-btn-danger {
+    background: var(--gq-danger, #dc3545);
+    color: white;
+}
+
+.gq-btn-warning {
+    background: var(--gq-warning, #ffc107);
+    color: #333;
+}
+
+.gq-btn-info {
+    background: var(--gq-info, #17a2b8);
+    color: white;
+}
+
+/* Button Sizes */
+.gq-btn-sm {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: 80px;
+    margin: 5px 10px 5px 0;
+}
+
+.gq-btn-lg {
+    padding: 16px 32px;
+    font-size: 16px;
+    min-width: 150px;
+}
+
+/* Legacy Button Support - Map old classes to new */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    text-align: center;
+    min-width: 120px;
+    margin: 5px 10px 5px 10px !important;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary {
+    background: var(--gq-primary, #007bff);
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--gq-secondary, #6c757d);
+    color: white;
+}
+
+.btn-success {
+    background: var(--gq-success, #28a745);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--gq-danger, #dc3545);
+    color: white;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: 80px;
+    margin: 5px 10px 5px 0;
+}
+
+/* ============================================
+   COLOR PALETTE VARIABLES
+   ============================================ */
+
 :root {
     --gq-primary: #46178f;
     --gq-secondary: #7b2cbf;
@@ -71,35 +233,30 @@
     --gq-danger: #dc3545;
 }
 
+/* ============================================
+   TEMPLATE STYLES
+   ============================================ */
+
 /* Template: Kahoot Style */
 .gq-template-kahoot .gamifiedquiz-container {
     background: linear-gradient(135deg, var(--gq-primary) 0%, var(--gq-secondary) 100%);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.gq-template-kahoot .btn-primary {
-    background: var(--gq-primary);
-    border: none;
-    border-radius: 50px;
-    padding: 15px 30px;
-    font-weight: bold;
-    font-size: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.gq-template-kahoot .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+.gq-template-kahoot .gq-container,
+.gq-template-kahoot .gq-container-lg,
+.gq-template-kahoot .gq-container-sm {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gq-template-kahoot .question-container {
     background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gq-template-kahoot .choice-option {
@@ -111,46 +268,73 @@
     font-size: 18px;
     transition: all 0.3s;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .gq-template-kahoot .choice-option:hover {
     border-color: var(--gq-primary);
     transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gq-template-kahoot .choice-option.selected {
     background: var(--gq-accent);
     border-color: var(--gq-primary);
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Template: Minimal */
 .gq-template-minimal .gamifiedquiz-container {
     background: white;
     border: 1px solid var(--gq-border);
-    border-radius: 4px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
 }
 
-.gq-template-minimal .btn-primary {
-    background: var(--gq-primary);
-    border-radius: 4px;
+.gq-template-minimal .gq-container,
+.gq-template-minimal .gq-container-lg,
+.gq-template-minimal .gq-container-sm {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Template: Modern */
 .gq-template-modern .gamifiedquiz-container {
     background: linear-gradient(to bottom, #f8f9fa, white);
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
 }
 
-.gq-template-modern .btn-primary {
-    background: linear-gradient(135deg, var(--gq-primary), var(--gq-secondary));
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+.gq-template-modern .gq-container,
+.gq-template-modern .gq-container-lg,
+.gq-template-modern .gq-container-sm {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Question Editor Styles */
+/* Template: Default */
+.gq-template-default .gamifiedquiz-container {
+    background: var(--gq-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+}
+
+.gq-template-default .gq-container,
+.gq-template-default .gq-container-lg,
+.gq-template-default .gq-container-sm {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   COMPONENT STYLES
+   ============================================ */
+
+/* Question Editor Modal */
 .question-editor-modal {
     display: none;
     position: fixed;
@@ -160,7 +344,7 @@
     width: 100%;
     height: 100%;
     padding-top: 80px;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
 }
 
@@ -171,9 +355,9 @@
     border-radius: 12px;
     width: 80%;
     max-width: 800px;
-    max-height: calc(100vh - 00px);
+    max-height: calc(100vh - 100px);
     overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .question-editor-close {
@@ -204,7 +388,7 @@
     width: 100%;
     padding: 10px;
     border: 2px solid var(--gq-border);
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
 }
 
@@ -231,12 +415,220 @@
     cursor: pointer;
 }
 
+/* Standardize all buttons in question editor */
+/* Choice input group buttons use utility classes - no specific styles needed */
 .choice-input-group button {
-    padding: 8px 15px;
-    background: var(--gq-danger);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    /* Styles inherited from .gq-btn utility classes */
 }
 
+/* Common Component Styles */
+.gamifiedquiz-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.gamifiedquiz-teacher,
+.gamifiedquiz-student {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.controls {
+    margin: 20px 0;
+}
+
+.controls button {
+    /* Margin already set in .btn and .gq-btn classes */
+}
+
+.questions-container {
+    margin: 20px 0;
+}
+
+.question-preview {
+    background: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 12px;
+    border-left: 4px solid var(--gq-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.question-preview h4 {
+    margin-top: 0;
+    color: #333;
+}
+
+.question-preview ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.question-preview li {
+    padding: 5px 10px;
+    margin: 5px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.question-preview li.correct {
+    background: #d4edda;
+    border-left: 3px solid #28a745;
+}
+
+.session-status {
+    padding: 10px;
+    margin: 10px 0;
+    background: #d1ecf1;
+    border-left: 4px solid #0c5460;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.session-status.success {
+    background: #d4edda;
+    border-left-color: #28a745;
+    border-color: #28a745;
+}
+
+.session-status.error {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.session-status.warning {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.waiting {
+    text-align: center;
+    padding: 40px;
+    background: #fff3cd;
+    border-radius: 12px;
+    font-size: 18px;
+    color: #856404;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.question-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.question-text {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #333;
+}
+
+.timer {
+    font-size: 18px;
+    color: #dc3545;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.choices {
+    margin: 20px 0;
+}
+
+.choice-option {
+    display: block;
+    padding: 12px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.choice-option:hover {
+    background: #e9ecef;
+    border-color: var(--gq-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.choice-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.choice-option.selected {
+    background: #cfe2ff;
+    border-color: var(--gq-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.result-container {
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.result.correct {
+    background: #d4edda;
+    border: 2px solid #28a745;
+}
+
+.result.incorrect {
+    background: #f8d7da;
+    border: 2px solid #dc3545;
+}
+
+.leaderboard-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.leaderboard-container h3 {
+    margin-top: 0;
+}
+
+.leaderboard-container ol {
+    padding-left: 20px;
+}
+
+.leaderboard-container li {
+    padding: 8px;
+    margin: 5px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.quiz-info {
+    background: #e7f3ff;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 15px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-info strong {
+    color: #0056b3;
+}
+
+/* Ensure all dynamically created containers use standard styles */
+[id*="question"],
+[id*="container"],
+[id*="display"],
+[id*="modal"] {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
