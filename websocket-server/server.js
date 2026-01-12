@@ -229,9 +229,10 @@ io.on('connection', async (socket) => {
   const instanceId = session.instanceId || socket.sessionId;
   await storeUsername(instanceId, numericUserId, socket.username);
   
-  // Emit session joined
+  // Emit session joined (include instanceId if available)
   socket.emit('session:joined', {
     sessionId: socket.sessionId,
+    instanceId: instanceId, // Include instanceId so students can join with correct session_id
     role: socket.role
   });
   

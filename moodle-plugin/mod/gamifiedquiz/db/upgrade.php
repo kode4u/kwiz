@@ -305,6 +305,31 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010112, 'gamifiedquiz');
     }
     
+    if ($oldversion < 2025010113) {
+        // Create gamifiedquiz_participants table to track student joins
+        $table = new xmldb_table('gamifiedquiz_participants');
+        
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('session_id', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('gamifiedquizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('username', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('timejoined', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('user', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+            $table->add_key('gamifiedquiz', XMLDB_KEY_FOREIGN, array('gamifiedquizid'), 'gamifiedquiz', array('id'));
+            
+            $table->add_index('session_user', XMLDB_INDEX_UNIQUE, array('session_id', 'userid'));
+            $table->add_index('session_id', XMLDB_INDEX_NOTUNIQUE, array('session_id'));
+            
+            $dbman->create_table($table);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010113, 'gamifiedquiz');
+    }
+    
     // Return true to indicate upgrade was successful
     return true;
 }

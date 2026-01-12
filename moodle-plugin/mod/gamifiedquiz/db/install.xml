@@ -132,6 +132,26 @@
         <INDEX NAME="quiz_user" UNIQUE="true" FIELDS="gamifiedquizid, userid"/>
       </INDEXES>
     </TABLE>
+
+    <TABLE NAME="gamifiedquiz_participants" COMMENT="Tracks students who joined a session">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gamifiedquizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="username" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timejoined" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="gamifiedquiz" TYPE="foreign" FIELDS="gamifiedquizid" REFTABLE="gamifiedquiz" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="session_user" UNIQUE="true" FIELDS="session_id, userid"/>
+        <INDEX NAME="session_id" UNIQUE="false" FIELDS="session_id"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
 

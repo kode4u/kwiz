@@ -1315,20 +1315,20 @@
                             finalLeaderboard = scoresResult.leaderboard;
                             console.log('Loaded final leaderboard from database:', finalLeaderboard);
                         }
-                        // Use unique_participants if available, otherwise count from leaderboard
-                        if (scoresResult.unique_participants !== undefined && scoresResult.unique_participants > 0) {
-                            participantCount = scoresResult.unique_participants;
-                        } else if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
-                            // Count unique users in leaderboard
+                        // Count unique users in leaderboard (always use this as it's most accurate)
+                        if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
                             const uniqueUsers = new Set();
                             scoresResult.leaderboard.forEach(entry => {
                                 const userId = entry.userId || entry.user_id || entry.userid || entry.id;
                                 if (userId) uniqueUsers.add(userId);
                             });
                             participantCount = uniqueUsers.size || scoresResult.leaderboard.length;
+                        } else if (scoresResult.total_responses !== undefined && scoresResult.total_responses > 0) {
+                            // Fallback: if we have responses but no leaderboard, estimate from responses
+                            // Note: This is less accurate as multiple responses from same user count as multiple participants
+                            participantCount = scoresResult.total_responses;
                         } else {
-                            // Fallback: use total_responses if available
-                            participantCount = scoresResult.total_responses || finalLeaderboard.length;
+                            participantCount = finalLeaderboard.length;
                         }
                     }
                 } catch (error) {
@@ -2198,6 +2198,49 @@
             waitingMsg.textContent = 'Waiting for teacher to start quiz session...';
         }
 
+        // Student joins session immediately when connecting (not just when session is created)
+        // This ensures we track all students who join, even before questions start
+        async function joinSession(sessionId) {
+            if (!sessionId) return;
+            
+            try {
+                const formData = new FormData();
+                formData.append('sessionid', sessionId);
+                formData.append('userid', config.userId);
+                formData.append('username', config.userName || config.fullName || '');
+                
+                const response = await fetch('ajax/session_join.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Joined session in DB, participant count:', result.participantCount);
+                } else {
+                    console.error('Failed to join session:', result.error);
+                }
+            } catch (error) {
+                console.error('Failed to join session in DB:', error);
+            }
+        }
+        
+        // Listen for session:joined event from WebSocket server
+        socket.on('session:joined', async (data) => {
+            console.log('Session joined event received:', data);
+            // Join session in database when WebSocket confirms join
+            // Prefer instanceId if available (it's the actual session_id in database)
+            const sessionIdToJoin = data.instanceId || data.sessionId;
+            if (sessionIdToJoin) {
+                await joinSession(sessionIdToJoin);
+            }
+        });
+        
+        // Join session when socket connects (if session exists)
+        // Also try to join with instanceId if available from active session
+        if (config.sessionId) {
+            joinSession(config.sessionId);
+        }
+        
         // Listen for session created
         socket.on('session:created', async (data) => {
             console.log('Session created, waiting for questions...', data);
@@ -2206,19 +2249,11 @@
             currentTotalScore = 0;
             previousScore = 0;
             
-            // Update participant count in database
+            // Join session when it's created (use instanceId if available)
             if (data.instanceId) {
-                try {
-                    const formData = new FormData();
-                    formData.append('sessionid', data.instanceId);
-                    await fetch('ajax/session_join.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    console.log('Joined session in DB');
-                } catch (error) {
-                    console.error('Failed to join session in DB:', error);
-                }
+                await joinSession(data.instanceId);
+            } else if (data.sessionId) {
+                await joinSession(data.sessionId);
             }
             
             const waitingMsg = document.getElementById('waiting-message');

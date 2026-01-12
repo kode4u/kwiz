@@ -22,8 +22,30 @@ try {
     $context = context_module::instance($cm->id);
     require_capability('mod/gamifiedquiz:manage', $context);
     
+    // Count participants from participants table (tracks all students who joined)
+    $participantCount = $DB->count_records('gamifiedquiz_participants', 
+        array('session_id' => $sessionid)
+    );
+    
+    // Fallback: if no participants recorded, count from responses
+    if ($participantCount == 0) {
+        $allResponses = $DB->get_records('gamifiedquiz_responses', 
+            array('session_id' => $sessionid)
+        );
+        if ($allResponses && count($allResponses) > 0) {
+            $uniqueUserIds = array();
+            foreach ($allResponses as $response) {
+                if (!in_array($response->userid, $uniqueUserIds)) {
+                    $uniqueUserIds[] = $response->userid;
+                }
+            }
+            $participantCount = count($uniqueUserIds);
+        }
+    }
+    
     $session->timeended = time();
     $session->results_data = $resultsdata;
+    $session->participants_count = $participantCount; // Update participant count
     $DB->update_record('gamifiedquiz_sessions', $session);
     
     // Calculate and update grades for all participants
@@ -48,7 +70,7 @@ try {
         'success' => true,
         'message' => 'Session ended',
         'grades_updated' => $updated_count,
-        'total_participants' => count($grades)
+        'total_participants' => $participantCount
     ]);
     
 } catch (Exception $e) {

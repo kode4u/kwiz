@@ -67,47 +67,49 @@ try {
             }
         }
         
-        // If session ended but no results stored, try to get from responses table
-        $participantCount = $session->participants_count;
-        if ($session->timeended && empty($results)) {
-            // Count unique participants from responses table
-            $responses = $DB->get_records('gamifiedquiz_responses', 
-                array('session_id' => $session->session_id),
-                '',
-                'DISTINCT userid'
-            );
-            if ($responses && count($responses) > 0) {
-                $participantCount = count($responses);
-                // Also try to load leaderboard from responses
-                if (empty($results)) {
-                    $allResponses = $DB->get_records('gamifiedquiz_responses', 
-                        array('session_id' => $session->session_id),
-                        'timecreated ASC'
-                    );
-                    $userScores = array();
-                    $userNames = array();
-                    foreach ($allResponses as $response) {
-                        $userid = $response->userid;
-                        if (!isset($userScores[$userid])) {
-                            $userScores[$userid] = 0;
-                            $userNames[$userid] = $response->username;
-                        }
-                        $userScores[$userid] += $response->score;
+        // Always calculate participant count from participants table (tracks all students who joined)
+        $participantCount = $DB->count_records('gamifiedquiz_participants', 
+            array('session_id' => $session->session_id)
+        );
+        
+        // Fallback to session participants_count if count is 0
+        if ($participantCount == 0) {
+            $participantCount = $session->participants_count;
+        }
+        
+        // Get all responses for this session (for leaderboard building)
+        $allResponses = $DB->get_records('gamifiedquiz_responses', 
+            array('session_id' => $session->session_id),
+            'timecreated ASC'
+        );
+        
+        // If session ended but no results stored in session_results field, build leaderboard from responses
+        if ($session->timeended && (empty($results) || !is_array($results) || count($results) === 0)) {
+            if ($allResponses && count($allResponses) > 0) {
+                $userScores = array();
+                $userNames = array();
+                foreach ($allResponses as $response) {
+                    $userid = $response->userid;
+                    if (!isset($userScores[$userid])) {
+                        $userScores[$userid] = 0;
+                        $userNames[$userid] = $response->username;
                     }
-                    foreach ($userScores as $userid => $totalScore) {
-                        $results[] = array(
-                            'userId' => (int)$userid,
-                            'user_id' => (int)$userid,
-                            'userid' => (int)$userid,
-                            'id' => (int)$userid,
-                            'username' => $userNames[$userid],
-                            'score' => (int)$totalScore
-                        );
-                    }
-                    usort($results, function($a, $b) {
-                        return $b['score'] - $a['score'];
-                    });
+                    $userScores[$userid] += $response->score;
                 }
+                $results = array(); // Reset results array
+                foreach ($userScores as $userid => $totalScore) {
+                    $results[] = array(
+                        'userId' => (int)$userid,
+                        'user_id' => (int)$userid,
+                        'userid' => (int)$userid,
+                        'id' => (int)$userid,
+                        'username' => $userNames[$userid],
+                        'score' => (int)$totalScore
+                    );
+                }
+                usort($results, function($a, $b) {
+                    return $b['score'] - $a['score'];
+                });
             }
         }
         
