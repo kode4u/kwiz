@@ -94,6 +94,42 @@
         <INDEX NAME="session_user" UNIQUE="false" FIELDS="session_id, userid"/>
       </INDEXES>
     </TABLE>
+
+    <TABLE NAME="gamifiedquiz_slots" COMMENT="Stores questions linked to gamified quiz instances (similar to quiz_slots)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="gamifiedquizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="slot" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Order of question in quiz"/>
+        <FIELD NAME="page" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Page number"/>
+        <FIELD NAME="maxmark" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" DEFAULT="1.0" SEQUENCE="false" COMMENT="Maximum mark for this question"/>
+        <FIELD NAME="displaynumber" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Custom display number"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="gamifiedquiz" TYPE="foreign" FIELDS="gamifiedquizid" REFTABLE="gamifiedquiz" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quiz_slot" UNIQUE="false" FIELDS="gamifiedquizid, slot"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="gamifiedquiz_grades" COMMENT="Stores final grades for users (similar to quiz_grades)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="gamifiedquizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" COMMENT="Final grade"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="gamifiedquiz" TYPE="foreign" FIELDS="gamifiedquizid" REFTABLE="gamifiedquiz" REFFIELDS="id"/>
+        <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quiz_user" UNIQUE="true" FIELDS="gamifiedquizid, userid"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
 

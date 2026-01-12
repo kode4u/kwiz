@@ -158,18 +158,42 @@ if ($is_teacher) {
     echo '</div>';
 }
 
-// Question Editor Modal
+// Question Editor Modal with Question Bank Browser (Moodle Quiz Style)
 if ($is_teacher) {
     echo '<div id="question-editor-modal" class="question-editor-modal">';
-    echo '<div class="question-editor-content">';
+    echo '<div class="question-editor-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">';
     echo '<span class="question-editor-close">&times;</span>';
     echo '<h2>Edit Questions</h2>';
-    echo '<div id="question-editor-form" class="question-editor-form">';
-    echo '<p>Question editor will be populated here</p>';
+    
+    // Question Bank Browser - Similar to Moodle Quiz
+    echo '<div id="question-bank-browser" style="margin-bottom: 20px;">';
+    echo '<div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">';
+    echo '<label for="question-category-select" style="font-weight: bold; min-width: 120px;">Category:</label>';
+    echo '<select id="question-category-select" style="flex: 1; min-width: 200px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">';
+    echo '<option value="0">Loading categories...</option>';
+    echo '</select>';
+    echo '<button id="refresh-categories-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Refresh</button>';
     echo '</div>';
-    echo '<div style="margin-top: 20px; text-align: right;">';
+    
+    echo '<div id="question-bank-list" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; min-height: 200px; max-height: 400px; overflow-y: auto; background: #f8f9fa;">';
+    echo '<p style="text-align: center; color: #666;">Select a category to view questions</p>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Selected Questions Section
+    echo '<div id="selected-questions-section" style="margin-top: 20px; border-top: 2px solid #ddd; padding-top: 20px;">';
+    echo '<h3>Selected Questions</h3>';
+    echo '<div id="question-editor-form" class="question-editor-form">';
+    echo '<p style="text-align: center; color: #666;">No questions selected. Select questions from the bank above or add new questions below.</p>';
+    echo '</div>';
+    echo '<div style="margin-top: 15px;">';
+    echo '<button id="add-new-question-btn" class="btn btn-secondary gq-btn gq-btn-secondary">Add New Question</button>';
+    echo '</div>';
+    echo '</div>';
+    
+    echo '<div style="margin-top: 20px; text-align: right; border-top: 2px solid #ddd; padding-top: 15px;">';
     echo '<button id="save-questions-btn" class="btn btn-primary gq-btn gq-btn-primary">Save Questions</button>';
-    echo '<button id="cancel-edit-btn" class="btn btn-secondary gq-btn gq-btn-secondary">Cancel</button>';
+    echo '<button id="cancel-edit-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Cancel</button>';
     echo '</div>';
     echo '</div>';
     echo '</div>';

@@ -232,6 +232,45 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010109, 'gamifiedquiz');
     }
     
+    // Add gamifiedquiz_slots and gamifiedquiz_grades tables (similar to quiz module)
+    if ($oldversion < 2025010110) {
+        // Create gamifiedquiz_slots table
+        $table = new xmldb_table('gamifiedquiz_slots');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('gamifiedquizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('slot', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('page', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1');
+            $table->add_field('maxmark', XMLDB_TYPE_NUMBER, '10', '5', XMLDB_NOTNULL, null, '1.0');
+            $table->add_field('displaynumber', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('gamifiedquiz', XMLDB_KEY_FOREIGN, array('gamifiedquizid'), 'gamifiedquiz', array('id'));
+            $table->add_index('quiz_slot', XMLDB_INDEX_UNIQUE, array('gamifiedquizid', 'slot'));
+            
+            $dbman->create_table($table);
+        }
+        
+        // Create gamifiedquiz_grades table
+        $table = new xmldb_table('gamifiedquiz_grades');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('gamifiedquizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('grade', XMLDB_TYPE_NUMBER, '10', '5', XMLDB_NOTNULL, null, null);
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('gamifiedquiz', XMLDB_KEY_FOREIGN, array('gamifiedquizid'), 'gamifiedquiz', array('id'));
+            $table->add_key('user', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+            $table->add_index('quiz_user', XMLDB_INDEX_UNIQUE, array('gamifiedquizid', 'userid'));
+            
+            $dbman->create_table($table);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010110, 'gamifiedquiz');
+    }
+    
     // Return true to indicate upgrade was successful
     return true;
 }

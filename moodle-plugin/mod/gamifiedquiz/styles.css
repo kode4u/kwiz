@@ -385,6 +385,43 @@
     border-color: var(--gq-primary);
 }
 
+/* Question Bank Browser Styles */
+.question-bank-item {
+    transition: all 0.2s ease;
+}
+
+.question-bank-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.select-question-btn {
+    white-space: nowrap;
+}
+
+#question-bank-list {
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f8f9fa;
+}
+
+#question-bank-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#question-bank-list::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+#question-bank-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+#question-bank-list::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
 .choice-input-group {
     display: flex;
     align-items: center;

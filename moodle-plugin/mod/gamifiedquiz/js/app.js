@@ -109,6 +109,8 @@
         let currentQuestionIndex = 0;
 
         // Question Editor Functions (define early for hoisting)
+        let selectedQuestionsFromBank = [];
+        
         function openQuestionEditor(questionsList, config) {
             const modal = document.getElementById('question-editor-modal');
             const form = document.getElementById('question-editor-form');
@@ -119,23 +121,37 @@
             }
             
             modal.style.display = 'block';
-            form.innerHTML = '';
+            
+            // Initialize selected questions
+            selectedQuestionsFromBank = [];
             
             // Use provided questions or current questions
             const qList = questionsList && questionsList.length > 0 ? questionsList : (window.currentQuestions || []);
             
-            // Add questions
-            qList.forEach((q, index) => {
-                addQuestionToEditor(form, q, index);
-            });
+            // Load question bank categories
+            loadQuestionBankCategories(config);
             
-            // Add "Add Question" button
-            const addBtn = document.createElement('button');
-            addBtn.type = 'button';
-            addBtn.className = 'btn btn-secondary gq-btn gq-btn-secondary';
-            addBtn.textContent = 'Add New Question';
-            addBtn.onclick = () => addQuestionToEditor(form, null, qList.length);
-            form.appendChild(addBtn);
+            // Initialize selected questions from existing list (only those with IDs are from bank)
+            selectedQuestionsFromBank = qList.filter(q => q.id);
+            
+            // Load existing questions into editor
+            form.innerHTML = '';
+            if (qList.length > 0) {
+                qList.forEach((q, index) => {
+                    addQuestionToEditor(form, q, index);
+                });
+            } else {
+                form.innerHTML = '<p style="text-align: center; color: #666;">No questions selected. Select questions from the bank above or add new questions below.</p>';
+            }
+            
+            // Add "Add New Question" button handler
+            const addNewBtn = document.getElementById('add-new-question-btn');
+            if (addNewBtn) {
+                addNewBtn.onclick = () => {
+                    const currentCount = form.querySelectorAll('.question-editor-item').length;
+                    addQuestionToEditor(form, null, currentCount);
+                };
+            }
             
             // Close button handler
             const closeBtn = modal.querySelector('.question-editor-close');
@@ -157,6 +173,103 @@
             const saveBtn = document.getElementById('save-questions-btn');
             if (saveBtn) {
                 saveBtn.onclick = () => saveQuestions(config);
+            }
+        }
+        
+        // Tab switching functionality
+        function initQuestionEditorTabs() {
+            const tabButtons = document.querySelectorAll('.question-tab-btn');
+            const tabContents = document.querySelectorAll('.question-tab-content');
+            
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    
+                    // Update button states
+                    tabButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.background = '#6c757d';
+                    });
+                    btn.classList.add('active');
+                    btn.style.background = '#007bff';
+                    
+                    // Update content visibility
+                    tabContents.forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    if (targetTab === 'questionbank') {
+                        document.getElementById('questionbank-tab').style.display = 'block';
+                    } else if (targetTab === 'manual') {
+                        document.getElementById('manual-tab').style.display = 'block';
+                    }
+                });
+            });
+        }
+        
+        // Listen for messages from question bank iframe (if questions are selected there)
+        function initQuestionBankIframeListener(config) {
+            window.addEventListener('message', (event) => {
+                // Handle messages from question bank iframe
+                // This would need to be implemented based on Moodle's question bank API
+                console.log('Message from question bank:', event.data);
+            });
+        }
+        
+        function updateSelectedQuestionsInEditor(config) {
+            const form = document.getElementById('question-editor-form');
+            if (!form) return;
+            
+            // Get manually added questions (those not from bank)
+            const existingItems = form.querySelectorAll('.question-editor-item');
+            const manualQuestions = [];
+            existingItems.forEach(item => {
+                const qText = item.querySelector('.question-text-input')?.value.trim();
+                if (qText) {
+                    const choices = [];
+                    const choicesContainer = item.querySelector('.choices-container');
+                    if (choicesContainer) {
+                        const choiceInputs = choicesContainer.querySelectorAll('.choice-text-input');
+                        const correctRadio = item.querySelector('input[type="radio"]:checked');
+                        let correctIndex = 0;
+                        
+                        choiceInputs.forEach((input, ci) => {
+                            const choiceText = input.value.trim();
+                            if (choiceText) {
+                                choices.push({
+                                    text: choiceText,
+                                    is_correct: (correctRadio && parseInt(correctRadio.value) === ci)
+                                });
+                                if (correctRadio && parseInt(correctRadio.value) === ci) {
+                                    correctIndex = ci;
+                                }
+                            }
+                        });
+                        
+                        if (choices.length > 0) {
+                            manualQuestions.push({
+                                question: qText,
+                                question_text: qText,
+                                choices: choices,
+                                correct_index: correctIndex
+                            });
+                        }
+                    }
+                }
+            });
+            
+            // Clear form
+            form.innerHTML = '';
+            
+            // Combine bank questions and manual questions
+            const allQuestions = [...selectedQuestionsFromBank, ...manualQuestions];
+            
+            if (allQuestions.length > 0) {
+                allQuestions.forEach((q, index) => {
+                    addQuestionToEditor(form, q, index);
+                });
+            } else {
+                form.innerHTML = '<p style="text-align: center; color: #666;">No questions selected. Select questions from the bank above or add new questions below.</p>';
             }
         }
         
