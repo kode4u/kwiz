@@ -20,6 +20,10 @@ try {
     // Generate unique session ID
     $sessionId = $quizid . '_' . time() . '_' . random_string(6);
     
+    // Delete any old responses for this session (reset scores to zero)
+    // This ensures a fresh start when teacher clicks start
+    $DB->delete_records('gamifiedquiz_responses', array('session_id' => $sessionId));
+    
     // Create session record
     $session = new stdClass();
     $session->gamifiedquizid = $quizid;

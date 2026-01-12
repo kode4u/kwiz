@@ -117,6 +117,7 @@ if ($is_teacher) {
     echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
     echo '<div class="controls">';
     echo '<button id="generate-questions-btn" class="btn btn-primary gq-btn gq-btn-primary" style="margin-left: 10px;">' . get_string('generate_questions', 'mod_gamifiedquiz') . '</button>';
+    echo '<button id="edit-questions-btn" class="btn btn-info gq-btn gq-btn-info" style="margin-left: 10px;">Edit Questions</button>';
     echo '<button id="start-session-btn" class="btn btn-success gq-btn gq-btn-success" style="margin-left: 10px;" disabled>' . get_string('start_session', 'mod_gamifiedquiz') . '</button>';
     echo '<button id="end-session-btn" class="btn btn-danger gq-btn gq-btn-danger" style="margin-left: 10px;" disabled>End Session</button>';
     echo '<button id="next-question-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;" disabled>Next Question</button>';
@@ -156,7 +157,10 @@ if ($is_teacher) {
     echo '</div>';
     echo '<div id="result-container" class="result-container" style="display:none;"></div>';
     echo '<div id="question-comparison-container" class="gq-container" style="display:none;"></div>';
-    // No leaderboard container for students - only teachers see it
+    // Leaderboard container for students (shown after timeout)
+    echo '<div id="student-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-top: 20px;"></div>';
+    // Final leaderboard container for students
+    echo '<div id="student-final-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-top: 20px;"></div>';
     echo '</div>';
     echo '</div>';
 }
@@ -218,6 +222,28 @@ if ($is_teacher) {
     echo '<button type="submit" id="submit-generate-btn" class="btn btn-primary gq-btn gq-btn-primary">Generate</button>';
     echo '</div>';
     echo '</form>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Question Editor Modal
+    echo '<div id="question-editor-modal" class="question-editor-modal" style="display:none;">';
+    echo '<div class="question-editor-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">';
+    echo '<span class="question-editor-close" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>';
+    echo '<h2>Edit Questions</h2>';
+    echo '<div id="question-bank-section" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">';
+    echo '<h3>Question Bank</h3>';
+    echo '<div style="margin-bottom: 15px;">';
+    echo '<label for="question-category-select" style="display: block; margin-bottom: 5px; font-weight: bold;">Category:</label>';
+    echo '<select id="question-category-select" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"><option value="">Loading categories...</option></select>';
+    echo '</div>';
+    echo '<div id="question-bank-list" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white; border-radius: 4px;"></div>';
+    echo '</div>';
+    echo '<form id="question-editor-form"></form>';
+    echo '<div style="margin-top: 20px; text-align: right; border-top: 2px solid #ddd; padding-top: 15px;">';
+    echo '<button id="add-new-question-btn" class="btn btn-primary gq-btn gq-btn-primary">Add New Question</button>';
+    echo '<button id="save-questions-btn" class="btn btn-success gq-btn gq-btn-success" style="margin-left: 10px;">Save Questions</button>';
+    echo '<button id="cancel-edit-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Cancel</button>';
+    echo '</div>';
     echo '</div>';
     echo '</div>';
     

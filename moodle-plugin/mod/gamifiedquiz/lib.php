@@ -107,7 +107,8 @@ function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
     
     // Post-processing after add
     $gamifiedquiz->id = $id;
-    gamifiedquiz_after_add_or_update($gamifiedquiz);
+    // Update grade item for the new quiz instance
+    gamifiedquiz_grade_item_update($gamifiedquiz);
     
     return $id;
 }
@@ -125,7 +126,14 @@ function gamifiedquiz_update_instance($gamifiedquiz, $mform = null) {
     $gamifiedquiz->timemodified = time();
     $gamifiedquiz->id = $gamifiedquiz->instance;
 
-    return $DB->update_record('gamifiedquiz', $gamifiedquiz);
+    $result = $DB->update_record('gamifiedquiz', $gamifiedquiz);
+    
+    // Update grade item after update
+    if ($result) {
+        gamifiedquiz_grade_item_update($gamifiedquiz);
+    }
+    
+    return $result;
 }
 
 /**

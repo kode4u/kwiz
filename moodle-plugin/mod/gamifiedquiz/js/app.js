@@ -20,6 +20,105 @@
     }
     
     function startApp(config) {
+        // Shared cache for user details (accessible by both teacher and student apps)
+        let userDetailsCache = {};
+        
+        // Shared helper function to get user display name
+        function getUserDisplayName(entry) {
+            // Try different possible field names for user ID
+            let userId = entry.userId || entry.user_id || entry.userid || entry.id;
+            
+            // Normalize userId to number for cache lookup
+            if (userId) {
+                userId = parseInt(userId);
+            }
+            
+            // Try lookup with number first
+            if (userId && !isNaN(userId)) {
+                if (userDetailsCache[userId]) {
+                    const user = userDetailsCache[userId];
+                    const name = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
+                    if (name && name.trim()) {
+                        return name;
+                    }
+                }
+                
+                // Try lookup with string version too (in case cache has string keys)
+                if (userDetailsCache[String(userId)]) {
+                    const user = userDetailsCache[String(userId)];
+                    const name = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
+                    if (name && name.trim()) {
+                        return name;
+                    }
+                }
+            }
+            
+            // If we have fullname or username in entry, use that (but prefer cache)
+            // Only use entry.username if it's not a generic "User X" format
+            if (entry.fullname && entry.fullname.trim() && !entry.fullname.match(/^User \d+$/)) {
+                return entry.fullname;
+            }
+            if (entry.username && entry.username.trim() && !entry.username.match(/^User \d+$/)) {
+                return entry.username;
+            }
+            
+            // Last resort
+            return 'User ' + (userId || '?');
+        }
+        
+        // Shared function to fetch user details from Moodle
+        async function fetchUserDetails(userIds) {
+            // Filter out invalid IDs and ensure they're numbers
+            const validIds = userIds.filter(id => id && !isNaN(id) && id > 0).map(id => parseInt(id));
+            if (validIds.length === 0) {
+                return userDetailsCache;
+            }
+            
+            // Check cache with both number and string keys
+            const uncachedIds = validIds.filter(id => {
+                return !userDetailsCache[id] && !userDetailsCache[String(id)];
+            });
+            
+            if (uncachedIds.length === 0) {
+                return userDetailsCache;
+            }
+            
+            try {
+                const wwwroot = config.wwwroot || '';
+                const sesskey = config.sesskey || '';
+                const url = `${wwwroot}/mod/gamifiedquiz/ajax/get_user_details.php?sesskey=${sesskey}&userids=${JSON.stringify(uncachedIds)}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    return userDetailsCache;
+                }
+                
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    return userDetailsCache;
+                }
+                
+                if (data.success && data.users) {
+                    // Update cache - ensure keys are numbers
+                    Object.keys(data.users).forEach(key => {
+                        const numKey = parseInt(key);
+                        if (!isNaN(numKey)) {
+                            userDetailsCache[numKey] = data.users[key];
+                            userDetailsCache[String(numKey)] = data.users[key];
+                        }
+                    });
+                    // Update global reference
+                    window.gamifiedQuizUserDetailsCache = userDetailsCache;
+                }
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+            }
+            
+            return userDetailsCache;
+        }
 
         // Initialize Socket.IO connection (declare at function scope)
         let socket = null;
@@ -78,6 +177,11 @@
         
         // Make socket available globally for this module
         window.gamifiedQuizSocket = socket;
+        
+        // Make functions available globally for showSessionResults
+        window.gamifiedQuizFetchUserDetails = fetchUserDetails;
+        window.gamifiedQuizUserDetailsCache = userDetailsCache;
+        window.gamifiedQuizGetUserDisplayName = getUserDisplayName;
 
     // Initialize app based on role
     if (config.role === 'teacher') {
@@ -95,13 +199,105 @@
         // Just attach event listeners to existing elements
         
         const generateBtn = document.getElementById('generate-questions-btn');
+        const editQuestionsBtn = document.getElementById('edit-questions-btn');
         const startBtn = document.getElementById('start-session-btn');
         const endBtn = document.getElementById('end-session-btn');
         const nextBtn = document.getElementById('next-question-btn');
         
+        // Function to load scores from database and update leaderboard
+        async function loadSessionScores(sessionId) {
+            if (!sessionId) return;
+            
+            try {
+                const response = await fetch(`ajax/get_session_scores.php?sessionid=${encodeURIComponent(sessionId)}&quizid=${config.quizId}`);
+                const result = await response.json();
+                
+                if (result.success && result.leaderboard && result.leaderboard.length > 0) {
+                    console.log('Loaded scores from database:', result.leaderboard);
+                    currentLeaderboard = result.leaderboard;
+                    
+                    // Update leaderboard display
+                    await displayLeaderboard(result.leaderboard);
+                    
+                    // Emit to WebSocket server to sync Redis
+                    if (socket && socket.connected) {
+                        socket.emit('teacher:sync_scores', {
+                            sessionId: sessionId,
+                            leaderboard: result.leaderboard
+                        });
+                    }
+                } else {
+                    console.log('No scores found in database for session:', sessionId);
+                    currentLeaderboard = [];
+                    await displayLeaderboard([]);
+                }
+            } catch (error) {
+                console.error('Error loading session scores:', error);
+            }
+        }
+        
+        // Check if there's an active session on page load and load scores
+        // This handles page reloads - check for active session in database
+        (async function checkActiveSession() {
+            try {
+                // Get latest session for this quiz
+                const response = await fetch(`ajax/get_sessions.php?quizid=${config.quizId}`);
+                const result = await response.json();
+                
+                if (result.success && result.sessions && result.sessions.length > 0) {
+                    // Find the most recent active session (started but not ended)
+                    const activeSession = result.sessions.find(s => s.started && !s.timeended);
+                    
+                    if (activeSession) {
+                        console.log('Found active session on page load:', activeSession.session_id);
+                        currentSessionInstanceId = activeSession.session_id;
+                        
+                        // Load scores from database
+                        await loadSessionScores(activeSession.session_id);
+                        
+                        // Update UI to show session is active
+                        const statusEl = document.getElementById('session-status');
+                        if (statusEl) {
+                            statusEl.style.display = 'block';
+                            statusEl.textContent = `Session active - ID: ${activeSession.session_id.slice(-8)}`;
+                            statusEl.style.background = '#d1ecf1';
+                        }
+                        
+                        if (startBtn) startBtn.disabled = true;
+                        if (endBtn) endBtn.disabled = false;
+                        if (nextBtn) nextBtn.disabled = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for active session:', error);
+            }
+        })();
+        
         if (!generateBtn) {
             console.error('Generate questions button not found!');
             return;
+        }
+        
+        // Edit Questions button handler
+        if (editQuestionsBtn) {
+            editQuestionsBtn.addEventListener('click', () => {
+                console.log('Edit Questions button clicked');
+                console.log('questions array:', questions);
+                console.log('window.currentQuestions:', window.currentQuestions);
+                
+                // Check both questions array and window.currentQuestions
+                const questionsToEdit = questions.length > 0 ? questions : (window.currentQuestions || []);
+                
+                if (questionsToEdit.length === 0) {
+                    alert('No questions to edit. Please generate questions first.');
+                    return;
+                }
+                
+                console.log('Opening editor with questions:', questionsToEdit);
+                openQuestionEditor(questionsToEdit, config);
+            });
+        } else {
+            console.error('Edit Questions button not found!');
         }
 
         let questions = [];
@@ -237,36 +433,42 @@
         }
         
         function openQuestionEditor(questionsList, config) {
+            console.log('openQuestionEditor called with:', questionsList);
             const modal = document.getElementById('question-editor-modal');
             const form = document.getElementById('question-editor-form');
             
-            if (!modal || !form) {
-                console.error('Question editor modal not found');
+            if (!modal) {
+                console.error('Question editor modal not found! Modal element:', modal);
+                alert('Error: Question editor modal not found. Please refresh the page.');
                 return;
             }
             
-            modal.style.display = 'block';
+            if (!form) {
+                console.error('Question editor form not found! Form element:', form);
+                alert('Error: Question editor form not found. Please refresh the page.');
+                return;
+            }
             
-            // Initialize selected questions
-            selectedQuestionsFromBank = [];
+            console.log('Showing modal');
+            modal.style.display = 'flex'; // Use flex to match other modals (like generate-questions-modal)
             
             // Use provided questions or current questions
             const qList = questionsList && questionsList.length > 0 ? questionsList : (window.currentQuestions || []);
             
-            // Load question bank categories
-            loadQuestionBankCategories(config);
-            
-            // Initialize selected questions from existing list (only those with IDs are from bank)
-            selectedQuestionsFromBank = qList.filter(q => q.id);
+            // Hide question bank section (we're not using Moodle question bank anymore)
+            const bankSection = document.getElementById('question-bank-section');
+            if (bankSection) {
+                bankSection.style.display = 'none';
+            }
             
             // Load existing questions into editor
             form.innerHTML = '';
             if (qList.length > 0) {
-                qList.forEach((q, index) => {
-                    addQuestionToEditor(form, q, index);
-                });
+            qList.forEach((q, index) => {
+                addQuestionToEditor(form, q, index);
+            });
             } else {
-                form.innerHTML = '<p style="text-align: center; color: #666;">No questions selected. Select questions from the bank above or add new questions below.</p>';
+                form.innerHTML = '<p style="text-align: center; color: #666;">No questions to edit. Please generate questions first.</p>';
             }
             
             // Add "Add New Question" button handler
@@ -297,7 +499,9 @@
             // Save button handler
             const saveBtn = document.getElementById('save-questions-btn');
             if (saveBtn) {
-                saveBtn.onclick = () => saveQuestions(config);
+                saveBtn.onclick = () => {
+                    saveQuestions(config);
+                };
             }
         }
         
@@ -1015,7 +1219,9 @@
             
             // RESET scores and leaderboard for new session
             currentLeaderboard = [];
-            userDetailsCache = {}; // Clear user cache for fresh start
+            if (window.gamifiedQuizUserDetailsCache) {
+                window.gamifiedQuizUserDetailsCache = {}; // Clear user cache for fresh start
+            }
             currentQuestionIndex = 0;
             
             // Create session in database first
@@ -1075,7 +1281,9 @@
             
             // Clear any cached leaderboard data
             currentLeaderboard = [];
-            userDetailsCache = {};
+            if (window.gamifiedQuizUserDetailsCache) {
+                window.gamifiedQuizUserDetailsCache = {};
+            }
             
             // Save session start to database
             saveSessionToDatabase({
@@ -1115,7 +1323,9 @@
                 
                 // RESET for next session
                 currentLeaderboard = [];
-                userDetailsCache = {}; // Clear user cache
+                if (window.gamifiedQuizUserDetailsCache) {
+                    window.gamifiedQuizUserDetailsCache = {}; // Clear user cache
+                }
                 currentQuestionIndex = 0;
                 
                 // Re-enable start button for new session
@@ -1329,14 +1539,15 @@
             // Increment index AFTER pushing
             currentQuestionIndex++;
             
-            // Disable next button until results are shown
+            // Update next button text (but keep it enabled - teacher can proceed anytime)
             if (nextBtn) {
-                nextBtn.disabled = true;
                 if (currentQuestionIndex >= questions.length) {
                     nextBtn.textContent = 'End Quiz';
                 } else {
                     nextBtn.textContent = 'Next Question';
                 }
+                // Keep button enabled - teacher can proceed anytime
+                nextBtn.disabled = false;
             }
         }
         
@@ -1349,19 +1560,16 @@
                         endBtn.click();
                     }
                 } else {
-                    // Push next question
-                    pushNextQuestion();
+                    // Push next question (teacher can proceed anytime)
+                pushNextQuestion();
                 }
             });
         }
         
-        // Listen for question timeout - don't auto-move, wait for teacher
+        // Listen for question timeout - just log it, button stays enabled
         socket.on('question:timeout', () => {
-            console.log('Question timeout - waiting for teacher to proceed');
-            // Just enable next button, don't auto-move
-            if (nextBtn) {
-                nextBtn.disabled = false;
-            }
+            console.log('Question timeout - teacher can proceed anytime');
+            // Button is already enabled, no need to change state
         });
 
         // Display questions
@@ -1429,8 +1637,40 @@
             }
         }
 
+        // Function to load scores from database and update leaderboard
+        async function loadSessionScores(sessionId) {
+            if (!sessionId) return;
+            
+            try {
+                const response = await fetch(`ajax/get_session_scores.php?sessionid=${encodeURIComponent(sessionId)}&quizid=${config.quizId}`);
+                const result = await response.json();
+                
+                if (result.success && result.leaderboard && result.leaderboard.length > 0) {
+                    console.log('Loaded scores from database:', result.leaderboard);
+                    currentLeaderboard = result.leaderboard;
+                    
+                    // Update leaderboard display
+                    await displayLeaderboard(result.leaderboard);
+                    
+                    // Emit to WebSocket server to sync Redis
+                    if (socket && socket.connected) {
+                        socket.emit('teacher:sync_scores', {
+                            sessionId: sessionId,
+                            leaderboard: result.leaderboard
+                        });
+                    }
+                } else {
+                    console.log('No scores found in database for session:', sessionId);
+                    currentLeaderboard = [];
+                    await displayLeaderboard([]);
+                }
+            } catch (error) {
+                console.error('Error loading session scores:', error);
+            }
+        }
+
         // Listen for session events
-        socket.on('session:created', (data) => {
+        socket.on('session:created', async (data) => {
             const statusEl = document.getElementById('session-status');
             if (statusEl) {
                 statusEl.textContent = 'Session active - Students can join';
@@ -1438,12 +1678,17 @@
             }
             // RESET scores and leaderboard for new session
             currentLeaderboard = [];
-            userDetailsCache = {}; // Clear user cache
+            if (window.gamifiedQuizUserDetailsCache) {
+                window.gamifiedQuizUserDetailsCache = {}; // Clear user cache
+            }
             // Clear leaderboard for new session
             displayLeaderboard([]).catch(err => console.error('Error clearing leaderboard:', err));
             // Store new instance ID
             currentSessionInstanceId = data.instanceId;
             console.log('New session created with instanceId:', currentSessionInstanceId);
+            
+            // Load any existing scores from database (in case of page reload)
+            await loadSessionScores(currentSessionInstanceId);
         });
 
         socket.on('session:ended', (data) => {
@@ -1484,70 +1729,20 @@
             displayQuestionResults(data);
             // Display ranking after each question
             await displayQuestionRanking(data.leaderboard || []);
-            // Enable next button when results are shown
+            // Update next button text (button stays enabled - teacher can proceed anytime)
             if (nextBtn) {
-                nextBtn.disabled = false;
                 if (currentQuestionIndex >= questions.length) {
                     nextBtn.textContent = 'End Quiz';
                 } else {
                     nextBtn.textContent = 'Next Question';
                 }
+                // Keep button enabled - teacher can proceed anytime
+                nextBtn.disabled = false;
             }
         });
         
-        // Cache for user details (defined early so it can be used by helper functions)
-        let userDetailsCache = {};
-        
-        // Helper function to get user display name
-        function getUserDisplayName(entry) {
-            // Try different possible field names for user ID
-            let userId = entry.userId || entry.user_id || entry.userid || entry.id;
-            
-            // Normalize userId to number for cache lookup
-            if (userId) {
-                userId = parseInt(userId);
-            }
-            
-            // Try lookup with number first
-            if (userId && !isNaN(userId)) {
-                if (userDetailsCache[userId]) {
-                    const user = userDetailsCache[userId];
-                    const name = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
-                    if (name && name.trim()) {
-                        console.log(`✓ Found user name for ID ${userId} (number key): ${name}`);
-                        return name;
-                    }
-                }
-                
-                // Try lookup with string version too (in case cache has string keys)
-                if (userDetailsCache[String(userId)]) {
-                    const user = userDetailsCache[String(userId)];
-                    const name = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
-                    if (name && name.trim()) {
-                        console.log(`✓ Found user name for ID ${userId} (string key): ${name}`);
-                        return name;
-                    }
-                }
-            }
-            
-            // If we have fullname or username in entry, use that (but prefer cache)
-            // Only use entry.username if it's not a generic "User X" format
-            if (entry.fullname && entry.fullname.trim() && !entry.fullname.match(/^User \d+$/)) {
-                console.log(`Using entry.fullname for ID ${userId}: ${entry.fullname}`);
-                return entry.fullname;
-            }
-            if (entry.username && entry.username.trim() && !entry.username.match(/^User \d+$/)) {
-                console.log(`Using entry.username for ID ${userId}: ${entry.username}`);
-                return entry.username;
-            }
-            
-            // Last resort - show we're trying to fetch
-            console.log(`User ID ${userId} not found in cache. Cache keys:`, Object.keys(userDetailsCache));
-            console.log(`Entry data:`, entry);
-            return 'User ' + (userId || '?');
-        }
-        
         // Function to display ranking after each question
+        // Note: getUserDisplayName and fetchUserDetails are defined in startApp scope
         async function displayQuestionRanking(leaderboard) {
             const rankingContainer = document.getElementById('question-ranking-display');
             const rankingTable = document.getElementById('ranking-table-container');
@@ -1562,8 +1757,8 @@
             
             console.log('Question ranking - Extracted user IDs:', userIds);
             
-            if (userIds.length > 0) {
-                await fetchUserDetails(userIds);
+            if (userIds.length > 0 && window.gamifiedQuizFetchUserDetails) {
+                await window.gamifiedQuizFetchUserDetails(userIds);
             }
             
             // Sort leaderboard by score (descending)
@@ -1585,7 +1780,7 @@
                                 <td style="padding: 12px;">
                                     ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1)}
                                 </td>
-                                <td style="padding: 12px;">${getUserDisplayName(entry)}</td>
+                                <td style="padding: 12px;">${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</td>
                                 <td style="padding: 12px; text-align: right; font-weight: bold;">${entry.score || 0} pts</td>
                             </tr>
                         `).join('')}
@@ -1631,6 +1826,12 @@
                 const result = await response.json();
                 if (result.success) {
                     console.log('Response saved to database:', result.responseid);
+                    
+                    // Reload scores from database to get updated leaderboard with accumulated scores
+                    // This ensures scores persist across page reloads
+                    if (currentSessionInstanceId) {
+                        await loadSessionScores(currentSessionInstanceId);
+                    }
                 } else {
                     console.error('Failed to save response:', result.error);
                 }
@@ -1770,72 +1971,7 @@
             `;
         }
         
-        // Function to fetch user details from Moodle
-        async function fetchUserDetails(userIds) {
-            // Filter out invalid IDs and ensure they're numbers
-            const validIds = userIds.filter(id => id && !isNaN(id) && id > 0).map(id => parseInt(id));
-            if (validIds.length === 0) {
-                console.log('No valid user IDs to fetch');
-                return userDetailsCache;
-            }
-            
-            // Check cache with both number and string keys
-            const uncachedIds = validIds.filter(id => {
-                return !userDetailsCache[id] && !userDetailsCache[String(id)];
-            });
-            
-            if (uncachedIds.length === 0) {
-                console.log('All user IDs already cached');
-                return userDetailsCache;
-            }
-            
-            try {
-                const wwwroot = config.wwwroot || '';
-                const sesskey = config.sesskey || '';
-                const url = `${wwwroot}/mod/gamifiedquiz/ajax/get_user_details.php?sesskey=${sesskey}&userids=${JSON.stringify(uncachedIds)}`;
-                console.log('Fetching user details for IDs:', uncachedIds, 'URL:', url);
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    console.error('HTTP error:', response.status, response.statusText);
-                    return userDetailsCache;
-                }
-                
-                const responseText = await response.text();
-                console.log('User details raw response:', responseText);
-                
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error('Failed to parse JSON response:', parseError, 'Response:', responseText);
-                    return userDetailsCache;
-                }
-                
-                console.log('User details parsed response:', data);
-                
-                if (data.success && data.users) {
-                    // Update cache - ensure keys are numbers
-                    Object.keys(data.users).forEach(key => {
-                        const numKey = parseInt(key);
-                        if (!isNaN(numKey)) {
-                            userDetailsCache[numKey] = data.users[key];
-                            // Also store with string key for compatibility
-                            userDetailsCache[String(numKey)] = data.users[key];
-                            console.log(`Cached user ${numKey}:`, data.users[key]);
-                        }
-                    });
-                    console.log('User details cached. Cache now has keys:', Object.keys(userDetailsCache));
-                    console.log('Cache sample:', userDetailsCache[Object.keys(userDetailsCache)[0]]);
-                } else {
-                    console.error('Failed to fetch user details:', data.error || 'Unknown error', data);
-                }
-            } catch (error) {
-                console.error('Error fetching user details:', error);
-            }
-            
-            return userDetailsCache;
-        }
+        // Note: fetchUserDetails is defined in startApp scope and accessible here
         
         async function displayLeaderboard(leaderboard) {
             console.log('displayLeaderboard called with:', leaderboard);
@@ -1866,12 +2002,16 @@
             }).filter(id => id && !isNaN(id) && id > 0);
             
             console.log('Extracted user IDs from leaderboard:', userIds);
+            // Use global cache reference
+            const userDetailsCache = window.gamifiedQuizUserDetailsCache || {};
             console.log('Current cache state before fetch:', Object.keys(userDetailsCache));
             
             // Fetch user details first
             if (userIds.length > 0) {
-                await fetchUserDetails(userIds);
-                console.log('Current cache state after fetch:', Object.keys(userDetailsCache));
+                await window.gamifiedQuizFetchUserDetails(userIds);
+                // Update local reference after fetch
+                const updatedCache = window.gamifiedQuizUserDetailsCache || {};
+                console.log('Current cache state after fetch:', Object.keys(updatedCache));
             } else {
                 console.warn('No valid user IDs found in leaderboard entries. Full entries:', leaderboard);
             }
@@ -1888,7 +2028,7 @@
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                        const displayName = getUserDisplayName(entry);
+                        const displayName = window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`;
                         const userId = entry.userId || entry.user_id || entry.userid || entry.id;
                         console.log(`Entry ${index}: userId=${userId}, displayName=${displayName}`);
                         return `
@@ -1915,8 +2055,8 @@
             console.log('Final leaderboard - Extracted user IDs:', userIds);
             
             // Fetch user details first
-            if (userIds.length > 0) {
-                await fetchUserDetails(userIds);
+            if (userIds.length > 0 && window.gamifiedQuizFetchUserDetails) {
+                await window.gamifiedQuizFetchUserDetails(userIds);
             }
 
             const topN = config.leaderboardTopN || 3;
@@ -1934,7 +2074,7 @@
                             <div style="text-align: center; flex: 1; max-width: 200px;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${getUserDisplayName(entry)}</div>
+                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</div>
                                     <div style="font-size: 24px; font-weight: bold;">${entry.score || 0} pts</div>
                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold;">#${rank}</div>
@@ -1948,7 +2088,7 @@
                         <ol style="list-style: none; padding: 0;">
                             ${leaderboard.slice(topN).map((entry, index) => `
                                 <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px;">
-                                    #${topN + index + 1} - ${getUserDisplayName(entry)}: ${entry.score || 0} pts
+                                    #${topN + index + 1} - ${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}: ${entry.score || 0} pts
                                 </li>
                             `).join('')}
                         </ol>
@@ -1968,7 +2108,7 @@
                 <ol>
                     ${leaderboard.map((entry, index) => `
                         <li>
-                            <strong>${getUserDisplayName(entry)}</strong>: 
+                            <strong>${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</strong>: 
                             ${entry.score || 0} points
                             ${index < 3 ? ' 🏆' : ''}
                         </li>
@@ -2009,6 +2149,10 @@
         socket.on('session:created', async (data) => {
             console.log('Session created, waiting for questions...', data);
             
+            // RESET student scores for new session
+            currentTotalScore = 0;
+            previousScore = 0;
+            
             // Update participant count in database
             if (data.instanceId) {
                 try {
@@ -2044,12 +2188,14 @@
             const questionContainer = document.getElementById('question-container');
             const resultContainer = document.getElementById('result-container');
             const comparisonContainer = document.getElementById('question-comparison-container');
+            const leaderboardContainer = document.getElementById('student-leaderboard-container');
             
             if (questionNumEl) questionNumEl.textContent = `Question ${questionNumber}`;
             if (waitingMsg) waitingMsg.style.display = 'none';
             if (questionContainer) questionContainer.style.display = 'block';
             if (resultContainer) resultContainer.style.display = 'none';
             if (comparisonContainer) comparisonContainer.style.display = 'none';
+            if (leaderboardContainer) leaderboardContainer.style.display = 'none';
             
             displayQuestion(data.question, data.timer || 60);
         });
@@ -2224,38 +2370,61 @@
         let previousScore = 0;
         let currentTotalScore = 0;
 
-        // Listen for answer result - just update score silently, keep same UI
+        // Listen for answer result - just update score silently
         socket.on('answer:result', (data) => {
             const questionScore = data.questionScore || 0;
             currentTotalScore = data.totalScore || currentTotalScore;
             previousScore = currentTotalScore;
-            
-            // Don't change UI - student stays on the same question view
-            // Just silently update the score for internal tracking
         });
         
-        // Listen for final leaderboard
-        socket.on('leaderboard:final', (data) => {
-            const container = document.getElementById('final-leaderboard-container');
+        // Helper function to display leaderboard for students
+        async function displayStudentLeaderboard(container, leaderboard, isFinal = false) {
             if (!container) return;
             
-            const leaderboard = data.leaderboard || [];
+            // Fetch user details (use global fetchUserDetails if available)
+            const userIds = leaderboard.map(entry => {
+                const id = entry.userId || entry.user_id || entry.userid || entry.id;
+                return id ? parseInt(id) : null;
+            }).filter(id => id && !isNaN(id) && id > 0);
+            
+            if (userIds.length > 0 && window.gamifiedQuizFetchUserDetails) {
+                await window.gamifiedQuizFetchUserDetails(userIds);
+            }
+            
+            // Helper to get display name
+            function getDisplayName(entry) {
+                const userId = entry.userId || entry.user_id || entry.userid || entry.id;
+                if (window.gamifiedQuizGetUserDisplayName) {
+                    return window.gamifiedQuizGetUserDisplayName(entry);
+                }
+                // Fallback if getUserDisplayName not available
+                if (entry.fullname && !entry.fullname.match(/^User \d+$/)) {
+                    return entry.fullname;
+                }
+                if (entry.username && !entry.username.match(/^User \d+$/)) {
+                    return entry.username;
+                }
+                return `User ${userId || '?'}`;
+            }
+            
             const topN = config.leaderboardTopN || 3;
             const topPlayers = leaderboard.slice(0, topN);
             
             container.style.display = 'block';
             container.innerHTML = `
-                <h2 style="margin-top: 0; text-align: center; font-size: 32px; color: white;">🏆 Final Leaderboard 🏆</h2>
+                <h2 style="margin-top: 0; text-align: center; font-size: ${isFinal ? '32px' : '28px'}; color: white;">
+                    ${isFinal ? '🏆 Final Leaderboard 🏆' : '📊 Current Leaderboard'}
+                </h2>
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const height = rank === 1 ? '120px' : rank === 2 ? '100px' : '80px';
-                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                         return `
                             <div style="text-align: center; flex: 1; max-width: 200px;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${getUserDisplayName(entry)}</div>
+                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${getDisplayName(entry)}</div>
                                     <div style="font-size: 24px; font-weight: bold; color: white;">${entry.score || 0} pts</div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: white;">#${rank}</div>
@@ -2269,13 +2438,56 @@
                         <ol style="list-style: none; padding: 0;">
                             ${leaderboard.slice(topN).map((entry, index) => `
                                 <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px; color: white;">
-                                    #${topN + index + 1} - ${getUserDisplayName(entry)}: ${entry.score || 0} pts
+                                    #${topN + index + 1} - ${getDisplayName(entry)}: ${entry.score || 0} pts
                                 </li>
                             `).join('')}
                         </ol>
                     </div>
                 ` : ''}
             `;
+        }
+        
+        // Listen for question timeout - hide quiz UI
+        socket.on('question:timeout', () => {
+            console.log('Question timeout - hiding quiz UI');
+            const questionContainer = document.getElementById('question-container');
+            if (questionContainer) {
+                questionContainer.style.display = 'none';
+            }
+        });
+        
+        // Listen for question results - show leaderboard
+        socket.on('question:results', async (data) => {
+            console.log('Question results received:', data);
+            const leaderboard = data.leaderboard || [];
+            
+            // Hide quiz UI
+            const questionContainer = document.getElementById('question-container');
+            if (questionContainer) {
+                questionContainer.style.display = 'none';
+            }
+            
+            // Show leaderboard
+            const leaderboardContainer = document.getElementById('student-leaderboard-container');
+            if (leaderboardContainer) {
+                await displayStudentLeaderboard(leaderboardContainer, leaderboard, false);
+            }
+        });
+        
+        // Listen for final leaderboard
+        socket.on('leaderboard:final', async (data) => {
+            const container = document.getElementById('student-final-leaderboard-container');
+            const leaderboard = data.leaderboard || [];
+            
+            // Hide quiz UI and intermediate leaderboard
+            const questionContainer = document.getElementById('question-container');
+            const leaderboardContainer = document.getElementById('student-leaderboard-container');
+            if (questionContainer) questionContainer.style.display = 'none';
+            if (leaderboardContainer) leaderboardContainer.style.display = 'none';
+            
+            if (container) {
+                await displayStudentLeaderboard(container, leaderboard, true);
+            }
         });
 
         // Listen for leaderboard updates (students don't see leaderboard during quiz)
@@ -2293,7 +2505,7 @@
                 <ol>
                     ${leaderboard.map((entry, index) => `
                         <li>
-                            <strong>${getUserDisplayName(entry)}</strong>: 
+                            <strong>${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</strong>: 
                             ${entry.score || 0} points
                             ${index < 3 ? ' 🏆' : ''}
                         </li>
@@ -2310,15 +2522,12 @@
                 timerInterval = null;
             }
             
-            const waitingMsg = document.getElementById('waiting-message');
-            if (waitingMsg) {
-                waitingMsg.style.display = 'block';
-                waitingMsg.textContent = 'Quiz session ended. Thank you for participating!';
-            }
+            // Hide quiz UI and intermediate leaderboard
             const questionContainer = document.getElementById('question-container');
-            if (questionContainer) {
-                questionContainer.style.display = 'none';
-            }
+            const leaderboardContainer = document.getElementById('student-leaderboard-container');
+            if (questionContainer) questionContainer.style.display = 'none';
+            if (leaderboardContainer) leaderboardContainer.style.display = 'none';
+            
             // Reset student score for this session
             currentTotalScore = 0;
             previousScore = 0;
@@ -2333,9 +2542,12 @@
                 waitingMsg.textContent = 'New quiz session started! Waiting for first question...';
             }
             const questionContainer = document.getElementById('question-container');
-            if (questionContainer) {
-                questionContainer.style.display = 'none';
-            }
+            const leaderboardContainer = document.getElementById('student-leaderboard-container');
+            const finalLeaderboardContainer = document.getElementById('student-final-leaderboard-container');
+            if (questionContainer) questionContainer.style.display = 'none';
+            if (leaderboardContainer) leaderboardContainer.style.display = 'none';
+            if (finalLeaderboardContainer) finalLeaderboardContainer.style.display = 'none';
+            
             // Reset student score for new session
             currentTotalScore = 0;
             previousScore = 0;
@@ -2478,7 +2690,7 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">${session.ended_formatted || '-'}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
                             ${session.session_results && session.session_results.length > 0 ? 
-                              `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="showSessionResults('${session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;')})">View Results</button>` : 
+                              `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="showSessionResults('${session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;').replace(/'/g, '&#39;')})">View Leaderboard</button>` : 
                               '<span style="color: #999;">No Results</span>'}
                         </td>
                     </tr>
@@ -2511,7 +2723,7 @@
     }
 
     // Show session results - make it global so it can be called from onclick
-    window.showSessionResults = function(sessionId, results) {
+    window.showSessionResults = async function(sessionId, results) {
         // Remove existing results dialog if any
         const existingDialog = document.getElementById('session-results-dialog');
         if (existingDialog) {
@@ -2524,36 +2736,13 @@
         dialog.className = 'question-editor-modal';
         dialog.style.display = 'block';
         
+        // Show loading state first
         let resultsHtml = `
-            <div class="question-editor-content" style="max-width: 600px;">
+            <div class="question-editor-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
                 <span class="results-close" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>
-                <h2>Session Results</h2>
+                <h2>Session Leaderboard</h2>
                 <div class="results-content">
-        `;
-        
-        if (results && results.length > 0) {
-            resultsHtml += `
-                <div class="leaderboard-display" style="margin-top: 20px;">
-                    <h3>Final Leaderboard</h3>
-            `;
-            
-            results.forEach((participant, index) => {
-                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-                resultsHtml += `
-                    <div style="display: flex; align-items: center; padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 5px; border-left: 4px solid ${index < 3 ? '#ffd700' : '#ddd'};">
-                        <span style="font-size: 1.2em; margin-right: 10px;">${medal}</span>
-                        <span style="flex: 1; font-weight: bold;">${participant.username}</span>
-                        <span style="font-size: 1.1em; color: #007bff; font-weight: bold;">${participant.score}pts</span>
-                    </div>
-                `;
-            });
-            
-            resultsHtml += '</div>';
-        } else {
-            resultsHtml += '<p>No results available for this session.</p>';
-        }
-        
-        resultsHtml += `
+                    <p>Loading leaderboard...</p>
                 </div>
             </div>
         `;
@@ -2573,6 +2762,106 @@
                 dialog.remove();
             }
         });
+        
+        if (!results || results.length === 0) {
+            const contentDiv = dialog.querySelector('.results-content');
+            contentDiv.innerHTML = '<p>No results available for this session.</p>';
+            return;
+        }
+        
+        // Sort results by score (descending)
+        const sortedResults = [...results].sort((a, b) => (b.score || 0) - (a.score || 0));
+        
+        // Extract user IDs to fetch full names
+        const userIds = sortedResults.map(participant => {
+            const id = participant.userId || participant.user_id || participant.userid || participant.id;
+            return id ? parseInt(id) : null;
+        }).filter(id => id && !isNaN(id) && id > 0);
+        
+        // Fetch user details if available
+        let userDetailsMap = {};
+        if (userIds.length > 0 && window.gamifiedQuizFetchUserDetails) {
+            await window.gamifiedQuizFetchUserDetails(userIds);
+            const cache = window.gamifiedQuizUserDetailsCache || {};
+            
+            // Build map for quick lookup from cache
+            userIds.forEach(id => {
+                if (cache[id]) {
+                    const user = cache[id];
+                    userDetailsMap[id] = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
+                } else if (cache[String(id)]) {
+                    const user = cache[String(id)];
+                    userDetailsMap[id] = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
+                }
+            });
+        }
+        
+        // Helper to get display name
+        function getParticipantName(participant) {
+            const userId = participant.userId || participant.user_id || participant.userid || participant.id;
+            if (userId && userDetailsMap[userId]) {
+                return userDetailsMap[userId];
+            }
+            // Fallback to username or fullname from participant data
+            if (participant.fullname && !participant.fullname.match(/^User \d+$/)) {
+                return participant.fullname;
+            }
+            if (participant.username && !participant.username.match(/^User \d+$/)) {
+                return participant.username;
+            }
+            return `User ${userId || '?'}`;
+        }
+        
+        // Build leaderboard HTML
+        resultsHtml = `
+            <div class="leaderboard-display" style="margin-top: 20px;">
+                <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px;">🏆 Final Leaderboard 🏆</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <th style="padding: 12px; text-align: center; width: 80px; border: 1px solid rgba(255,255,255,0.3);">Rank</th>
+                            <th style="padding: 12px; text-align: left; border: 1px solid rgba(255,255,255,0.3);">Student Name</th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid rgba(255,255,255,0.3);">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        sortedResults.forEach((participant, index) => {
+            const rank = index + 1;
+            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+            const displayName = getParticipantName(participant);
+            const score = participant.score || 0;
+            const isTopThree = rank <= 3;
+            
+            resultsHtml += `
+                <tr style="border-bottom: 1px solid #dee2e6; ${isTopThree ? 'background: #fff3cd; font-weight: bold;' : ''}">
+                    <td style="padding: 12px; text-align: center; border: 1px solid #dee2e6;">
+                        <span style="font-size: 1.2em;">${medal || rank}</span>
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #dee2e6;">
+                        <span style="font-size: 16px;">${displayName}</span>
+                    </td>
+                    <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">
+                        <span style="font-size: 18px; color: #007bff; font-weight: bold;">${score} pts</span>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        resultsHtml += `
+                    </tbody>
+                </table>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <p style="margin: 0; color: #666; font-size: 14px;">
+                        <strong>Total Participants:</strong> ${sortedResults.length}
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        const contentDiv = dialog.querySelector('.results-content');
+        contentDiv.innerHTML = resultsHtml;
     };
 
     // Start initialization

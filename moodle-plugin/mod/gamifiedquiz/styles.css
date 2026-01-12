@@ -334,6 +334,12 @@
     padding-top: 80px;
     background-color: rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.question-editor-modal[style*="flex"] {
+    display: flex !important;
 }
 
 .question-editor-content {

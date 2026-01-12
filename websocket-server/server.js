@@ -493,6 +493,46 @@ io.on('connection', async (socket) => {
     socket.emit('leaderboard:update', { leaderboard });
   });
   
+  // Teacher: Sync scores from database to Redis
+  socket.on('teacher:sync_scores', async (data) => {
+    if (socket.role !== 'teacher') {
+      socket.emit('error', { message: 'Unauthorized' });
+      return;
+    }
+    
+    const instanceId = data.sessionId;
+    const leaderboard = data.leaderboard || [];
+    
+    // Clear existing Redis leaderboard
+    const leaderboardKey = `session:${instanceId}:leaderboard`;
+    await redisClient.del(leaderboardKey);
+    
+    // Populate Redis with scores from database
+    for (const entry of leaderboard) {
+      const userId = entry.userId || entry.user_id || entry.userid || entry.id;
+      const score = entry.score || 0;
+      const username = entry.username || `User ${userId}`;
+      
+      if (userId) {
+        await redisClient.zAdd(leaderboardKey, {
+          score: score,
+          value: userId.toString()
+        });
+        
+        // Store username
+        await storeUsername(instanceId, userId, username);
+      }
+    }
+    
+    console.log(`Synced ${leaderboard.length} scores from database to Redis for session ${instanceId}`);
+    
+    // Emit updated leaderboard
+    const updatedLeaderboard = await buildLeaderboard(instanceId, session);
+    io.to(`session:${socket.sessionId}`).emit('leaderboard:update', {
+      leaderboard: updatedLeaderboard
+    });
+  });
+  
   // Disconnect handling
   socket.on('disconnect', async () => {
     if (socket.role === 'teacher') {
