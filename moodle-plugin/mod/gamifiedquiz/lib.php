@@ -467,55 +467,75 @@ function gamifiedquiz_create_question_bank_question($questiontext, $choices, $ca
 function gamifiedquiz_load_question_bank_questions($categoryid, $limit = 0) {
     global $DB, $CFG;
     
-    require_once($CFG->dirroot . '/question/engine/bank.php');
-    
-    if (empty($categoryid)) {
-        return array();
-    }
-    
-    // Get questions from category
-    $sql = "SELECT q.*, qc.name as categoryname
-            FROM {question} q
-            JOIN {question_categories} qc ON q.category = qc.id
-            WHERE q.category = ? AND q.hidden = 0 AND q.qtype = 'multichoice'
-            ORDER BY q.timecreated DESC";
-    
-    $params = array($categoryid);
-    if ($limit > 0) {
-        $sql .= " LIMIT ?";
-        $params[] = $limit;
-    }
-    
-    $questions = $DB->get_records_sql($sql, $params);
-    $result = array();
-    
-    foreach ($questions as $q) {
-        // Get answers
-        $answers = $DB->get_records('question_answers', array('question' => $q->id), 'id ASC');
-        
-        $choices = array();
-        $correctindex = 0;
-        foreach ($answers as $idx => $answer) {
-            $choices[] = array(
-                'text' => $answer->answer,
-                'is_correct' => ($answer->fraction > 0)
-            );
-            if ($answer->fraction > 0) {
-                $correctindex = $idx;
-            }
+    try {
+        if (file_exists($CFG->dirroot . '/question/engine/bank.php')) {
+            require_once($CFG->dirroot . '/question/engine/bank.php');
         }
         
-        $result[] = array(
-            'id' => $q->id,
-            'question' => $q->questiontext,
-            'question_text' => $q->questiontext,
-            'choices' => $choices,
-            'correct_index' => $correctindex,
-            'difficulty' => 'medium' // Default, could be stored in question tags
-        );
+        if (empty($categoryid)) {
+            return array();
+        }
+        
+        // Verify category exists
+        $category = $DB->get_record('question_categories', array('id' => $categoryid));
+        if (!$category) {
+            return array();
+        }
+        
+        // Get questions from category
+        $sql = "SELECT q.*, qc.name as categoryname
+                FROM {question} q
+                JOIN {question_categories} qc ON q.category = qc.id
+                WHERE q.category = ? AND q.hidden = 0 AND q.qtype = 'multichoice'
+                ORDER BY q.timecreated DESC";
+        
+        $params = array($categoryid);
+        if ($limit > 0) {
+            $sql .= " LIMIT ?";
+            $params[] = $limit;
+        }
+        
+        $questions = $DB->get_records_sql($sql, $params);
+        $result = array();
+        
+        foreach ($questions as $q) {
+            // Get answers
+            $answers = $DB->get_records('question_answers', array('question' => $q->id), 'id ASC');
+            
+            if (empty($answers)) {
+                continue; // Skip questions without answers
+            }
+            
+            $choices = array();
+            $correctindex = 0;
+            foreach ($answers as $idx => $answer) {
+                $choices[] = array(
+                    'text' => $answer->answer,
+                    'is_correct' => ($answer->fraction > 0)
+                );
+                if ($answer->fraction > 0) {
+                    $correctindex = $idx;
+                }
+            }
+            
+            $result[] = array(
+                'id' => $q->id,
+                'question' => $q->questiontext,
+                'question_text' => $q->questiontext,
+                'choices' => $choices,
+                'correct_index' => $correctindex,
+                'difficulty' => 'medium' // Default, could be stored in question tags
+            );
+        }
+        
+        return $result;
+    } catch (Exception $e) {
+        error_log("Gamified Quiz: Error loading question bank questions: " . $e->getMessage());
+        return array(); // Return empty array on error
+    } catch (Error $e) {
+        error_log("Gamified Quiz: Fatal error loading question bank questions: " . $e->getMessage());
+        return array(); // Return empty array on fatal error
     }
-    
-    return $result;
 }
 
 /**
@@ -528,58 +548,89 @@ function gamifiedquiz_load_question_bank_questions($categoryid, $limit = 0) {
 function gamifiedquiz_get_question_category($courseid, $quizid) {
     global $DB, $CFG;
     
-    require_once($CFG->dirroot . '/question/engine/bank.php');
-    require_once($CFG->dirroot . '/question/editlib.php');
-    
-    $context = context_course::instance($courseid);
-    $categoryname = "Gamified Quiz #{$quizid}";
-    
-    // Try to find existing category
-    $category = $DB->get_record('question_categories', array(
-        'contextid' => $context->id,
-        'name' => $categoryname
-    ));
-    
-    if ($category) {
-        return $category->id;
+    try {
+        if (file_exists($CFG->dirroot . '/question/engine/bank.php')) {
+            require_once($CFG->dirroot . '/question/engine/bank.php');
+        }
+        if (file_exists($CFG->dirroot . '/question/editlib.php')) {
+            require_once($CFG->dirroot . '/question/editlib.php');
+        }
+        
+        // Verify course exists
+        $course = $DB->get_record('course', array('id' => $courseid));
+        if (!$course) {
+            error_log("Gamified Quiz: Course {$courseid} not found");
+            return 0;
+        }
+        
+        // Get or create context
+        try {
+            $context = context_course::instance($courseid);
+        } catch (Exception $ctx_error) {
+            error_log("Gamified Quiz: Error creating context for course {$courseid}: " . $ctx_error->getMessage());
+            return 0;
+        }
+        
+        if (!$context || !$context->id) {
+            error_log("Gamified Quiz: Invalid context for course {$courseid}");
+            return 0;
+        }
+        
+        $categoryname = "Gamified Quiz #{$quizid}";
+        
+        // Try to find existing category
+        $category = $DB->get_record('question_categories', array(
+            'contextid' => $context->id,
+            'name' => $categoryname
+        ));
+        
+        if ($category) {
+            return $category->id;
+        }
+        
+        // Get default category for the context
+        // Try to get the top-level category for this context
+        $defaultcategory = $DB->get_record_sql(
+            "SELECT * FROM {question_categories} 
+             WHERE contextid = ? AND parent = 0 
+             ORDER BY sortorder ASC 
+             LIMIT 1",
+            array($context->id)
+        );
+        
+        if (!$defaultcategory) {
+            // If no default category exists, create one
+            $defaultcategory = new stdClass();
+            $defaultcategory->name = 'Default';
+            $defaultcategory->contextid = $context->id;
+            $defaultcategory->info = '';
+            $defaultcategory->infoformat = FORMAT_HTML;
+            $defaultcategory->stamp = make_unique_id_code();
+            $defaultcategory->parent = 0;
+            $defaultcategory->sortorder = 999;
+            $defaultcategory->idnumber = null;
+            $defaultcategory->id = $DB->insert_record('question_categories', $defaultcategory);
+        }
+        
+        // Create new category
+        $category = new stdClass();
+        $category->name = $categoryname;
+        $category->contextid = $context->id;
+        $category->info = '';
+        $category->infoformat = FORMAT_HTML;
+        $category->stamp = make_unique_id_code();
+        $category->parent = $defaultcategory->id;
+        $category->sortorder = 999;
+        $category->idnumber = null;
+        
+        return $DB->insert_record('question_categories', $category);
+    } catch (Exception $e) {
+        error_log("Gamified Quiz: Error getting question category: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        return 0; // Return 0 on error
+    } catch (Error $e) {
+        error_log("Gamified Quiz: Fatal error getting question category: " . $e->getMessage());
+        return 0; // Return 0 on fatal error
     }
-    
-    // Get default category for the context
-    // Try to get the top-level category for this context
-    $defaultcategory = $DB->get_record_sql(
-        "SELECT * FROM {question_categories} 
-         WHERE contextid = ? AND parent = 0 
-         ORDER BY sortorder ASC 
-         LIMIT 1",
-        array($context->id)
-    );
-    
-    if (!$defaultcategory) {
-        // If no default category exists, create one
-        $defaultcategory = new stdClass();
-        $defaultcategory->name = 'Default';
-        $defaultcategory->contextid = $context->id;
-        $defaultcategory->info = '';
-        $defaultcategory->infoformat = FORMAT_HTML;
-        $defaultcategory->stamp = make_unique_id_code();
-        $defaultcategory->parent = 0;
-        $defaultcategory->sortorder = 999;
-        $defaultcategory->idnumber = null;
-        $defaultcategory->id = $DB->insert_record('question_categories', $defaultcategory);
-    }
-    
-    // Create new category
-    $category = new stdClass();
-    $category->name = $categoryname;
-    $category->contextid = $context->id;
-    $category->info = '';
-    $category->infoformat = FORMAT_HTML;
-    $category->stamp = make_unique_id_code();
-    $category->parent = $defaultcategory->id;
-    $category->sortorder = 999;
-    $category->idnumber = null;
-    
-    return $DB->insert_record('question_categories', $category);
 }
 
 /**

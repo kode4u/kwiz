@@ -98,6 +98,11 @@ window.GAMIFIED_QUIZ_CONFIG = {
 };
 </script>';
 
+// Content is already inside Moodle's standard structure:
+// #page-content > #region-main-box > #region-main
+// No need to create duplicate wrappers
+
+
 // Display quiz info
 echo '<div class="quiz-info">';
 echo '<strong>' . get_string('topic', 'mod_gamifiedquiz') . ':</strong> ' . s($gamifiedquiz->topic) . ' | ';

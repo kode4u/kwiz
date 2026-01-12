@@ -11,21 +11,21 @@
 /* Standard Container Styles */
 .gq-container {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); */
     padding: 20px;
     background: white;
 }
 
 .gq-container-lg {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); */
     padding: 30px;
     background: white;
 }
 
 .gq-container-sm {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); */
     padding: 15px;
     background: white;
 }
@@ -39,7 +39,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); */
     display: inline-block;
     text-align: center;
     min-width: 120px;
@@ -48,19 +48,19 @@
 
 .gq-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); */
 }
 
 .gq-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); */
 }
 
 .gq-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
 }
 
 /* Button Variants */
@@ -109,7 +109,7 @@
 }
 
 /* Legacy Button Support - Map old classes to new */
-.btn {
+/* .btn {
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -117,7 +117,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); */
     display: inline-block;
     text-align: center;
     min-width: 120px;
@@ -126,14 +126,13 @@
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-}
+} */
 
 .btn-primary {
     background: var(--gq-primary, #007bff);
@@ -241,22 +240,20 @@
 .gq-template-kahoot .gamifiedquiz-container {
     background: linear-gradient(135deg, var(--gq-primary) 0%, var(--gq-secondary) 100%);
     border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); */
 }
 
 .gq-template-kahoot .gq-container,
 .gq-template-kahoot .gq-container-lg,
 .gq-template-kahoot .gq-container-sm {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gq-template-kahoot .question-container {
     background: white;
     border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gq-template-kahoot .choice-option {
@@ -268,20 +265,17 @@
     font-size: 18px;
     transition: all 0.3s;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .gq-template-kahoot .choice-option:hover {
     border-color: var(--gq-primary);
     transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gq-template-kahoot .choice-option.selected {
     background: var(--gq-accent);
     border-color: var(--gq-primary);
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Template: Minimal */
@@ -289,45 +283,39 @@
     background: white;
     border: 1px solid var(--gq-border);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 20px;
+    padding: 0;
 }
 
 .gq-template-minimal .gq-container,
 .gq-template-minimal .gq-container-lg,
 .gq-template-minimal .gq-container-sm {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Template: Modern */
 .gq-template-modern .gamifiedquiz-container {
     background: linear-gradient(to bottom, #f8f9fa, white);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 20px;
+    padding: 0;
 }
 
 .gq-template-modern .gq-container,
 .gq-template-modern .gq-container-lg,
 .gq-template-modern .gq-container-sm {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Template: Default */
 .gq-template-default .gamifiedquiz-container {
     background: var(--gq-bg);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 20px;
+    padding: 0;
 }
 
 .gq-template-default .gq-container,
 .gq-template-default .gq-container-lg,
 .gq-template-default .gq-container-sm {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* ============================================
@@ -357,7 +345,6 @@
     max-width: 800px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .question-editor-close {
@@ -422,10 +409,22 @@
 }
 
 /* Common Component Styles */
-.gamifiedquiz-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
+/* Container is inside Moodle's standard structure: #page-content > #region-main-box > #region-main */
+/* It inherits Moodle's standard width automatically */
+#page-content #region-main-box #region-main .gamifiedquiz-container,
+#region-main-box #region-main .gamifiedquiz-container,
+#region-main .gamifiedquiz-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Ensure all child elements respect container width */
+.gamifiedquiz-container * {
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .gamifiedquiz-teacher,
@@ -433,8 +432,10 @@
     background: #f5f5f5;
     padding: 20px;
     border-radius: 12px;
-    margin: 20px 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin: 15px 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
 }
 
 .controls {
@@ -455,7 +456,6 @@
     margin: 10px 0;
     border-radius: 12px;
     border-left: 4px solid var(--gq-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .question-preview h4 {
@@ -486,7 +486,6 @@
     background: #d1ecf1;
     border-left: 4px solid #0c5460;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .session-status.success {
@@ -514,7 +513,6 @@
     border-radius: 12px;
     font-size: 18px;
     color: #856404;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .question-container {
@@ -522,7 +520,9 @@
     padding: 30px;
     border-radius: 12px;
     margin: 20px 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
 }
 
 .question-text {
@@ -552,13 +552,11 @@
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .choice-option:hover {
     background: #e9ecef;
     border-color: var(--gq-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .choice-option input[type="radio"] {
@@ -568,7 +566,6 @@
 .choice-option.selected {
     background: #cfe2ff;
     border-color: var(--gq-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .result-container {
@@ -576,7 +573,6 @@
     margin: 20px 0;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .result.correct {
@@ -594,7 +590,6 @@
     padding: 20px;
     border-radius: 12px;
     margin: 20px 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .leaderboard-container h3 {
@@ -618,7 +613,6 @@
     padding: 15px;
     border-radius: 12px;
     margin: 15px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .quiz-info strong {
@@ -643,21 +637,18 @@
     border-radius: 25px;
     color: white;
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
     transition: all 0.3s ease;
     flex: 0 1 auto;
-    min-width: fit-content;
+    min-width: 0;
 }
 
 .quiz-info-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
 }
 
 .quiz-info-icon {
     font-size: 18px;
     line-height: 1;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .quiz-info-label {
@@ -671,7 +662,6 @@
 .quiz-info-value {
     font-size: 14px;
     font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Topic Badge */
@@ -699,6 +689,12 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .gamifiedquiz-container {
+        max-width: 100%;
+        padding: 15px;
+        margin: 10px auto;
+    }
+    
     .quiz-info-modern {
         flex-direction: column;
         gap: 10px;
@@ -708,13 +704,16 @@
         width: 100%;
         justify-content: center;
     }
+    
+    .question-container {
+        padding: 20px;
+    }
+    
+    .gamifiedquiz-teacher,
+    .gamifiedquiz-student {
+        padding: 15px;
+    }
 }
 
 /* Ensure all dynamically created containers use standard styles */
-[id*="question"],
-[id*="container"],
-[id*="display"],
-[id*="modal"] {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+/* Removed automatic box-shadow to prevent unwanted shadows */

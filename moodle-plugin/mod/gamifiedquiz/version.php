@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_gamifiedquiz';
-$plugin->version = 2025010108;
+$plugin->version = 2025010109;
 $plugin->requires = 2022041900; // Moodle 4.0
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->release = 'v1.0.0-alpha';
