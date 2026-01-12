@@ -95,7 +95,6 @@
         // Just attach event listeners to existing elements
         
         const generateBtn = document.getElementById('generate-questions-btn');
-        const editBtn = document.getElementById('edit-questions-btn');
         const startBtn = document.getElementById('start-session-btn');
         const endBtn = document.getElementById('end-session-btn');
         const nextBtn = document.getElementById('next-question-btn');
@@ -110,6 +109,132 @@
 
         // Question Editor Functions (define early for hoisting)
         let selectedQuestionsFromBank = [];
+        
+        async function loadQuestionBankCategories(config) {
+            const categorySelect = document.getElementById('question-category-select');
+            const questionList = document.getElementById('question-bank-list');
+            
+            if (!categorySelect || !questionList) {
+                console.error('Question bank elements not found');
+                return;
+            }
+            
+            try {
+                const url = `${config.wwwroot}/mod/gamifiedquiz/ajax/get_question_bank.php?quizid=${config.quizId}&cmid=${config.cmId}&sesskey=${config.sesskey}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Populate category select
+                    categorySelect.innerHTML = '<option value="0">-- Select Category --</option>';
+                    data.categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        categorySelect.appendChild(option);
+                    });
+                    
+                    // Handle category change
+                    categorySelect.onchange = () => {
+                        const categoryId = categorySelect.value;
+                        if (categoryId > 0) {
+                            loadQuestionsFromCategory(categoryId, config);
+                        } else {
+                            questionList.innerHTML = '<p style="text-align: center; color: #666;">Select a category to view questions</p>';
+                        }
+                    };
+                    
+                    // Refresh button
+                    const refreshBtn = document.getElementById('refresh-categories-btn');
+                    if (refreshBtn) {
+                        refreshBtn.onclick = () => loadQuestionBankCategories(config);
+                    }
+                } else {
+                    console.error('Failed to load categories:', data.error);
+                    categorySelect.innerHTML = '<option value="0">Error loading categories</option>';
+                }
+            } catch (error) {
+                console.error('Error loading question bank:', error);
+                categorySelect.innerHTML = '<option value="0">Error loading categories</option>';
+            }
+        }
+        
+        async function loadQuestionsFromCategory(categoryId, config) {
+            const questionList = document.getElementById('question-bank-list');
+            
+            if (!questionList) return;
+            
+            questionList.innerHTML = '<p style="text-align: center; color: #666;">Loading questions...</p>';
+            
+            try {
+                const url = `${config.wwwroot}/mod/gamifiedquiz/ajax/get_question_bank.php?quizid=${config.quizId}&cmid=${config.cmId}&categoryid=${categoryId}&sesskey=${config.sesskey}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.questions) {
+                    if (data.questions.length === 0) {
+                        questionList.innerHTML = '<p style="text-align: center; color: #666;">No questions found in this category</p>';
+                        return;
+                    }
+                    
+                    questionList.innerHTML = '';
+                    data.questions.forEach((q, index) => {
+                        const questionItem = document.createElement('div');
+                        questionItem.className = 'question-bank-item';
+                        questionItem.style.cssText = 'border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: white;';
+                        
+                        const isSelected = selectedQuestionsFromBank.some(sq => sq.id === q.id);
+                        
+                        questionItem.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div style="flex: 1;">
+                                    <strong>Question ${index + 1}:</strong>
+                                    <p style="margin: 8px 0; color: #333;">${q.question || q.question_text || ''}</p>
+                                    <div style="margin-top: 10px;">
+                                        <strong>Choices:</strong>
+                                        <ul style="margin: 5px 0; padding-left: 20px;">
+                                            ${(q.choices || []).map((choice, ci) => {
+                                                const choiceText = typeof choice === 'string' ? choice : (choice.text || '');
+                                                const isCorrect = typeof choice === 'object' ? choice.is_correct : (ci === q.correct_index);
+                                                return `<li style="color: ${isCorrect ? '#28a745' : '#666'}; font-weight: ${isCorrect ? 'bold' : 'normal'};">${choiceText} ${isCorrect ? '✓' : ''}</li>`;
+                                            }).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <button type="button" class="select-question-btn gq-btn gq-btn-sm ${isSelected ? 'gq-btn-secondary' : 'gq-btn-primary'}" 
+                                        data-question-id="${q.id}" 
+                                        style="margin-left: 15px; min-width: 100px;">
+                                    ${isSelected ? 'Selected' : 'Select'}
+                                </button>
+                            </div>
+                        `;
+                        
+                        const selectBtn = questionItem.querySelector('.select-question-btn');
+                        selectBtn.onclick = () => {
+                            if (isSelected) {
+                                // Remove from selected
+                                selectedQuestionsFromBank = selectedQuestionsFromBank.filter(sq => sq.id !== q.id);
+                                selectBtn.textContent = 'Select';
+                                selectBtn.className = 'select-question-btn gq-btn gq-btn-sm gq-btn-primary';
+                            } else {
+                                // Add to selected
+                                selectedQuestionsFromBank.push(q);
+                                selectBtn.textContent = 'Selected';
+                                selectBtn.className = 'select-question-btn gq-btn gq-btn-sm gq-btn-secondary';
+                            }
+                            updateSelectedQuestionsInEditor(config);
+                        };
+                        
+                        questionList.appendChild(questionItem);
+                    });
+                } else {
+                    questionList.innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading questions</p>';
+                }
+            } catch (error) {
+                console.error('Error loading questions from category:', error);
+                questionList.innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading questions</p>';
+            }
+        }
         
         function openQuestionEditor(questionsList, config) {
             const modal = document.getElementById('question-editor-modal');
@@ -174,46 +299,6 @@
             if (saveBtn) {
                 saveBtn.onclick = () => saveQuestions(config);
             }
-        }
-        
-        // Tab switching functionality
-        function initQuestionEditorTabs() {
-            const tabButtons = document.querySelectorAll('.question-tab-btn');
-            const tabContents = document.querySelectorAll('.question-tab-content');
-            
-            tabButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const targetTab = btn.getAttribute('data-tab');
-                    
-                    // Update button states
-                    tabButtons.forEach(b => {
-                        b.classList.remove('active');
-                        b.style.background = '#6c757d';
-                    });
-                    btn.classList.add('active');
-                    btn.style.background = '#007bff';
-                    
-                    // Update content visibility
-                    tabContents.forEach(content => {
-                        content.style.display = 'none';
-                    });
-                    
-                    if (targetTab === 'questionbank') {
-                        document.getElementById('questionbank-tab').style.display = 'block';
-                    } else if (targetTab === 'manual') {
-                        document.getElementById('manual-tab').style.display = 'block';
-                    }
-                });
-            });
-        }
-        
-        // Listen for messages from question bank iframe (if questions are selected there)
-        function initQuestionBankIframeListener(config) {
-            window.addEventListener('message', (event) => {
-                // Handle messages from question bank iframe
-                // This would need to be implemented based on Moodle's question bank API
-                console.log('Message from question bank:', event.data);
-            });
         }
         
         function updateSelectedQuestionsInEditor(config) {
@@ -456,12 +541,215 @@
             });
         }
         
-        // Question Editor functionality
-        if (editBtn) {
-            editBtn.addEventListener('click', () => {
-                // Use current questions or empty array
-                const qList = questions.length > 0 ? questions : (window.currentQuestions || []);
-                openQuestionEditor(qList, config);
+        // Multi-Category Generation functionality
+        let categories = []; // Array of {name, topic, difficulty, count}
+        
+        function initMultiCategoryGeneration() {
+            const modal = document.getElementById('generate-questions-modal');
+            const addCategoryBtn = document.getElementById('add-category-btn');
+            const generateAllBtn = document.getElementById('generate-all-btn');
+            const cancelBtn = document.getElementById('cancel-generate-btn');
+            const closeBtn = modal ? modal.querySelector('.generate-questions-close') : null;
+            const categoryList = document.getElementById('category-list');
+            
+            if (!modal || !addCategoryBtn || !generateAllBtn) {
+                console.error('Multi-category generation elements not found');
+                return;
+            }
+            
+            // Add category button
+            addCategoryBtn.addEventListener('click', () => {
+                addCategoryRow();
+            });
+            
+            // Generate all button
+            generateAllBtn.addEventListener('click', async () => {
+                await generateAllCategories(config);
+            });
+            
+            // Cancel/Close buttons
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                    categories = [];
+                });
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                    categories = [];
+                });
+            }
+            
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    categories = [];
+                }
+            });
+            
+            // Add initial category
+            addCategoryRow();
+        }
+        
+        function addCategoryRow() {
+            const categoryList = document.getElementById('category-list');
+            if (!categoryList) return;
+            
+            const categoryIndex = categories.length;
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category-row gq-container';
+            categoryDiv.style.marginBottom = '15px';
+            categoryDiv.style.padding = '15px';
+            categoryDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Category Name:</label>
+                        <input type="text" class="category-name-input" placeholder="e.g., Variables" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" 
+                               value="Category ${categoryIndex + 1}">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Topic:</label>
+                        <input type="text" class="category-topic-input" placeholder="Topic" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+                               value="${config.topic || ''}">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty:</label>
+                        <select class="category-difficulty-input" 
+                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="easy" ${config.difficulty === 'easy' ? 'selected' : ''}>Easy</option>
+                            <option value="medium" ${config.difficulty === 'medium' ? 'selected' : ''}>Medium</option>
+                            <option value="hard" ${config.difficulty === 'hard' ? 'selected' : ''}>Hard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Count:</label>
+                        <select class="category-count-input" 
+                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="3">3</option>
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="button" class="remove-category-btn btn btn-danger gq-btn gq-btn-danger" 
+                                style="margin-top: 25px;">Remove</button>
+                    </div>
+                </div>
+            `;
+            
+            categoryList.appendChild(categoryDiv);
+            
+            // Remove button handler
+            const removeBtn = categoryDiv.querySelector('.remove-category-btn');
+            removeBtn.addEventListener('click', () => {
+                categoryDiv.remove();
+            });
+        }
+        
+        async function generateAllCategories(config) {
+            const categoryList = document.getElementById('category-list');
+            if (!categoryList) return;
+            
+            // Collect all categories
+            categories = [];
+            const categoryRows = categoryList.querySelectorAll('.category-row');
+            
+            categoryRows.forEach(row => {
+                const name = row.querySelector('.category-name-input')?.value.trim() || 'Default';
+                const topic = row.querySelector('.category-topic-input')?.value.trim() || config.topic || '';
+                const difficulty = row.querySelector('.category-difficulty-input')?.value || config.difficulty || 'medium';
+                const count = parseInt(row.querySelector('.category-count-input')?.value || '5');
+                
+                if (topic) {
+                    categories.push({ name, topic, difficulty, count });
+                }
+            });
+            
+            if (categories.length === 0) {
+                alert('Please add at least one category with a topic.');
+                return;
+            }
+            
+            // Show loading
+            const loadingModal = document.getElementById('loading-modal');
+            const generateModal = document.getElementById('generate-questions-modal');
+            if (loadingModal) loadingModal.style.display = 'flex';
+            if (generateModal) generateModal.style.display = 'none';
+            
+            // Generate questions for each category
+            const allQuestions = [];
+            const wwwroot = config.wwwroot || '';
+            const sesskey = config.sesskey || '';
+            
+            try {
+                for (const category of categories) {
+                    const formData = new URLSearchParams();
+                    formData.append('quizid', config.quizId);
+                    formData.append('cmid', config.cmId);
+                    formData.append('sesskey', sesskey);
+                    formData.append('prompt', category.topic);
+                    formData.append('difficulty', category.difficulty);
+                    formData.append('count', category.count);
+                    formData.append('category_name', category.name);
+                    
+                    const response = await fetch(wwwroot + '/mod/gamifiedquiz/ajax/generate.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.questions) {
+                        // Add category name to each question
+                        data.questions.forEach(q => {
+                            q.category_name = category.name;
+                        });
+                        allQuestions.push(...data.questions);
+                    } else {
+                        console.error('Failed to generate questions for category:', category.name, data.error);
+                    }
+                }
+                
+                // Hide loading
+                if (loadingModal) loadingModal.style.display = 'none';
+                
+                if (allQuestions.length > 0) {
+                    questions = allQuestions;
+                    window.currentQuestions = questions;
+                    if (startBtn) startBtn.disabled = false;
+                    currentQuestionIndex = 0;
+                    
+                    const statusEl = document.getElementById('session-status');
+                    if (statusEl) {
+                        statusEl.style.display = 'block';
+                        statusEl.textContent = `Generated ${allQuestions.length} questions from ${categories.length} categories. Ready to start session.`;
+                        statusEl.style.background = '#d4edda';
+                        statusEl.style.borderColor = '#28a745';
+                    }
+                } else {
+                    alert('Failed to generate questions. Please check your LLM API configuration.');
+                }
+            } catch (error) {
+                console.error('Error generating questions:', error);
+                if (loadingModal) loadingModal.style.display = 'none';
+                alert('Error generating questions: ' + error.message);
+            }
+        }
+        
+        // Initialize multi-category generation when generate button is clicked
+        if (generateBtn) {
+            generateBtn.addEventListener('click', () => {
+                const modal = document.getElementById('generate-questions-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    initMultiCategoryGeneration();
+                }
             });
         }
         
@@ -725,6 +1013,11 @@
                 return;
             }
             
+            // RESET scores and leaderboard for new session
+            currentLeaderboard = [];
+            userDetailsCache = {}; // Clear user cache for fresh start
+            currentQuestionIndex = 0;
+            
             // Create session in database first
             try {
                 const formData = new FormData();
@@ -771,8 +1064,18 @@
             // Clear leaderboard display
             const leaderboardContainer = document.getElementById('leaderboard-container');
             if (leaderboardContainer) {
-                leaderboardContainer.innerHTML = '<h3>Current Leaderboard</h3><p>Waiting for students to answer...</p>';
+                leaderboardContainer.innerHTML = '<h3>🏆 Current Leaderboard</h3><p>Waiting for students to answer...</p>';
             }
+            
+            // Clear ranking display
+            const rankingContainer = document.getElementById('question-ranking-display');
+            if (rankingContainer) {
+                rankingContainer.style.display = 'none';
+            }
+            
+            // Clear any cached leaderboard data
+            currentLeaderboard = [];
+            userDetailsCache = {};
             
             // Save session start to database
             saveSessionToDatabase({
@@ -810,6 +1113,11 @@
                     instance_id: currentSessionInstanceId
                 });
                 
+                // RESET for next session
+                currentLeaderboard = [];
+                userDetailsCache = {}; // Clear user cache
+                currentQuestionIndex = 0;
+                
                 // Re-enable start button for new session
                 if (startBtn) startBtn.disabled = false;
                 if (endBtn) endBtn.disabled = true;
@@ -844,16 +1152,7 @@
             }
         }
 
-        // Next question button
-        if (nextBtn) {
-            nextBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Next Question button clicked');
-                pushNextQuestion();
-            });
-        } else {
-            console.error('Next Question button not found!');
-        }
+        // Next question button handler is defined after pushNextQuestion function
         
         // Update session in database (for ending session with results)
         async function updateSessionInDatabase(sessionData) {
@@ -1021,16 +1320,18 @@
             }
             window.teacherTimerInterval = teacherTimerInterval;
             
-            // Hide previous results
+            // Hide previous results and ranking
             const resultsEl = document.getElementById('question-results-display');
             if (resultsEl) resultsEl.style.display = 'none';
+            const rankingEl = document.getElementById('question-ranking-display');
+            if (rankingEl) rankingEl.style.display = 'none';
             
             // Increment index AFTER pushing
             currentQuestionIndex++;
             
-            // Keep next button enabled so teacher can proceed anytime
+            // Disable next button until results are shown
             if (nextBtn) {
-                nextBtn.disabled = false;
+                nextBtn.disabled = true;
                 if (currentQuestionIndex >= questions.length) {
                     nextBtn.textContent = 'End Quiz';
                 } else {
@@ -1039,14 +1340,28 @@
             }
         }
         
-        // Listen for question timeout to auto-move to next question
+        // Next Question button handler
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (currentQuestionIndex >= questions.length) {
+                    // End quiz
+                    if (endBtn) {
+                        endBtn.click();
+                    }
+                } else {
+                    // Push next question
+                    pushNextQuestion();
+                }
+            });
+        }
+        
+        // Listen for question timeout - don't auto-move, wait for teacher
         socket.on('question:timeout', () => {
-            console.log('Question timeout - auto-moving to next question');
-            
-            // Auto-move to next question after a short delay to show results
-            setTimeout(() => {
-                pushNextQuestion();
-            }, 3000); // 3 second delay to show results before moving on
+            console.log('Question timeout - waiting for teacher to proceed');
+            // Just enable next button, don't auto-move
+            if (nextBtn) {
+                nextBtn.disabled = false;
+            }
         });
 
         // Display questions
@@ -1121,8 +1436,11 @@
                 statusEl.textContent = 'Session active - Students can join';
                 statusEl.style.background = '#d1ecf1';
             }
+            // RESET scores and leaderboard for new session
+            currentLeaderboard = [];
+            userDetailsCache = {}; // Clear user cache
             // Clear leaderboard for new session
-            displayLeaderboard([]);
+            displayLeaderboard([]).catch(err => console.error('Error clearing leaderboard:', err));
             // Store new instance ID
             currentSessionInstanceId = data.instanceId;
             console.log('New session created with instanceId:', currentSessionInstanceId);
@@ -1161,9 +1479,11 @@
         let questionResults = [];
         
         // Listen for question results
-        socket.on('question:results', (data) => {
+        socket.on('question:results', async (data) => {
             console.log('Question results received:', data);
             displayQuestionResults(data);
+            // Display ranking after each question
+            await displayQuestionRanking(data.leaderboard || []);
             // Enable next button when results are shown
             if (nextBtn) {
                 nextBtn.disabled = false;
@@ -1175,17 +1495,116 @@
             }
         });
         
+        // Cache for user details (defined early so it can be used by helper functions)
+        let userDetailsCache = {};
+        
+        // Helper function to get user display name
+        function getUserDisplayName(entry) {
+            // Try different possible field names for user ID
+            let userId = entry.userId || entry.user_id || entry.userid || entry.id;
+            
+            // Normalize userId to number for cache lookup
+            if (userId) {
+                userId = parseInt(userId);
+            }
+            
+            // Try lookup with number first
+            if (userId && !isNaN(userId)) {
+                if (userDetailsCache[userId]) {
+                    const user = userDetailsCache[userId];
+                    const name = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
+                    if (name && name.trim()) {
+                        console.log(`✓ Found user name for ID ${userId} (number key): ${name}`);
+                        return name;
+                    }
+                }
+                
+                // Try lookup with string version too (in case cache has string keys)
+                if (userDetailsCache[String(userId)]) {
+                    const user = userDetailsCache[String(userId)];
+                    const name = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
+                    if (name && name.trim()) {
+                        console.log(`✓ Found user name for ID ${userId} (string key): ${name}`);
+                        return name;
+                    }
+                }
+            }
+            
+            // If we have fullname or username in entry, use that (but prefer cache)
+            // Only use entry.username if it's not a generic "User X" format
+            if (entry.fullname && entry.fullname.trim() && !entry.fullname.match(/^User \d+$/)) {
+                console.log(`Using entry.fullname for ID ${userId}: ${entry.fullname}`);
+                return entry.fullname;
+            }
+            if (entry.username && entry.username.trim() && !entry.username.match(/^User \d+$/)) {
+                console.log(`Using entry.username for ID ${userId}: ${entry.username}`);
+                return entry.username;
+            }
+            
+            // Last resort - show we're trying to fetch
+            console.log(`User ID ${userId} not found in cache. Cache keys:`, Object.keys(userDetailsCache));
+            console.log(`Entry data:`, entry);
+            return 'User ' + (userId || '?');
+        }
+        
+        // Function to display ranking after each question
+        async function displayQuestionRanking(leaderboard) {
+            const rankingContainer = document.getElementById('question-ranking-display');
+            const rankingTable = document.getElementById('ranking-table-container');
+            
+            if (!rankingContainer || !rankingTable) return;
+            
+            // Fetch user details for all users in leaderboard (try different field names)
+            const userIds = leaderboard.map(entry => {
+                const id = entry.userId || entry.user_id || entry.userid || entry.id;
+                return id ? parseInt(id) : null;
+            }).filter(id => id && !isNaN(id) && id > 0);
+            
+            console.log('Question ranking - Extracted user IDs:', userIds);
+            
+            if (userIds.length > 0) {
+                await fetchUserDetails(userIds);
+            }
+            
+            // Sort leaderboard by score (descending)
+            const sorted = [...leaderboard].sort((a, b) => (b.score || 0) - (a.score || 0));
+            
+            rankingContainer.style.display = 'block';
+            rankingTable.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                            <th style="padding: 12px; text-align: left; width: 60px;">Rank</th>
+                            <th style="padding: 12px; text-align: left;">Student</th>
+                            <th style="padding: 12px; text-align: right;">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.map((entry, index) => `
+                            <tr style="border-bottom: 1px solid #dee2e6; ${index < 3 ? 'background: #fff3cd; font-weight: bold;' : ''}">
+                                <td style="padding: 12px;">
+                                    ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1)}
+                                </td>
+                                <td style="padding: 12px;">${getUserDisplayName(entry)}</td>
+                                <td style="padding: 12px; text-align: right; font-weight: bold;">${entry.score || 0} pts</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
         // Listen for leaderboard updates
-        socket.on('leaderboard:update', (data) => {
+        socket.on('leaderboard:update', async (data) => {
             console.log('Leaderboard update received:', data);
             console.log('Leaderboard data:', data.leaderboard);
             if (data.leaderboard && data.leaderboard.length > 0) {
                 currentLeaderboard = data.leaderboard;
-                displayLeaderboard(data.leaderboard);
+                await displayLeaderboard(data.leaderboard);
             } else {
                 console.log('No leaderboard data to display');
                 currentLeaderboard = [];
-                displayLeaderboard([]);
+                await displayLeaderboard([]);
             }
         });
         
@@ -1248,8 +1667,8 @@
         }
         
         // Listen for final leaderboard
-        socket.on('leaderboard:final', (data) => {
-            displayFinalLeaderboard(data.leaderboard || []);
+        socket.on('leaderboard:final', async (data) => {
+            await displayFinalLeaderboard(data.leaderboard || []);
         });
         
         function displayQuestionResults(data) {
@@ -1351,7 +1770,74 @@
             `;
         }
         
-        function displayLeaderboard(leaderboard) {
+        // Function to fetch user details from Moodle
+        async function fetchUserDetails(userIds) {
+            // Filter out invalid IDs and ensure they're numbers
+            const validIds = userIds.filter(id => id && !isNaN(id) && id > 0).map(id => parseInt(id));
+            if (validIds.length === 0) {
+                console.log('No valid user IDs to fetch');
+                return userDetailsCache;
+            }
+            
+            // Check cache with both number and string keys
+            const uncachedIds = validIds.filter(id => {
+                return !userDetailsCache[id] && !userDetailsCache[String(id)];
+            });
+            
+            if (uncachedIds.length === 0) {
+                console.log('All user IDs already cached');
+                return userDetailsCache;
+            }
+            
+            try {
+                const wwwroot = config.wwwroot || '';
+                const sesskey = config.sesskey || '';
+                const url = `${wwwroot}/mod/gamifiedquiz/ajax/get_user_details.php?sesskey=${sesskey}&userids=${JSON.stringify(uncachedIds)}`;
+                console.log('Fetching user details for IDs:', uncachedIds, 'URL:', url);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.error('HTTP error:', response.status, response.statusText);
+                    return userDetailsCache;
+                }
+                
+                const responseText = await response.text();
+                console.log('User details raw response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Failed to parse JSON response:', parseError, 'Response:', responseText);
+                    return userDetailsCache;
+                }
+                
+                console.log('User details parsed response:', data);
+                
+                if (data.success && data.users) {
+                    // Update cache - ensure keys are numbers
+                    Object.keys(data.users).forEach(key => {
+                        const numKey = parseInt(key);
+                        if (!isNaN(numKey)) {
+                            userDetailsCache[numKey] = data.users[key];
+                            // Also store with string key for compatibility
+                            userDetailsCache[String(numKey)] = data.users[key];
+                            console.log(`Cached user ${numKey}:`, data.users[key]);
+                        }
+                    });
+                    console.log('User details cached. Cache now has keys:', Object.keys(userDetailsCache));
+                    console.log('Cache sample:', userDetailsCache[Object.keys(userDetailsCache)[0]]);
+                } else {
+                    console.error('Failed to fetch user details:', data.error || 'Unknown error', data);
+                }
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+            }
+            
+            return userDetailsCache;
+        }
+        
+        async function displayLeaderboard(leaderboard) {
             console.log('displayLeaderboard called with:', leaderboard);
             const container = document.getElementById('leaderboard-container');
             if (!container) {
@@ -1364,21 +1850,50 @@
                 return;
             }
             
+            // Debug: Log leaderboard entries to see structure
+            if (leaderboard.length > 0) {
+                console.log('Leaderboard entries structure (first entry):', {
+                    keys: Object.keys(leaderboard[0]),
+                    fullEntry: leaderboard[0]
+                });
+            }
+            
+            // Fetch user details for all users in leaderboard (try different field names)
+            const userIds = leaderboard.map(entry => {
+                // Try different possible field names
+                const id = entry.userId || entry.user_id || entry.userid || entry.id;
+                return id ? parseInt(id) : null;
+            }).filter(id => id && !isNaN(id) && id > 0);
+            
+            console.log('Extracted user IDs from leaderboard:', userIds);
+            console.log('Current cache state before fetch:', Object.keys(userDetailsCache));
+            
+            // Fetch user details first
+            if (userIds.length > 0) {
+                await fetchUserDetails(userIds);
+                console.log('Current cache state after fetch:', Object.keys(userDetailsCache));
+            } else {
+                console.warn('No valid user IDs found in leaderboard entries. Full entries:', leaderboard);
+            }
+            
             const topN = config.leaderboardTopN || 5;
             const topPlayers = leaderboard.slice(0, topN);
             
             console.log('Displaying top players:', topPlayers);
             
+            // Render the leaderboard with user names
             container.innerHTML = `
                 <h3>🏆 Current Leaderboard</h3>
                 <ol style="padding-left: 20px;">
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                        console.log('Leaderboard entry:', entry);
+                        const displayName = getUserDisplayName(entry);
+                        const userId = entry.userId || entry.user_id || entry.userid || entry.id;
+                        console.log(`Entry ${index}: userId=${userId}, displayName=${displayName}`);
                         return `
                             <li style="padding: 10px; margin: 8px 0; background: ${rank <= 3 ? '#fff3cd' : '#f8f9fa'}; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: bold;">${medal} ${entry.username || 'User ' + entry.userId}</span>
+                                <span style="font-weight: bold;">${medal} ${displayName}</span>
                                 <span style="font-size: 18px; font-weight: bold; color: #007bff;">${entry.score || 0} pts</span>
                             </li>
                         `;
@@ -1387,9 +1902,22 @@
             `;
         }
         
-        function displayFinalLeaderboard(leaderboard) {
+        async function displayFinalLeaderboard(leaderboard) {
             const container = document.getElementById('final-leaderboard-container');
         if (!container) return;
+
+            // Fetch user details for all users in leaderboard (try different field names)
+            const userIds = leaderboard.map(entry => {
+                const id = entry.userId || entry.user_id || entry.userid || entry.id;
+                return id ? parseInt(id) : null;
+            }).filter(id => id && !isNaN(id) && id > 0);
+            
+            console.log('Final leaderboard - Extracted user IDs:', userIds);
+            
+            // Fetch user details first
+            if (userIds.length > 0) {
+                await fetchUserDetails(userIds);
+            }
 
             const topN = config.leaderboardTopN || 3;
             const topPlayers = leaderboard.slice(0, topN);
@@ -1406,7 +1934,7 @@
                             <div style="text-align: center; flex: 1; max-width: 200px;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${entry.username || 'User ' + entry.userId}</div>
+                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${getUserDisplayName(entry)}</div>
                                     <div style="font-size: 24px; font-weight: bold;">${entry.score || 0} pts</div>
                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold;">#${rank}</div>
@@ -1420,7 +1948,7 @@
                         <ol style="list-style: none; padding: 0;">
                             ${leaderboard.slice(topN).map((entry, index) => `
                                 <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px;">
-                                    #${topN + index + 1} - ${entry.username || 'User ' + entry.userId}: ${entry.score || 0} pts
+                                    #${topN + index + 1} - ${getUserDisplayName(entry)}: ${entry.score || 0} pts
                                 </li>
                             `).join('')}
                         </ol>
@@ -1440,7 +1968,7 @@
                 <ol>
                     ${leaderboard.map((entry, index) => `
                         <li>
-                            <strong>${entry.username || 'User ' + entry.userId}</strong>: 
+                            <strong>${getUserDisplayName(entry)}</strong>: 
                             ${entry.score || 0} points
                             ${index < 3 ? ' 🏆' : ''}
                         </li>
@@ -1727,7 +2255,7 @@
                             <div style="text-align: center; flex: 1; max-width: 200px;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${entry.username || 'User ' + entry.userId}</div>
+                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${getUserDisplayName(entry)}</div>
                                     <div style="font-size: 24px; font-weight: bold; color: white;">${entry.score || 0} pts</div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: white;">#${rank}</div>
@@ -1741,7 +2269,7 @@
                         <ol style="list-style: none; padding: 0;">
                             ${leaderboard.slice(topN).map((entry, index) => `
                                 <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px; color: white;">
-                                    #${topN + index + 1} - ${entry.username || 'User ' + entry.userId}: ${entry.score || 0} pts
+                                    #${topN + index + 1} - ${getUserDisplayName(entry)}: ${entry.score || 0} pts
                                 </li>
                             `).join('')}
                         </ol>
@@ -1765,7 +2293,7 @@
                 <ol>
                     ${leaderboard.map((entry, index) => `
                         <li>
-                            <strong>${entry.username || 'User ' + entry.userId}</strong>: 
+                            <strong>${getUserDisplayName(entry)}</strong>: 
                             ${entry.score || 0} points
                             ${index < 3 ? ' 🏆' : ''}
                         </li>

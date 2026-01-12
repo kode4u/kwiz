@@ -271,6 +271,40 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010110, 'gamifiedquiz');
     }
     
+    // Add sumgrades field to gamifiedquiz table
+    if ($oldversion < 2025010111) {
+        $table = new xmldb_table('gamifiedquiz');
+        $field = new xmldb_field('sumgrades', XMLDB_TYPE_NUMBER, '10', '2', XMLDB_NOTNULL, false, '0', 'question_category');
+        
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Calculate sumgrades for existing quizzes
+        $quizzes = $DB->get_records('gamifiedquiz');
+        foreach ($quizzes as $quiz) {
+            $sumgrades = $DB->get_field_sql(
+                "SELECT COALESCE(SUM(maxmark), 0) FROM {gamifiedquiz_slots} WHERE gamifiedquizid = ?",
+                array($quiz->id)
+            );
+            $DB->set_field('gamifiedquiz', 'sumgrades', $sumgrades, array('id' => $quiz->id));
+        }
+        
+        upgrade_mod_savepoint(true, 2025010111, 'gamifiedquiz');
+    }
+    
+    // Add category_name field to gamifiedquiz_questions table
+    if ($oldversion < 2025010112) {
+        $table = new xmldb_table('gamifiedquiz_questions');
+        $field = new xmldb_field('category_name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, false, null, 'difficulty');
+        
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025010112, 'gamifiedquiz');
+    }
+    
     // Return true to indicate upgrade was successful
     return true;
 }

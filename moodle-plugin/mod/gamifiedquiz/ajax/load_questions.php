@@ -59,67 +59,7 @@ if (empty($course) || empty($course->id)) {
 }
 
 try {
-    // First check questions_data field (edited questions)
-    if (!empty($gamifiedquiz->questions_data)) {
-        $questions = json_decode($gamifiedquiz->questions_data, true);
-        if (is_array($questions) && count($questions) > 0) {
-            echo json_encode(array(
-                'success' => true,
-                'questions' => $questions,
-                'source' => 'questions_data'
-            ));
-            exit;
-        }
-    }
-    
-    // Try to load from question bank
-    try {
-        if (file_exists($CFG->dirroot . '/question/engine/bank.php')) {
-            require_once($CFG->dirroot . '/question/engine/bank.php');
-        }
-        if (file_exists($CFG->dirroot . '/question/editlib.php')) {
-            require_once($CFG->dirroot . '/question/editlib.php');
-        }
-        
-        // Check if quiz has a specific question category set
-        // Use property_exists to check if field exists (in case upgrade hasn't run)
-        $categoryid = 0;
-        if (property_exists($gamifiedquiz, 'question_category') && isset($gamifiedquiz->question_category) && $gamifiedquiz->question_category > 0) {
-            $categoryid = $gamifiedquiz->question_category;
-        } else {
-            // Auto-create category if not set
-            try {
-                $categoryid = gamifiedquiz_get_question_category($course->id, $gamifiedquiz->id);
-            } catch (Exception $cat_error) {
-                error_log("Gamified Quiz: Error getting question category: " . $cat_error->getMessage());
-                $categoryid = 0;
-            }
-        }
-        
-        if ($categoryid && $categoryid > 0) {
-            $bank_questions = gamifiedquiz_load_question_bank_questions($categoryid);
-            
-            if (!empty($bank_questions) && is_array($bank_questions)) {
-                echo json_encode(array(
-                    'success' => true,
-                    'questions' => $bank_questions,
-                    'source' => 'question_bank',
-                    'count' => count($bank_questions)
-                ));
-                exit;
-            }
-        }
-    } catch (Exception $bank_error) {
-        // If question bank loading fails, log and continue to fallback
-        error_log("Gamified Quiz: Error loading from question bank: " . $bank_error->getMessage() . " in " . $bank_error->getFile() . ":" . $bank_error->getLine());
-        // Continue to fallback
-    } catch (Error $bank_error) {
-        // Catch fatal errors too
-        error_log("Gamified Quiz: Fatal error loading from question bank: " . $bank_error->getMessage());
-        // Continue to fallback
-    }
-    
-    // Fallback: load from database (gamifiedquiz_questions table)
+    // Load from database (gamifiedquiz_questions table) - no Moodle question bank integration
     $session_id = 'session_' . $gamifiedquiz->id . '_' . ($cmid ?: 0);
     $db_questions = $DB->get_records('gamifiedquiz_questions', 
         array('gamifiedquizid' => $gamifiedquiz->id),

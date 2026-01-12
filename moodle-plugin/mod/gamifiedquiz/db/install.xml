@@ -23,6 +23,7 @@
         <FIELD NAME="time_limit_per_question" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="60" SEQUENCE="false" COMMENT="Time limit per question in seconds"/>
         <FIELD NAME="leaderboard_top_n" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="3" SEQUENCE="false" COMMENT="Number of top students to show in leaderboard"/>
         <FIELD NAME="question_category" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Question bank category ID"/>
+        <FIELD NAME="sumgrades" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Sum of all question marks"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -63,6 +64,7 @@
         <FIELD NAME="choices" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON array of choices"/>
         <FIELD NAME="correct_index" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="category_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Category name for this question"/>
         <FIELD NAME="bloom_level" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>

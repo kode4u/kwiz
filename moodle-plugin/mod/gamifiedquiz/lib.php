@@ -61,16 +61,30 @@ function mod_gamifiedquiz_auto_sync_jwt_secret() {
  */
 function gamifiedquiz_supports($feature) {
     switch($feature) {
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
         case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
-        case FEATURE_GRADE_HAS_GRADE:
+        case FEATURE_CONTROLS_GRADE_VISIBILITY:
             return true;
-        case FEATURE_GRADE_OUTCOMES:
-            return false;
+        case FEATURE_USES_QUESTIONS:
+            return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_ASSESSMENT;
         default:
             return null;
     }
@@ -91,9 +105,9 @@ function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
 
     $id = $DB->insert_record('gamifiedquiz', $gamifiedquiz);
     
-    // Create grade item
+    // Post-processing after add
     $gamifiedquiz->id = $id;
-    gamifiedquiz_grade_item_update($gamifiedquiz);
+    gamifiedquiz_after_add_or_update($gamifiedquiz);
     
     return $id;
 }
@@ -143,15 +157,31 @@ function gamifiedquiz_delete_instance($id) {
  * @return int Grade item ID
  */
 function gamifiedquiz_grade_item_update($gamifiedquiz) {
-    global $CFG;
-    
+    global $CFG, $DB;
     require_once($CFG->dirroot . '/lib/gradelib.php');
+    
+    // Calculate total marks from slots if sumgrades is not set
+    $sumgrades = isset($gamifiedquiz->sumgrades) ? $gamifiedquiz->sumgrades : 0;
+    if ($sumgrades == 0) {
+        $slots = $DB->get_records('gamifiedquiz_slots', array('gamifiedquizid' => $gamifiedquiz->id));
+        foreach ($slots as $slot) {
+            $sumgrades += $slot->maxmark;
+        }
+        // Update quiz record with calculated sumgrades
+        if ($sumgrades > 0) {
+            $gamifiedquiz->sumgrades = $sumgrades;
+            $DB->update_record('gamifiedquiz', $gamifiedquiz);
+        }
+    }
+    
+    // Use sumgrades as maximum grade, default to 100 if no questions
+    $grademax = $sumgrades > 0 ? $sumgrades : 100;
     
     $params = array(
         'itemname' => $gamifiedquiz->name,
         'idnumber' => $gamifiedquiz->id,
         'gradetype' => GRADE_TYPE_VALUE,
-        'grademax' => 100,
+        'grademax' => $grademax,
         'grademin' => 0
     );
     
@@ -372,10 +402,10 @@ function gamifiedquiz_create_question_bank_question($questiontext, $choices, $ca
         // Get category to ensure it exists
         $category = $DB->get_record('question_categories', array('id' => $categoryid), '*', MUST_EXIST);
         
-        // Use question_bank::create_question() like quiz module does
-        // This is the proper Moodle way to create questions
-        $question = question_bank::create_question('multichoice');
+        // Create question object (direct database insertion like Moodle question import)
+        $question = new stdClass();
         $question->category = $categoryid;
+        $question->parent = 0;
         $question->name = shorten_text(strip_tags($questiontext), 80);
         $question->questiontext = $questiontext;
         $question->questiontextformat = FORMAT_HTML;
@@ -383,18 +413,78 @@ function gamifiedquiz_create_question_bank_question($questiontext, $choices, $ca
         $question->generalfeedbackformat = FORMAT_HTML;
         $question->defaultmark = 1.0;
         $question->penalty = 0.3333333;
+        $question->qtype = 'multichoice';
+        $question->length = 1;
+        $question->stamp = make_unique_id_code();
+        $question->version = make_unique_id_code();
+        $question->hidden = 0;
+        $question->timecreated = time();
+        $question->timemodified = $question->timecreated;
+        $question->createdby = $USER->id;
+        $question->modifiedby = $USER->id;
+        $question->idnumber = null;
         
-        // Set multichoice options
-        $question->single = 1; // Single answer
-        $question->shuffleanswers = 1;
-        $question->answernumbering = 'abc';
-        $question->layout = 0; // Vertical layout
-        $question->correctfeedback = get_string('correctansweris', 'qtype_multichoice');
-        $question->correctfeedbackformat = FORMAT_HTML;
-        $question->partiallycorrectfeedback = '';
-        $question->partiallycorrectfeedbackformat = FORMAT_HTML;
-        $question->incorrectfeedback = get_string('incorrectansweris', 'qtype_multichoice');
-        $question->incorrectfeedbackformat = FORMAT_HTML;
+        // Insert question
+        $question->id = $DB->insert_record('question', $question);
+        
+        if (!$question->id) {
+            error_log("Gamified Quiz: Failed to insert question into question table");
+            return false;
+        }
+        
+        // Create question bank entry (Moodle 4.0+)
+        $tablemanager = $DB->get_manager();
+        if ($tablemanager->table_exists('question_bank_entries')) {
+            try {
+                // Check if entry already exists for this question
+                $existingversion = $DB->get_record('question_versions', array('questionid' => $question->id), '*');
+                if (!$existingversion) {
+                    $entry = new stdClass();
+                    $entry->questioncategoryid = $categoryid;
+                    $entry->idnumber = null;
+                    $entry->ownerid = $USER->id;
+                    $entry->id = $DB->insert_record('question_bank_entries', $entry);
+                    
+                    if ($entry->id) {
+                        // Link question to entry via question_versions
+                        $version = new stdClass();
+                        $version->questionbankentryid = $entry->id;
+                        $version->questionid = $question->id;
+                        $version->version = 1;
+                        $version->status = 'ready';
+                        $version->id = $DB->insert_record('question_versions', $version);
+                        
+                        error_log("Gamified Quiz: Created question bank entry {$entry->id} and version {$version->id} for question {$question->id}");
+                    } else {
+                        error_log("Gamified Quiz: Failed to create question bank entry for question {$question->id}");
+                    }
+                } else {
+                    error_log("Gamified Quiz: Question version already exists for question {$question->id}");
+                }
+            } catch (Exception $e) {
+                error_log("Gamified Quiz: Error creating question bank entry: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+                // Continue anyway - question is still created
+            }
+        } else {
+            error_log("Gamified Quiz: question_bank_entries table does not exist (older Moodle version?)");
+        }
+        
+        // Create multichoice options
+        $mc = new stdClass();
+        $mc->questionid = $question->id;
+        $mc->layout = 0; // Vertical layout
+        $mc->single = 1; // Single answer
+        $mc->shuffleanswers = 1;
+        $mc->correctfeedback = get_string('correctansweris', 'qtype_multichoice');
+        $mc->correctfeedbackformat = FORMAT_HTML;
+        $mc->partiallycorrectfeedback = '';
+        $mc->partiallycorrectfeedbackformat = FORMAT_HTML;
+        $mc->incorrectfeedback = get_string('incorrectansweris', 'qtype_multichoice');
+        $mc->incorrectfeedbackformat = FORMAT_HTML;
+        $mc->answernumbering = 'abc';
+        $mc->showstandardinstruction = 0;
+        
+        $DB->insert_record('qtype_multichoice_options', $mc);
         
         // Find correct answer index
         $correctindex = 0;
@@ -405,22 +495,17 @@ function gamifiedquiz_create_question_bank_question($questiontext, $choices, $ca
             }
         }
         
-        // Add answer options
-        $question->answers = array();
+        // Create answer options
         foreach ($choices as $idx => $choice) {
-            $answertext = is_array($choice) ? $choice['text'] : $choice;
-            $fraction = ($idx == $correctindex) ? 1.0 : 0.0;
+            $answer = new stdClass();
+            $answer->question = $question->id;
+            $answer->answer = is_array($choice) ? $choice['text'] : $choice;
+            $answer->answerformat = FORMAT_HTML;
+            $answer->fraction = ($idx == $correctindex) ? 1.0 : 0.0;
+            $answer->feedback = '';
+            $answer->feedbackformat = FORMAT_HTML;
             
-            $answer = new question_answer($idx, $answertext, $fraction, '', FORMAT_HTML);
-            $question->answers[] = $answer;
-        }
-        
-        // Save the question
-        $question->id = $question->save_question();
-        
-        if (!$question->id) {
-            error_log("Gamified Quiz: Failed to create question using question_bank::create_question()");
-            return false;
+            $DB->insert_record('question_answers', $answer);
         }
         
         return $question->id;
@@ -639,9 +724,21 @@ function gamifiedquiz_add_quiz_question($questionid, $gamifiedquiz, $page = 0, $
     $questionslots = $DB->get_records_sql($sql, [$gamifiedquiz->id, 'mod_gamifiedquiz', 'slot',
             context_module::instance($gamifiedquiz->cmid)->id]);
     
-    $currententry = get_question_bank_entry($questionid);
+    // Get question bank entry for this question (similar to quiz module)
+    // Use helper function if available, otherwise query directly
+    if (function_exists('get_question_bank_entry')) {
+        $currententry = get_question_bank_entry($questionid);
+    } else {
+        $entrysql = "SELECT qbe.id
+                      FROM {question} q
+                      JOIN {question_versions} qv ON q.id = qv.questionid
+                      JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+                     WHERE q.id = ?
+                     ORDER BY qv.version DESC LIMIT 1";
+        $currententry = $DB->get_record_sql($entrysql, array($questionid));
+    }
     
-    if (array_key_exists($currententry->id, $questionslots)) {
+    if ($currententry && array_key_exists($currententry->id, $questionslots)) {
         $trans->allow_commit();
         return false; // Question already in quiz
     }
@@ -663,16 +760,18 @@ function gamifiedquiz_add_quiz_question($questionid, $gamifiedquiz, $page = 0, $
         }
     }
     
-    // Create new slot
-    $slot = new stdClass();
-    $slot->gamifiedquizid = $gamifiedquiz->id;
-    
-    if ($maxmark !== null) {
-        $slot->maxmark = $maxmark;
-    } else {
-        $slot->maxmark = $DB->get_field('question', 'defaultmark', array('id' => $questionid));
-    }
-    
+        // Create new slot
+        $slot = new stdClass();
+        $slot->gamifiedquizid = $gamifiedquiz->id;
+        
+        if ($maxmark !== null) {
+            $slot->maxmark = $maxmark;
+        } else {
+            // Get default mark from question, default to 1.0 if not found
+            $defaultmark = $DB->get_field('question', 'defaultmark', array('id' => $questionid));
+            $slot->maxmark = $defaultmark !== false ? $defaultmark : 1.0;
+        }
+        
     if (is_int($page) && $page >= 1) {
         // Adding on a specific page
         $lastslotbefore = 0;
@@ -699,13 +798,42 @@ function gamifiedquiz_add_quiz_question($questionid, $gamifiedquiz, $page = 0, $
     
     $slotid = $DB->insert_record('gamifiedquiz_slots', $slot);
     
+    // Update quiz sumgrades after adding question
+    $sumgrades = $DB->get_field_sql(
+        "SELECT COALESCE(SUM(maxmark), 0) FROM {gamifiedquiz_slots} WHERE gamifiedquizid = ?",
+        array($gamifiedquiz->id)
+    );
+    $DB->set_field('gamifiedquiz', 'sumgrades', $sumgrades, array('id' => $gamifiedquiz->id));
+    
+    // Update grade item
+    $gamifiedquiz->sumgrades = $sumgrades;
+    gamifiedquiz_grade_item_update($gamifiedquiz);
+    
     // Create question reference (like quiz module)
     $questionreferences = new stdClass();
     $questionreferences->usingcontextid = context_module::instance($gamifiedquiz->cmid)->id;
     $questionreferences->component = 'mod_gamifiedquiz';
     $questionreferences->questionarea = 'slot';
     $questionreferences->itemid = $slotid;
-    $questionreferences->questionbankentryid = get_question_bank_entry($questionid)->id;
+    // Get question bank entry ID (similar to quiz module)
+    if (function_exists('get_question_bank_entry')) {
+        $entry = get_question_bank_entry($questionid);
+    } else {
+        $entrysql = "SELECT qbe.id
+                      FROM {question} q
+                      JOIN {question_versions} qv ON q.id = qv.questionid
+                      JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+                     WHERE q.id = ?
+                     ORDER BY qv.version DESC LIMIT 1";
+        $entry = $DB->get_record_sql($entrysql, array($questionid));
+    }
+    
+    if (!$entry || !isset($entry->id)) {
+        $trans->rollback();
+        return false;
+    }
+    
+    $questionreferences->questionbankentryid = $entry->id;
     $questionreferences->version = null; // Always latest
     $DB->insert_record('question_references', $questionreferences);
     
@@ -830,11 +958,27 @@ function gamifiedquiz_update_gradebook($quizid, $userid, $grade, $cmid) {
         $cmid = $cm->id;
     }
     
+    // Get total marks (sumgrades) from quiz or calculate from slots
+    $sumgrades = isset($gamifiedquiz->sumgrades) ? $gamifiedquiz->sumgrades : 0;
+    if ($sumgrades == 0) {
+        // Calculate from slots
+        $slots = $DB->get_records('gamifiedquiz_slots', array('gamifiedquizid' => $quizid));
+        foreach ($slots as $slot) {
+            $sumgrades += $slot->maxmark;
+        }
+        // Update quiz record
+        if ($sumgrades > 0) {
+            $DB->set_field('gamifiedquiz', 'sumgrades', $sumgrades, array('id' => $quizid));
+        }
+    }
+    
     // Prepare grade data
+    // Grade is already a percentage (0-100), convert to raw grade based on total marks
     $grade_data = new stdClass();
     $grade_data->userid = $userid;
-    $grade_data->rawgrade = $grade;
-    $grade_data->rawgrademax = 100;
+    // Convert percentage to raw grade: if grade is 80% and sumgrades is 10, rawgrade = 8
+    $grade_data->rawgrade = ($sumgrades > 0) ? ($grade / 100) * $sumgrades : $grade;
+    $grade_data->rawgrademax = $sumgrades > 0 ? $sumgrades : 100;
     $grade_data->rawgrademin = 0;
     $grade_data->dategraded = time();
     $grade_data->datesubmitted = time();
@@ -913,4 +1057,101 @@ function gamifiedquiz_get_session_grades($sessionid, $quizid) {
     }
     
     return $grades;
+}
+
+/**
+ * Add random questions to gamified quiz (similar to quiz_add_random_questions)
+ *
+ * @param stdClass $gamifiedquiz Quiz instance
+ * @param int $addonpage Page number to add questions
+ * @param int $categoryid Category ID
+ * @param int $randomcount Number of random questions
+ * @param bool $recurse Include subcategories
+ * @return void
+ */
+function gamifiedquiz_add_random_questions($gamifiedquiz, $addonpage, $categoryid, $randomcount, $recurse = false) {
+    global $DB;
+    
+    if (!isset($gamifiedquiz->cmid)) {
+        $cm = get_coursemodule_from_instance('gamifiedquiz', $gamifiedquiz->id, $gamifiedquiz->course);
+        $gamifiedquiz->cmid = $cm->id;
+    }
+    
+    // Get questions from category
+    $category = $DB->get_record('question_categories', array('id' => $categoryid), '*', MUST_EXIST);
+    
+    // Build SQL to get questions from category (and subcategories if recurse)
+    if ($recurse) {
+        // Get all subcategories
+        $subcategories = $DB->get_records_sql(
+            "SELECT id FROM {question_categories} 
+             WHERE contextid = ? AND (id = ? OR " . $DB->sql_like('path', '?') . ")",
+            array($category->contextid, $categoryid, '%/' . $categoryid . '/%')
+        );
+        $categoryids = array_keys($subcategories);
+    } else {
+        $categoryids = array($categoryid);
+    }
+    
+    // Get multichoice questions from categories
+    list($insql, $inparams) = $DB->get_in_or_equal($categoryids);
+    $questions = $DB->get_records_sql(
+        "SELECT DISTINCT q.id 
+         FROM {question} q
+         WHERE q.category $insql 
+           AND q.qtype = 'multichoice' 
+           AND q.hidden = 0
+         ORDER BY RAND()",
+        $inparams
+    );
+    
+    // Limit to requested count
+    $questions = array_slice($questions, 0, $randomcount);
+    
+    // Add questions to quiz
+    foreach ($questions as $question) {
+        gamifiedquiz_add_quiz_question($question->id, $gamifiedquiz, $addonpage, 1.0);
+    }
+    
+    // Update grade item after adding all random questions
+    gamifiedquiz_grade_item_update($gamifiedquiz);
+}
+
+/**
+ * Output fragment for question bank (similar to mod_quiz_output_fragment_quiz_question_bank)
+ *
+ * @param array $args Fragment arguments
+ * @return string Rendered HTML
+ */
+function mod_gamifiedquiz_output_fragment_question_bank($args): string {
+    global $PAGE;
+    
+    // Retrieve params
+    $params = [];
+    $extraparams = [];
+    $querystring = parse_url($args['querystring'], PHP_URL_QUERY);
+    parse_str($querystring, $params);
+    
+    $viewclass = \mod_gamifiedquiz\question\bank\custom_view::class;
+    $extraparams['view'] = $viewclass;
+    
+    // Build required parameters (use quiz's function)
+    if (function_exists('build_required_parameters_for_custom_view')) {
+        [$contexts, $thispageurl, $cm, $pagevars, $extraparams] =
+            build_required_parameters_for_custom_view($params, $extraparams);
+    } else {
+        // Fallback: use question_edit_setup
+        list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars) =
+            question_edit_setup('editq', '/mod/gamifiedquiz/edit.php', true);
+    }
+    
+    $course = get_course($cm->course);
+    require_capability('mod/gamifiedquiz:addinstance', $contexts->lowest());
+    
+    // Custom View
+    $questionbank = new $viewclass($contexts, $thispageurl, $course, $cm, $pagevars, $extraparams);
+    
+    // Output using core question bank renderer
+    $renderer = $PAGE->get_renderer('core_question', 'bank');
+    return $renderer->render($questionbank);
 }

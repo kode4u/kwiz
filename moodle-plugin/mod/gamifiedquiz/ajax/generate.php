@@ -107,22 +107,12 @@ try {
         exit;
     }
 
-    // Include question bank libraries
-    require_once($CFG->dirroot . '/question/engine/bank.php');
-    require_once($CFG->dirroot . '/question/editlib.php');
+    // Get category name (optional parameter)
+    $category_name = optional_param('category_name', '', PARAM_TEXT);
     
-    // Get question category - use selected category or create default
-    $categoryid = 0;
-    if (isset($gamifiedquiz->question_category) && $gamifiedquiz->question_category > 0) {
-        $categoryid = $gamifiedquiz->question_category;
-    } else {
-        // Get or create question category for this quiz
-        $categoryid = gamifiedquiz_get_question_category($course->id, $gamifiedquiz->id);
-    }
-    
-    // Save questions to question bank and get question IDs
-    $question_ids = array();
+    // Save questions to gamifiedquiz_questions table only
     $session_id = 'session_' . $gamifiedquiz->id . '_' . ($cmid ?: time());
+    $saved_count = 0;
     
     foreach ($questions as $index => $question) {
         // Handle different question formats
@@ -133,51 +123,42 @@ try {
             continue; // Skip invalid questions
         }
         
-        // Create question in question bank
-        $questionid = gamifiedquiz_create_question_bank_question(
-            $question_text,
-            $choices,
-            $categoryid,
-            $course->id,
-            $gamifiedquiz->difficulty
-        );
-        
-        if ($questionid) {
-            $question_ids[] = $questionid;
-            
-            // Also save to gamifiedquiz_questions for backward compatibility
-            // Auto-calculate correct_index from is_correct if not provided
-            $correct_index = $question['correct_index'] ?? null;
-            if ($correct_index === null) {
-                foreach ($choices as $idx => $choice) {
-                    if (is_array($choice) && isset($choice['is_correct']) && $choice['is_correct'] === true) {
-                        $correct_index = $idx;
-                        break;
-                    }
-                }
-                if ($correct_index === null) {
-                    $correct_index = 0;
+        // Auto-calculate correct_index from is_correct if not provided
+        $correct_index = $question['correct_index'] ?? null;
+        if ($correct_index === null) {
+            foreach ($choices as $idx => $choice) {
+                if (is_array($choice) && isset($choice['is_correct']) && $choice['is_correct'] === true) {
+                    $correct_index = $idx;
+                    break;
                 }
             }
-            
-            $record = new stdClass();
-            $record->gamifiedquizid = $gamifiedquiz->id;
-            $record->session_id = $session_id;
-            $record->question_text = $question_text;
-            $record->choices = json_encode($choices);
-            $record->correct_index = $correct_index;
-            $record->difficulty = $gamifiedquiz->difficulty;
-            $record->timecreated = time();
-            
-            $DB->insert_record('gamifiedquiz_questions', $record);
+            if ($correct_index === null) {
+                $correct_index = 0;
+            }
         }
+        
+        // Save to gamifiedquiz_questions table
+        $record = new stdClass();
+        $record->gamifiedquizid = $gamifiedquiz->id;
+        $record->session_id = $session_id;
+        $record->question_text = $question_text;
+        $record->choices = json_encode($choices);
+        $record->correct_index = $correct_index;
+        $record->difficulty = $gamifiedquiz->difficulty;
+        $record->category_name = $category_name; // Store category name
+        $record->timecreated = time();
+        
+        $DB->insert_record('gamifiedquiz_questions', $record);
+        $saved_count++;
     }
     
     echo json_encode(array(
         'success' => true,
         'questions' => $questions,
         'session_id' => $session_id,
-        'count' => count($questions)
+        'count' => $saved_count,
+        'category_name' => $category_name,
+        'message' => 'Generated ' . $saved_count . ' questions for category: ' . ($category_name ?: 'Default')
     ));
     
 } catch (Exception $e) {

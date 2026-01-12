@@ -117,7 +117,6 @@ if ($is_teacher) {
     echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
     echo '<div class="controls">';
     echo '<button id="generate-questions-btn" class="btn btn-primary gq-btn gq-btn-primary" style="margin-left: 10px;">' . get_string('generate_questions', 'mod_gamifiedquiz') . '</button>';
-    echo '<button id="edit-questions-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Edit Questions</button>';
     echo '<button id="start-session-btn" class="btn btn-success gq-btn gq-btn-success" style="margin-left: 10px;" disabled>' . get_string('start_session', 'mod_gamifiedquiz') . '</button>';
     echo '<button id="end-session-btn" class="btn btn-danger gq-btn gq-btn-danger" style="margin-left: 10px;" disabled>End Session</button>';
     echo '<button id="next-question-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;" disabled>Next Question</button>';
@@ -133,6 +132,10 @@ if ($is_teacher) {
     echo '<div id="active-question-choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
     echo '</div>';
     echo '<div id="question-results-display" class="gq-container" style="display:none;"></div>';
+    echo '<div id="question-ranking-display" class="gq-container-lg" style="display:none; margin-top: 20px;">
+        <h3 style="text-align: center; margin-bottom: 20px;">Current Rankings</h3>
+        <div id="ranking-table-container"></div>
+    </div>';
     echo '<div id="leaderboard-container" class="leaderboard-container"></div>';
     echo '<div id="final-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"></div>';
     echo '</div>';
@@ -158,48 +161,28 @@ if ($is_teacher) {
     echo '</div>';
 }
 
-// Question Editor Modal with Question Bank Browser (Moodle Quiz Style)
+// Generate Questions Modal with Multi-Category Support
 if ($is_teacher) {
-    echo '<div id="question-editor-modal" class="question-editor-modal">';
-    echo '<div class="question-editor-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">';
-    echo '<span class="question-editor-close">&times;</span>';
-    echo '<h2>Edit Questions</h2>';
+    echo '<div id="generate-questions-modal" class="question-editor-modal" style="display:none;">';
+    echo '<div class="question-editor-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">';
+    echo '<span class="generate-questions-close question-editor-close">&times;</span>';
+    echo '<h2>Generate Questions</h2>';
     
-    // Question Bank Browser - Similar to Moodle Quiz
-    echo '<div id="question-bank-browser" style="margin-bottom: 20px;">';
-    echo '<div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">';
-    echo '<label for="question-category-select" style="font-weight: bold; min-width: 120px;">Category:</label>';
-    echo '<select id="question-category-select" style="flex: 1; min-width: 200px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">';
-    echo '<option value="0">Loading categories...</option>';
-    echo '</select>';
-    echo '<button id="refresh-categories-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Refresh</button>';
-    echo '</div>';
-    
-    echo '<div id="question-bank-list" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; min-height: 200px; max-height: 400px; overflow-y: auto; background: #f8f9fa;">';
-    echo '<p style="text-align: center; color: #666;">Select a category to view questions</p>';
-    echo '</div>';
-    echo '</div>';
-    
-    // Selected Questions Section
-    echo '<div id="selected-questions-section" style="margin-top: 20px; border-top: 2px solid #ddd; padding-top: 20px;">';
-    echo '<h3>Selected Questions</h3>';
-    echo '<div id="question-editor-form" class="question-editor-form">';
-    echo '<p style="text-align: center; color: #666;">No questions selected. Select questions from the bank above or add new questions below.</p>';
-    echo '</div>';
-    echo '<div style="margin-top: 15px;">';
-    echo '<button id="add-new-question-btn" class="btn btn-secondary gq-btn gq-btn-secondary">Add New Question</button>';
-    echo '</div>';
+    echo '<div id="categories-container" style="margin-bottom: 20px;">';
+    echo '<h3>Categories</h3>';
+    echo '<div id="category-list" style="margin-bottom: 15px;"></div>';
+    echo '<button id="add-category-btn" class="btn btn-primary gq-btn gq-btn-primary" style="margin-top: 10px;">Add Category</button>';
     echo '</div>';
     
     echo '<div style="margin-top: 20px; text-align: right; border-top: 2px solid #ddd; padding-top: 15px;">';
-    echo '<button id="save-questions-btn" class="btn btn-primary gq-btn gq-btn-primary">Save Questions</button>';
-    echo '<button id="cancel-edit-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Cancel</button>';
+    echo '<button id="generate-all-btn" class="btn btn-success gq-btn gq-btn-success">Generate All Questions</button>';
+    echo '<button id="cancel-generate-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Cancel</button>';
     echo '</div>';
     echo '</div>';
     echo '</div>';
     
-    // Generate Questions Dialog Modal
-    echo '<div id="generate-questions-modal" class="question-editor-modal" style="display:none;">';
+    // Old generate modal (keep for backward compatibility, will be replaced)
+    echo '<div id="generate-questions-modal-old" class="question-editor-modal" style="display:none;">';
     echo '<div class="question-editor-content" style="max-width: 600px;">';
     echo '<span class="generate-questions-close question-editor-close">&times;</span>';
     echo '<h2>Generate Questions</h2>';
