@@ -2885,30 +2885,48 @@
             return id ? parseInt(id) : null;
         }).filter(id => id && !isNaN(id) && id > 0);
         
-        // Fetch user details if available
-        let userDetailsMap = {};
+        // Fetch user details if available - ensure we wait for it to complete
         if (userIds.length > 0 && window.gamifiedQuizFetchUserDetails) {
-            await window.gamifiedQuizFetchUserDetails(userIds);
-            const cache = window.gamifiedQuizUserDetailsCache || {};
-            
-            // Build map for quick lookup from cache
-            userIds.forEach(id => {
-                if (cache[id]) {
-                    const user = cache[id];
-                    userDetailsMap[id] = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
-                } else if (cache[String(id)]) {
-                    const user = cache[String(id)];
-                    userDetailsMap[id] = user.fullname || (user.firstname + ' ' + user.lastname) || user.username;
-                }
-            });
+            console.log('Fetching user details for leaderboard:', userIds);
+            try {
+                await window.gamifiedQuizFetchUserDetails(userIds);
+                // Wait a bit for cache to be updated
+                await new Promise(resolve => setTimeout(resolve, 200));
+                console.log('User details cache after fetch:', window.gamifiedQuizUserDetailsCache);
+            } catch (error) {
+                console.error('Error fetching user details for leaderboard:', error);
+            }
         }
         
-        // Helper to get display name
+        // Helper to get display name - prioritize cache since we just fetched
         function getParticipantName(participant) {
             const userId = participant.userId || participant.user_id || participant.userid || participant.id;
-            if (userId && userDetailsMap[userId]) {
-                return userDetailsMap[userId];
+            
+            // First, check cache directly (most reliable after fetch)
+            const cache = window.gamifiedQuizUserDetailsCache || {};
+            if (userId) {
+                const numUserId = parseInt(userId);
+                if (!isNaN(numUserId)) {
+                    // Try both numeric and string keys
+                    const user = cache[numUserId] || cache[String(numUserId)];
+                    if (user) {
+                        const name = user.fullname || (user.firstname && user.lastname ? (user.firstname + ' ' + user.lastname) : null) || user.username;
+                        if (name && name.trim() && !name.match(/^User \d+$/)) {
+                            return name;
+                        }
+                    }
+                }
             }
+            
+            // Use global getUserDisplayName if available (it has better logic)
+            if (window.gamifiedQuizGetUserDisplayName) {
+                const displayName = window.gamifiedQuizGetUserDisplayName(participant);
+                // Only return if it's not a generic "User X" format
+                if (displayName && !displayName.match(/^User \d+$/)) {
+                    return displayName;
+                }
+            }
+            
             // Fallback to username or fullname from participant data
             if (participant.fullname && !participant.fullname.match(/^User \d+$/)) {
                 return participant.fullname;
@@ -2916,6 +2934,8 @@
             if (participant.username && !participant.username.match(/^User \d+$/)) {
                 return participant.username;
             }
+            
+            // Last resort
             return `User ${userId || '?'}`;
         }
         
