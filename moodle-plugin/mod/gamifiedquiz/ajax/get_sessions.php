@@ -62,8 +62,52 @@ try {
         $results = array();
         if (!empty($session->session_results)) {
             $decoded = json_decode($session->session_results, true);
-            if ($decoded) {
+            if ($decoded && is_array($decoded)) {
                 $results = $decoded;
+            }
+        }
+        
+        // If session ended but no results stored, try to get from responses table
+        $participantCount = $session->participants_count;
+        if ($session->timeended && empty($results)) {
+            // Count unique participants from responses table
+            $responses = $DB->get_records('gamifiedquiz_responses', 
+                array('session_id' => $session->session_id),
+                '',
+                'DISTINCT userid'
+            );
+            if ($responses && count($responses) > 0) {
+                $participantCount = count($responses);
+                // Also try to load leaderboard from responses
+                if (empty($results)) {
+                    $allResponses = $DB->get_records('gamifiedquiz_responses', 
+                        array('session_id' => $session->session_id),
+                        'timecreated ASC'
+                    );
+                    $userScores = array();
+                    $userNames = array();
+                    foreach ($allResponses as $response) {
+                        $userid = $response->userid;
+                        if (!isset($userScores[$userid])) {
+                            $userScores[$userid] = 0;
+                            $userNames[$userid] = $response->username;
+                        }
+                        $userScores[$userid] += $response->score;
+                    }
+                    foreach ($userScores as $userid => $totalScore) {
+                        $results[] = array(
+                            'userId' => (int)$userid,
+                            'user_id' => (int)$userid,
+                            'userid' => (int)$userid,
+                            'id' => (int)$userid,
+                            'username' => $userNames[$userid],
+                            'score' => (int)$totalScore
+                        );
+                    }
+                    usort($results, function($a, $b) {
+                        return $b['score'] - $a['score'];
+                    });
+                }
             }
         }
         
@@ -72,7 +116,7 @@ try {
             'session_id' => $session->session_id,
             'session_name' => $session->session_name,
             'teacher_name' => $teachername,
-            'participants_count' => $session->participants_count,
+            'participants_count' => $participantCount,
             'total_questions' => $session->total_questions,
             'started' => $session->started,
             'timecreated' => $session->timecreated,

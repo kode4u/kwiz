@@ -1302,19 +1302,72 @@
         // End session
         if (endBtn) {
             endBtn.addEventListener('click', async () => {
-                // End session in database
+                // Get final leaderboard before ending (load from database to ensure we have latest scores)
+                let finalLeaderboard = currentLeaderboard || [];
+                let participantCount = finalLeaderboard.length;
+                
+                try {
+                    // Load latest scores from database to ensure we have the most up-to-date leaderboard
+                    const scoresResponse = await fetch(`ajax/get_session_scores.php?sessionid=${encodeURIComponent(currentSessionInstanceId)}&quizid=${config.quizId}`);
+                    const scoresResult = await scoresResponse.json();
+                    if (scoresResult.success) {
+                        if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
+                            finalLeaderboard = scoresResult.leaderboard;
+                            console.log('Loaded final leaderboard from database:', finalLeaderboard);
+                        }
+                        // Use unique_participants if available, otherwise count from leaderboard
+                        if (scoresResult.unique_participants !== undefined && scoresResult.unique_participants > 0) {
+                            participantCount = scoresResult.unique_participants;
+                        } else if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
+                            // Count unique users in leaderboard
+                            const uniqueUsers = new Set();
+                            scoresResult.leaderboard.forEach(entry => {
+                                const userId = entry.userId || entry.user_id || entry.userid || entry.id;
+                                if (userId) uniqueUsers.add(userId);
+                            });
+                            participantCount = uniqueUsers.size || scoresResult.leaderboard.length;
+                        } else {
+                            // Fallback: use total_responses if available
+                            participantCount = scoresResult.total_responses || finalLeaderboard.length;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load final scores:', error);
+                    // Fallback: count unique users in current leaderboard
+                    const uniqueUsers = new Set();
+                    finalLeaderboard.forEach(entry => {
+                        const userId = entry.userId || entry.user_id || entry.userid || entry.id;
+                        if (userId) uniqueUsers.add(userId);
+                    });
+                    participantCount = uniqueUsers.size || finalLeaderboard.length;
+                }
+                
+                // End session in database with final leaderboard
                 try {
                     const formData = new FormData();
                     formData.append('sessionid', currentSessionInstanceId);
-                    formData.append('resultsdata', JSON.stringify(currentLeaderboard || []));
+                    formData.append('resultsdata', JSON.stringify(finalLeaderboard));
                     
                     await fetch('ajax/session_end.php', {
                         method: 'POST',
                         body: formData
                     });
-                    console.log('Session ended in DB');
+                    console.log('Session ended in DB with leaderboard');
                 } catch (error) {
                     console.error('Failed to end session in DB:', error);
+                }
+                
+                // Also update session with final results (always save, even if empty)
+                try {
+                    await updateSessionInDatabase({
+                        instanceId: currentSessionInstanceId,
+                        participantsCount: participantCount,
+                        sessionResults: finalLeaderboard, // Always save, even if empty array
+                        endedAt: Math.floor(Date.now() / 1000)
+                    });
+                    console.log('Session updated with participant count:', participantCount, 'and results:', finalLeaderboard.length);
+                } catch (error) {
+                    console.error('Failed to update session with results:', error);
                 }
                 
                 socket.emit('teacher:end_session', {
@@ -2689,9 +2742,11 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">${session.created_formatted}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">${session.ended_formatted || '-'}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
-                            ${session.session_results && session.session_results.length > 0 ? 
-                              `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="showSessionResults('${session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;').replace(/'/g, '&#39;')})">View Leaderboard</button>` : 
-                              '<span style="color: #999;">No Results</span>'}
+                            ${session.timeended ? 
+                              (session.session_results && Array.isArray(session.session_results) && session.session_results.length > 0 ? 
+                                `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="showSessionResults('${session.session_id || session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;').replace(/'/g, '&#39;')})">View Leaderboard</button>` : 
+                                `<button class="btn btn-sm btn-info gq-btn gq-btn-sm gq-btn-info" onclick="loadAndShowSessionLeaderboard('${session.session_id || session.id}')">View Leaderboard</button>`) :
+                              '<span style="color: #999;">Session Active</span>'}
                         </td>
                     </tr>
                 `;
@@ -2722,6 +2777,23 @@
         });
     }
 
+    // Load and show session leaderboard from database
+    window.loadAndShowSessionLeaderboard = async function(sessionId) {
+        try {
+            const response = await fetch(`ajax/get_session_scores.php?sessionid=${encodeURIComponent(sessionId)}&quizid=${window.GAMIFIED_QUIZ_CONFIG?.quizId || ''}`);
+            const result = await response.json();
+            
+            if (result.success && result.leaderboard && result.leaderboard.length > 0) {
+                window.showSessionResults(sessionId, result.leaderboard);
+            } else {
+                alert('No leaderboard data found for this session.');
+            }
+        } catch (error) {
+            console.error('Error loading session leaderboard:', error);
+            alert('Error loading leaderboard: ' + error.message);
+        }
+    };
+    
     // Show session results - make it global so it can be called from onclick
     window.showSessionResults = async function(sessionId, results) {
         // Remove existing results dialog if any
