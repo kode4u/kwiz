@@ -23,9 +23,14 @@ try {
     require_capability('mod/gamifiedquiz:manage', $context);
     
     // Count participants from participants table (tracks all students who joined)
-    $participantCount = $DB->count_records('gamifiedquiz_participants', 
-        array('session_id' => $sessionid)
-    );
+    $tableExists = $DB->get_manager()->table_exists('gamifiedquiz_participants');
+    $participantCount = 0;
+    
+    if ($tableExists) {
+        $participantCount = $DB->count_records('gamifiedquiz_participants', 
+            array('session_id' => $sessionid)
+        );
+    }
     
     // Fallback: if no participants recorded, count from responses
     if ($participantCount == 0) {
@@ -41,6 +46,11 @@ try {
             }
             $participantCount = count($uniqueUserIds);
         }
+    }
+    
+    // Final fallback: use existing participant_count from session
+    if ($participantCount == 0) {
+        $participantCount = $session->participants_count;
     }
     
     $session->timeended = time();

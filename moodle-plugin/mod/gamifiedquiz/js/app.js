@@ -201,7 +201,6 @@
         const generateBtn = document.getElementById('generate-questions-btn');
         const editQuestionsBtn = document.getElementById('edit-questions-btn');
         const startBtn = document.getElementById('start-session-btn');
-        const endBtn = document.getElementById('end-session-btn');
         const nextBtn = document.getElementById('next-question-btn');
         
         // Function to load scores from database and update leaderboard
@@ -264,7 +263,6 @@
                         }
                         
                         if (startBtn) startBtn.disabled = true;
-                        if (endBtn) endBtn.disabled = false;
                         if (nextBtn) nextBtn.disabled = false;
                     }
                 }
@@ -1256,7 +1254,6 @@
                 questions: questions
             });
             if (startBtn) startBtn.disabled = true;
-            if (endBtn) endBtn.disabled = false;
             if (nextBtn) nextBtn.disabled = false;
             currentQuestionIndex = 0;
             const statusEl = document.getElementById('session-status');
@@ -1299,23 +1296,37 @@
             }, 1000);
         });
 
-        // End session
-        if (endBtn) {
-            endBtn.addEventListener('click', async () => {
-                // Get final leaderboard before ending (load from database to ensure we have latest scores)
-                let finalLeaderboard = currentLeaderboard || [];
-                let participantCount = finalLeaderboard.length;
-                
-                try {
-                    // Load latest scores from database to ensure we have the most up-to-date leaderboard
-                    const scoresResponse = await fetch(`ajax/get_session_scores.php?sessionid=${encodeURIComponent(currentSessionInstanceId)}&quizid=${config.quizId}`);
-                    const scoresResult = await scoresResponse.json();
-                    if (scoresResult.success) {
-                        if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
-                            finalLeaderboard = scoresResult.leaderboard;
-                            console.log('Loaded final leaderboard from database:', finalLeaderboard);
-                        }
-                        // Count unique users in leaderboard (always use this as it's most accurate)
+        // End session handler (extracted to function so it can be called from Next button)
+        // End session handler (extracted to function so it can be called from Next button)
+        async function endSessionHandler() {
+            // Get final leaderboard before ending (load from database to ensure we have latest scores)
+            let finalLeaderboard = currentLeaderboard || [];
+            let participantCount = 0;
+            
+            try {
+                    // First, try to get participant count from participants table
+                    const participantsResponse = await fetch(`ajax/get_participants.php?sessionid=${encodeURIComponent(currentSessionInstanceId)}&quizid=${config.quizId}`);
+                    const participantsResult = await participantsResponse.json();
+                    if (participantsResult.success && participantsResult.count !== undefined) {
+                        participantCount = participantsResult.count;
+                        console.log('Participant count from participants table:', participantCount);
+                    }
+            } catch (error) {
+                console.log('Could not get participant count from participants table, will count from leaderboard:', error);
+            }
+            
+            try {
+                // Load latest scores from database to ensure we have the most up-to-date leaderboard
+                const scoresResponse = await fetch(`ajax/get_session_scores.php?sessionid=${encodeURIComponent(currentSessionInstanceId)}&quizid=${config.quizId}`);
+                const scoresResult = await scoresResponse.json();
+                if (scoresResult.success) {
+                    if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
+                        finalLeaderboard = scoresResult.leaderboard;
+                        console.log('Loaded final leaderboard from database:', finalLeaderboard);
+                    }
+                    
+                    // If we don't have participant count yet, count from leaderboard
+                    if (participantCount == 0) {
                         if (scoresResult.leaderboard && scoresResult.leaderboard.length > 0) {
                             const uniqueUsers = new Set();
                             scoresResult.leaderboard.forEach(entry => {
@@ -1325,15 +1336,16 @@
                             participantCount = uniqueUsers.size || scoresResult.leaderboard.length;
                         } else if (scoresResult.total_responses !== undefined && scoresResult.total_responses > 0) {
                             // Fallback: if we have responses but no leaderboard, estimate from responses
-                            // Note: This is less accurate as multiple responses from same user count as multiple participants
                             participantCount = scoresResult.total_responses;
                         } else {
                             participantCount = finalLeaderboard.length;
                         }
                     }
-                } catch (error) {
-                    console.error('Failed to load final scores:', error);
-                    // Fallback: count unique users in current leaderboard
+                }
+            } catch (error) {
+                console.error('Failed to load final scores:', error);
+                // Fallback: count unique users in current leaderboard
+                if (participantCount == 0) {
                     const uniqueUsers = new Set();
                     finalLeaderboard.forEach(entry => {
                         const userId = entry.userId || entry.user_id || entry.userid || entry.id;
@@ -1341,51 +1353,63 @@
                     });
                     participantCount = uniqueUsers.size || finalLeaderboard.length;
                 }
+            }
+            
+            // End session in database with final leaderboard
+            try {
+                const formData = new FormData();
+                formData.append('sessionid', currentSessionInstanceId);
+                formData.append('resultsdata', JSON.stringify(finalLeaderboard));
                 
-                // End session in database with final leaderboard
-                try {
-                    const formData = new FormData();
-                    formData.append('sessionid', currentSessionInstanceId);
-                    formData.append('resultsdata', JSON.stringify(finalLeaderboard));
-                    
-                    await fetch('ajax/session_end.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    console.log('Session ended in DB with leaderboard');
-                } catch (error) {
-                    console.error('Failed to end session in DB:', error);
-                }
-                
-                // Also update session with final results (always save, even if empty)
-                try {
-                    await updateSessionInDatabase({
-                        instanceId: currentSessionInstanceId,
-                        participantsCount: participantCount,
-                        sessionResults: finalLeaderboard, // Always save, even if empty array
-                        endedAt: Math.floor(Date.now() / 1000)
-                    });
-                    console.log('Session updated with participant count:', participantCount, 'and results:', finalLeaderboard.length);
-                } catch (error) {
-                    console.error('Failed to update session with results:', error);
-                }
-                
-                socket.emit('teacher:end_session', {
-                    instance_id: currentSessionInstanceId
+                await fetch('ajax/session_end.php', {
+                    method: 'POST',
+                    body: formData
                 });
-                
-                // RESET for next session
-                currentLeaderboard = [];
-                if (window.gamifiedQuizUserDetailsCache) {
-                    window.gamifiedQuizUserDetailsCache = {}; // Clear user cache
-                }
-                currentQuestionIndex = 0;
-                
-                // Re-enable start button for new session
-                if (startBtn) startBtn.disabled = false;
-                if (endBtn) endBtn.disabled = true;
-                if (nextBtn) nextBtn.disabled = true;
+                console.log('Session ended in DB with leaderboard');
+            } catch (error) {
+                console.error('Failed to end session in DB:', error);
+            }
+            
+            // Also update session with final results (always save, even if empty)
+            try {
+                await updateSessionInDatabase({
+                    instanceId: currentSessionInstanceId,
+                    participantsCount: participantCount,
+                    sessionResults: finalLeaderboard, // Always save, even if empty array
+                    endedAt: Math.floor(Date.now() / 1000)
+                });
+                console.log('Session updated with participant count:', participantCount, 'and results:', finalLeaderboard.length);
+            } catch (error) {
+                console.error('Failed to update session with results:', error);
+            }
+            
+            socket.emit('teacher:end_session', {
+                instance_id: currentSessionInstanceId
             });
+            
+            // Show leaderboard dialog with final results
+            if (finalLeaderboard && finalLeaderboard.length > 0) {
+                console.log('Showing final leaderboard dialog with', finalLeaderboard.length, 'participants');
+                await window.showSessionResults(currentSessionInstanceId, finalLeaderboard);
+            } else {
+                // Even if no leaderboard, show dialog with message
+                console.log('No leaderboard data, showing empty dialog');
+                await window.showSessionResults(currentSessionInstanceId, []);
+            }
+            
+            // RESET for next session
+            currentLeaderboard = [];
+            if (window.gamifiedQuizUserDetailsCache) {
+                window.gamifiedQuizUserDetailsCache = {}; // Clear user cache
+            }
+            currentQuestionIndex = 0;
+            
+            // Re-enable start button for new session
+            if (startBtn) startBtn.disabled = false;
+            if (nextBtn) {
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'Next Question';
+            }
         }
         
         // Save session to database
@@ -1604,17 +1628,15 @@
             }
         }
         
-        // Next Question button handler
+        // Next Question button handler - also handles ending quiz when it says "End Quiz"
         if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
+            nextBtn.addEventListener('click', async () => {
                 if (currentQuestionIndex >= questions.length) {
-                    // End quiz
-                    if (endBtn) {
-                        endBtn.click();
-                    }
+                    // End quiz - call end session handler
+                    await endSessionHandler();
                 } else {
                     // Push next question (teacher can proceed anytime)
-                pushNextQuestion();
+                    pushNextQuestion();
                 }
             });
         }
@@ -1750,7 +1772,6 @@
                 statusEl.textContent = 'Session ended - Results saved';
                 statusEl.style.background = '#d4edda';
             }
-            if (endBtn) endBtn.disabled = true;
             if (nextBtn) nextBtn.disabled = true;
             if (startBtn) startBtn.disabled = false; // Re-enable for new session
             const currentQEl = document.getElementById('current-question-display');
@@ -2236,10 +2257,37 @@
         });
         
         // Join session when socket connects (if session exists)
-        // Also try to join with instanceId if available from active session
-        if (config.sessionId) {
-            joinSession(config.sessionId);
-        }
+        // First, try to get active session instanceId from database
+        (async function joinActiveSession() {
+            try {
+                // Check if there's an active session
+                const response = await fetch(`ajax/get_sessions.php?quizid=${config.quizId}`);
+                const result = await response.json();
+                
+                if (result.success && result.sessions && result.sessions.length > 0) {
+                    // Find the most recent active session (started but not ended)
+                    const activeSession = result.sessions.find(s => s.started && !s.timeended);
+                    
+                    if (activeSession && activeSession.session_id) {
+                        console.log('Found active session, joining with instanceId:', activeSession.session_id);
+                        await joinSession(activeSession.session_id);
+                        return;
+                    }
+                }
+                
+                // Fallback: use config.sessionId if no active session found
+                if (config.sessionId) {
+                    console.log('No active session found, using config.sessionId:', config.sessionId);
+                    await joinSession(config.sessionId);
+                }
+            } catch (error) {
+                console.error('Error checking active session:', error);
+                // Fallback: use config.sessionId
+                if (config.sessionId) {
+                    await joinSession(config.sessionId);
+                }
+            }
+        })();
         
         // Listen for session created
         socket.on('session:created', async (data) => {

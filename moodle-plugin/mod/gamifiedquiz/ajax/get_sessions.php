@@ -68,13 +68,35 @@ try {
         }
         
         // Always calculate participant count from participants table (tracks all students who joined)
-        $participantCount = $DB->count_records('gamifiedquiz_participants', 
-            array('session_id' => $session->session_id)
-        );
+        // Check if table exists first (in case upgrade hasn't run yet)
+        $tableExists = $DB->get_manager()->table_exists('gamifiedquiz_participants');
         
-        // Fallback to session participants_count if count is 0
+        $participantCount = 0;
+        if ($tableExists) {
+            $participantCount = $DB->count_records('gamifiedquiz_participants', 
+                array('session_id' => $session->session_id)
+            );
+        }
+        
+        // Fallback: if table doesn't exist or count is 0, count from responses
         if ($participantCount == 0) {
-            $participantCount = $session->participants_count;
+            $allResponses = $DB->get_records('gamifiedquiz_responses', 
+                array('session_id' => $session->session_id)
+            );
+            if ($allResponses && count($allResponses) > 0) {
+                $uniqueUserIds = array();
+                foreach ($allResponses as $response) {
+                    if (!in_array($response->userid, $uniqueUserIds)) {
+                        $uniqueUserIds[] = $response->userid;
+                    }
+                }
+                $participantCount = count($uniqueUserIds);
+            }
+            
+            // Final fallback to session participants_count
+            if ($participantCount == 0) {
+                $participantCount = $session->participants_count;
+            }
         }
         
         // Get all responses for this session (for leaderboard building)

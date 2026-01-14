@@ -119,7 +119,6 @@ if ($is_teacher) {
     echo '<button id="generate-questions-btn" class="btn btn-primary gq-btn gq-btn-primary" style="margin-left: 10px;">' . get_string('generate_questions', 'mod_gamifiedquiz') . '</button>';
     echo '<button id="edit-questions-btn" class="btn btn-info gq-btn gq-btn-info" style="margin-left: 10px;">Edit Questions</button>';
     echo '<button id="start-session-btn" class="btn btn-success gq-btn gq-btn-success" style="margin-left: 10px;" disabled>' . get_string('start_session', 'mod_gamifiedquiz') . '</button>';
-    echo '<button id="end-session-btn" class="btn btn-danger gq-btn gq-btn-danger" style="margin-left: 10px;" disabled>End Session</button>';
     echo '<button id="next-question-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;" disabled>Next Question</button>';
     echo '</div>';
     echo '<div id="session-status" class="session-status" style="display:none;"></div>';

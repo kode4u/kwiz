@@ -27,26 +27,41 @@ try {
         }
     }
     
-    // Check if participant already exists
-    $existing = $DB->get_record('gamifiedquiz_participants', [
-        'session_id' => $sessionid,
-        'userid' => $userid
-    ]);
+    // Check if participants table exists (in case upgrade hasn't run yet)
+    $tableExists = $DB->get_manager()->table_exists('gamifiedquiz_participants');
+    $participantCount = 0;
     
-    if (!$existing) {
-        // Insert new participant record
-        $participant = new stdClass();
-        $participant->session_id = $sessionid;
-        $participant->gamifiedquizid = $session->gamifiedquizid;
-        $participant->userid = $userid;
-        $participant->username = $username;
-        $participant->timejoined = time();
+    if ($tableExists) {
+        // Check if participant already exists
+        $existing = $DB->get_record('gamifiedquiz_participants', [
+            'session_id' => $sessionid,
+            'userid' => $userid
+        ]);
         
-        $DB->insert_record('gamifiedquiz_participants', $participant);
+        if (!$existing) {
+            // Insert new participant record
+            $participant = new stdClass();
+            $participant->session_id = $sessionid;
+            $participant->gamifiedquizid = $session->gamifiedquizid;
+            $participant->userid = $userid;
+            $participant->username = $username;
+            $participant->timejoined = time();
+            
+            $DB->insert_record('gamifiedquiz_participants', $participant);
+        }
+        
+        // Count total participants for this session
+        $participantCount = $DB->count_records('gamifiedquiz_participants', ['session_id' => $sessionid]);
+    } else {
+        // Table doesn't exist yet - fallback to counting from responses
+        $responses = $DB->get_records('gamifiedquiz_responses', ['session_id' => $sessionid], '', 'DISTINCT userid');
+        if ($responses) {
+            $participantCount = count($responses);
+        } else {
+            // Use existing participant_count from session
+            $participantCount = $session->participant_count;
+        }
     }
-    
-    // Count total participants for this session
-    $participantCount = $DB->count_records('gamifiedquiz_participants', ['session_id' => $sessionid]);
     
     // Update session participant count
     $session->participant_count = $participantCount;
