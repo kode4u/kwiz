@@ -103,7 +103,7 @@ Environment variables:
 - `OPENAI_API_KEY`: OpenAI API key (if using OpenAI)
 - `MAX_QUESTIONS`: Maximum questions per request (default: 10)
 - `DEFAULT_LANGUAGE`: Default language code (default: `en`)
-- `FLASK_PORT`: Port to run on (default: 5000)
+- `FLASK_PORT`: Port to run on (default: 5001)
 
 ## Supported Backends
 
@@ -130,10 +130,10 @@ Integration with:
 
 ```bash
 # Test health endpoint
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Test question generation
-curl -X POST http://localhost:5000/generate \
+curl -X POST http://localhost:5001/generate \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "Python programming",
@@ -151,7 +151,7 @@ docker build -t jica-llmapi .
 
 Run container:
 ```bash
-docker run -p 5000:5000 \
+docker run -p 5001:5001 \
   -e OPENAI_API_KEY=your-key \
   -e LLM_BACKEND=openai \
   jica-llmapi

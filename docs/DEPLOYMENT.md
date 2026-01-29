@@ -66,7 +66,7 @@
    CORS_ORIGIN=https://your-domain.com
 
    # LLM API
-   LLM_API_PORT=5000
+   LLM_API_PORT=5001
    LLM_BACKEND=openai
    OPENAI_API_KEY=your-production-openai-key
    MAX_QUESTIONS=10

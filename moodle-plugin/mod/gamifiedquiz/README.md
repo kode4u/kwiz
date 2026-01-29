@@ -48,7 +48,7 @@ The plugin is automatically mounted in the Docker Compose setup. After starting 
    - Production: `wss://your-domain.com`
 
 2. **LLM API URL**: URL of the LLM API service
-   - Development: `http://localhost:5000`
+   - Development: `http://localhost:5001`
    - Production: `https://your-domain.com/api`
 
 3. **JWT Secret**: Secret key for JWT token generation

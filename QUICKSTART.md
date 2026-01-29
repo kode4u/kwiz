@@ -47,7 +47,7 @@ docker-compose logs -f
 This will start:
 - MySQL database (port 3306)
 - Redis (port 6379)
-- LLM API service (port 5000)
+- LLM API service (port 5001)
 - WebSocket server (port 3001)
 - Moodle (port 8080)
 
@@ -75,7 +75,7 @@ This will start:
 
 2. **Configure:**
    - WebSocket Server URL: `ws://localhost:3001`
-   - LLM API URL: `http://localhost:5000`
+   - LLM API URL: `http://localhost:5001`
    - JWT Secret: (must match `JWT_SECRET` in `.env`)
 
 ## Step 6: Create Your First Quiz
@@ -117,7 +117,7 @@ Check all services are running:
 docker-compose ps
 
 # Test LLM API
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Test WebSocket server
 curl http://localhost:3001/health
@@ -152,7 +152,7 @@ docker exec -it jica-moodle php /var/www/html/moodle/admin/cli/purge_caches.php
 
 - Verify OpenAI API key is set in `.env`
 - Check LLM API logs: `docker-compose logs llmapi`
-- Test API directly: `curl -X POST http://localhost:5000/generate ...`
+- Test API directly: `curl -X POST http://localhost:5001/generate ...`
 
 ## Next Steps
 

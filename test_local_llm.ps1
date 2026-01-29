@@ -21,7 +21,7 @@ Write-Host ""
 # 2. Check LLM API health
 Write-Host "2. Checking LLM API service..." -ForegroundColor Yellow
 try {
-    $apiHealth = Invoke-RestMethod -Uri "http://localhost:5000/health" -ErrorAction Stop
+    $apiHealth = Invoke-RestMethod -Uri "http://localhost:5001/health" -ErrorAction Stop
     if ($apiHealth.status -eq "healthy") {
         Write-Host "   [OK] LLM API is healthy" -ForegroundColor Green
         Write-Host "   Current backend: $($apiHealth.backend)" -ForegroundColor Gray
@@ -47,7 +47,7 @@ $testRequest = @{
 } | ConvertTo-Json
 
 try {
-    $response = Invoke-RestMethod -Uri "http://localhost:5000/generate" `
+    $response = Invoke-RestMethod -Uri "http://localhost:5001/generate" `
         -Method POST `
         -ContentType "application/json" `
         -Body $testRequest `

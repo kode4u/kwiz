@@ -139,7 +139,7 @@ WS_SECRET=your-random-secret-here
 
 2. **Configure settings**:
    - **WebSocket Server URL**: `ws://localhost:3001`
-   - **LLM API URL**: `http://localhost:5000`
+   - **LLM API URL**: `http://localhost:5001`
    - **JWT Secret**: (must match `JWT_SECRET` in `docker/.env`)
 
 3. **Save settings**
@@ -148,7 +148,7 @@ WS_SECRET=your-random-secret-here
 
 ```powershell
 # Test LLM API
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Test WebSocket server
 curl http://localhost:3001/health

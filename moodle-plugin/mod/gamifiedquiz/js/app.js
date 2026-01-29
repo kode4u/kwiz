@@ -513,6 +513,9 @@
             existingItems.forEach(item => {
                 const qText = item.querySelector('.question-text-input')?.value.trim();
                 if (qText) {
+                    const urlInput = item.querySelector('.question-image-url-input');
+                    const dataInput = item.querySelector('.question-image-data');
+                    const questionImage = (urlInput && urlInput.value.trim()) || (dataInput && dataInput.value) || '';
                     const choices = [];
                     const choicesContainer = item.querySelector('.choices-container');
                     if (choicesContainer) {
@@ -534,12 +537,14 @@
                         });
                         
                         if (choices.length > 0) {
-                            manualQuestions.push({
+                            const qObj = {
                                 question: qText,
                                 question_text: qText,
                                 choices: choices,
                                 correct_index: correctIndex
-                            });
+                            };
+                            if (questionImage) qObj.question_image = questionImage;
+                            manualQuestions.push(qObj);
                         }
                     }
                 }
@@ -568,11 +573,25 @@
             const qText = question ? (question.question || question.question_text || '') : '';
             const choices = question ? (question.choices || []) : [];
             const correctIndex = question ? (question.correct_index || 0) : 0;
+            const questionImage = question && question.question_image ? question.question_image : '';
+            const imageIsUrl = questionImage && !questionImage.startsWith('data:');
             
             questionDiv.innerHTML = `
                 <h4>Question ${index + 1}</h4>
                 <label>Question Text:</label>
-                <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;">${qText}</textarea>
+                <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;">${escapeHtml(qText)}</textarea>
+                <label>Question Image (optional):</label>
+                <div class="question-image-editor" style="margin-bottom: 10px;">
+                    <input type="text" class="question-image-url-input" placeholder="Image URL" value="${imageIsUrl ? escapeHtml(questionImage) : ''}" style="width: 100%; padding: 8px; margin-bottom: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="color: #666;">or</span>
+                        <input type="file" class="question-image-file-input" accept="image/*" style="font-size: 13px;">
+                    </div>
+                    <input type="hidden" class="question-image-data" value="${questionImage && questionImage.startsWith('data:') ? questionImage : ''}">
+                    <div class="question-image-preview" style="margin-top: 10px; min-height: 40px;">
+                        ${questionImage ? `<img src="${questionImage.startsWith('data:') ? questionImage : escapeAttr(questionImage)}" alt="Question" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">` : ''}
+                    </div>
+                </div>
                 <label>Choices:</label>
                 <div class="choices-container" data-question-index="${index}"></div>
                 <button type="button" class="add-choice-btn gq-btn gq-btn-sm gq-btn-primary" data-index="${index}">Add Choice</button>
@@ -580,6 +599,52 @@
             `;
             
             form.appendChild(questionDiv);
+            
+            const urlInput = questionDiv.querySelector('.question-image-url-input');
+            const fileInput = questionDiv.querySelector('.question-image-file-input');
+            const dataInput = questionDiv.querySelector('.question-image-data');
+            const previewDiv = questionDiv.querySelector('.question-image-preview');
+            
+            function updatePreview(src) {
+                if (!src) {
+                    previewDiv.innerHTML = '';
+                    return;
+                }
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = 'Question';
+                img.style.cssText = 'max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;';
+                previewDiv.innerHTML = '';
+                previewDiv.appendChild(img);
+            }
+            
+            urlInput.addEventListener('input', () => {
+                dataInput.value = '';
+                const url = urlInput.value.trim();
+                if (url) updatePreview(url); else previewDiv.innerHTML = '';
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file || !file.type.startsWith('image/')) {
+                    fileInput.value = '';
+                    return;
+                }
+                // Limit to ~500KB to keep saved JSON and form manageable
+                if (file.size > 500 * 1024) {
+                    alert('Image too large. Please use an image under 500 KB or use an image URL instead.');
+                    fileInput.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    dataInput.value = reader.result;
+                    urlInput.value = '';
+                    updatePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+                fileInput.value = '';
+            });
             
             const choicesContainer = questionDiv.querySelector('.choices-container');
             
@@ -601,6 +666,22 @@
             removeBtn.onclick = () => {
                 questionDiv.remove();
             };
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        function escapeAttr(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
         }
         
         function addChoiceToEditor(container, qIndex, cIndex, text, isCorrect) {
@@ -633,6 +714,10 @@
                 const qText = item.querySelector('.question-text-input').value.trim();
                 if (!qText) return;
                 
+                const urlInput = item.querySelector('.question-image-url-input');
+                const dataInput = item.querySelector('.question-image-data');
+                let questionImage = (urlInput && urlInput.value.trim()) || (dataInput && dataInput.value) || '';
+                
                 const choices = [];
                 // Find choices container
                 const choicesContainer = item.querySelector('.choices-container');
@@ -660,12 +745,14 @@
                 
                 if (choices.length >= 2) {
                     choices[correctIndex].is_correct = true;
-                    savedQuestions.push({
+                    const saved = {
                         question: qText,
                         choices: choices,
                         correct_index: correctIndex,
                         difficulty: config.difficulty || 'medium'
-                    });
+                    };
+                    if (questionImage) saved.question_image = questionImage;
+                    savedQuestions.push(saved);
                 }
             });
             
@@ -734,8 +821,10 @@
                 });
                 choicesHtml += '</ul>';
                 
+                const imgHtml = (q.question_image || q.image) ? `<div style="margin-bottom: 12px;"><img src="${(q.question_image || q.image).replace(/"/g, '&quot;')}" alt="Question" style="max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #ddd;"></div>` : '';
                 qDiv.innerHTML = `
                     <h4>Question ${index + 1}</h4>
+                    ${imgHtml}
                     <p>${qText}</p>
                     ${choicesHtml}
                 `;
@@ -1515,6 +1604,7 @@
                 }
             }
             
+            const questionImage = question.question_image || question.image || '';
             const questionData = {
                 question: {
                     id: 'q' + (currentQuestionIndex + 1),
@@ -1526,6 +1616,7 @@
                 questionNumber: currentQuestionIndex + 1,
                 totalQuestions: questions.length
             };
+            if (questionImage) questionData.question.image = questionImage;
             
             console.log('Pushing question:', questionData);
             socket.emit('teacher:push_question', questionData);
@@ -1533,6 +1624,7 @@
             // Show active question display for teacher (Kahoot-style)
             const activeQEl = document.getElementById('active-question-display');
             const activeQNum = document.getElementById('active-question-number');
+            const activeQImage = document.getElementById('active-question-image');
             const activeQText = document.getElementById('active-question-text');
             const activeQTimer = document.getElementById('active-question-timer');
             const activeQChoices = document.getElementById('active-question-choices');
@@ -1548,6 +1640,15 @@
             if (activeQEl) {
                 activeQEl.style.display = 'block';
                 if (activeQNum) activeQNum.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+                if (activeQImage) {
+                    if (questionImage) {
+                        activeQImage.innerHTML = '<img src="' + questionImage.replace(/"/g, '&quot;') + '" alt="Question" style="max-width: 100%; max-height: 280px; border-radius: 12px; border: 2px solid #ddd;">';
+                        activeQImage.style.display = 'block';
+                    } else {
+                        activeQImage.innerHTML = '';
+                        activeQImage.style.display = 'none';
+                    }
+                }
                 if (activeQText) activeQText.textContent = questionData.question.text;
                 if (activeQTimer) {
                     activeQTimer.textContent = `${timeLimit}s`;
@@ -1690,9 +1791,11 @@
                         choices[correctIndex].is_correct = true;
                     }
                     
+                    const imgHtml = (q.question_image || q.image) ? `<div style="margin-bottom: 12px;"><img src="${String(q.question_image || q.image).replace(/"/g, '&quot;')}" alt="Question" style="max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #ddd;"></div>` : '';
                     return `
                 <div class="question-preview">
                     <h4>Question ${i + 1}</h4>
+                            ${imgHtml}
                             <p>${questionText}</p>
                             <ul>
                                 ${choices.map((c, idx) => `
@@ -2340,6 +2443,22 @@
         function displayQuestion(question, timer) {
             // Handle different question formats
             const questionText = question.text || question.question || question.question_text || '';
+            const questionImage = question.image || question.question_image || '';
+            const questionImageContainer = document.getElementById('question-image-container');
+            if (questionImageContainer) {
+                if (questionImage) {
+                    const img = document.createElement('img');
+                    img.src = questionImage;
+                    img.alt = 'Question';
+                    img.style.cssText = 'max-width: 100%; max-height: 280px; border-radius: 12px; border: 2px solid #ddd;';
+                    questionImageContainer.innerHTML = '';
+                    questionImageContainer.appendChild(img);
+                    questionImageContainer.style.display = 'block';
+                } else {
+                    questionImageContainer.innerHTML = '';
+                    questionImageContainer.style.display = 'none';
+                }
+            }
             const questionTextEl = document.getElementById('question-text');
             if (questionTextEl) {
                 questionTextEl.textContent = questionText;

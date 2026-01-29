@@ -47,7 +47,7 @@ services:
       dockerfile: Dockerfile
     container_name: jica-llmapi
     environment:
-      FLASK_PORT: ${LLM_API_PORT:-5000}
+      FLASK_PORT: 5001
       LLM_BACKEND: ${LLM_BACKEND:-openai}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       LOCAL_LLM_URL: ${LOCAL_LLM_URL:-http://host.docker.internal:11434}
@@ -55,14 +55,14 @@ services:
       MAX_QUESTIONS: 10
       DEFAULT_LANGUAGE: en
     ports:
-      - "${LLM_API_PORT:-5000}:5000"
+      - "${LLM_API_PORT:-5001}:5001"
     networks:
       - jica-network
     depends_on:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 30s
       timeout: 10s
       retries: 3

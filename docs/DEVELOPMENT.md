@@ -51,7 +51,7 @@
 
 3. **Testing:**
    ```bash
-   curl -X POST http://localhost:5000/generate \
+   curl -X POST http://localhost:5001/generate \
      -H "Content-Type: application/json" \
      -d '{"topic": "Python", "level": "easy", "n_questions": 1}'
    ```

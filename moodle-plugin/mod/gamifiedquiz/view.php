@@ -128,6 +128,7 @@ if ($is_teacher) {
     echo '<div id="active-question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
     echo '<div id="active-question-timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
     echo '</div>';
+    echo '<div id="active-question-image" style="text-align: center; margin-bottom: 15px;"></div>';
     echo '<div id="active-question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
     echo '<div id="active-question-choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
     echo '</div>';
@@ -151,6 +152,7 @@ if ($is_teacher) {
     echo '<div id="question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
     echo '<div id="timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
     echo '</div>';
+    echo '<div id="question-image-container" style="text-align: center; margin-bottom: 15px;"></div>';
     echo '<div id="question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
     echo '<div id="choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
     echo '</div>';
@@ -226,9 +228,12 @@ if ($is_teacher) {
     
     // Question Editor Modal
     echo '<div id="question-editor-modal" class="question-editor-modal" style="display:none;">';
-    echo '<div class="question-editor-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">';
+    echo '<div class="question-editor-content question-editor-content-with-footer">';
+    echo '<div class="question-editor-header">';
     echo '<span class="question-editor-close" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>';
     echo '<h2>Edit Questions</h2>';
+    echo '</div>';
+    echo '<div class="question-editor-scroll">';
     echo '<div id="question-bank-section" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">';
     echo '<h3>Question Bank</h3>';
     echo '<div style="margin-bottom: 15px;">';
@@ -238,7 +243,8 @@ if ($is_teacher) {
     echo '<div id="question-bank-list" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white; border-radius: 4px;"></div>';
     echo '</div>';
     echo '<form id="question-editor-form"></form>';
-    echo '<div style="margin-top: 20px; text-align: right; border-top: 2px solid #ddd; padding-top: 15px;">';
+    echo '</div>';
+    echo '<div class="question-editor-footer">';
     echo '<button id="add-new-question-btn" class="btn btn-primary gq-btn gq-btn-primary">Add New Question</button>';
     echo '<button id="save-questions-btn" class="btn btn-success gq-btn gq-btn-success" style="margin-left: 10px;">Save Questions</button>';
     echo '<button id="cancel-edit-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;">Cancel</button>';

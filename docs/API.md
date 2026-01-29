@@ -2,7 +2,7 @@
 
 ## LLM API Service
 
-Base URL: `http://localhost:5000` (development) or `https://your-domain.com/api` (production)
+Base URL: `http://localhost:5001` (development) or `https://your-domain.com/api` (production)
 
 ### POST /generate
 

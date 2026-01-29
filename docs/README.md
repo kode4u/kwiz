@@ -54,21 +54,21 @@ docker-compose logs -f [service-name]
 
 ### Access Services
 - Moodle: http://localhost:8080
-- LLM API: http://localhost:5000
+- LLM API: http://localhost:5001
 - WebSocket: ws://localhost:3001
 
 ## Common Tasks
 
 ### Generate Questions
 ```bash
-curl -X POST http://localhost:5000/generate \
+curl -X POST http://localhost:5001/generate \
   -H "Content-Type: application/json" \
   -d '{"topic": "Python", "level": "medium", "n_questions": 3}'
 ```
 
 ### Check Health
 ```bash
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 curl http://localhost:3001/health
 ```
 

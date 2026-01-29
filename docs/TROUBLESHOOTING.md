@@ -262,7 +262,7 @@ If using WSL2 backend:
 
 1. **Check API health**:
    ```powershell
-   curl http://localhost:5000/health
+   curl http://localhost:5001/health
    ```
 
 2. **Check API logs**:
@@ -276,7 +276,7 @@ If using WSL2 backend:
 
 4. **Test question generation**:
    ```powershell
-   curl -X POST http://localhost:5000/generate `
+   curl -X POST http://localhost:5001/generate `
      -H "Content-Type: application/json" `
      -d '{\"topic\": \"Python\", \"level\": \"easy\", \"n_questions\": 1}'
    ```

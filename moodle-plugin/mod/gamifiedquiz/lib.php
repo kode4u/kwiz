@@ -276,7 +276,7 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
         // Default: use Docker service name when running in Docker, localhost otherwise
-        $api_url = 'http://llmapi:5000';
+        $api_url = 'http://llmapi:5001';
     }
     
     // If URL contains localhost and we're in Docker, try to use service name

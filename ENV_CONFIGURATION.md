@@ -88,7 +88,7 @@ Key variables in `docker/.env`:
 - `MYSQL_USER` - MySQL database user
 - `MYSQL_DATABASE` - MySQL database name
 - `WS_PORT` - WebSocket server port (default: 3001)
-- `LLM_API_PORT` - LLM API port (default: 5000)
+- `LLM_API_PORT` - LLM API port (default: 5001)
 - `MOODLE_URL` - Moodle URL (default: http://localhost:8080)
 - `CORS_ORIGIN` - CORS origin for WebSocket (default: http://localhost:8080)
 

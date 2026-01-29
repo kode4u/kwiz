@@ -9,7 +9,7 @@
 ### Note: The API automatically detects if you're running locally vs in Docker
 ### and will try localhost as fallback if the configured URL fails
 
-@baseUrl = http://localhost:5000
+@baseUrl = http://localhost:5001
 @contentType = application/json
 
 ### Variables

@@ -21,7 +21,7 @@ $string['gamifiedquiz:attempt'] = 'Attempt Gamified Quiz';
 $string['websocket_url'] = 'WebSocket Server URL';
 $string['websocket_url_desc'] = 'URL of the WebSocket server (e.g., ws://localhost:3001 or wss://example.com)';
 $string['llmapi_url'] = 'LLM API URL';
-$string['llmapi_url_desc'] = 'URL of the LLM API service (e.g., http://localhost:5000)';
+$string['llmapi_url_desc'] = 'URL of the LLM API service (e.g., http://localhost:5001)';
 $string['jwt_secret'] = 'JWT Secret';
 $string['jwt_secret_desc'] = 'Secret key for JWT token generation (must match WebSocket server)';
 

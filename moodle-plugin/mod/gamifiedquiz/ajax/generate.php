@@ -59,7 +59,7 @@ if ($cmid) {
 try {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
-        $api_url = 'http://localhost:5000';
+        $api_url = 'http://localhost:5001';
     }
     
     // Get LLM backend from quiz instance, default to 'local' (Ollama)

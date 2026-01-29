@@ -330,7 +330,7 @@ io.on('connection', async (socket) => {
     
     // Start timer countdown
     let remaining = timer;
-    session.timerInterval = setInterval(() => {
+    session.timerInterval = setInterval(async () => {
       remaining--;
       io.to(room).emit('timer:update', { remaining });
       

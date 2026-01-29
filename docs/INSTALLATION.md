@@ -56,7 +56,7 @@ WS_PORT=3001
 WS_SECRET=your-secret-key-here
 
 # LLM API
-LLM_API_PORT=5000
+LLM_API_PORT=5001
 LLM_API_KEY=your-api-key
 LLM_BACKEND=openai  # or 'local', 'ollama', etc.
 OPENAI_API_KEY=your-openai-key  # if using OpenAI
@@ -113,7 +113,7 @@ Test endpoints:
 
 ```bash
 # LLM API health
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # WebSocket server (check logs)
 docker-compose logs websocket-server
@@ -180,7 +180,7 @@ php admin/cli/upgrade.php
 2. Go to: Site administration → Plugins → Activity modules → Gamified Quiz
 3. Configure:
    - WebSocket Server URL: `ws://localhost:3001` (dev) or `wss://your-domain.com` (prod)
-   - LLM API URL: `http://localhost:5000` (dev) or `https://your-domain.com/api` (prod)
+   - LLM API URL: `http://localhost:5001` (dev) or `https://your-domain.com/api` (prod)
    - JWT Secret: (must match WebSocket server)
 
 ### WebSocket Server Configuration
@@ -199,7 +199,7 @@ CORS_ORIGIN=http://localhost:8080
 Edit `llmapi/.env`:
 
 ```env
-FLASK_PORT=5000
+FLASK_PORT=5001
 LLM_BACKEND=openai
 OPENAI_API_KEY=your-key
 MAX_QUESTIONS=10
@@ -215,7 +215,7 @@ DEFAULT_LANGUAGE=en
 docker-compose logs
 
 # Check ports
-netstat -an | grep -E '3001|5000|8080|6379'
+netstat -an | grep -E '3001|5001|8080|6379'
 
 # Restart services
 docker-compose restart
@@ -246,7 +246,7 @@ docker exec -it moodle php /var/www/html/moodle/admin/cli/purge_caches.php
 1. Check API key is set correctly
 2. Verify backend is accessible
 3. Check logs: `docker-compose logs llmapi`
-4. Test endpoint: `curl http://localhost:5000/health`
+4. Test endpoint: `curl http://localhost:5001/health`
 
 ## Production Deployment
 

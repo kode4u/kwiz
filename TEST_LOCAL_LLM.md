@@ -17,7 +17,7 @@
 
 2. **Check LLM API health:**
    ```powershell
-   curl http://localhost:5000/health
+   curl http://localhost:5001/health
    ```
 
 3. **Test question generation with local LLM:**
@@ -29,7 +29,7 @@
        backend = "local"
    } | ConvertTo-Json
    
-   Invoke-RestMethod -Uri "http://localhost:5000/generate" `
+   Invoke-RestMethod -Uri "http://localhost:5001/generate" `
        -Method POST `
        -ContentType "application/json" `
        -Body $body `
@@ -39,7 +39,7 @@
 ### Method 3: Using curl (if available)
 
 ```bash
-curl -X POST http://localhost:5000/generate \
+curl -X POST http://localhost:5001/generate \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "Python programming",
