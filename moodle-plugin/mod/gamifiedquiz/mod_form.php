@@ -119,8 +119,35 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->setDefault('leaderboard_top_n', 3);
         $mform->addHelpButton('leaderboard_top_n', 'leaderboard_top_n', 'mod_gamifiedquiz');
 
+        // Background image for question screen
+        $mform->addElement('header', 'backgroundheader', get_string('background_image', 'mod_gamifiedquiz'));
+        $mform->setExpanded('backgroundheader', false);
+        $predefined = array(
+            '' => get_string('background_none', 'mod_gamifiedquiz'),
+            'predefined:gradient_blue' => get_string('background_gradient_blue', 'mod_gamifiedquiz'),
+            'predefined:gradient_purple' => get_string('background_gradient_purple', 'mod_gamifiedquiz'),
+            'predefined:gradient_green' => get_string('background_gradient_green', 'mod_gamifiedquiz'),
+            'predefined:gradient_orange' => get_string('background_gradient_orange', 'mod_gamifiedquiz'),
+            'predefined:gradient_teal' => get_string('background_gradient_teal', 'mod_gamifiedquiz')
+        );
+        $mform->addElement('select', 'background_image', get_string('background_predefined', 'mod_gamifiedquiz'), $predefined);
+        $mform->setType('background_image', PARAM_TEXT);
+        $mform->addHelpButton('background_image', 'background_image', 'mod_gamifiedquiz');
+        $mform->addElement('text', 'background_image_url', get_string('background_custom_url', 'mod_gamifiedquiz'), array('size' => '60'));
+        $mform->setType('background_image_url', PARAM_URL);
+        $mform->addHelpButton('background_image_url', 'background_custom_url', 'mod_gamifiedquiz');
+
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+    public function set_data($defaultvalues) {
+        // When editing: if background_image is a URL, show it in the URL field
+        if (!empty($defaultvalues->background_image) && strpos($defaultvalues->background_image, 'http') === 0) {
+            $defaultvalues->background_image_url = $defaultvalues->background_image;
+            $defaultvalues->background_image = '';
+        }
+        parent::set_data($defaultvalues);
     }
 }
 

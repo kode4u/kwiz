@@ -330,6 +330,16 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010113, 'gamifiedquiz');
     }
     
+    // Add background_image for quiz question screen background
+    if ($oldversion < 2025010114) {
+        $table = new xmldb_table('gamifiedquiz');
+        $field = new xmldb_field('background_image', XMLDB_TYPE_CHAR, '500', null, null, null, null, 'question_category');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2025010114, 'gamifiedquiz');
+    }
+
     // Return true to indicate upgrade was successful
     return true;
 }

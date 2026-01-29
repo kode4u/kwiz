@@ -797,3 +797,37 @@
 
 /* Ensure all dynamically created containers use standard styles */
 /* Removed automatic box-shadow to prevent unwanted shadows */
+
+/* Full screen question screen */
+.gq-question-screen.gq-fullscreen,
+.gq-question-screen:-webkit-full-screen,
+.gq-question-screen:-moz-full-screen,
+.gq-question-screen:fullscreen {
+    min-height: 100vh;
+    padding: 30px;
+}
+.gq-fullscreen-btn:hover {
+    background: rgba(255, 255, 255, 1) !important;
+}
+
+/* Leaderboard animation (from previous state) */
+@keyframes gqLeaderboardIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes gqLeaderboardRow {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

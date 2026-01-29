@@ -100,6 +100,12 @@ function gamifiedquiz_supports($feature) {
 function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
     global $DB;
 
+    // Prefer custom URL over predefined background
+    if (!empty($gamifiedquiz->background_image_url)) {
+        $gamifiedquiz->background_image = trim($gamifiedquiz->background_image_url);
+    }
+    unset($gamifiedquiz->background_image_url);
+
     $gamifiedquiz->timecreated = time();
     $gamifiedquiz->timemodified = $gamifiedquiz->timecreated;
 
@@ -122,6 +128,12 @@ function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
  */
 function gamifiedquiz_update_instance($gamifiedquiz, $mform = null) {
     global $DB;
+
+    // Prefer custom URL over predefined background
+    if (!empty($gamifiedquiz->background_image_url)) {
+        $gamifiedquiz->background_image = trim($gamifiedquiz->background_image_url);
+    }
+    unset($gamifiedquiz->background_image_url);
 
     $gamifiedquiz->timemodified = time();
     $gamifiedquiz->id = $gamifiedquiz->instance;

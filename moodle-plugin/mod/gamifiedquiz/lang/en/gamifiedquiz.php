@@ -90,3 +90,16 @@ $string['questioncategory'] = 'Question Category';
 $string['questioncategory_help'] = 'Select a question category to use questions from the question bank. Questions generated will be added to this category.';
 $string['defaultcategory'] = 'Use default category (Gamified Quiz #X)';
 
+// Background image for question screen
+$string['background_image'] = 'Question screen background';
+$string['background_image_help'] = 'Choose a predefined background or enter a custom image URL. Used behind each question (e.g. Question 1 of 20).';
+$string['background_none'] = 'None';
+$string['background_predefined'] = 'Predefined background';
+$string['background_gradient_blue'] = 'Blue gradient';
+$string['background_gradient_purple'] = 'Purple gradient';
+$string['background_gradient_green'] = 'Green gradient';
+$string['background_gradient_orange'] = 'Orange gradient';
+$string['background_gradient_teal'] = 'Teal gradient';
+$string['background_custom_url'] = 'Custom image URL';
+$string['background_custom_url_help'] = 'Enter a full image URL to use as background. Overrides predefined selection if set.';
+

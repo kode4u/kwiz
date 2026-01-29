@@ -1639,6 +1639,7 @@
             
             if (activeQEl) {
                 activeQEl.style.display = 'block';
+                if (config.questionBackgroundStyle) { activeQEl.style.cssText = (activeQEl.style.cssText || '') + '; ' + config.questionBackgroundStyle + '; padding: 20px; border-radius: 12px;'; }
                 if (activeQNum) activeQNum.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
                 if (activeQImage) {
                     if (questionImage) {
@@ -1651,8 +1652,17 @@
                 }
                 if (activeQText) activeQText.textContent = questionData.question.text;
                 if (activeQTimer) {
-                    activeQTimer.textContent = `${timeLimit}s`;
-                    activeQTimer.style.color = '#007bff';
+                    activeQTimer.textContent = '—';
+                    activeQTimer.style.color = '#666';
+                }
+                // Show "Start timer" button - timer starts when teacher clicks it (or full screen)
+                const startTimerBtn = document.getElementById('start-question-timer-btn');
+                if (startTimerBtn) {
+                    startTimerBtn.style.display = 'inline-block';
+                    startTimerBtn.onclick = () => {
+                        if (socket && socket.connected) socket.emit('teacher:start_question_timer');
+                        startTimerBtn.style.display = 'none';
+                    };
                 }
                 if (activeQChoices) {
                     activeQChoices.innerHTML = questionData.question.choices.map((c, i) => {
@@ -1681,32 +1691,11 @@
                 }
             }
             
-            // Start timer countdown for teacher view
-            let remaining = timeLimit;
-            const teacherTimerInterval = setInterval(() => {
-                remaining--;
-                if (activeQTimer) {
-                    activeQTimer.textContent = `${remaining}s`;
-                    if (remaining <= 10) {
-                        activeQTimer.style.color = '#dc3545';
-                        activeQTimer.style.background = '#f8d7da';
-                    }
-                }
-                if (remaining <= 0) {
-                    clearInterval(teacherTimerInterval);
-                    if (activeQTimer) {
-                        activeQTimer.textContent = 'Time\'s Up!';
-                        activeQTimer.style.color = '#721c24';
-                        activeQTimer.style.background = '#f8d7da';
-                    }
-                }
-            }, 1000);
-            
-            // Store timer interval to clear if needed
+            // Timer countdown comes from server (teacher:start_question_timer) via timer:update
             if (window.teacherTimerInterval) {
                 clearInterval(window.teacherTimerInterval);
+                window.teacherTimerInterval = null;
             }
-            window.teacherTimerInterval = teacherTimerInterval;
             
             // Hide previous results and ranking
             const resultsEl = document.getElementById('question-results-display');
@@ -1742,6 +1731,44 @@
             });
         }
         
+        // Full screen for teacher question screen
+        const activeFullscreenBtn = document.getElementById('active-question-fullscreen-btn');
+        if (activeFullscreenBtn) {
+            activeFullscreenBtn.addEventListener('click', () => {
+                const el = document.getElementById('active-question-display');
+                if (!el) return;
+                if (!document.fullscreenElement) {
+                    el.requestFullscreen().catch(() => {});
+                } else {
+                    document.exitFullscreen().catch(() => {});
+                }
+            });
+        }
+        
+        socket.on('timer:started', () => {
+            const activeQTimer = document.getElementById('active-question-timer');
+            const timeLimit = config.timeLimitPerQuestion || 60;
+            if (activeQTimer) {
+                activeQTimer.textContent = `${timeLimit}s`;
+                activeQTimer.style.color = '#007bff';
+                activeQTimer.style.background = '#e7f3ff';
+            }
+        });
+        socket.on('timer:update', (data) => {
+            const activeQTimer = document.getElementById('active-question-timer');
+            if (!activeQTimer) return;
+            const remaining = data.remaining !== undefined ? data.remaining : 0;
+            activeQTimer.textContent = `${remaining}s`;
+            if (remaining <= 10) {
+                activeQTimer.style.color = '#dc3545';
+                activeQTimer.style.background = '#f8d7da';
+            }
+            if (remaining <= 0) {
+                activeQTimer.textContent = 'Time\'s Up!';
+                activeQTimer.style.color = '#721c24';
+                activeQTimer.style.background = '#f8d7da';
+            }
+        });
         // Listen for question timeout - just log it, button stays enabled
         socket.on('question:timeout', () => {
             console.log('Question timeout - teacher can proceed anytime');
@@ -2055,7 +2082,7 @@
             
             const questionNum = data.questionNumber || currentQuestionIndex;
             const responses = data.responses || [];
-            const correctCount = responses.filter(r => r.is_correct).length;
+            const correctCount = responses.filter(r => r.is_correct || r.isCorrect).length;
             const totalCount = responses.length;
             
             // Get current question to show answer distribution
@@ -2431,16 +2458,21 @@
             
             if (questionNumEl) questionNumEl.textContent = `Question ${questionNumber}`;
             if (waitingMsg) waitingMsg.style.display = 'none';
-            if (questionContainer) questionContainer.style.display = 'block';
+            if (questionContainer) {
+                questionContainer.style.display = 'block';
+                if (config.questionBackgroundStyle) { questionContainer.style.cssText = (questionContainer.style.cssText || '') + '; ' + config.questionBackgroundStyle + '; padding: 20px; border-radius: 12px;'; }
+            }
             if (resultContainer) resultContainer.style.display = 'none';
             if (comparisonContainer) comparisonContainer.style.display = 'none';
             if (leaderboardContainer) leaderboardContainer.style.display = 'none';
+            const answerResultsEl = document.getElementById('student-answer-results-container');
+            if (answerResultsEl) answerResultsEl.style.display = 'none';
             
-            displayQuestion(data.question, data.timer || 60);
+            displayQuestion(data.question, data.timer || 60, data.timerStarted !== false);
         });
 
         // Display question (Kahoot-style for students)
-        function displayQuestion(question, timer) {
+        function displayQuestion(question, timer, timerStarted) {
             // Handle different question formats
             const questionText = question.text || question.question || question.question_text || '';
             const questionImage = question.image || question.question_image || '';
@@ -2536,18 +2568,19 @@
                 });
             });
 
-            // Start timer with config time limit
+            // Timer: wait for timer:started from server (teacher clicks Start timer), then listen for timer:update
             const timeLimit = config.timeLimitPerQuestion || timer || 60;
-            currentTimerDuration = timeLimit; // Store for score calculation
-            let remaining = timeLimit;
+            currentTimerDuration = timeLimit;
             const timerEl = document.getElementById('timer');
             if (timerEl) {
-                timerEl.textContent = `${remaining}s`;
-                timerEl.style.color = '#007bff';
-                timerEl.style.background = '#e7f3ff';
+                timerEl.textContent = timerStarted ? `${timeLimit}s` : '—';
+                timerEl.style.color = timerStarted ? '#007bff' : '#666';
+                timerEl.style.background = timerStarted ? '#e7f3ff' : '#f0f0f0';
             }
             
             if (timerInterval) clearInterval(timerInterval);
+            if (!timerStarted) return; // Timer updates will come from server
+            let remaining = timeLimit;
             timerInterval = setInterval(() => {
                 remaining--;
                 if (timerEl) {
@@ -2632,8 +2665,9 @@
             previousScore = currentTotalScore;
         });
         
-        // Helper function to display leaderboard for students
-        async function displayStudentLeaderboard(container, leaderboard, isFinal = false) {
+        // Helper function to display leaderboard for students (animate = from previous state)
+        let previousStudentLeaderboardOrder = {};
+        async function displayStudentLeaderboard(container, leaderboard, isFinal = false, animate = false) {
             if (!container) return;
             
             // Fetch user details (use global fetchUserDetails if available)
@@ -2652,7 +2686,6 @@
                 if (window.gamifiedQuizGetUserDisplayName) {
                     return window.gamifiedQuizGetUserDisplayName(entry);
                 }
-                // Fallback if getUserDisplayName not available
                 if (entry.fullname && !entry.fullname.match(/^User \d+$/)) {
                     return entry.fullname;
                 }
@@ -2664,10 +2697,12 @@
             
             const topN = config.leaderboardTopN || 3;
             const topPlayers = leaderboard.slice(0, topN);
+            const animStyle = animate ? 'opacity: 0; transform: translateY(-20px); animation: gqLeaderboardIn 0.5s ease forwards;' : '';
+            const animDelay = (i) => animate ? `animation-delay: ${i * 0.15}s;` : '';
             
             container.style.display = 'block';
             container.innerHTML = `
-                <h2 style="margin-top: 0; text-align: center; font-size: ${isFinal ? '32px' : '28px'}; color: white;">
+                <h2 style="margin-top: 0; text-align: center; font-size: ${isFinal ? '32px' : '28px'}; color: white; ${animStyle} ${animDelay(0)}">
                     ${isFinal ? '🏆 Final Leaderboard 🏆' : '📊 Current Leaderboard'}
                 </h2>
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
@@ -2675,15 +2710,18 @@
                         const rank = index + 1;
                         const height = rank === 1 ? '120px' : rank === 2 ? '100px' : '80px';
                         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                        const oldRank = previousStudentLeaderboardOrder[entry.userId || entry.user_id || entry.userid || entry.id];
+                        const fromBottom = oldRank !== undefined ? (oldRank - rank) * 30 : 0;
+                        const rowAnim = animate ? `opacity: 0; transform: translateY(${fromBottom}px); animation: gqLeaderboardRow 0.6s ease ${index * 0.12}s forwards;` : '';
                         return `
-                            <div style="text-align: center; flex: 1; max-width: 200px;">
+                            <div class="gq-leaderboard-row" style="text-align: center; flex: 1; max-width: 200px; ${rowAnim}">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
                                     <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${getDisplayName(entry)}</div>
                                     <div style="font-size: 24px; font-weight: bold; color: white;">${entry.score || 0} pts</div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: white;">#${rank}</div>
-                </div>
+                            </div>
                         `;
                     }).join('')}
                 </div>
@@ -2700,8 +2738,50 @@
                     </div>
                 ` : ''}
             `;
+            // Store current order for next animated transition
+            leaderboard.forEach((entry, i) => {
+                const id = entry.userId || entry.user_id || entry.userid || entry.id;
+                if (id != null) previousStudentLeaderboardOrder[id] = i + 1;
+            });
         }
         
+        socket.on('timer:started', () => {
+            const timerEl = document.getElementById('timer');
+            const timeLimit = config.timeLimitPerQuestion || 60;
+            if (timerEl) {
+                timerEl.textContent = `${timeLimit}s`;
+                timerEl.style.color = '#007bff';
+                timerEl.style.background = '#e7f3ff';
+            }
+        });
+        socket.on('timer:update', (data) => {
+            const timerEl = document.getElementById('timer');
+            if (!timerEl) return;
+            const remaining = data.remaining !== undefined ? data.remaining : 0;
+            timerEl.textContent = `${remaining}s`;
+            if (remaining <= 10) {
+                timerEl.style.color = '#dc3545';
+                timerEl.style.background = '#f8d7da';
+            }
+            if (remaining <= 0) {
+                timerEl.textContent = 'Time\'s Up!';
+                timerEl.style.color = '#721c24';
+                timerEl.style.background = '#f8d7da';
+            }
+        });
+        // Full screen for student question screen
+        const questionFullscreenBtn = document.getElementById('question-fullscreen-btn');
+        if (questionFullscreenBtn) {
+            questionFullscreenBtn.addEventListener('click', () => {
+                const el = document.getElementById('question-container');
+                if (!el) return;
+                if (!document.fullscreenElement) {
+                    el.requestFullscreen().catch(() => {});
+                } else {
+                    document.exitFullscreen().catch(() => {});
+                }
+            });
+        }
         // Listen for question timeout - hide quiz UI
         socket.on('question:timeout', () => {
             console.log('Question timeout - hiding quiz UI');
@@ -2711,21 +2791,77 @@
             }
         });
         
-        // Listen for question results - show leaderboard
+        // Listen for question results - show answer graph first, then leaderboard
         socket.on('question:results', async (data) => {
             console.log('Question results received:', data);
             const leaderboard = data.leaderboard || [];
+            const responses = data.responses || [];
+            const question = data.question || currentQuestion;
             
             // Hide quiz UI
             const questionContainer = document.getElementById('question-container');
-            if (questionContainer) {
-                questionContainer.style.display = 'none';
-            }
+            if (questionContainer) questionContainer.style.display = 'none';
             
-            // Show leaderboard
+            const answerResultsEl = document.getElementById('student-answer-results-container');
             const leaderboardContainer = document.getElementById('student-leaderboard-container');
+            
+            // Show answer distribution graph first (with correct answer highlighted)
+            if (answerResultsEl && question && question.choices) {
+                const choices = Array.isArray(question.choices) ? question.choices : [];
+                const choiceTexts = choices.map(c => typeof c === 'string' ? c : (c.text || c));
+                const correctIndex = parseInt(question.correct_index) || 0;
+                const answerCounts = {};
+                responses.forEach(r => {
+                    const i = r.answerIndex ?? r.answer_index ?? -1;
+                    answerCounts[i] = (answerCounts[i] || 0) + 1;
+                });
+                const total = responses.length || 1;
+                const kahootColors = [
+                    { bg: '#DB524D', border: '#C73E39' },
+                    { bg: '#4A90E2', border: '#357ABD' },
+                    { bg: '#F5A623', border: '#D68910' },
+                    { bg: '#7ED321', border: '#6BB01A' }
+                ];
+                answerResultsEl.style.display = 'block';
+                answerResultsEl.innerHTML = `
+                    <h3 style="text-align: center; margin-bottom: 20px;">Answer results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 600px; margin: 0 auto;">
+                        ${choiceTexts.map((text, i) => {
+                            const count = answerCounts[i] || 0;
+                            const pct = Math.round((count / total) * 100);
+                            const isCorrect = i === correctIndex;
+                            const color = kahootColors[i % 4];
+                            return `
+                                <div style="background: ${color.bg}; border: 4px solid ${color.border}; color: white; padding: 15px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}">
+                                    <div style="font-weight: bold; margin-bottom: 8px;">${String.fromCharCode(65 + i)} ${isCorrect ? '✓ Correct' : ''}</div>
+                                    <div style="font-size: 14px; margin-bottom: 8px;">${text}</div>
+                                    <div style="font-size: 24px; font-weight: bold;">${count} (${pct}%)</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="button" id="student-results-next-btn" class="gq-btn gq-btn-primary" style="padding: 12px 24px;">Next → Leaderboard</button>
+                    </div>
+                `;
+                const nextBtn = document.getElementById('student-results-next-btn');
+                if (nextBtn) {
+                    nextBtn.onclick = () => {
+                        answerResultsEl.style.display = 'none';
+                        displayStudentLeaderboard(leaderboardContainer, leaderboard, false, true);
+                    };
+                }
+                // Auto-show leaderboard after 5 seconds
+                setTimeout(() => {
+                    if (answerResultsEl.style.display !== 'none' && document.getElementById('student-results-next-btn')) {
+                        answerResultsEl.style.display = 'none';
+                        displayStudentLeaderboard(leaderboardContainer, leaderboard, false, true);
+                    }
+                }, 5000);
+                return;
+            }
             if (leaderboardContainer) {
-                await displayStudentLeaderboard(leaderboardContainer, leaderboard, false);
+                await displayStudentLeaderboard(leaderboardContainer, leaderboard, false, true);
             }
         });
         

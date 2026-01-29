@@ -316,19 +316,35 @@ io.on('connection', async (socket) => {
       JSON.stringify(question)
     );
     
-    // Broadcast to all students
+    // Broadcast to all students (timer starts when teacher calls teacher:start_question_timer)
     io.to(room).emit('question:new', {
       question,
       timer,
-      questionNumber: data.questionNumber || 1
+      questionNumber: data.questionNumber || 1,
+      timerStarted: false
     });
     
     // Clear any existing timer
     if (session.timerInterval) {
       clearInterval(session.timerInterval);
+      session.timerInterval = null;
     }
+  });
+  
+  // Teacher: Start question timer (e.g. after full screen)
+  socket.on('teacher:start_question_timer', async () => {
+    if (socket.role !== 'teacher') {
+      socket.emit('error', { message: 'Unauthorized' });
+      return;
+    }
+    const session = await getSession(socket.sessionId);
+    if (!session || !session.currentQuestion) return;
+    if (session.timerInterval) return; // Already running
     
-    // Start timer countdown
+    const room = `session:${socket.sessionId}`;
+    const timer = session.timer || 60;
+    io.to(room).emit('timer:started', {});
+    
     let remaining = timer;
     session.timerInterval = setInterval(async () => {
       remaining--;
@@ -339,7 +355,6 @@ io.on('connection', async (socket) => {
         session.timerInterval = null;
         io.to(room).emit('question:timeout');
         
-        // Send question results to teacher after timeout
         const responses = session.questionResponses || [];
         const instanceId = session.instanceId || socket.sessionId;
         const leaderboard = await buildLeaderboard(instanceId, session);
@@ -349,7 +364,8 @@ io.on('connection', async (socket) => {
           responses,
           correctCount: responses.filter(r => r.isCorrect).length,
           totalCount: responses.length,
-          leaderboard
+          leaderboard,
+          question: session.currentQuestion
         });
       }
     }, 1000);

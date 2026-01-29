@@ -71,6 +71,28 @@ $container_class = 'gamifiedquiz-container gq-template-' . $template . ' gq-pale
 // Get user's full name for display
 $user_fullname = fullname($USER);
 
+// Compute question screen background from quiz setting
+$background_image = isset($gamifiedquiz->background_image) ? trim($gamifiedquiz->background_image) : '';
+$background_style = '';
+if (!empty($background_image)) {
+    if (strpos($background_image, 'predefined:') === 0) {
+        $key = substr($background_image, strlen('predefined:'));
+        $gradients = array(
+            'gradient_blue' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'gradient_purple' => 'linear-gradient(135deg, #764ba2 0%, #f093fb 100%)',
+            'gradient_green' => 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+            'gradient_orange' => 'linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)',
+            'gradient_teal' => 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)'
+        );
+        $background_style = isset($gradients[$key]) ? $gradients[$key] : '';
+    } else if (strpos($background_image, 'http') === 0) {
+        $background_style = 'url(' . s($background_image) . ')';
+    }
+}
+if ($background_style) {
+    $background_style = 'background-image: ' . $background_style . '; background-size: cover; background-position: center;';
+}
+
 // Set config before loading JS - use inline script to ensure it's available
 echo '<script>
 window.GAMIFIED_QUIZ_CONFIG = {
@@ -94,7 +116,8 @@ window.GAMIFIED_QUIZ_CONFIG = {
     llmBackend: ' . json_encode(isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai') . ',
     questionsData: ' . json_encode(isset($gamifiedquiz->questions_data) ? $gamifiedquiz->questions_data : '') . ',
     timeLimitPerQuestion: ' . (isset($gamifiedquiz->time_limit_per_question) ? intval($gamifiedquiz->time_limit_per_question) : 60) . ',
-    leaderboardTopN: ' . (isset($gamifiedquiz->leaderboard_top_n) ? intval($gamifiedquiz->leaderboard_top_n) : 3) . '
+    leaderboardTopN: ' . (isset($gamifiedquiz->leaderboard_top_n) ? intval($gamifiedquiz->leaderboard_top_n) : 3) . ',
+    questionBackgroundStyle: ' . json_encode($background_style) . '
 };
 </script>';
 
@@ -123,10 +146,14 @@ if ($is_teacher) {
     echo '</div>';
     echo '<div id="session-status" class="session-status" style="display:none;"></div>';
     echo '<div id="questions-container" class="questions-container" style="display:none;"></div>';
-    echo '<div id="active-question-display" class="gq-container-lg" style="display:none; min-height: 400px;">';
+    echo '<div id="active-question-display" class="gq-container-lg gq-question-screen" style="display:none; min-height: 400px; position: relative;">';
+    echo '<button type="button" id="active-question-fullscreen-btn" class="gq-fullscreen-btn" title="Full screen" aria-label="Full screen" style="position: absolute; top: 10px; right: 10px; z-index: 10; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 18px;">⛶</button>';
     echo '<div id="active-question-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">';
     echo '<div id="active-question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
+    echo '<div style="display: flex; align-items: center; gap: 10px;">';
+    echo '<button type="button" id="start-question-timer-btn" class="gq-btn gq-btn-primary" style="display: none; padding: 10px 20px;">Start timer</button>';
     echo '<div id="active-question-timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
+    echo '</div>';
     echo '</div>';
     echo '<div id="active-question-image" style="text-align: center; margin-bottom: 15px;"></div>';
     echo '<div id="active-question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
@@ -147,7 +174,8 @@ if ($is_teacher) {
     echo '<div class="gamifiedquiz-student">';
     echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
     echo '<div id="waiting-message" class="waiting">Waiting for teacher to start quiz session...</div>';
-    echo '<div id="question-container" class="question-container gq-container-lg" style="display:none; min-height: 400px;">';
+    echo '<div id="question-container" class="question-container gq-container-lg gq-question-screen" style="display:none; min-height: 400px; position: relative;">';
+    echo '<button type="button" id="question-fullscreen-btn" class="gq-fullscreen-btn" title="Full screen" aria-label="Full screen" style="position: absolute; top: 10px; right: 10px; z-index: 10; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 18px;">⛶</button>';
     echo '<div id="question-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">';
     echo '<div id="question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
     echo '<div id="timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
@@ -157,6 +185,7 @@ if ($is_teacher) {
     echo '<div id="choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
     echo '</div>';
     echo '<div id="result-container" class="result-container" style="display:none;"></div>';
+    echo '<div id="student-answer-results-container" class="gq-container" style="display:none;"></div>';
     echo '<div id="question-comparison-container" class="gq-container" style="display:none;"></div>';
     // Leaderboard container for students (shown after timeout)
     echo '<div id="student-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-top: 20px;"></div>';
