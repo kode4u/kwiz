@@ -392,7 +392,7 @@
                                             ${(q.choices || []).map((choice, ci) => {
                                                 const choiceText = typeof choice === 'string' ? choice : (choice.text || '');
                                                 const isCorrect = typeof choice === 'object' ? choice.is_correct : (ci === q.correct_index);
-                                                return `<li style="color: ${isCorrect ? '#28a745' : '#666'}; font-weight: ${isCorrect ? 'bold' : 'normal'};">${choiceText} ${isCorrect ? '✓' : ''}</li>`;
+                                                return `<li style="color: ${isCorrect ? '#28a745' : '#666'}; font-weight: ${isCorrect ? 'bold' : 'normal'};">${choiceText}</li>`;
                                             }).join('')}
                                         </ul>
                                     </div>
@@ -1683,7 +1683,7 @@
                                         position: relative;
                                         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
                                         transition: transform 0.2s;">
-                                ${isCorrect ? '<span style="position: absolute; top: 10px; right: 10px; font-size: 32px;">✓</span>' : ''}
+                                ${isCorrect ? '' : ''}
                                 <div style="font-size: 48px; margin-bottom: 10px;">${String.fromCharCode(65 + i)}</div>
                                 <div>${c}</div>
                             </div>
@@ -1829,7 +1829,7 @@
                             <ul>
                                 ${choices.map((c, idx) => `
                                     <li class="${c.is_correct ? 'correct' : ''}">
-                                        ${idx === correctIndex ? '✓ ' : ''}${c.text || c}
+                                        ${c.text || c}
                                     </li>
                         `).join('')}
                     </ul>
