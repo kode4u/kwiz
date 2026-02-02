@@ -202,6 +202,8 @@
         const editQuestionsBtn = document.getElementById('edit-questions-btn');
         const startBtn = document.getElementById('start-session-btn');
         const nextBtn = document.getElementById('next-question-btn');
+        const activeQuestionDisplayEl = document.getElementById('active-question-display');
+        const activeQuestionDisplayTemplate = activeQuestionDisplayEl ? activeQuestionDisplayEl.innerHTML : '';
         
         // Function to load scores from database and update leaderboard
         async function loadSessionScores(sessionId) {
@@ -1696,6 +1698,16 @@
                         `;
                     }).join('');
                 }
+                const activeFullscreenBtn = document.getElementById('active-question-fullscreen-btn');
+                if (activeFullscreenBtn) {
+                    activeFullscreenBtn.onclick = () => {
+                        if (!document.fullscreenElement) {
+                            activeQEl.requestFullscreen().catch(() => {});
+                        } else {
+                            document.exitFullscreen().catch(() => {});
+                        }
+                    };
+                }
             }
             
             // Timer countdown comes from server (teacher:start_question_timer) via timer:update
@@ -1934,23 +1946,119 @@
         let previousScores = {};
         let questionResults = [];
         
-        // Listen for question results
+        // Teacher container phase: 'result' | 'ranking' (same container, step-through)
+        let teacherContainerPhase = null;
+        let teacherContainerData = null;
+        
+        // Listen for question results - show result in same container, then ranking, then Next
         socket.on('question:results', async (data) => {
             console.log('Question results received:', data);
-            // Hide active question; show only results/ranking/leaderboard (one view at a time)
             const activeQEl = document.getElementById('active-question-display');
-            if (activeQEl) activeQEl.style.display = 'none';
-            displayQuestionResults(data);
-            // Display ranking after each question
-            await displayQuestionRanking(data.leaderboard || []);
-            // Update next button text (button stays enabled - teacher can proceed anytime)
-            if (nextBtn) {
-                if (currentQuestionIndex >= questions.length) {
-                    nextBtn.textContent = 'End Quiz';
-                } else {
-                    nextBtn.textContent = 'Next Question';
+            if (!activeQEl) return;
+            activeQEl.style.display = 'block';
+            teacherContainerData = data;
+            const leaderboard = data.leaderboard || [];
+            const userIds = leaderboard.map(entry => {
+                const id = entry.userId || entry.user_id || entry.userid || entry.id;
+                return id ? parseInt(id) : null;
+            }).filter(id => id && !isNaN(id) && id > 0);
+            if (userIds.length > 0 && window.gamifiedQuizFetchUserDetails) {
+                await window.gamifiedQuizFetchUserDetails(userIds);
+            }
+            const questionNum = data.questionNumber || currentQuestionIndex;
+            const responses = data.responses || [];
+            const correctCount = responses.filter(r => r.is_correct || r.isCorrect).length;
+            const totalCount = responses.length;
+            const questionIndex = questionNum - 1;
+            const currentQuestion = questions[questionIndex];
+            let choices = [];
+            if (currentQuestion && Array.isArray(currentQuestion.choices)) {
+                choices = currentQuestion.choices.map(c => typeof c === 'string' ? c : (c.text || c));
+            } else if (currentQuestion && typeof currentQuestion.choices === 'string') {
+                try {
+                    const parsed = JSON.parse(currentQuestion.choices);
+                    choices = Array.isArray(parsed) ? parsed.map(c => typeof c === 'string' ? c : (c.text || c)) : [];
+                } catch (e) { choices = []; }
+            }
+            const answerCounts = {};
+            responses.forEach(r => {
+                const i = r.answerIndex !== undefined ? r.answerIndex : -1;
+                answerCounts[i] = (answerCounts[i] || 0) + 1;
+            });
+            const kahootColors = [
+                { bg: '#DB524D', border: '#C73E39', text: 'white' },
+                { bg: '#4A90E2', border: '#357ABD', text: 'white' },
+                { bg: '#F5A623', border: '#D68910', text: 'white' },
+                { bg: '#7ED321', border: '#6BB01A', text: 'white' }
+            ];
+            const resultBody = currentQuestion ? `
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #d4edda; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #155724;">${correctCount}</div><div style="color: #155724; font-size: 14px;">Correct</div></div>
+                    <div style="background: #f8d7da; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div><div style="color: #721c24; font-size: 14px;">Incorrect</div></div>
+                    <div style="background: #d1ecf1; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #0c5460;">${totalCount}</div><div style="color: #0c5460; font-size: 14px;">Total</div></div>
+                    <div style="background: #fff3cd; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #856404;">${totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0}%</div><div style="color: #856404; font-size: 14px;">Accuracy</div></div>
+                </div>
+                <h4 style="margin-bottom: 12px; font-size: 18px;">Answer distribution</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    ${choices.map((c, i) => {
+                        const count = answerCounts[i] || 0;
+                        const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+                        const color = kahootColors[i % 4];
+                        const isCorrect = i === currentQuestion.correct_index;
+                        const choiceText = typeof c === 'string' ? c : (c.text || c);
+                        return `<div style="background: ${color.bg}; border: 4px solid ${color.border}; color: ${color.text}; padding: 16px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 20px; font-weight: bold;">${String.fromCharCode(65 + i)}</span>${isCorrect ? '<span style="font-size: 28px;">✓</span>' : ''}</div><div style="font-size: 14px; margin-bottom: 8px;">${escapeHtml(choiceText)}</div><div style="background: rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; text-align: center;"><span style="font-size: 24px; font-weight: bold;">${count}</span> <span style="font-size: 12px;">(${pct}%)</span></div></div>`;
+                    }).join('')}
+                </div>
+            ` : '<p>No question data.</p>';
+            teacherContainerPhase = 'result';
+            activeQEl.innerHTML = `
+                <div id="teacher-container-content" class="gq-teacher-container-content">
+                    <h3 style="margin-top: 0; font-size: 24px; margin-bottom: 16px;">Question ${questionNum} results</h3>
+                    ${resultBody}
+                    <div style="text-align: center; margin-top: 24px;">
+                        <button type="button" id="teacher-container-next-btn" class="gq-btn gq-btn-primary" style="padding: 12px 24px;">Next: Show ranking</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('teacher-container-next-btn').onclick = function teacherContainerNext() {
+                if (teacherContainerPhase === 'result') {
+                    const lb = teacherContainerData.leaderboard || [];
+                    const sorted = [...lb].sort((a, b) => (b.score || 0) - (a.score || 0));
+                    const tableRows = sorted.map((entry, index) => {
+                        const name = window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`;
+                        return `<tr style="border-bottom: 1px solid #dee2e6; ${index < 3 ? 'background: #fff3cd; font-weight: bold;' : ''}"><td style="padding: 12px;">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1)}</td><td style="padding: 12px;">${escapeHtml(name)}</td><td style="padding: 12px; text-align: right; font-weight: bold;">${entry.score || 0} pts</td></tr>`;
+                    }).join('');
+                    teacherContainerPhase = 'ranking';
+                    activeQEl.innerHTML = `
+                        <div id="teacher-container-content" class="gq-teacher-container-content">
+                            <h3 style="margin-top: 0; font-size: 24px; margin-bottom: 16px;">Ranking</h3>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead><tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;"><th style="padding: 12px; text-align: left; width: 60px;">Rank</th><th style="padding: 12px; text-align: left;">Student</th><th style="padding: 12px; text-align: right;">Score</th></tr></thead>
+                                <tbody>${tableRows}</tbody>
+                            </table>
+                            <div style="text-align: center; margin-top: 24px;">
+                                <button type="button" id="teacher-container-next-btn" class="gq-btn gq-btn-primary" style="padding: 12px 24px;">${currentQuestionIndex >= questions.length ? 'End Quiz' : 'Next Question'}</button>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('teacher-container-next-btn').onclick = teacherContainerNext;
+                    return;
                 }
-                // Keep button enabled - teacher can proceed anytime
+                if (teacherContainerPhase === 'ranking') {
+                    teacherContainerPhase = null;
+                    teacherContainerData = null;
+                    if (currentQuestionIndex >= questions.length) {
+                        endSessionHandler();
+                    } else {
+                        if (activeQuestionDisplayEl && activeQuestionDisplayTemplate) {
+                            activeQuestionDisplayEl.innerHTML = activeQuestionDisplayTemplate;
+                        }
+                        pushNextQuestion();
+                    }
+                }
+            };
+            if (nextBtn) {
+                nextBtn.textContent = currentQuestionIndex >= questions.length ? 'End Quiz' : 'Next Question';
                 nextBtn.disabled = false;
             }
         });
