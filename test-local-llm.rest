@@ -28,7 +28,7 @@ Content-Type: {{contentType}}
 {
   "topic": "Python programming",
   "level": "easy",
-  "n_questions": 1,
+  "n_questions": 5,
   "language": "en",
   "backend": "local"
 }
