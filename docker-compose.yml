@@ -58,6 +58,9 @@ services:
       - "${LLM_API_PORT:-5001}:5001"
     networks:
       - jica-network
+    # Allow container to reach Ollama on host (Mac/Windows: built-in; Linux: needs this)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       redis:
         condition: service_healthy

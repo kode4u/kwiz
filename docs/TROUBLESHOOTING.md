@@ -281,6 +281,10 @@ If using WSL2 backend:
      -d '{\"topic\": \"Python\", \"level\": \"easy\", \"n_questions\": 1}'
    ```
 
+5. **500 "Cannot connect to Ollama" when using local LLM**:
+   - Ollama must run **on your host**, not in Docker. See [TEST_LOCAL_LLM.md](../TEST_LOCAL_LLM.md) for setup.
+   - Set `.env`: `LLM_BACKEND=local`, `LOCAL_LLM_URL=http://host.docker.internal:11434`, then `docker-compose restart llmapi`.
+
 ### Memory Issues
 
 **Error**: Container killed due to memory limit

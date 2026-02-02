@@ -163,7 +163,7 @@ if ($is_teacher) {
     echo '</div>';
     echo '<div id="question-results-display" class="gq-container gq-teacher-secondary" style="display:none;"></div>';
     echo '<div id="question-ranking-display" class="gq-container-lg gq-teacher-secondary" style="display:none; margin-top: 20px;">
-        <h3 style="text-align: center; margin-bottom: 20px;">Current Rankings</h3>
+        <h3 style="text-align: center; margin-bottom: 20px; font-size: 32px;">Current Rankings</h3>
         <div id="ranking-table-container"></div>
     </div>';
     echo '<div id="leaderboard-container" class="leaderboard-container gq-teacher-secondary" style="display:none;"></div>';

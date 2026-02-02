@@ -1,5 +1,21 @@
 # How to Test Local LLM (Ollama)
 
+## Quick fix: 500 "Cannot connect to Ollama" when generating questions
+
+1. **Run Ollama on your computer** (not in Docker): install from [ollama.ai](https://ollama.ai), then start it and pull a model, e.g. `ollama pull deepseek-coder`.
+2. **Set local LLM in `.env`** (project root or `docker/.env`):
+   ```env
+   LLM_BACKEND=local
+   LOCAL_LLM_URL=http://host.docker.internal:11434
+   OLLAMA_MODEL=deepseek-coder:latest
+   ```
+3. **Restart the LLM API:** `docker-compose restart llmapi`
+4. **Check from host:** `curl http://localhost:11434/api/tags` should list models.
+
+See [Troubleshooting → Connection Refused](#1-connection-refused-500--cannot-connect-to-ollama-at-) below for more detail.
+
+---
+
 ## Quick Test
 
 ### Method 1: Using PowerShell Script
@@ -76,17 +92,49 @@ docker-compose restart llmapi
 
 ## Troubleshooting
 
-### 1. Connection Refused Error
+### 1. Connection Refused (500 – "Cannot connect to Ollama at ...")
 
-**Problem:** `Connection refused` when trying to use local LLM
+**Problem:** `Connection refused` or `Failed to establish a new connection` when generating questions with local LLM.
+
+**Cause:** The LLM API runs inside Docker and tries to reach Ollama at `host.docker.internal:11434`. Ollama must run **on your host machine**, not in Docker.
 
 **Solution:**
-- Ensure Ollama is running: `docker ps | findstr ollama`
-- Check if `LOCAL_LLM_URL` is set correctly in the container:
-  ```powershell
-  docker exec jica-llmapi env | findstr LOCAL_LLM
-  ```
-- Should show: `LOCAL_LLM_URL=http://host.docker.internal:11434`
+
+1. **Install Ollama on your host** (if not already): https://ollama.ai  
+   - Windows/Mac: download and run the installer.  
+   - Linux: `curl -fsSL https://ollama.ai/install.sh | sh`
+
+2. **Start Ollama and pull a model on your host:**
+   ```bash
+   ollama serve          # usually starts automatically; if not, run this
+   ollama pull deepseek-coder   # or another model you want
+   ```
+   Check it’s reachable on the host:
+   ```bash
+   curl http://localhost:11434/api/tags
+   ```
+
+3. **Use local backend and correct URL:**
+   - In project root `.env` (or `docker/.env`), set:
+     ```env
+     LLM_BACKEND=local
+     LOCAL_LLM_URL=http://host.docker.internal:11434
+     OLLAMA_MODEL=deepseek-coder:latest
+     ```
+   - `docker-compose.yml` already uses `extra_hosts` so `host.docker.internal` works on Linux too.
+
+4. **Restart the LLM API container:**
+   ```bash
+   docker-compose restart llmapi
+   ```
+
+5. **Verify from inside the container (optional):**
+   ```bash
+   docker exec jica-llmapi env | grep LOCAL_LLM
+   docker exec jica-llmapi curl -s http://host.docker.internal:11434/api/tags
+   ```
+
+**Linux note:** If `host.docker.internal` still doesn’t work, set `LOCAL_LLM_URL=http://172.17.0.1:11434` (Docker bridge IP) in `.env` and restart `llmapi`.
 
 ### 2. Model Not Found
 

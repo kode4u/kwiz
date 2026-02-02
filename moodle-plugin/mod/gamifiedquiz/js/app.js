@@ -1358,7 +1358,7 @@
             // Clear leaderboard display
             const leaderboardContainer = document.getElementById('leaderboard-container');
             if (leaderboardContainer) {
-                leaderboardContainer.innerHTML = '<h3>🏆 Current Leaderboard</h3><p>Waiting for students to answer...</p>';
+                leaderboardContainer.innerHTML = '<h3 style="font-size: 32px;">🏆 Current Leaderboard</h3><p style="font-size: 24px;">Waiting for students to answer...</p>';
             }
             
             // Clear ranking display
@@ -1976,12 +1976,12 @@
             ];
             const resultBody = currentQuestion ? `
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
-                    <div style="background: #d4edda; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #155724;">${correctCount}</div><div style="color: #155724; font-size: 14px;">Correct</div></div>
-                    <div style="background: #f8d7da; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div><div style="color: #721c24; font-size: 14px;">Incorrect</div></div>
-                    <div style="background: #d1ecf1; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #0c5460;">${totalCount}</div><div style="color: #0c5460; font-size: 14px;">Total</div></div>
-                    <div style="background: #fff3cd; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 28px; font-weight: bold; color: #856404;">${totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0}%</div><div style="color: #856404; font-size: 14px;">Accuracy</div></div>
+                    <div style="background: #d4edda; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 24px; font-weight: bold; color: #155724;">${correctCount}</div><div style="color: #155724; font-size: 18px;">Correct</div></div>
+                    <div style="background: #f8d7da; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 24px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div><div style="color: #721c24; font-size: 18px;">Incorrect</div></div>
+                    <div style="background: #d1ecf1; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 24px; font-weight: bold; color: #0c5460;">${totalCount}</div><div style="color: #0c5460; font-size: 18px;">Total</div></div>
+                    <div style="background: #fff3cd; padding: 16px; border-radius: 12px; text-align: center;"><div style="font-size: 24px; font-weight: bold; color: #856404;">${totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0}%</div><div style="color: #856404; font-size: 18px;">Accuracy</div></div>
                 </div>
-                <h4 style="margin-bottom: 12px; font-size: 18px;">Answer distribution</h4>
+                <h4 style="margin-bottom: 12px; font-size: 24px;">Answer distribution</h4>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
                     ${choices.map((c, i) => {
                         const count = answerCounts[i] || 0;
@@ -1989,14 +1989,14 @@
                         const color = kahootColors[i % 4];
                         const isCorrect = i === currentQuestion.correct_index;
                         const choiceText = typeof c === 'string' ? c : (c.text || c);
-                        return `<div style="background: ${color.bg}; border: 4px solid ${color.border}; color: ${color.text}; padding: 16px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 20px; font-weight: bold;">${String.fromCharCode(65 + i)}</span>${isCorrect ? '<span style="font-size: 28px;">✓</span>' : ''}</div><div style="font-size: 14px; margin-bottom: 8px;">${escapeHtml(choiceText)}</div><div style="background: rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; text-align: center;"><span style="font-size: 24px; font-weight: bold;">${count}</span> <span style="font-size: 12px;">(${pct}%)</span></div></div>`;
+                        return `<div style="background: ${color.bg}; border: 4px solid ${color.border}; color: ${color.text}; padding: 16px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 24px; font-weight: bold;">${String.fromCharCode(65 + i)}</span>${isCorrect ? '<span style="font-size: 28px;">✓</span>' : ''}</div><div style="font-size: 24px; margin-bottom: 8px;">${escapeHtml(choiceText)}</div><div style="background: rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; text-align: center;"><span style="font-size: 24px; font-weight: bold;">${count}</span> <span style="font-size: 18px;">(${pct}%)</span></div></div>`;
                     }).join('')}
                 </div>
             ` : '<p>No question data.</p>';
             teacherContainerPhase = 'result';
             activeQEl.innerHTML = `
                 <div id="teacher-container-content" class="gq-teacher-container-content">
-                    <h3 style="margin-top: 0; font-size: 24px; margin-bottom: 16px;">Question ${questionNum} results</h3>
+                    <h3 style="margin-top: 0; font-size: 32px; margin-bottom: 16px;">Question ${questionNum} results</h3>
                     ${resultBody}
                     <div style="text-align: center; margin-top: 24px;">
                         <button type="button" id="teacher-container-next-btn" class="gq-btn gq-btn-primary" style="padding: 12px 24px;">Next: Show ranking</button>
@@ -2014,8 +2014,8 @@
                     teacherContainerPhase = 'ranking';
                     activeQEl.innerHTML = `
                         <div id="teacher-container-content" class="gq-teacher-container-content">
-                            <h3 style="margin-top: 0; font-size: 24px; margin-bottom: 16px;">Ranking</h3>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                            <h3 style="margin-top: 0; font-size: 32px; margin-bottom: 16px;">Ranking</h3>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 24px;">
                                 <thead><tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;"><th style="padding: 12px; text-align: left; width: 60px;">Rank</th><th style="padding: 12px; text-align: left;">Student</th><th style="padding: 12px; text-align: right;">Score</th></tr></thead>
                                 <tbody>${tableRows}</tbody>
                             </table>
@@ -2071,7 +2071,7 @@
             
             rankingContainer.style.display = 'block';
             rankingTable.innerHTML = `
-                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 24px;">
                     <thead>
                         <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                             <th style="padding: 12px; text-align: left; width: 60px;">Rank</th>
@@ -2223,27 +2223,27 @@
             
             resultsEl.style.display = 'block';
             resultsEl.innerHTML = `
-                <h3 style="margin-top: 0; font-size: 28px; margin-bottom: 20px;">Question ${questionNum} Results</h3>
+                <h3 style="margin-top: 0; font-size: 32px; margin-bottom: 20px;">Question ${questionNum} Results</h3>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
                     <div style="background: #d4edda; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <div style="font-size: 36px; font-weight: bold; color: #155724;">${correctCount}</div>
-                        <div style="color: #155724; font-size: 16px; margin-top: 5px;">Correct</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #155724;">${correctCount}</div>
+                        <div style="color: #155724; font-size: 18px; margin-top: 5px;">Correct</div>
                     </div>
                     <div style="background: #f8d7da; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <div style="font-size: 36px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div>
-                        <div style="color: #721c24; font-size: 16px; margin-top: 5px;">Incorrect</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #721c24;">${totalCount - correctCount}</div>
+                        <div style="color: #721c24; font-size: 18px; margin-top: 5px;">Incorrect</div>
                     </div>
                     <div style="background: #d1ecf1; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <div style="font-size: 36px; font-weight: bold; color: #0c5460;">${totalCount}</div>
-                        <div style="color: #0c5460; font-size: 16px; margin-top: 5px;">Total</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #0c5460;">${totalCount}</div>
+                        <div style="color: #0c5460; font-size: 18px; margin-top: 5px;">Total</div>
                     </div>
                     <div style="background: #fff3cd; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <div style="font-size: 36px; font-weight: bold; color: #856404;">${totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0}%</div>
-                        <div style="color: #856404; font-size: 16px; margin-top: 5px;">Accuracy</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #856404;">${totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0}%</div>
+                        <div style="color: #856404; font-size: 18px; margin-top: 5px;">Accuracy</div>
                     </div>
                 </div>
                 <div style="margin-top: 30px;">
-                    <h4 style="margin-bottom: 15px; font-size: 20px;">Answer Distribution</h4>
+                    <h4 style="margin-bottom: 15px; font-size: 24px;">Answer Distribution</h4>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                         ${choices.map((c, i) => {
                             const count = answerCounts[i] || 0;
@@ -2263,10 +2263,10 @@
                                         <div style="font-size: 24px; font-weight: bold;">${String.fromCharCode(65 + i)}</div>
                                         ${isCorrect ? '<span style="font-size: 32px;">✓</span>' : ''}
                                     </div>
-                                    <div style="font-size: 18px; margin-bottom: 10px;">${choiceText}</div>
+                                    <div style="font-size: 24px; margin-bottom: 10px;">${choiceText}</div>
                                     <div style="background: rgba(255,255,255,0.3); padding: 10px; border-radius: 8px; text-align: center;">
-                                        <div style="font-size: 28px; font-weight: bold;">${count}</div>
-                                        <div style="font-size: 14px;">${percentage}%</div>
+                                        <div style="font-size: 24px; font-weight: bold;">${count}</div>
+                                        <div style="font-size: 18px;">${percentage}%</div>
                                     </div>
                                 </div>
                             `;
@@ -2287,7 +2287,7 @@
             }
             
             if (!Array.isArray(leaderboard) || leaderboard.length === 0) {
-                container.innerHTML = '<h3>🏆 Current Leaderboard</h3><p>No scores yet.</p>';
+                container.innerHTML = '<h3 style="font-size: 32px;">🏆 Current Leaderboard</h3><p style="font-size: 24px;">No scores yet.</p>';
                 container.style.display = 'block';
                 return;
             }
@@ -2330,8 +2330,8 @@
             
             // Render the leaderboard with user names
             container.innerHTML = `
-                <h3>🏆 Current Leaderboard</h3>
-                <ol style="padding-left: 20px;">
+                <h3 style="font-size: 32px;">🏆 Current Leaderboard</h3>
+                <ol style="padding-left: 20px; font-size: 24px;">
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
@@ -2341,7 +2341,7 @@
                         return `
                             <li style="padding: 10px; margin: 8px 0; background: ${rank <= 3 ? '#fff3cd' : '#f8f9fa'}; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-weight: bold;">${medal} ${displayName}</span>
-                                <span style="font-size: 18px; font-weight: bold; color: #007bff;">${entry.score || 0} pts</span>
+                                <span style="font-size: 24px; font-weight: bold; color: #007bff;">${entry.score || 0} pts</span>
                             </li>
                         `;
                     }).join('')}
@@ -2381,7 +2381,7 @@
                             <div style="text-align: center; flex: 1; max-width: 200px;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</div>
+                                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</div>
                                     <div style="font-size: 24px; font-weight: bold;">${entry.score || 0} pts</div>
                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold;">#${rank}</div>
@@ -2391,8 +2391,8 @@
                 </div>
                 ${leaderboard.length > topN ? `
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
-                        <h3 style="text-align: center;">Other Participants</h3>
-                        <ol style="list-style: none; padding: 0;">
+                        <h3 style="text-align: center; font-size: 24px;">Other Participants</h3>
+                        <ol style="list-style: none; padding: 0; font-size: 24px;">
                             ${leaderboard.slice(topN).map((entry, index) => `
                                 <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px;">
                                     #${topN + index + 1} - ${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}: ${entry.score || 0} pts
@@ -2407,12 +2407,12 @@
         function updateLeaderboard(leaderboard) {
             const container = document.getElementById('leaderboard-container');
             if (leaderboard.length === 0) {
-                container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
+                container.innerHTML = '<h3 style="font-size: 32px;">Leaderboard</h3><p style="font-size: 24px;">No scores yet.</p>';
                 return;
             }
             container.innerHTML = `
-                <h3>Current Leaderboard</h3>
-                <ol>
+                <h3 style="font-size: 32px;">Current Leaderboard</h3>
+                <ol style="font-size: 24px;">
                     ${leaderboard.map((entry, index) => `
                         <li>
                             <strong>${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</strong>: 
@@ -2804,7 +2804,7 @@
             
             container.style.display = 'block';
             container.innerHTML = `
-                <h2 style="margin-top: 0; text-align: center; font-size: ${isFinal ? '32px' : '28px'}; color: white; ${animStyle} ${animDelay(0)}">
+                <h2 style="margin-top: 0; text-align: center; font-size: 32px; color: white; ${animStyle} ${animDelay(0)}">
                     ${isFinal ? '🏆 Final Leaderboard 🏆' : '📊 Current Leaderboard'}
                 </h2>
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
@@ -2819,7 +2819,7 @@
                             <div class="gq-leaderboard-row" style="text-align: center; flex: 1; max-width: 200px; ${rowAnim}">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
                                 <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; height: ${height}; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px; color: white;">${getDisplayName(entry)}</div>
+                                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px; color: white;">${getDisplayName(entry)}</div>
                                     <div style="font-size: 24px; font-weight: bold; color: white;">${entry.score || 0} pts</div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: white;">#${rank}</div>
@@ -2829,8 +2829,8 @@
                 </div>
                 ${leaderboard.length > topN ? `
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
-                        <h3 style="text-align: center; color: white;">Other Participants</h3>
-                        <ol style="list-style: none; padding: 0;">
+                        <h3 style="text-align: center; color: white; font-size: 24px;">Other Participants</h3>
+                        <ol style="list-style: none; padding: 0; font-size: 24px;">
                             ${leaderboard.slice(topN).map((entry, index) => `
                                 <li style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 4px; color: white;">
                                     #${topN + index + 1} - ${getDisplayName(entry)}: ${entry.score || 0} pts
@@ -2917,7 +2917,7 @@
                 ];
                 answerResultsEl.style.display = 'block';
                 answerResultsEl.innerHTML = `
-                    <h3 style="text-align: center; margin-bottom: 20px;">Answer results</h3>
+                    <h3 style="text-align: center; margin-bottom: 20px; font-size: 32px;">Answer results</h3>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 600px; margin: 0 auto;">
                         ${choiceTexts.map((text, i) => {
                             const count = answerCounts[i] || 0;
@@ -2926,8 +2926,8 @@
                             const color = kahootColors[i % 4];
                             return `
                                 <div style="background: ${color.bg}; border: 4px solid ${color.border}; color: white; padding: 15px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}">
-                                    <div style="font-weight: bold; margin-bottom: 8px;">${String.fromCharCode(65 + i)} ${isCorrect ? '✓ Correct' : ''}</div>
-                                    <div style="font-size: 14px; margin-bottom: 8px;">${text}</div>
+                                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">${String.fromCharCode(65 + i)} ${isCorrect ? '✓ Correct' : ''}</div>
+                                    <div style="font-size: 24px; margin-bottom: 8px;">${text}</div>
                                     <div style="font-size: 24px; font-weight: bold;">${count} (${pct}%)</div>
                                 </div>
                             `;
@@ -2981,12 +2981,12 @@
             
             const leaderboard = data.leaderboard || [];
             if (leaderboard.length === 0) {
-                container.innerHTML = '<h3>Leaderboard</h3><p>No scores yet.</p>';
+                container.innerHTML = '<h3 style="font-size: 32px;">Leaderboard</h3><p style="font-size: 24px;">No scores yet.</p>';
                 return;
             }
             container.innerHTML = `
-                <h3>Leaderboard</h3>
-                <ol>
+                <h3 style="font-size: 32px;">Leaderboard</h3>
+                <ol style="font-size: 24px;">
                     ${leaderboard.map((entry, index) => `
                         <li>
                             <strong>${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</strong>: 

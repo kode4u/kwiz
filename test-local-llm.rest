@@ -1,0 +1,62 @@
+### Test Local LLM API (Ollama)
+### Use REST Client extension in VS Code/Cursor to run these.
+###
+### Prerequisites:
+### 1. Ollama running on host: ollama serve (or install from https://ollama.ai)
+### 2. Model pulled: ollama pull deepseek-coder
+### 3. LLM API running (e.g. Docker): docker-compose up -d llmapi
+### 4. .env: LLM_BACKEND=local, LOCAL_LLM_URL=http://host.docker.internal:11434
+
+@baseUrl = http://localhost:5001
+@contentType = application/json
+
+###############################################
+### 1. Health check (LLM API)
+###############################################
+
+### Health
+GET {{baseUrl}}/health
+
+###############################################
+### 2. Generate questions – Local backend (Ollama)
+###############################################
+
+### Generate 1 question – Local LLM
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "Python programming",
+  "level": "easy",
+  "n_questions": 1,
+  "language": "en",
+  "backend": "local"
+}
+
+### Generate 2 questions – Local LLM
+POST {{baseUrl}}/generate
+Content-Type: {{contentType}}
+
+{
+  "topic": "JavaScript basics",
+  "level": "medium",
+  "n_questions": 2,
+  "language": "en",
+  "backend": "local"
+}
+
+###############################################
+### 3. Moodle generate.php (needs valid quizid + login)
+###############################################
+### Replace {{quizid}} and optionally {{cmid}} with real IDs from your Moodle quiz.
+### You must be logged in (session cookie) or use a tool that sends cookies.
+
+@moodleBase = http://localhost:8080
+@quizid = 1
+@cmid = 1
+
+### Moodle – Generate questions (local backend)
+POST {{moodleBase}}/mod/gamifiedquiz/ajax/generate.php
+Content-Type: application/x-www-form-urlencoded
+
+quizid={{quizid}}&cmid={{cmid}}&prompt=Python%20programming&difficulty=easy&count=1
