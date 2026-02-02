@@ -798,6 +798,41 @@
 /* Ensure all dynamically created containers use standard styles */
 /* Removed automatic box-shadow to prevent unwanted shadows */
 
+/* Active question display: responsive, single visible container */
+#active-question-display {
+    box-sizing: border-box;
+    max-width: 100%;
+    width: 100%;
+    min-height: min(400px, 50vh);
+}
+#active-question-display .question-text {
+    font-size: clamp(1.25rem, 4vw, 2rem);
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+#active-question-display .choices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(10px, 2vw, 20px);
+}
+#active-question-display .kahoot-choice,
+#active-question-display .kahoot-choice-student {
+    padding: clamp(12px, 2vw, 30px) clamp(10px, 2vw, 20px);
+    font-size: clamp(0.875rem, 2.5vw, 1.5rem);
+}
+@media (max-width: 640px) {
+    #active-question-display .choices {
+        grid-template-columns: 1fr;
+    }
+    #active-question-display #active-question-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+.gq-teacher-secondary {
+    display: none;
+}
+
 /* Full screen question screen */
 .gq-question-screen.gq-fullscreen,
 .gq-question-screen:-webkit-full-screen,

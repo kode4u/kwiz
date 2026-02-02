@@ -124,6 +124,11 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->setExpanded('backgroundheader', false);
         $predefined = array(
             '' => get_string('background_none', 'mod_gamifiedquiz'),
+            'predefined:bg1' => get_string('background_bg', 'mod_gamifiedquiz', 1),
+            'predefined:bg2' => get_string('background_bg', 'mod_gamifiedquiz', 2),
+            'predefined:bg3' => get_string('background_bg', 'mod_gamifiedquiz', 3),
+            'predefined:bg4' => get_string('background_bg', 'mod_gamifiedquiz', 4),
+            'predefined:bg5' => get_string('background_bg', 'mod_gamifiedquiz', 5),
             'predefined:gradient_blue' => get_string('background_gradient_blue', 'mod_gamifiedquiz'),
             'predefined:gradient_purple' => get_string('background_gradient_purple', 'mod_gamifiedquiz'),
             'predefined:gradient_green' => get_string('background_gradient_green', 'mod_gamifiedquiz'),
@@ -136,6 +141,75 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->addElement('text', 'background_image_url', get_string('background_custom_url', 'mod_gamifiedquiz'), array('size' => '60'));
         $mform->setType('background_image_url', PARAM_URL);
         $mform->addHelpButton('background_image_url', 'background_custom_url', 'mod_gamifiedquiz');
+
+        // Preview box for selected background
+        global $CFG;
+        $previewlabel = get_string('background_preview', 'mod_gamifiedquiz');
+        $wwwroot = $CFG->wwwroot;
+        $bgbase = $wwwroot . '/mod/gamifiedquiz/pix/backgrounds/';
+        $mform->addElement('static', 'background_preview_static', $previewlabel,
+            '<div id="gq-background-preview-wrap" style="margin-top:8px;">
+                <div id="gq-background-preview" style="width:280px;height:160px;border:2px solid #ddd;border-radius:8px;background:#f5f5f5;background-size:cover;background-position:center;"></div>
+                <div id="gq-background-preview-label" style="margin-top:6px;font-size:12px;color:#666;"></div>
+            </div>');
+        $mform->addElement('html', '<script>
+(function() {
+    var wwwroot = ' . json_encode($wwwroot) . ';
+    var bgbase = ' . json_encode($bgbase) . ';
+    var gradients = {
+        "predefined:gradient_blue": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "predefined:gradient_purple": "linear-gradient(135deg, #764ba2 0%, #f093fb 100%)",
+        "predefined:gradient_green": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        "predefined:gradient_orange": "linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)",
+        "predefined:gradient_teal": "linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)"
+    };
+    var bgImages = { "predefined:bg1": "bg1.jpg", "predefined:bg2": "bg2.jpg", "predefined:bg3": "bg3.jpg", "predefined:bg4": "bg4.jpg", "predefined:bg5": "bg5.jpg" };
+    function updatePreview() {
+        var sel = document.getElementById("id_background_image");
+        var urlInput = document.getElementById("id_background_image_url");
+        var box = document.getElementById("gq-background-preview");
+        var label = document.getElementById("gq-background-preview-label");
+        if (!box) return;
+        var predefined = sel ? sel.value : "";
+        var customUrl = urlInput ? urlInput.value.trim() : "";
+        box.style.backgroundSize = "cover";
+        box.style.backgroundPosition = "center";
+        if (customUrl) {
+            box.style.backgroundImage = "url(" + customUrl.replace(/"/g, "\\\"") + ")";
+            box.style.background = "#f5f5f5";
+            if (label) label.textContent = customUrl;
+        } else if (predefined && predefined !== "") {
+            if (gradients[predefined]) {
+                box.style.background = gradients[predefined];
+                box.style.backgroundImage = "none";
+                if (label) label.textContent = sel ? sel.options[sel.selectedIndex].text : "";
+            } else if (bgImages[predefined]) {
+                var u = bgbase + bgImages[predefined];
+                box.style.backgroundImage = "url(" + u + ")";
+                box.style.background = "#f5f5f5";
+                if (label) label.textContent = sel ? sel.options[sel.selectedIndex].text : "";
+            } else {
+                box.style.background = "#f5f5f5";
+                box.style.backgroundImage = "none";
+                if (label) label.textContent = "";
+            }
+        } else {
+            box.style.background = "#f5f5f5";
+            box.style.backgroundImage = "none";
+            if (label) label.textContent = "";
+        }
+    }
+    function init() {
+        var sel = document.getElementById("id_background_image");
+        var urlInput = document.getElementById("id_background_image_url");
+        if (sel) sel.addEventListener("change", updatePreview);
+        if (urlInput) urlInput.addEventListener("input", updatePreview);
+        updatePreview();
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+})();
+</script>');
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();

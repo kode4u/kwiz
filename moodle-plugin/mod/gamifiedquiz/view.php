@@ -84,7 +84,12 @@ if (!empty($background_image)) {
             'gradient_orange' => 'linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)',
             'gradient_teal' => 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)'
         );
-        $background_style = isset($gradients[$key]) ? $gradients[$key] : '';
+        if (isset($gradients[$key])) {
+            $background_style = $gradients[$key];
+        } else if (in_array($key, array('bg1', 'bg2', 'bg3', 'bg4', 'bg5'), true)) {
+            $bgurl = $CFG->wwwroot . '/mod/gamifiedquiz/pix/backgrounds/' . $key . '.jpg';
+            $background_style = 'url(' . s($bgurl) . ')';
+        }
     } else if (strpos($background_image, 'http') === 0) {
         $background_style = 'url(' . s($background_image) . ')';
     }
@@ -159,13 +164,13 @@ if ($is_teacher) {
     echo '<div id="active-question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
     echo '<div id="active-question-choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
     echo '</div>';
-    echo '<div id="question-results-display" class="gq-container" style="display:none;"></div>';
-    echo '<div id="question-ranking-display" class="gq-container-lg" style="display:none; margin-top: 20px;">
+    echo '<div id="question-results-display" class="gq-container gq-teacher-secondary" style="display:none;"></div>';
+    echo '<div id="question-ranking-display" class="gq-container-lg gq-teacher-secondary" style="display:none; margin-top: 20px;">
         <h3 style="text-align: center; margin-bottom: 20px;">Current Rankings</h3>
         <div id="ranking-table-container"></div>
     </div>';
-    echo '<div id="leaderboard-container" class="leaderboard-container"></div>';
-    echo '<div id="final-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"></div>';
+    echo '<div id="leaderboard-container" class="leaderboard-container gq-teacher-secondary" style="display:none;"></div>';
+    echo '<div id="final-leaderboard-container" class="gq-container-lg gq-teacher-secondary" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"></div>';
     echo '</div>';
     echo '</div>';
 } else {

@@ -581,18 +581,18 @@
                 <label>Question Text:</label>
                 <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;">${escapeHtml(qText)}</textarea>
                 <label>Question Image (optional):</label>
-                <div class="question-image-editor" style="margin-bottom: 10px;">
-                    <input type="text" class="question-image-url-input" placeholder="Image URL" value="${imageIsUrl ? escapeHtml(questionImage) : ''}" style="width: 100%; padding: 8px; margin-bottom: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                <div class="question-image-editor" style="margin-bottom: 4px;">
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="color: #666;">or</span>
+                        <input type="text" class="question-image-url-input" placeholder="Image URL" value="${imageIsUrl ? escapeHtml(questionImage) : ''}" style="flex: 1; min-width: 120px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <span style="color: #666; white-space: nowrap;">or</span>
                         <input type="file" class="question-image-file-input" accept="image/*" style="font-size: 13px;">
                     </div>
                     <input type="hidden" class="question-image-data" value="${questionImage && questionImage.startsWith('data:') ? questionImage : ''}">
-                    <div class="question-image-preview" style="margin-top: 10px; min-height: 40px;">
+                    <div class="question-image-preview" style="margin-top: 8px; min-height: 40px;">
                         ${questionImage ? `<img src="${questionImage.startsWith('data:') ? questionImage : escapeAttr(questionImage)}" alt="Question" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">` : ''}
                     </div>
                 </div>
-                <label>Choices:</label>
+                <label style="margin-top: 6px;">Choices:</label>
                 <div class="choices-container" data-question-index="${index}"></div>
                 <button type="button" class="add-choice-btn gq-btn gq-btn-sm gq-btn-primary" data-index="${index}">Add Choice</button>
                 <button type="button" class="remove-question-btn gq-btn gq-btn-sm gq-btn-danger" data-index="${index}">Remove Question</button>
@@ -1641,6 +1641,13 @@
                 activeQEl.style.display = 'block';
                 if (config.questionBackgroundStyle) { activeQEl.style.cssText = (activeQEl.style.cssText || '') + '; ' + config.questionBackgroundStyle + '; padding: 20px; border-radius: 12px;'; }
                 if (activeQNum) activeQNum.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+                // Only show this container: hide results, ranking, leaderboard, etc.
+                const secondary = document.querySelectorAll('.gq-teacher-secondary');
+                secondary.forEach(el => { el.style.display = 'none'; });
+                const leaderboardEl = document.getElementById('leaderboard-container');
+                if (leaderboardEl) leaderboardEl.style.display = 'none';
+                const questionsContainerEl = document.getElementById('questions-container');
+                if (questionsContainerEl) questionsContainerEl.style.display = 'none';
                 if (activeQImage) {
                     if (questionImage) {
                         activeQImage.innerHTML = '<img src="' + questionImage.replace(/"/g, '&quot;') + '" alt="Question" style="max-width: 100%; max-height: 280px; border-radius: 12px; border: 2px solid #ddd;">';
@@ -1930,6 +1937,9 @@
         // Listen for question results
         socket.on('question:results', async (data) => {
             console.log('Question results received:', data);
+            // Hide active question; show only results/ranking/leaderboard (one view at a time)
+            const activeQEl = document.getElementById('active-question-display');
+            if (activeQEl) activeQEl.style.display = 'none';
             displayQuestionResults(data);
             // Display ranking after each question
             await displayQuestionRanking(data.leaderboard || []);
@@ -2187,8 +2197,10 @@
             
             if (!Array.isArray(leaderboard) || leaderboard.length === 0) {
                 container.innerHTML = '<h3>🏆 Current Leaderboard</h3><p>No scores yet.</p>';
+                container.style.display = 'block';
                 return;
             }
+            container.style.display = 'block';
             
             // Debug: Log leaderboard entries to see structure
             if (leaderboard.length > 0) {
