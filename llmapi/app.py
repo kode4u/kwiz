@@ -28,6 +28,8 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 LOCAL_LLM_URL = os.getenv('LOCAL_LLM_URL', 'http://localhost:11434')  # Ollama default
 MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', '10'))
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', 'en')
+# Optional: comma-separated list of Ollama models to pre-pull on startup
+OLLAMA_PRELOAD_MODELS = os.getenv('OLLAMA_PRELOAD_MODELS', '').strip()
 
 
 class QuestionRequest(BaseModel):
@@ -57,6 +59,62 @@ class Question(BaseModel):
 class QuestionResponse(BaseModel):
     questions: List[Question]
     metadata: dict
+
+
+def _preload_ollama_models():
+    """
+    Optionally pre-pull a set of Ollama models on startup.
+    Controlled via OLLAMA_PRELOAD_MODELS env var (comma-separated list).
+    """
+    if not OLLAMA_PRELOAD_MODELS:
+        return
+    if not LOCAL_LLM_URL:
+        logger.warning("OLLAMA_PRELOAD_MODELS is set but LOCAL_LLM_URL is empty; skipping preload.")
+        return
+
+    models = [m.strip() for m in OLLAMA_PRELOAD_MODELS.split(',') if m.strip()]
+    if not models:
+        return
+
+    try:
+        import requests
+        logger.info(f"Preloading Ollama models: {models}")
+
+        # Get currently available models
+        try:
+            resp = requests.get(f"{LOCAL_LLM_URL}/api/tags", timeout=15)
+            resp.raise_for_status()
+            tags = resp.json().get('models', []) or []
+            existing = {m.get('name') or m.get('model') for m in tags}
+        except Exception as e:
+            logger.warning(f"Could not list existing Ollama models at {LOCAL_LLM_URL}: {e}")
+            existing = set()
+
+        # Pull any missing models
+        for model in models:
+            if model in existing:
+                logger.info(f"Ollama model already present: {model}")
+                continue
+            try:
+                logger.info(f"Pre-pulling Ollama model: {model}")
+                pull_resp = requests.post(
+                    f"{LOCAL_LLM_URL}/api/pull",
+                    json={"model": model, "stream": False},
+                    timeout=1800,  # up to 30 minutes for large models
+                )
+                if pull_resp.status_code != 200:
+                    logger.error(
+                        "Failed to pull Ollama model %s: %s %s",
+                        model,
+                        pull_resp.status_code,
+                        pull_resp.text[:200],
+                    )
+                else:
+                    logger.info(f"Successfully pulled Ollama model: {model}")
+            except Exception as e:
+                logger.error(f"Error while pulling Ollama model {model}: {e}")
+    except Exception as e:
+        logger.error(f"Error during Ollama preload: {e}", exc_info=True)
 
 
 def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str]) -> List[Question]:
