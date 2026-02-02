@@ -69,6 +69,7 @@ try {
     $topic = !empty($prompt) ? $prompt : $gamifiedquiz->topic;
     $level = !empty($difficulty) ? $difficulty : $gamifiedquiz->difficulty;
     $predefined_data = !empty($data) ? $data : '';
+    $llmmodel = property_exists($gamifiedquiz, 'llm_model') ? $gamifiedquiz->llm_model : '';
     
     $questions = gamifiedquiz_generate_questions(
         $topic,
@@ -76,7 +77,8 @@ try {
         $count, // Number of questions from form
         $gamifiedquiz->language,
         $backend,
-        $predefined_data
+        $predefined_data,
+        $llmmodel
     );
 
     // Check if result contains an error

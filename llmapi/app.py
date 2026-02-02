@@ -40,6 +40,7 @@ class QuestionRequest(BaseModel):
     bloom_level: Optional[str] = Field(default=None, description="Bloom's taxonomy level")
     context: Optional[str] = Field(default=None, description="Additional context")
     backend: Optional[str] = Field(default=None, description="LLM backend: openai, gemini, local")
+    model: Optional[str] = Field(default=None, description="Override model name for local backend")
 
 
 class Choice(BaseModel):
@@ -294,12 +295,14 @@ IMPORTANT:
         raise Exception(f"Gemini generation error: {str(e)}")
 
 
-def generate_with_local_llm(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str]) -> List[Question]:
+def generate_with_local_llm(topic: str, level: str, n_questions: int, language: str,
+                            bloom_level: Optional[str], context: Optional[str],
+                            model: Optional[str] = None) -> List[Question]:
     """Generate questions using local LLM (Ollama)"""
     try:
         import requests
         
-        ollama_model = os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+        ollama_model = model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
         logger.info(f"Connecting to Ollama at {LOCAL_LLM_URL} with model {ollama_model}")
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
@@ -473,6 +476,73 @@ def health():
     }), 200
 
 
+@app.route('/models/ollama', methods=['GET'])
+def list_ollama_models():
+    """List models available in local Ollama."""
+    try:
+        import requests
+        resp = requests.get(f"{LOCAL_LLM_URL}/api/tags", timeout=10)
+        resp.raise_for_status()
+        return jsonify(resp.json()), 200
+    except Exception as e:
+        logger.error(f"Error listing Ollama models: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/models/ollama/pull', methods=['POST'])
+def pull_ollama_model():
+    """Trigger download (pull) of a specific Ollama model on demand."""
+    try:
+        import requests
+        data = request.get_json(force=True, silent=True) or {}
+        model = data.get('model')
+        stream = bool(data.get('stream', False))
+
+        if not model:
+            return jsonify({'error': "Missing 'model' in request body"}), 400
+
+        logger.info(f"Pulling Ollama model on demand: {model} (stream={stream})")
+        resp = requests.post(
+            f"{LOCAL_LLM_URL}/api/pull",
+            json={"model": model, "stream": stream},
+            timeout=1800,  # up to 30 minutes
+            stream=stream,
+        )
+
+        # If streaming, proxy chunks back to client.
+        if stream:
+            def generate():
+                try:
+                    for chunk in resp.iter_content(chunk_size=None):
+                        if chunk:
+                            yield chunk
+                except Exception as e:
+                    logger.error(f"Error streaming Ollama pull for {model}: {e}", exc_info=True)
+            return app.response_class(generate(), status=resp.status_code, mimetype='application/x-ndjson')
+
+        # Non-streaming: just return JSON/text
+        try:
+            resp.raise_for_status()
+        except Exception:
+            logger.error(
+                "Failed to pull Ollama model %s: %s %s",
+                model,
+                resp.status_code,
+                getattr(resp, 'text', '')[:200],
+            )
+            return jsonify({'error': f"Failed to pull model {model}", 'status': resp.status_code, 'detail': resp.text}), resp.status_code
+
+        # Try to pass through JSON if possible
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({'status': 'ok', 'detail': resp.text}), resp.status_code
+
+    except Exception as e:
+        logger.error(f"Error pulling Ollama model: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/generate', methods=['POST'])
 def generate_questions():
     """Generate MCQ questions"""
@@ -501,7 +571,8 @@ def generate_questions():
         elif backend == 'local':
             questions = generate_with_local_llm(
                 req.topic, req.level, req.n_questions,
-                req.language, req.bloom_level, req.context
+                req.language, req.bloom_level, req.context,
+                model=req.model,
             )
         else:
             return jsonify({'error': f'Unknown backend: {backend}'}), 400
@@ -536,6 +607,8 @@ def validate_question():
 
 
 if __name__ == '__main__':
+    # Optionally pull common Ollama models on startup
+    _preload_ollama_models()
     port = int(os.getenv('FLASK_PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=os.getenv('NODE_ENV') == 'development')
 

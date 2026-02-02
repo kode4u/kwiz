@@ -340,6 +340,22 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010114, 'gamifiedquiz');
     }
 
+    // Add llm_model field for storing selected local LLM model
+    if ($oldversion < 2025010115) {
+        $table = new xmldb_table('gamifiedquiz');
+        // Place after llm_backend if present, otherwise fall back to language
+        $afterfield = 'llm_backend';
+        $checkfield = new xmldb_field('llm_backend');
+        if (!$dbman->field_exists($table, $checkfield)) {
+            $afterfield = 'language';
+        }
+        $field = new xmldb_field('llm_model', XMLDB_TYPE_CHAR, '100', null, null, null, null, $afterfield);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2025010115, 'gamifiedquiz');
+    }
+
     // Return true to indicate upgrade was successful
     return true;
 }

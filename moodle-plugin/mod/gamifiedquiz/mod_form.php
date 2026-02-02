@@ -9,6 +9,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/gamifiedquiz/lib.php');
 
 class mod_gamifiedquiz_mod_form extends moodleform_mod {
 
@@ -52,6 +53,19 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         ));
         $mform->setDefault('llm_backend', 'openai');
         $mform->addHelpButton('llm_backend', 'llm_backend', 'mod_gamifiedquiz');
+
+        // Local LLM model selection (dynamic from llmapi; same HTTP/URL logic as lib.php)
+        $llmmodeloptions = array('' => get_string('choose', 'moodle'));
+        $models = gamifiedquiz_fetch_ollama_models();
+        foreach ($models as $name => $label) {
+            $llmmodeloptions[$name] = $label;
+        }
+
+        $mform->addElement('select', 'llm_model', get_string('llm_model', 'mod_gamifiedquiz'), $llmmodeloptions);
+        $mform->setType('llm_model', PARAM_TEXT);
+        $mform->addHelpButton('llm_model', 'llm_model', 'mod_gamifiedquiz');
+        // Only relevant when backend is local.
+        $mform->hideIf('llm_model', 'llm_backend', 'neq', 'local');
 
         // Question Bank Category Selector
         $mform->addElement('header', 'questionbankheader', get_string('questionbank', 'mod_gamifiedquiz'));

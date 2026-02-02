@@ -40,6 +40,8 @@ $string['language_km'] = 'Khmer';
 // New fields
 $string['llm_backend'] = 'LLM Backend';
 $string['llm_backend_help'] = 'Select the AI model to use for question generation';
+$string['llm_model'] = 'Local LLM model';
+$string['llm_model_help'] = 'Choose which local Ollama model to use when backend is set to Local LLM.';
 $string['use_predefined'] = 'Use Predefined Questions';
 $string['use_predefined_desc'] = 'Check to use predefined questions instead of generating with AI';
 $string['predefined_data'] = 'Predefined Questions';

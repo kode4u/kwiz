@@ -274,6 +274,47 @@ function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
 }
 
 /**
+ * Fetch list of available Ollama model names from the LLM API.
+ * Uses same URL resolution and native curl as gamifiedquiz_generate_questions.
+ *
+ * @return array Associative array model_name => model_name for dropdown options
+ */
+function gamifiedquiz_fetch_ollama_models() {
+    $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
+    if (empty($api_url)) {
+        $api_url = 'http://llmapi:5001';
+    }
+    if (strpos($api_url, 'localhost') !== false || strpos($api_url, '127.0.0.1') !== false) {
+        $api_url = str_replace(['localhost', '127.0.0.1'], 'llmapi', $api_url);
+    }
+    $url = rtrim($api_url, '/') . '/models/ollama';
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($response === false || $http_code !== 200) {
+        return array();
+    }
+    $data = json_decode($response, true);
+    if (!isset($data['models']) || !is_array($data['models'])) {
+        return array();
+    }
+    $names = array();
+    foreach ($data['models'] as $model) {
+        $name = !empty($model['name']) ? $model['name'] : (isset($model['model']) ? $model['model'] : null);
+        if ($name) {
+            $names[$name] = $name;
+        }
+    }
+    return $names;
+}
+
+/**
  * Call LLM API to generate questions
  *
  * @param string $topic Topic for questions
@@ -282,9 +323,10 @@ function gamifiedquiz_generate_jwt($userid, $sessionid, $role) {
  * @param string $language Language code
  * @param string $backend LLM backend (openai, gemini, local)
  * @param string $predefined_data Optional predefined data/context for question generation
+ * @param string $llmmodel Optional local LLM model name (for backend = local)
  * @return array|false Generated questions or false on error
  */
-function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '') {
+function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '') {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
         // Default: use Docker service name when running in Docker, localhost otherwise
@@ -311,6 +353,11 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     // Add predefined data if provided
     if (!empty($predefined_data)) {
         $data['predefined_data'] = $predefined_data;
+    }
+
+    // Add explicit model override for local backend if provided
+    if ($backend === 'local' && !empty($llmmodel)) {
+        $data['model'] = $llmmodel;
     }
 
     $ch = curl_init($api_url . '/generate');

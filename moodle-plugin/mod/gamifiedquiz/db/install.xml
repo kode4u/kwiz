@@ -15,6 +15,7 @@
         <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="medium" SEQUENCE="false"/>
         <FIELD NAME="language" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="en" SEQUENCE="false"/>
         <FIELD NAME="llm_backend" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="openai" SEQUENCE="false"/>
+        <FIELD NAME="llm_model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Selected local LLM model (Ollama)"/>
         <FIELD NAME="template" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="default" SEQUENCE="false"/>
         <FIELD NAME="color_palette" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="kahoot" SEQUENCE="false"/>
         <FIELD NAME="use_predefined" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
