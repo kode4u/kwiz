@@ -316,35 +316,18 @@ io.on('connection', async (socket) => {
       JSON.stringify(question)
     );
     
-    // Broadcast to all students (timer starts when teacher calls teacher:start_question_timer)
+    // Broadcast to all students; timer starts automatically
     io.to(room).emit('question:new', {
       question,
       timer,
-      questionNumber: data.questionNumber || 1,
-      timerStarted: false
+      questionNumber: data.questionNumber || 1
     });
     
-    // Clear any existing timer
+    // Clear any existing timer and start countdown
     if (session.timerInterval) {
       clearInterval(session.timerInterval);
       session.timerInterval = null;
     }
-  });
-  
-  // Teacher: Start question timer (e.g. after full screen)
-  socket.on('teacher:start_question_timer', async () => {
-    if (socket.role !== 'teacher') {
-      socket.emit('error', { message: 'Unauthorized' });
-      return;
-    }
-    const session = await getSession(socket.sessionId);
-    if (!session || !session.currentQuestion) return;
-    if (session.timerInterval) return; // Already running
-    
-    const room = `session:${socket.sessionId}`;
-    const timer = session.timer || 60;
-    io.to(room).emit('timer:started', {});
-    
     let remaining = timer;
     session.timerInterval = setInterval(async () => {
       remaining--;

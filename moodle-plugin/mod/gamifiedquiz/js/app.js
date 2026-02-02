@@ -1661,17 +1661,9 @@
                 }
                 if (activeQText) activeQText.textContent = questionData.question.text;
                 if (activeQTimer) {
-                    activeQTimer.textContent = '—';
-                    activeQTimer.style.color = '#666';
-                }
-                // Show "Start timer" button - timer starts when teacher clicks it (or full screen)
-                const startTimerBtn = document.getElementById('start-question-timer-btn');
-                if (startTimerBtn) {
-                    startTimerBtn.style.display = 'inline-block';
-                    startTimerBtn.onclick = () => {
-                        if (socket && socket.connected) socket.emit('teacher:start_question_timer');
-                        startTimerBtn.style.display = 'none';
-                    };
+                    activeQTimer.textContent = `${timeLimit}s`;
+                    activeQTimer.style.color = '#007bff';
+                    activeQTimer.style.background = '#e7f3ff';
                 }
                 if (activeQChoices) {
                     activeQChoices.innerHTML = questionData.question.choices.map((c, i) => {
@@ -1710,7 +1702,7 @@
                 }
             }
             
-            // Timer countdown comes from server (teacher:start_question_timer) via timer:update
+            // Timer countdown from server via timer:update
             if (window.teacherTimerInterval) {
                 clearInterval(window.teacherTimerInterval);
                 window.teacherTimerInterval = null;
@@ -1764,15 +1756,6 @@
             });
         }
         
-        socket.on('timer:started', () => {
-            const activeQTimer = document.getElementById('active-question-timer');
-            const timeLimit = config.timeLimitPerQuestion || 60;
-            if (activeQTimer) {
-                activeQTimer.textContent = `${timeLimit}s`;
-                activeQTimer.style.color = '#007bff';
-                activeQTimer.style.background = '#e7f3ff';
-            }
-        });
         socket.on('timer:update', (data) => {
             const activeQTimer = document.getElementById('active-question-timer');
             if (!activeQTimer) return;
@@ -2588,11 +2571,11 @@
             const answerResultsEl = document.getElementById('student-answer-results-container');
             if (answerResultsEl) answerResultsEl.style.display = 'none';
             
-            displayQuestion(data.question, data.timer || 60, data.timerStarted !== false);
+            displayQuestion(data.question, data.timer || 60, true);
         });
 
         // Display question (Kahoot-style for students)
-        function displayQuestion(question, timer, timerStarted) {
+        function displayQuestion(question, timer) {
             // Handle different question formats
             const questionText = question.text || question.question || question.question_text || '';
             const questionImage = question.image || question.question_image || '';
@@ -2688,18 +2671,17 @@
                 });
             });
 
-            // Timer: wait for timer:started from server (teacher clicks Start timer), then listen for timer:update
+            // Timer: starts automatically when question is pushed; listen for timer:update
             const timeLimit = config.timeLimitPerQuestion || timer || 60;
             currentTimerDuration = timeLimit;
             const timerEl = document.getElementById('timer');
             if (timerEl) {
-                timerEl.textContent = timerStarted ? `${timeLimit}s` : '—';
-                timerEl.style.color = timerStarted ? '#007bff' : '#666';
-                timerEl.style.background = timerStarted ? '#e7f3ff' : '#f0f0f0';
+                timerEl.textContent = `${timeLimit}s`;
+                timerEl.style.color = '#007bff';
+                timerEl.style.background = '#e7f3ff';
             }
             
             if (timerInterval) clearInterval(timerInterval);
-            if (!timerStarted) return; // Timer updates will come from server
             let remaining = timeLimit;
             timerInterval = setInterval(() => {
                 remaining--;
@@ -2865,15 +2847,6 @@
             });
         }
         
-        socket.on('timer:started', () => {
-            const timerEl = document.getElementById('timer');
-            const timeLimit = config.timeLimitPerQuestion || 60;
-            if (timerEl) {
-                timerEl.textContent = `${timeLimit}s`;
-                timerEl.style.color = '#007bff';
-                timerEl.style.background = '#e7f3ff';
-            }
-        });
         socket.on('timer:update', (data) => {
             const timerEl = document.getElementById('timer');
             if (!timerEl) return;

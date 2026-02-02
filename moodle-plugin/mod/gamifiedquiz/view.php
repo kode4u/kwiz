@@ -155,10 +155,7 @@ if ($is_teacher) {
     echo '<button type="button" id="active-question-fullscreen-btn" class="gq-fullscreen-btn" title="Full screen" aria-label="Full screen" style="position: absolute; top: 10px; right: 10px; z-index: 10; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 18px;">⛶</button>';
     echo '<div id="active-question-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">';
     echo '<div id="active-question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
-    echo '<div style="display: flex; align-items: center; gap: 10px;">';
-    echo '<button type="button" id="start-question-timer-btn" class="gq-btn gq-btn-primary" style="display: none; padding: 10px 20px;">Start timer</button>';
     echo '<div id="active-question-timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
-    echo '</div>';
     echo '</div>';
     echo '<div id="active-question-image" style="text-align: center; margin-bottom: 15px;"></div>';
     echo '<div id="active-question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
