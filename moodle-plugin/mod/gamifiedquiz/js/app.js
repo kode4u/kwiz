@@ -1390,6 +1390,15 @@
         // End session handler (extracted to function so it can be called from Next button)
         // End session handler (extracted to function so it can be called from Next button)
         async function endSessionHandler() {
+            console.log('endSessionHandler called. currentQuestionIndex:', currentQuestionIndex, 'questions.length:', questions.length);
+            
+            // Disable the button immediately to prevent double-clicks
+            const btn = document.getElementById('teacher-container-next-btn') || document.getElementById('next-question-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Ending quiz...';
+            }
+            
             // Get final leaderboard before ending (load from database to ensure we have latest scores)
             let finalLeaderboard = currentLeaderboard || [];
             let participantCount = 0;
@@ -1479,13 +1488,22 @@
             });
             
             // Show leaderboard dialog with final results
-            if (finalLeaderboard && finalLeaderboard.length > 0) {
-                console.log('Showing final leaderboard dialog with', finalLeaderboard.length, 'participants');
-                await window.showSessionResults(currentSessionInstanceId, finalLeaderboard);
-            } else {
-                // Even if no leaderboard, show dialog with message
-                console.log('No leaderboard data, showing empty dialog');
-                await window.showSessionResults(currentSessionInstanceId, []);
+            try {
+                if (finalLeaderboard && finalLeaderboard.length > 0) {
+                    console.log('Showing final leaderboard dialog with', finalLeaderboard.length, 'participants');
+                    await window.showSessionResults(currentSessionInstanceId, finalLeaderboard);
+                } else {
+                    // Even if no leaderboard, show dialog with message
+                    console.log('No leaderboard data, showing empty dialog');
+                    await window.showSessionResults(currentSessionInstanceId, []);
+                }
+            } catch (error) {
+                console.error('Error showing session results:', error);
+                // Fallback: show alert if dialog fails
+                alert('Quiz session ended. Final leaderboard:\n\n' + 
+                    (finalLeaderboard.length > 0 
+                        ? finalLeaderboard.map((e, i) => `${i+1}. ${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(e) : 'User ' + (e.userId || e.user_id || e.userid || '?')}: ${e.score || 0} pts`).join('\n')
+                        : 'No participants'));
             }
             
             // RESET for next session
@@ -1733,8 +1751,13 @@
         if (nextBtn) {
             nextBtn.addEventListener('click', async () => {
                 if (currentQuestionIndex >= questions.length) {
-                    // End quiz - call end session handler
-                    await endSessionHandler();
+                    // End quiz - call end session handler with error handling
+                    try {
+                        await endSessionHandler();
+                    } catch (error) {
+                        console.error('Error ending session:', error);
+                        alert('Failed to end quiz session. Please try again or refresh the page.');
+                    }
                 } else {
                     // Push next question (teacher can proceed anytime)
                     pushNextQuestion();
@@ -2004,6 +2027,7 @@
                 </div>
             `;
             document.getElementById('teacher-container-next-btn').onclick = function teacherContainerNext() {
+                console.log('teacher-container-next-btn clicked. Phase:', teacherContainerPhase, 'currentQuestionIndex:', currentQuestionIndex, 'questions.length:', questions.length);
                 if (teacherContainerPhase === 'result') {
                     const lb = teacherContainerData.leaderboard || [];
                     const sorted = [...lb].sort((a, b) => (b.score || 0) - (a.score || 0));
@@ -2024,15 +2048,27 @@
                             </div>
                         </div>
                     `;
-                    document.getElementById('teacher-container-next-btn').onclick = teacherContainerNext;
+                    // Reattach handler after recreating button
+                    const newBtn = document.getElementById('teacher-container-next-btn');
+                    if (newBtn) {
+                        newBtn.onclick = teacherContainerNext;
+                        console.log('Reattached handler to teacher-container-next-btn. currentQuestionIndex:', currentQuestionIndex, 'questions.length:', questions.length, 'button text:', newBtn.textContent);
+                    }
                     return;
                 }
                 if (teacherContainerPhase === 'ranking') {
+                    console.log('Ranking phase - checking if should end quiz. currentQuestionIndex:', currentQuestionIndex, 'questions.length:', questions.length);
                     teacherContainerPhase = null;
                     teacherContainerData = null;
                     if (currentQuestionIndex >= questions.length) {
-                        endSessionHandler();
+                        console.log('All questions answered - calling endSessionHandler');
+                        // End quiz - ensure async handler completes
+                        endSessionHandler().catch(error => {
+                            console.error('Error ending session:', error);
+                            alert('Failed to end quiz session. Please try again or refresh the page.');
+                        });
                     } else {
+                        console.log('More questions remaining - pushing next question');
                         if (activeQuestionDisplayEl && activeQuestionDisplayTemplate) {
                             activeQuestionDisplayEl.innerHTML = activeQuestionDisplayTemplate;
                         }
@@ -3174,9 +3210,8 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">${session.ended_formatted || '-'}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
                             ${session.timeended ? 
-                              (session.session_results && Array.isArray(session.session_results) && session.session_results.length > 0 ? 
-                                `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="showSessionResults('${session.session_id || session.id}', ${JSON.stringify(session.session_results).replace(/"/g, '&quot;').replace(/'/g, '&#39;')})">View Leaderboard</button>` : 
-                                `<button class="btn btn-sm btn-info gq-btn gq-btn-sm gq-btn-info" onclick="loadAndShowSessionLeaderboard('${session.session_id || session.id}')">View Leaderboard</button>`) :
+                              // Always recalculate from database to ensure scores match what was shown during quiz
+                              `<button class="btn btn-sm btn-primary gq-btn gq-btn-sm gq-btn-primary" onclick="loadAndShowSessionLeaderboard('${session.session_id || session.id}')">View Leaderboard</button>` :
                               '<span style="color: #999;">Session Active</span>'}
                         </td>
                     </tr>

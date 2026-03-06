@@ -295,13 +295,21 @@ function gamifiedquiz_fetch_ollama_models() {
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
     curl_close($ch);
 
     if ($response === false || $http_code !== 200) {
+        // Log error for debugging (only if error logging is enabled)
+        if ($response === false) {
+            error_log("Gamified Quiz: Failed to fetch Ollama models from {$url}. cURL error: " . ($curl_error ?: 'Unknown error'));
+        } else {
+            error_log("Gamified Quiz: Failed to fetch Ollama models from {$url}. HTTP {$http_code}. Response: " . substr($response, 0, 200));
+        }
         return array();
     }
     $data = json_decode($response, true);
     if (!isset($data['models']) || !is_array($data['models'])) {
+        error_log("Gamified Quiz: Invalid response format from {$url}. Expected 'models' array. Got: " . substr($response, 0, 200));
         return array();
     }
     $names = array();
