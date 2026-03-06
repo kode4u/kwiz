@@ -41,12 +41,13 @@ Thumbs.db
 *.log
 logs/
 
-# Docker
+# Docker (only override and env secrets ignored; docker/ and all Dockerfiles are tracked)
 docker-compose.override.yml
+# docker/.env and docker/.env.* are ignored above under "Environment files"
 
-# Moodle
+# Moodle (root-level only; docker/moodle/ and its Dockerfile are tracked)
 moodle-data/
-moodle/
+/moodle/
 
 # Backups
 *.sql
