@@ -1,19 +1,19 @@
-# LBE JICA ? AI-Enhanced Gamified Moodle Quiz
+# LBE JICA — AI-Enhanced Gamified Moodle Quiz
 
 A comprehensive system that integrates AI-powered question generation with real-time gamified quizzes in Moodle.
 
-## ??? Project Structure
+## 🏗️ Project Structure
 
 ```
 jica/
-??? moodle-plugin/          # Moodle PHP plugin
-??? websocket-server/       # Node.js real-time server
-??? llmapi/                 # LLM adapter service (Python/Flask)
-??? docker/                 # Docker Compose and configurations
-??? docs/                   # Documentation
+├── moodle-plugin/          # Moodle PHP plugin
+├── websocket-server/       # Node.js real-time server
+├── llmapi/                 # LLM adapter service (Python/Flask)
+├── docker/                 # Docker Compose and configurations
+└── docs/                   # Documentation
 ```
-
-## ?? Quick Start
+ 
+## 🚀 Quick Start
 
 See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
 
@@ -56,7 +56,7 @@ See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
    - Complete installation wizard
    - Configure plugin settings (see [QUICKSTART.md](QUICKSTART.md))
 
-## ?? Documentation
+## 📚 Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [Installation Guide](docs/INSTALLATION.md)
@@ -64,7 +64,7 @@ See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
 - [API Documentation](docs/API.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
 
-## ?? Services
+## 🔧 Services
 
 ### 1. Moodle Plugin (`moodle-plugin/`)
 - PHP-based Moodle activity plugin
@@ -84,7 +84,7 @@ See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
 - Structured MCQ output
 - Multi-language support (English, Khmer)
 
-## ?? Docker Services
+## 🐳 Docker Services
 
 All services are containerized:
 - `moodle-plugin`: Moodle with plugin installed
@@ -93,7 +93,7 @@ All services are containerized:
 - `redis`: Caching and pub/sub
 - `mysql`: Database (Moodle)
 
-## ?? Development Workflow
+## 📋 Development Workflow
 
 1. **Local Development:**
    - Each service can run independently
@@ -110,7 +110,7 @@ All services are containerized:
    - Kubernetes manifests (optional)
    - CI/CD with GitHub Actions
 
-## ?? Security
+## 🔐 Security
 
 - JWT authentication for WebSocket
 - HTTPS/WSS in production
@@ -118,21 +118,21 @@ All services are containerized:
 - Input sanitization
 - Environment-based secrets
 
-## ?? Monitoring
+## 📊 Monitoring
 
 - Prometheus metrics (optional)
 - Application logs via Docker
 - Health check endpoints
 
-## ?? Contributing
+## 🤝 Contributing
 
 See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
-## ?? License
+## 📄 License
 
 GPL v3 (Moodle plugin compatibility)
 
-## ?? Support
+## 📞 Support
 
 For issues and questions, please open a GitHub issue.
 
