@@ -208,6 +208,13 @@ io.on('connection', async (socket) => {
   
   // Join room
   socket.join(room);
+
+  // Research / ops: round-trip latency measurement (ack callback)
+  socket.on('eval:ping', (cb) => {
+    if (typeof cb === 'function') {
+      cb();
+    }
+  });
   
   // Register user in session
   if (socket.role === 'teacher') {

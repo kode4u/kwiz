@@ -10,9 +10,17 @@ jica/
 ├── websocket-server/       # Node.js real-time server
 ├── llmapi/                 # LLM adapter service (Python/Flask)
 ├── docker/                 # Docker Compose and configurations
-└── docs/                   # Documentation
+├── docs/                   # Documentation
+└── evaluate/               # Research evaluation (metrics, SUS, JMeter, classroom)
 ```
- 
+
+## 📄 Research & publication
+
+This project supports empirical evaluation for **academic papers**:
+
+- **Research overview (abstract, methods, claims):** [docs/RESEARCH_README.md](docs/RESEARCH_README.md)
+- **Reproducible evaluation suite:** [evaluate/README.md](evaluate/README.md) — LLM latency, WebSocket latency, SUS, JMeter load tests, classroom deployment protocols
+
 ## 🚀 Quick Start
 
 See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!

@@ -1,0 +1,11 @@
+{
+  "name": "gamifiedquiz-ws-eval",
+  "private": true,
+  "description": "WebSocket latency evaluation for research paper",
+  "scripts": {
+    "measure": "node measure_websocket_latency.js"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}
