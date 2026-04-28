@@ -38,9 +38,7 @@ python app.py
 ```
 
 ## API Endpoints
-
 ### `POST /generate`
-
 Generate MCQ questions.
 
 **Request:**
@@ -106,7 +104,6 @@ Environment variables:
 - `FLASK_PORT`: Port to run on (default: 5001)
 
 ## Supported Backends
-
 ### OpenAI (Current)
 
 Uses GPT-3.5-turbo or GPT-4 for question generation.
