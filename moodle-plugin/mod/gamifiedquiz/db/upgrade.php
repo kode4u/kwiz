@@ -356,6 +356,49 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010115, 'gamifiedquiz');
     }
 
+    // Add generation logs table for research/performance analysis.
+    if ($oldversion < 2025010116) {
+        $table = new xmldb_table('gamifiedquiz_generation_logs');
+
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('gamifiedquizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('cmid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('session_id', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+            $table->add_field('request_uuid', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('topic', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('difficulty', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+            $table->add_field('language', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+            $table->add_field('backend', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+            $table->add_field('llm_model', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+            $table->add_field('api_url', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('requested_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('generated_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('saved_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('started_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('ended_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('duration_ms', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('questions_per_sec', XMLDB_TYPE_NUMBER, '10', '4', null, null, null);
+            $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'started');
+            $table->add_field('error_message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('gamifiedquiz', XMLDB_KEY_FOREIGN, array('gamifiedquizid'), 'gamifiedquiz', array('id'));
+            $table->add_key('user', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+            $table->add_index('quiz_time', XMLDB_INDEX_NOTUNIQUE, array('gamifiedquizid', 'timecreated'));
+            $table->add_index('request_uuid', XMLDB_INDEX_UNIQUE, array('request_uuid'));
+            $table->add_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2025010116, 'gamifiedquiz');
+    }
+
     // Return true to indicate upgrade was successful
     return true;
 }

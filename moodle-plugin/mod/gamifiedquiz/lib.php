@@ -100,6 +100,9 @@ function gamifiedquiz_supports($feature) {
 function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
     global $DB;
 
+    // Store per-user API keys in user preferences (not in activity table).
+    gamifiedquiz_save_user_llm_api_keys_from_form($gamifiedquiz);
+
     // Prefer custom URL over predefined background
     if (!empty($gamifiedquiz->background_image_url)) {
         $gamifiedquiz->background_image = trim($gamifiedquiz->background_image_url);
@@ -129,6 +132,9 @@ function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
 function gamifiedquiz_update_instance($gamifiedquiz, $mform = null) {
     global $DB;
 
+    // Store per-user API keys in user preferences (not in activity table).
+    gamifiedquiz_save_user_llm_api_keys_from_form($gamifiedquiz);
+
     // Prefer custom URL over predefined background
     if (!empty($gamifiedquiz->background_image_url)) {
         $gamifiedquiz->background_image = trim($gamifiedquiz->background_image_url);
@@ -146,6 +152,49 @@ function gamifiedquiz_update_instance($gamifiedquiz, $mform = null) {
     }
     
     return $result;
+}
+
+/**
+ * Persist LLM API keys from form object into user preferences.
+ * Keys are user-specific and never saved on the quiz instance record.
+ *
+ * @param stdClass $formdata
+ * @return void
+ */
+function gamifiedquiz_save_user_llm_api_keys_from_form($formdata) {
+    global $USER;
+
+    if (isset($formdata->openai_user_api_key)) {
+        $key = trim((string)$formdata->openai_user_api_key);
+        set_user_preference('mod_gamifiedquiz_openai_api_key', $key, $USER->id);
+        unset($formdata->openai_user_api_key);
+    }
+
+    if (isset($formdata->gemini_user_api_key)) {
+        $key = trim((string)$formdata->gemini_user_api_key);
+        set_user_preference('mod_gamifiedquiz_gemini_api_key', $key, $USER->id);
+        unset($formdata->gemini_user_api_key);
+    }
+}
+
+/**
+ * Get user-specific API key by backend.
+ *
+ * @param string $backend
+ * @param int|null $userid
+ * @return string
+ */
+function gamifiedquiz_get_user_llm_api_key($backend, $userid = null) {
+    global $USER;
+    $uid = $userid ?: $USER->id;
+
+    if ($backend === 'openai') {
+        return (string)get_user_preferences('mod_gamifiedquiz_openai_api_key', '', $uid);
+    }
+    if ($backend === 'gemini') {
+        return (string)get_user_preferences('mod_gamifiedquiz_gemini_api_key', '', $uid);
+    }
+    return '';
 }
 
 /**
@@ -334,7 +383,7 @@ function gamifiedquiz_fetch_ollama_models() {
  * @param string $llmmodel Optional local LLM model name (for backend = local)
  * @return array|false Generated questions or false on error
  */
-function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '') {
+function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '') {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
         // Default: use Docker service name when running in Docker, localhost otherwise
@@ -366,6 +415,13 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     // Add explicit model override for local backend if provided
     if ($backend === 'local' && !empty($llmmodel)) {
         $data['model'] = $llmmodel;
+    }
+
+    // Pass user-specific API key to LLM API for cloud backends.
+    if ($backend === 'openai' && !empty($userapikey)) {
+        $data['openai_api_key'] = $userapikey;
+    } else if ($backend === 'gemini' && !empty($userapikey)) {
+        $data['gemini_api_key'] = $userapikey;
     }
 
     $ch = curl_init($api_url . '/generate');

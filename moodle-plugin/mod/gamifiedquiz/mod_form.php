@@ -54,6 +54,18 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->setDefault('llm_backend', 'openai');
         $mform->addHelpButton('llm_backend', 'llm_backend', 'mod_gamifiedquiz');
 
+        // User-specific OpenAI API key (saved to user preferences, not activity record).
+        $mform->addElement('passwordunmask', 'openai_user_api_key', get_string('openai_user_api_key', 'mod_gamifiedquiz'));
+        $mform->setType('openai_user_api_key', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('openai_user_api_key', 'openai_user_api_key', 'mod_gamifiedquiz');
+        $mform->hideIf('openai_user_api_key', 'llm_backend', 'neq', 'openai');
+
+        // User-specific Gemini API key (saved to user preferences, not activity record).
+        $mform->addElement('passwordunmask', 'gemini_user_api_key', get_string('gemini_user_api_key', 'mod_gamifiedquiz'));
+        $mform->setType('gemini_user_api_key', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('gemini_user_api_key', 'gemini_user_api_key', 'mod_gamifiedquiz');
+        $mform->hideIf('gemini_user_api_key', 'llm_backend', 'neq', 'gemini');
+
         // Local LLM model selection (dynamic from llmapi; same HTTP/URL logic as lib.php)
         $llmmodeloptions = array('' => get_string('choose', 'moodle'));
         $models = gamifiedquiz_fetch_ollama_models();
@@ -230,12 +242,41 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
     }
 
     public function set_data($defaultvalues) {
+        global $USER;
+
+        // Load user-specific API keys into form (never saved on activity instance).
+        $defaultvalues->openai_user_api_key = get_user_preferences('mod_gamifiedquiz_openai_api_key', '', $USER->id);
+        $defaultvalues->gemini_user_api_key = get_user_preferences('mod_gamifiedquiz_gemini_api_key', '', $USER->id);
+
         // When editing: if background_image is a URL, show it in the URL field
         if (!empty($defaultvalues->background_image) && strpos($defaultvalues->background_image, 'http') === 0) {
             $defaultvalues->background_image_url = $defaultvalues->background_image;
             $defaultvalues->background_image = '';
         }
         parent::set_data($defaultvalues);
+    }
+
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if (!empty($data['llm_backend']) && $data['llm_backend'] === 'openai') {
+            $value = trim((string)($data['openai_user_api_key'] ?? ''));
+            if ($value === '') {
+                $errors['openai_user_api_key'] = get_string('apikey_required_openai', 'mod_gamifiedquiz');
+            }
+        } else if (!empty($data['llm_backend']) && $data['llm_backend'] === 'gemini') {
+            $value = trim((string)($data['gemini_user_api_key'] ?? ''));
+            if ($value === '') {
+                $errors['gemini_user_api_key'] = get_string('apikey_required_gemini', 'mod_gamifiedquiz');
+            }
+        } else if (!empty($data['llm_backend']) && $data['llm_backend'] === 'local') {
+            $value = trim((string)($data['llm_model'] ?? ''));
+            if ($value === '') {
+                $errors['llm_model'] = get_string('llm_model_required_local', 'mod_gamifiedquiz');
+            }
+        }
+
+        return $errors;
     }
 }
 

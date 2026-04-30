@@ -1,0 +1,28 @@
+services:
+  # Experiment resource caps (applied via compose override).
+  # Use together with docker-compose.yml:
+  # docker compose -f docker-compose.yml -f docker-compose.experiment.yml up -d
+
+  db:
+    cpus: "${EXP_DB_CPUS:-4.00}"
+    mem_limit: "${EXP_DB_MEM_LIMIT:-8g}"
+
+  redis:
+    cpus: "${EXP_REDIS_CPUS:-4.00}"
+    mem_limit: "${EXP_REDIS_MEM_LIMIT:-8g}"
+
+  llmapi:
+    cpus: "${EXP_LLMAPI_CPUS:-4.00}"
+    mem_limit: "${EXP_LLMAPI_MEM_LIMIT:-8g}"
+
+  websocket-server:
+    cpus: "${EXP_WS_CPUS:-4.00}"
+    mem_limit: "${EXP_WS_MEM_LIMIT:-8g}"
+
+  moodle:
+    cpus: "${EXP_MOODLE_CPUS:-4.00}"
+    mem_limit: "${EXP_MOODLE_MEM_LIMIT:-8g}"
+
+  phpmyadmin:
+    cpus: "${EXP_PHPMYADMIN_CPUS:-4.00}"
+    mem_limit: "${EXP_PHPMYADMIN_MEM_LIMIT:-8g}"

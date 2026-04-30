@@ -55,6 +55,19 @@ if ($cmid) {
     require_capability('mod/gamifiedquiz:addinstance', $context);
 }
 
+// Track generation request lifecycle for research analytics.
+$requeststart = microtime(true);
+$requestuuid = sprintf(
+    '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+    mt_rand(0, 0xffff),
+    mt_rand(0, 0x0fff) | 0x4000,
+    mt_rand(0, 0x3fff) | 0x8000,
+    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+);
+$startedat = time();
+$generationlogid = null;
+
 // Generate questions
 try {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
@@ -70,6 +83,28 @@ try {
     $level = !empty($difficulty) ? $difficulty : $gamifiedquiz->difficulty;
     $predefined_data = !empty($data) ? $data : '';
     $llmmodel = property_exists($gamifiedquiz, 'llm_model') ? $gamifiedquiz->llm_model : '';
+    $userapikey = gamifiedquiz_get_user_llm_api_key($backend, $USER->id);
+
+    // Insert initial log row before calling LLM service.
+    $logrecord = new stdClass();
+    $logrecord->gamifiedquizid = $gamifiedquiz->id;
+    $logrecord->userid = $USER->id;
+    $logrecord->cmid = $cmid ?: null;
+    $logrecord->request_uuid = $requestuuid;
+    $logrecord->topic = core_text::substr((string)$topic, 0, 255);
+    $logrecord->difficulty = core_text::substr((string)$level, 0, 20);
+    $logrecord->language = core_text::substr((string)$gamifiedquiz->language, 0, 10);
+    $logrecord->backend = core_text::substr((string)$backend, 0, 20);
+    $logrecord->llm_model = !empty($llmmodel) ? core_text::substr((string)$llmmodel, 0, 100) : null;
+    $logrecord->api_url = core_text::substr((string)$api_url, 0, 255);
+    $logrecord->requested_count = max(0, (int)$count);
+    $logrecord->generated_count = 0;
+    $logrecord->saved_count = 0;
+    $logrecord->started_at = $startedat;
+    $logrecord->status = 'started';
+    $logrecord->timecreated = $startedat;
+    $logrecord->timemodified = $startedat;
+    $generationlogid = $DB->insert_record('gamifiedquiz_generation_logs', $logrecord);
     
     $questions = gamifiedquiz_generate_questions(
         $topic,
@@ -78,21 +113,47 @@ try {
         $gamifiedquiz->language,
         $backend,
         $predefined_data,
-        $llmmodel
+        $llmmodel,
+        $userapikey
     );
 
     // Check if result contains an error
     if (is_array($questions) && isset($questions['error'])) {
+        if (!empty($generationlogid)) {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$questions['error'], 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
+        }
         http_response_code(500);
         echo json_encode(array(
             'success' => false,
             'error' => $questions['error'],
-            'api_url' => $api_url
+            'api_url' => $api_url,
+            'request_uuid' => $requestuuid
         ));
         exit;
     }
     
     if ($questions === false || empty($questions) || !is_array($questions)) {
+        if (!empty($generationlogid)) {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = 'No valid questions returned from LLM API';
+            $updatelog->timemodified = $now;
+            $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
+        }
         http_response_code(500);
         $error_msg = 'Failed to generate questions. ';
         $error_msg .= 'Please check:\n';
@@ -104,7 +165,8 @@ try {
         echo json_encode(array(
             'success' => false,
             'error' => $error_msg,
-            'api_url' => $api_url
+            'api_url' => $api_url,
+            'request_uuid' => $requestuuid
         ));
         exit;
     }
@@ -153,6 +215,26 @@ try {
         $DB->insert_record('gamifiedquiz_questions', $record);
         $saved_count++;
     }
+
+    $generatedcount = count($questions);
+    $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+    $durationsec = $durationms > 0 ? ($durationms / 1000.0) : 0.0;
+    $questionspersec = ($durationsec > 0 && $generatedcount > 0) ? ($generatedcount / $durationsec) : null;
+
+    if (!empty($generationlogid)) {
+        $now = time();
+        $updatelog = new stdClass();
+        $updatelog->id = $generationlogid;
+        $updatelog->session_id = $session_id;
+        $updatelog->generated_count = $generatedcount;
+        $updatelog->saved_count = $saved_count;
+        $updatelog->ended_at = $now;
+        $updatelog->duration_ms = $durationms;
+        $updatelog->questions_per_sec = $questionspersec;
+        $updatelog->status = 'success';
+        $updatelog->timemodified = $now;
+        $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
+    }
     
     echo json_encode(array(
         'success' => true,
@@ -160,10 +242,33 @@ try {
         'session_id' => $session_id,
         'count' => $saved_count,
         'category_name' => $category_name,
-        'message' => 'Generated ' . $saved_count . ' questions for category: ' . ($category_name ?: 'Default')
+        'message' => 'Generated ' . $saved_count . ' questions for category: ' . ($category_name ?: 'Default'),
+        'request_uuid' => $requestuuid,
+        'metrics' => array(
+            'duration_ms' => $durationms,
+            'generated_count' => $generatedcount,
+            'saved_count' => $saved_count,
+            'questions_per_sec' => $questionspersec
+        )
     ));
     
 } catch (Exception $e) {
+    if (!empty($generationlogid)) {
+        try {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$e->getMessage(), 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
+        } catch (Throwable $logexception) {
+            error_log('Gamified Quiz logging update failed: ' . $logexception->getMessage());
+        }
+    }
     http_response_code(500);
     header('Content-Type: application/json');
     
@@ -179,9 +284,26 @@ try {
         'error' => 'Error generating questions: ' . $e->getMessage(),
         'file' => basename($e->getFile()),
         'line' => $e->getLine(),
-        'trace' => explode("\n", $e->getTraceAsString())
+        'trace' => explode("\n", $e->getTraceAsString()),
+        'request_uuid' => $requestuuid
     ));
 } catch (Error $e) {
+    if (!empty($generationlogid)) {
+        try {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$e->getMessage(), 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
+        } catch (Throwable $logerror) {
+            error_log('Gamified Quiz logging update failed: ' . $logerror->getMessage());
+        }
+    }
     http_response_code(500);
     header('Content-Type: application/json');
     
@@ -195,9 +317,26 @@ try {
         'error' => 'Fatal error: ' . $e->getMessage(),
         'file' => basename($e->getFile()),
         'line' => $e->getLine(),
-        'trace' => explode("\n", $e->getTraceAsString())
+        'trace' => explode("\n", $e->getTraceAsString()),
+        'request_uuid' => $requestuuid
     ));
 } catch (Throwable $e) {
+    if (!empty($generationlogid)) {
+        try {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$e->getMessage(), 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
+        } catch (Throwable $logthrowable) {
+            error_log('Gamified Quiz logging update failed: ' . $logthrowable->getMessage());
+        }
+    }
     http_response_code(500);
     header('Content-Type: application/json');
     
@@ -206,7 +345,8 @@ try {
     echo json_encode(array(
         'success' => false,
         'error' => 'Error: ' . $e->getMessage(),
-        'type' => get_class($e)
+        'type' => get_class($e),
+        'request_uuid' => $requestuuid
     ));
 }
 

@@ -40,6 +40,13 @@ $string['language_km'] = 'Khmer';
 // New fields
 $string['llm_backend'] = 'LLM Backend';
 $string['llm_backend_help'] = 'Select the AI model to use for question generation';
+$string['openai_user_api_key'] = 'OpenAI API key (your account)';
+$string['openai_user_api_key_help'] = 'This key is stored per user and only used for your own generation requests. Other users must provide their own key.';
+$string['gemini_user_api_key'] = 'Gemini API key (your account)';
+$string['gemini_user_api_key_help'] = 'This key is stored per user and only used for your own generation requests. Other users must provide their own key.';
+$string['apikey_required_openai'] = 'OpenAI backend requires your OpenAI API key.';
+$string['apikey_required_gemini'] = 'Gemini backend requires your Gemini API key.';
+$string['llm_model_required_local'] = 'Local LLM backend requires selecting an available local model.';
 $string['llm_model'] = 'Local LLM model';
 $string['llm_model_help'] = 'Choose which local Ollama model to use when backend is set to Local LLM.';
 $string['use_predefined'] = 'Use Predefined Questions';

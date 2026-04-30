@@ -13,6 +13,8 @@ This folder contains **separate evaluation modules** for the paper: each subfold
 | [`sus-usability/`](sus-usability/) | System Usability Scale (survey + score) | SUS score and interpretation |
 | [`load-testing-jmeter/`](load-testing-jmeter/) | Apache JMeter load & scalability | Up to ~200 concurrent users (your environment) |
 | [`classroom-deployment/`](classroom-deployment/) | Field study protocol & checklist | Real classroom deployment narrative |
+| [`sql/`](sql/) | SQL analytics over Moodle generation logs | DB-backed latency/throughput/error analysis for publication |
+| [`quality-expert/`](quality-expert/) | Expert rubric-based question quality assessment (EN/KM) | Human-evaluated quality and agreement by model/language |
 
 ## Recommended order
 

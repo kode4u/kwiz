@@ -41,6 +41,8 @@ class QuestionRequest(BaseModel):
     context: Optional[str] = Field(default=None, description="Additional context")
     backend: Optional[str] = Field(default=None, description="LLM backend: openai, gemini, local")
     model: Optional[str] = Field(default=None, description="Override model name for local backend")
+    openai_api_key: Optional[str] = Field(default=None, description="Per-request OpenAI API key override")
+    gemini_api_key: Optional[str] = Field(default=None, description="Per-request Gemini API key override")
 
 
 class Choice(BaseModel):
@@ -118,14 +120,15 @@ def _preload_ollama_models():
         logger.error(f"Error during Ollama preload: {e}", exc_info=True)
 
 
-def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str]) -> List[Question]:
+def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None) -> List[Question]:
     """Generate questions using OpenAI API"""
     try:
         from openai import OpenAI
         
         # Initialize client with just the API key
         # OpenAI library 2.x+ uses simple initialization
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        api_key = api_key_override or OPENAI_API_KEY
+        client = OpenAI(api_key=api_key)
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
 
@@ -213,15 +216,16 @@ IMPORTANT:
         raise Exception(f"OpenAI generation error: {str(e)}")
 
 
-def generate_with_gemini(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str]) -> List[Question]:
+def generate_with_gemini(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None) -> List[Question]:
     """Generate questions using Google Gemini API"""
     try:
         import google.generativeai as genai
         
-        if not GEMINI_API_KEY:
+        effective_api_key = api_key_override or GEMINI_API_KEY
+        if not effective_api_key:
             raise Exception("Gemini API key not configured")
         
-        genai.configure(api_key=GEMINI_API_KEY)
+        genai.configure(api_key=effective_api_key)
         model = genai.GenerativeModel('gemini-pro')
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
@@ -555,18 +559,22 @@ def generate_questions():
         
         # Generate questions based on backend
         if backend == 'openai':
-            if not OPENAI_API_KEY:
+            effective_openai_key = req.openai_api_key or OPENAI_API_KEY
+            if not effective_openai_key:
                 return jsonify({'error': 'OpenAI API key not configured'}), 500
             questions = generate_with_openai(
                 req.topic, req.level, req.n_questions, 
-                req.language, req.bloom_level, req.context
+                req.language, req.bloom_level, req.context,
+                api_key_override=req.openai_api_key,
             )
         elif backend == 'gemini':
-            if not GEMINI_API_KEY:
+            effective_gemini_key = req.gemini_api_key or GEMINI_API_KEY
+            if not effective_gemini_key:
                 return jsonify({'error': 'Gemini API key not configured'}), 500
             questions = generate_with_gemini(
                 req.topic, req.level, req.n_questions,
-                req.language, req.bloom_level, req.context
+                req.language, req.bloom_level, req.context,
+                api_key_override=req.gemini_api_key,
             )
         elif backend == 'local':
             questions = generate_with_local_llm(
