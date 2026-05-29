@@ -399,6 +399,27 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010116, 'gamifiedquiz');
     }
 
+    if ($oldversion < 2025010117) {
+        $table = new xmldb_table('gamifiedquiz_generation_logs');
+
+        $field = new xmldb_field('batch_id', XMLDB_TYPE_CHAR, '36', null, null, null, null, 'request_uuid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('category_name', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'batch_id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('batch_id', XMLDB_INDEX_NOTUNIQUE, array('batch_id'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, 2025010117, 'gamifiedquiz');
+    }
+
     // Return true to indicate upgrade was successful
     return true;
 }

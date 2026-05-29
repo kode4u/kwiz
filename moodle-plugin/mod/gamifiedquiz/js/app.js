@@ -836,7 +836,78 @@
         
         // Multi-Category Generation functionality
         let categories = []; // Array of {name, topic, difficulty, count}
-        
+        let activeGenerationBatchId = null;
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        async function pollGenerationBatch(batchId, config, onProgress) {
+            const wwwroot = config.wwwroot || '';
+            const sesskey = config.sesskey || '';
+            const pollUrl = `${wwwroot}/mod/gamifiedquiz/ajax/generate_status.php`;
+            const maxWaitMs = 50 * 60 * 1000; // 50 minutes
+            const startedAt = Date.now();
+
+            while (true) {
+                if (Date.now() - startedAt > maxWaitMs) {
+                    throw new Error('Generation timed out while waiting for background jobs to finish.');
+                }
+
+                const params = new URLSearchParams({
+                    quizid: String(config.quizId),
+                    cmid: String(config.cmId),
+                    sesskey,
+                    batch_id: batchId,
+                });
+                const response = await fetch(`${pollUrl}?${params.toString()}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to check generation status');
+                }
+
+                if (onProgress) {
+                    onProgress(data);
+                }
+
+                if (data.complete) {
+                    return data;
+                }
+
+                await sleep(2500);
+            }
+        }
+
+        function applyGeneratedQuestions(allQuestions, categoriesCount) {
+            questions = allQuestions;
+            window.currentQuestions = questions;
+            if (startBtn) {
+                startBtn.disabled = allQuestions.length > 0;
+            }
+            currentQuestionIndex = 0;
+
+            const statusEl = document.getElementById('session-status');
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                if (allQuestions.length > 0) {
+                    statusEl.textContent = `Generated ${allQuestions.length} questions from ${categoriesCount} categories. Ready to start session.`;
+                    statusEl.style.background = '#d4edda';
+                    statusEl.style.borderColor = '#28a745';
+                } else {
+                    statusEl.textContent = 'Generation finished but no questions were saved.';
+                    statusEl.style.background = '#f8d7da';
+                    statusEl.style.borderColor = '#dc3545';
+                }
+            }
+        }
+
+        if (socket) {
+            socket.on('generation:complete', (data) => {
+                console.log('Background generation update:', data);
+            });
+        }
+
         function initMultiCategoryGeneration() {
             const modal = document.getElementById('generate-questions-modal');
             const addCategoryBtn = document.getElementById('add-category-btn');
@@ -980,8 +1051,22 @@
             const wwwroot = config.wwwroot || '';
             const sesskey = config.sesskey || '';
             
+            const lessonEl = document.getElementById('generate-lesson-content');
+            const lessonContent = lessonEl ? lessonEl.value.trim() : '';
+
+            const loadingStatus = loadingModal ? loadingModal.querySelector('p') : null;
+            const batchId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `batch_${Date.now()}`;
+            activeGenerationBatchId = batchId;
+
             try {
+                let categoryIndex = 0;
                 for (const category of categories) {
+                    categoryIndex++;
+                    if (loadingStatus) {
+                        loadingStatus.textContent = `Queuing category ${categoryIndex} of ${categories.length}: ${category.name}…`;
+                    }
                     const formData = new URLSearchParams();
                     formData.append('quizid', config.quizId);
                     formData.append('cmid', config.cmId);
@@ -990,49 +1075,63 @@
                     formData.append('difficulty', category.difficulty);
                     formData.append('count', category.count);
                     formData.append('category_name', category.name);
-                    
+                    formData.append('async', '1');
+                    formData.append('batch_id', batchId);
+                    if (lessonContent) {
+                        formData.append('data', lessonContent);
+                    }
+
                     const response = await fetch(wwwroot + '/mod/gamifiedquiz/ajax/generate.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: formData.toString()
                     });
-                    
+
                     const data = await response.json();
-                    
-                    if (data.success && data.questions) {
-                        // Add category name to each question
-                        data.questions.forEach(q => {
-                            q.category_name = category.name;
-                        });
-                        allQuestions.push(...data.questions);
-                    } else {
-                        console.error('Failed to generate questions for category:', category.name, data.error);
+                    if (!data.success) {
+                        throw new Error(data.error || `Failed to queue category: ${category.name}`);
                     }
                 }
-                
-                // Hide loading
-                if (loadingModal) loadingModal.style.display = 'none';
-                
-                if (allQuestions.length > 0) {
-                    questions = allQuestions;
-                    window.currentQuestions = questions;
-                    if (startBtn) startBtn.disabled = false;
-                    currentQuestionIndex = 0;
-                    
-                    const statusEl = document.getElementById('session-status');
-                    if (statusEl) {
-                        statusEl.style.display = 'block';
-                        statusEl.textContent = `Generated ${allQuestions.length} questions from ${categories.length} categories. Ready to start session.`;
-                        statusEl.style.background = '#d4edda';
-                        statusEl.style.borderColor = '#28a745';
+
+                if (loadingStatus) {
+                    loadingStatus.textContent = 'Generating questions in the background… This may take several minutes.';
+                }
+
+                const batchResult = await pollGenerationBatch(batchId, config, (progress) => {
+                    if (loadingStatus) {
+                        const failedNote = progress.failed > 0 ? ` (${progress.failed} failed)` : '';
+                        const activeJob = (progress.jobs || []).find((j) => !j.complete);
+                        const step = activeJob?.status_label || activeJob?.status || 'working';
+                        loadingStatus.textContent =
+                            `Categories ${progress.completed}/${progress.total} — ${step}${failedNote}`;
                     }
-                } else {
-                    alert('Failed to generate questions. Please check your LLM API configuration.');
+                });
+
+                if (loadingModal) {
+                    loadingModal.style.display = 'none';
+                }
+
+                const failedJobs = (batchResult.jobs || []).filter((j) => j.status === 'error');
+                if (failedJobs.length > 0) {
+                    console.error('Some categories failed:', failedJobs);
+                }
+
+                applyGeneratedQuestions(batchResult.questions || [], categories.length);
+
+                if (!batchResult.questions || batchResult.questions.length === 0) {
+                    const firstError = failedJobs[0]?.error;
+                    alert(firstError || 'Failed to generate questions. Please check your LLM API configuration.');
+                } else if (failedJobs.length > 0) {
+                    alert(`Generated ${batchResult.questions.length} questions, but ${failedJobs.length} category(ies) failed.`);
                 }
             } catch (error) {
                 console.error('Error generating questions:', error);
-                if (loadingModal) loadingModal.style.display = 'none';
                 alert('Error generating questions: ' + error.message);
+            } finally {
+                if (loadingModal) {
+                    loadingModal.style.display = 'none';
+                }
+                activeGenerationBatchId = null;
             }
         }
         
@@ -1190,6 +1289,7 @@
                     formData.append('data', predefinedData);
                     formData.append('difficulty', difficulty);
                     formData.append('count', questionCount);
+                    formData.append('async', '1');
                     
                     const response = await fetch(url, {
                         method: 'POST',
@@ -1200,23 +1300,19 @@
                     let responseText = '';
                     let responseData;
                     
-                    // Get response text first
                     responseText = await response.text();
                     console.log('Generate questions raw response (status ' + response.status + '):', responseText);
                     
                     if (!response.ok) {
-                        // Try to parse error response
                         let errorMessage = 'HTTP error! status: ' + response.status;
                         try {
                             if (responseText) {
                                 responseData = JSON.parse(responseText);
                                 if (responseData.error) {
                                     errorMessage = responseData.error;
-                                    console.error('Server error details:', responseData);
                                 }
                             }
                         } catch (parseErr) {
-                            console.error('Failed to parse error response:', parseErr);
                             if (responseText) {
                                 errorMessage += '. Response: ' + responseText.substring(0, 500);
                             }
@@ -1224,26 +1320,30 @@
                         throw new Error(errorMessage);
                     }
                     
-                    try {
-                        if (!responseText || responseText.trim() === '') {
-                            throw new Error('Empty response from server');
+                    if (!responseText || responseText.trim() === '') {
+                        throw new Error('Empty response from server');
+                    }
+                    responseData = JSON.parse(responseText);
+                    console.log('Generate questions parsed response:', responseData);
+
+                    if (responseData.async && responseData.batch_id) {
+                        const loadingStatus = loadingModal ? loadingModal.querySelector('p') : null;
+                        if (loadingStatus) {
+                            loadingStatus.textContent = 'Generating questions in the background…';
                         }
-                        
-                        responseData = JSON.parse(responseText);
-                    } catch (parseError) {
-                        console.error('Failed to parse JSON response:', parseError);
-                        console.error('Response text was:', responseText);
-                        throw new Error('Invalid response from server: ' + parseError.message + '. Response: ' + responseText.substring(0, 200));
+                        const batchResult = await pollGenerationBatch(responseData.batch_id, config, (progress) => {
+                            if (loadingStatus && progress.total <= 1) {
+                                loadingStatus.textContent = 'Generating questions…';
+                            }
+                        });
+                        responseData.questions = batchResult.questions || [];
+                        responseData.success = responseData.questions.length > 0;
                     }
                     
-                    console.log('Generate questions parsed response:', responseData);
-                    
-                    // Hide loading dialog
                     if (loadingModal) {
                         loadingModal.style.display = 'none';
                     }
                     
-                    // If there's an error in the response, show it
                     if (responseData.error) {
                         console.error('Server error details:', responseData);
                     }
@@ -1251,12 +1351,8 @@
                     if (responseData.success && responseData.questions && Array.isArray(responseData.questions) && responseData.questions.length > 0) {
                         questions = responseData.questions;
                         console.log('Questions received:', questions);
-                        // Store questions globally for editor
                         window.currentQuestions = questions;
-                        // Don't display questions preview - just show status
-                        // displayQuestions(questions);
                         if (startBtn) startBtn.disabled = false;
-                        // Reset question index
                         currentQuestionIndex = 0;
                         const statusEl = document.getElementById('session-status');
                         if (statusEl) {

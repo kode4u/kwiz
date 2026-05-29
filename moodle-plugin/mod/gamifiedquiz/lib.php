@@ -372,31 +372,48 @@ function gamifiedquiz_fetch_ollama_models() {
 }
 
 /**
- * Call LLM API to generate questions
+ * HTTP timeout (seconds) for one LLM /generate call.
+ *
+ * @param string $backend LLM backend id
+ * @return int
+ */
+function gamifiedquiz_generation_timeout($backend) {
+    if ($backend === 'local') {
+        return 600;
+    }
+    return 180;
+}
+
+/**
+ * Batch size for local (Ollama) generation — smaller requests avoid timeouts.
+ *
+ * @return int
+ */
+function gamifiedquiz_local_generation_batch_size() {
+    return 3;
+}
+
+/**
+ * Call LLM API to generate questions (single request).
  *
  * @param string $topic Topic for questions
  * @param string $level Difficulty level
  * @param int $n_questions Number of questions
  * @param string $language Language code
  * @param string $backend LLM backend (openai, gemini, local)
- * @param string $predefined_data Optional predefined data/context for question generation
+ * @param string $predefined_data Optional lesson/context text
  * @param string $llmmodel Optional local LLM model name (for backend = local)
- * @return array|false Generated questions or false on error
+ * @param string $userapikey Optional per-user API key
+ * @return array Generated questions or array with 'error' key
  */
-function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '') {
+function gamifiedquiz_generate_questions_request($topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey) {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
-        // Default: use Docker service name when running in Docker, localhost otherwise
         $api_url = 'http://llmapi:5001';
     }
-    
-    // If URL contains localhost and we're in Docker, try to use service name
-    // This handles cases where user sets localhost in settings
+
     if (strpos($api_url, 'localhost') !== false || strpos($api_url, '127.0.0.1') !== false) {
-        // Try Docker service name first
-        $docker_url = str_replace(['localhost', '127.0.0.1'], 'llmapi', $api_url);
-        // Fallback to original if Docker URL doesn't work
-        $api_url = $docker_url;
+        $api_url = str_replace(['localhost', '127.0.0.1'], 'llmapi', $api_url);
     }
 
     $data = array(
@@ -404,33 +421,32 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
         'level' => $level,
         'n_questions' => $n_questions,
         'language' => $language,
-        'backend' => $backend
+        'backend' => $backend,
     );
-    
-    // Add predefined data if provided
+
     if (!empty($predefined_data)) {
-        $data['predefined_data'] = $predefined_data;
+        $data['context'] = $predefined_data;
     }
 
-    // Add explicit model override for local backend if provided
     if ($backend === 'local' && !empty($llmmodel)) {
         $data['model'] = $llmmodel;
     }
 
-    // Pass user-specific API key to LLM API for cloud backends.
     if ($backend === 'openai' && !empty($userapikey)) {
         $data['openai_api_key'] = $userapikey;
     } else if ($backend === 'gemini' && !empty($userapikey)) {
         $data['gemini_api_key'] = $userapikey;
     }
 
+    $timeout = gamifiedquiz_generation_timeout($backend);
+
     $ch = curl_init($api_url . '/generate');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 180); // 180 second timeout (local LLM can be slow)
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 second connection timeout
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
 
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -447,31 +463,485 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
         $result = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log("Gamified Quiz: JSON decode error: " . json_last_error_msg());
-            error_log("Gamified Quiz: Response: " . substr($response, 0, 500));
             return array('error' => 'Invalid JSON response from LLM API');
         }
-        
-        // Handle both response formats
+
         if (isset($result['questions']) && is_array($result['questions'])) {
             return $result['questions'];
-        } elseif (isset($result['error'])) {
-            error_log("Gamified Quiz API error: " . $result['error']);
+        }
+        if (isset($result['error'])) {
             return array('error' => $result['error']);
-        } else {
-            error_log("Gamified Quiz: Unexpected response format: " . print_r($result, true));
-            return array('error' => 'Unexpected response format from LLM API');
         }
-    } else {
-        $error_msg = "HTTP error " . $http_code;
-        $error_data = json_decode($response, true);
-        if (isset($error_data['error'])) {
-            $error_msg .= ": " . $error_data['error'];
-        } else {
-            $error_msg .= ": " . substr($response, 0, 200);
-        }
-        error_log("Gamified Quiz: " . $error_msg . " (API URL: " . $api_url . ")");
-        return array('error' => $error_msg);
+        return array('error' => 'Unexpected response format from LLM API');
     }
+
+    $error_msg = "HTTP error " . $http_code;
+    $error_data = json_decode($response, true);
+    if (isset($error_data['error'])) {
+        $error_msg .= ": " . $error_data['error'];
+    } else {
+        $error_msg .= ": " . substr((string)$response, 0, 200);
+    }
+    error_log("Gamified Quiz: " . $error_msg . " (API URL: " . $api_url . ")");
+    return array('error' => $error_msg);
+}
+
+/**
+ * Call LLM API to generate questions (batches local/Ollama requests when needed).
+ *
+ * @param string $topic Topic for questions
+ * @param string $level Difficulty level
+ * @param int $n_questions Number of questions
+ * @param string $language Language code
+ * @param string $backend LLM backend (openai, gemini, local)
+ * @param string $predefined_data Optional predefined data/context for question generation
+ * @param string $llmmodel Optional local LLM model name (for backend = local)
+ * @return array|false Generated questions or false on error
+ */
+function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '') {
+    $batchsize = gamifiedquiz_local_generation_batch_size();
+    if ($backend === 'local' && $n_questions > $batchsize) {
+        $all = array();
+        $remaining = (int)$n_questions;
+        while ($remaining > 0) {
+            $batch = min($batchsize, $remaining);
+            $chunk = gamifiedquiz_generate_questions_request(
+                $topic, $level, $batch, $language, $backend, $predefined_data, $llmmodel, $userapikey
+            );
+            if (isset($chunk['error'])) {
+                if (!empty($all)) {
+                    $chunk['error'] .= ' (' . count($all) . ' of ' . $n_questions . ' questions were generated before this error.)';
+                }
+                return $chunk;
+            }
+            $all = array_merge($all, $chunk);
+            $remaining -= $batch;
+        }
+        return $all;
+    }
+
+    return gamifiedquiz_generate_questions_request(
+        $topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey
+    );
+}
+
+/**
+ * Shared secret for background generation worker callbacks.
+ *
+ * @return string
+ */
+function gamifiedquiz_worker_token() {
+    $token = getenv('GAMIFIEDQUIZ_WORKER_TOKEN');
+    if (!empty($token)) {
+        return $token;
+    }
+    $token = get_config('mod_gamifiedquiz', 'worker_token');
+    return !empty($token) ? $token : '';
+}
+
+/**
+ * Moodle base URL reachable from Docker (llmapi / websocket containers).
+ *
+ * @return string
+ */
+function gamifiedquiz_moodle_internal_base_url() {
+    $url = get_config('mod_gamifiedquiz', 'moodle_internal_url');
+    if (!empty($url)) {
+        return rtrim($url, '/');
+    }
+    return 'http://moodle';
+}
+
+/**
+ * Webhook callback URL for LLM async completion.
+ *
+ * @return string
+ */
+function gamifiedquiz_generation_webhook_url() {
+    return gamifiedquiz_moodle_internal_base_url() . '/mod/gamifiedquiz/ajax/complete_generation_job.php';
+}
+
+/**
+ * WebSocket server base URL for internal enqueue API.
+ *
+ * @return string
+ */
+function gamifiedquiz_websocket_internal_url() {
+    $url = get_config('mod_gamifiedquiz', 'websocket_internal_url');
+    if (!empty($url)) {
+        return rtrim($url, '/');
+    }
+    return 'http://websocket-server:3001';
+}
+
+/**
+ * Create a new UUID for jobs/batches.
+ *
+ * @return string
+ */
+function gamifiedquiz_new_uuid() {
+    return sprintf(
+        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0x0fff) | 0x4000,
+        mt_rand(0, 0x3fff) | 0x8000,
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff)
+    );
+}
+
+/**
+ * Save LLM-generated questions to gamifiedquiz_questions.
+ *
+ * @param int $gamifiedquizid Quiz instance id
+ * @param array $questions Question payloads from LLM
+ * @param string $categoryname Category label
+ * @param string $sessionid Session id for this job/batch
+ * @param string $difficulty Difficulty stored on rows
+ * @return int Number saved
+ */
+function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $categoryname, $sessionid, $difficulty) {
+    global $DB;
+
+    $saved = 0;
+    foreach ($questions as $question) {
+        $questiontext = $question['question'] ?? $question['question_text'] ?? '';
+        $choices = $question['choices'] ?? array();
+        if (empty($questiontext) || empty($choices)) {
+            continue;
+        }
+
+        $correctindex = $question['correct_index'] ?? null;
+        if ($correctindex === null) {
+            foreach ($choices as $idx => $choice) {
+                if (is_array($choice) && !empty($choice['is_correct'])) {
+                    $correctindex = $idx;
+                    break;
+                }
+            }
+            if ($correctindex === null) {
+                $correctindex = 0;
+            }
+        }
+
+        $record = new stdClass();
+        $record->gamifiedquizid = $gamifiedquizid;
+        $record->session_id = $sessionid;
+        $record->question_text = $questiontext;
+        $record->choices = json_encode($choices);
+        $record->correct_index = $correctindex;
+        $record->difficulty = $difficulty;
+        $record->category_name = $categoryname;
+        $record->timecreated = time();
+        $DB->insert_record('gamifiedquiz_questions', $record);
+        $saved++;
+    }
+
+    return $saved;
+}
+
+/**
+ * Queue a background generation job (DB row + Redis via WebSocket server).
+ *
+ * @param stdClass $gamifiedquiz Quiz instance
+ * @param int $userid User who requested generation
+ * @param int $cmid Course module id
+ * @param string $topic Topic/prompt
+ * @param string $level Difficulty
+ * @param int $count Question count
+ * @param string $language Language code
+ * @param string $backend LLM backend
+ * @param string $lessoncontext Optional lesson text
+ * @param string $llmmodel Local model name
+ * @param string $userapikey User API key for cloud backends
+ * @param string $categoryname Category label
+ * @param string $batchid Batch id grouping multiple categories
+ * @return array Job info with request_uuid or error
+ */
+function gamifiedquiz_enqueue_generation_job($gamifiedquiz, $userid, $cmid, $topic, $level, $count, $language,
+        $backend, $lessoncontext, $llmmodel, $userapikey, $categoryname, $batchid) {
+    global $DB;
+
+    $apiurl = get_config('mod_gamifiedquiz', 'llmapi_url');
+    if (empty($apiurl)) {
+        $apiurl = 'http://llmapi:5001';
+    }
+    if (strpos($apiurl, 'localhost') !== false || strpos($apiurl, '127.0.0.1') !== false) {
+        $apiurl = str_replace(array('localhost', '127.0.0.1'), 'llmapi', $apiurl);
+    }
+
+    $requestuuid = gamifiedquiz_new_uuid();
+    $sessionid = 'genjob_' . $requestuuid;
+    $now = time();
+
+    $log = new stdClass();
+    $log->gamifiedquizid = $gamifiedquiz->id;
+    $log->userid = $userid;
+    $log->cmid = $cmid ?: null;
+    $log->session_id = $sessionid;
+    $log->request_uuid = $requestuuid;
+    $log->batch_id = $batchid ?: null;
+    $log->category_name = core_text::substr((string)$categoryname, 0, 255);
+    $log->topic = core_text::substr((string)$topic, 0, 255);
+    $log->difficulty = core_text::substr((string)$level, 0, 20);
+    $log->language = core_text::substr((string)$language, 0, 10);
+    $log->backend = core_text::substr((string)$backend, 0, 20);
+    $log->llm_model = !empty($llmmodel) ? core_text::substr((string)$llmmodel, 0, 100) : null;
+    $log->api_url = core_text::substr((string)$apiurl, 0, 255);
+    $log->requested_count = max(0, (int)$count);
+    $log->generated_count = 0;
+    $log->saved_count = 0;
+    $log->started_at = $now;
+    $log->status = 'queued';
+    $log->timecreated = $now;
+    $log->timemodified = $now;
+    $logid = $DB->insert_record('gamifiedquiz_generation_logs', $log);
+
+    $dispatch = gamifiedquiz_dispatch_llm_async_job(
+        $logid,
+        $requestuuid,
+        $apiurl,
+        $topic,
+        $level,
+        $count,
+        $language,
+        $backend,
+        $lessoncontext,
+        $llmmodel,
+        $userapikey
+    );
+    if (isset($dispatch['error'])) {
+        $fail = new stdClass();
+        $fail->id = $logid;
+        $fail->status = 'error';
+        $fail->error_message = core_text::substr($dispatch['error'], 0, 1333);
+        $fail->ended_at = time();
+        $fail->timemodified = time();
+        $DB->update_record('gamifiedquiz_generation_logs', $fail);
+        return array('error' => $dispatch['error']);
+    }
+
+    return array(
+        'job_id' => $requestuuid,
+        'batch_id' => $batchid,
+        'log_id' => $logid,
+        'session_id' => $sessionid,
+        'status' => $dispatch['status'],
+    );
+}
+
+/**
+ * Send async generation request to LLM API (webhook back to Moodle when done).
+ *
+ * @param int $logid Generation log row id
+ * @param string $requestuuid Job uuid
+ * @param string $apiurl LLM API base URL
+ * @param string $topic Topic
+ * @param string $level Difficulty
+ * @param int $count Question count
+ * @param string $language Language
+ * @param string $backend Backend id
+ * @param string $lessoncontext Optional lesson text
+ * @param string $llmmodel Local model name
+ * @param string $userapikey Cloud API key
+ * @return array status or error
+ */
+function gamifiedquiz_dispatch_llm_async_job($logid, $requestuuid, $apiurl, $topic, $level, $count, $language,
+        $backend, $lessoncontext, $llmmodel, $userapikey) {
+    global $DB;
+
+    $token = gamifiedquiz_worker_token();
+    if (empty($token)) {
+        return array('error' => 'Generation worker token is not configured (GAMIFIEDQUIZ_WORKER_TOKEN).');
+    }
+
+    $payload = array(
+        'request_uuid' => $requestuuid,
+        'topic' => $topic,
+        'level' => $level,
+        'n_questions' => (int)$count,
+        'language' => $language,
+        'backend' => $backend,
+        'webhook_url' => gamifiedquiz_generation_webhook_url(),
+        'webhook_token' => $token,
+    );
+    if (!empty($lessoncontext)) {
+        $payload['context'] = $lessoncontext;
+    }
+    if ($backend === 'local' && !empty($llmmodel)) {
+        $payload['model'] = $llmmodel;
+    }
+    if ($backend === 'openai' && !empty($userapikey)) {
+        $payload['openai_api_key'] = $userapikey;
+    } else if ($backend === 'gemini' && !empty($userapikey)) {
+        $payload['gemini_api_key'] = $userapikey;
+    }
+
+    $url = rtrim($apiurl, '/') . '/generate/async';
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+
+    $response = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlerror = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlerror) {
+        return array('error' => 'Failed to send request to LLM API: ' . $curlerror);
+    }
+
+    $data = json_decode($response, true);
+    if ($code < 200 || $code >= 300) {
+        $msg = is_array($data) && isset($data['error']) ? $data['error'] : substr((string)$response, 0, 200);
+        return array('error' => 'LLM API rejected async job (HTTP ' . $code . '): ' . $msg);
+    }
+
+    $now = time();
+    $update = new stdClass();
+    $update->id = $logid;
+    $update->status = 'sent';
+    $update->timemodified = $now;
+    $DB->update_record('gamifiedquiz_generation_logs', $update);
+
+    return array('status' => 'sent');
+}
+
+/**
+ * Push a generation job onto the Redis queue via the WebSocket server.
+ *
+ * @param array $payload Job payload
+ * @return array Empty on success or error array
+ */
+function gamifiedquiz_push_generation_queue(array $payload) {
+    $token = gamifiedquiz_worker_token();
+    if (empty($token)) {
+        return array('error' => 'Generation worker token is not configured (GAMIFIEDQUIZ_WORKER_TOKEN).');
+    }
+
+    $url = gamifiedquiz_websocket_internal_url() . '/internal/generation/enqueue';
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/json',
+        'X-Worker-Token: ' . $token,
+    ));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+    $response = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlerror = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlerror) {
+        return array('error' => 'Failed to enqueue generation job: ' . $curlerror);
+    }
+    if ($code < 200 || $code >= 300) {
+        return array('error' => 'Failed to enqueue generation job (HTTP ' . $code . '): ' . substr((string)$response, 0, 200));
+    }
+
+    return array();
+}
+
+/**
+ * Load generated questions for a completed job.
+ *
+ * @param string $sessionid Job session id
+ * @return array Normalized question list
+ */
+function gamifiedquiz_load_questions_for_session($sessionid) {
+    global $DB;
+
+    $records = $DB->get_records('gamifiedquiz_questions', array('session_id' => $sessionid), 'id ASC');
+    $questions = array();
+    foreach ($records as $q) {
+        $choices = json_decode($q->choices, true);
+        $questions[] = array(
+            'question' => $q->question_text,
+            'choices' => is_array($choices) ? $choices : array(),
+            'correct_index' => (int)$q->correct_index,
+            'difficulty' => $q->difficulty,
+            'category_name' => $q->category_name,
+        );
+    }
+    return $questions;
+}
+
+/**
+ * Format a generation log row for status API / UI polling.
+ *
+ * @param stdClass $log DB row
+ * @return array
+ */
+function gamifiedquiz_format_generation_job_status($log) {
+    $status = $log->status;
+    $now = time();
+    $lasttouch = !empty($log->timemodified) ? (int)$log->timemodified : (int)$log->timecreated;
+    // Early states should move quickly; processing may take many minutes (local LLM).
+    if (in_array($status, array('queued', 'sent'), true)) {
+        $staleafter = 120;
+    } else if (in_array($status, array('processing', 'running', 'started'), true)) {
+        $staleafter = 1200;
+    } else {
+        $staleafter = 900;
+    }
+
+    if (in_array($status, array('queued', 'sent', 'processing', 'running', 'started'), true) &&
+            ($now - $lasttouch) > $staleafter) {
+        $status = 'error';
+        $log->error_message = 'Generation timed out or LLM did not respond in time.';
+    }
+
+    $complete = in_array($status, array('success', 'error'), true);
+    $statuslabel = gamifiedquiz_generation_status_label($status);
+
+    $out = array(
+        'job_id' => $log->request_uuid,
+        'batch_id' => $log->batch_id ?? null,
+        'category_name' => $log->category_name ?? '',
+        'status' => $status,
+        'status_label' => $statuslabel,
+        'complete' => $complete,
+        'requested_count' => (int)$log->requested_count,
+        'generated_count' => (int)$log->generated_count,
+        'saved_count' => (int)$log->saved_count,
+        'error' => $log->error_message ?? null,
+        'questions' => array(),
+    );
+
+    if ($status === 'success' && !empty($log->session_id)) {
+        $out['questions'] = gamifiedquiz_load_questions_for_session($log->session_id);
+    }
+
+    return $out;
+}
+
+/**
+ * Human-readable generation status for UI polling.
+ *
+ * @param string $status Status code
+ * @return string
+ */
+function gamifiedquiz_generation_status_label($status) {
+    $map = array(
+        'queued' => get_string('generation_status_queued', 'mod_gamifiedquiz'),
+        'sent' => get_string('generation_status_sent', 'mod_gamifiedquiz'),
+        'processing' => get_string('generation_status_processing', 'mod_gamifiedquiz'),
+        'running' => get_string('generation_status_processing', 'mod_gamifiedquiz'),
+        'success' => get_string('generation_status_success', 'mod_gamifiedquiz'),
+        'error' => get_string('generation_status_error', 'mod_gamifiedquiz'),
+    );
+    return $map[$status] ?? $status;
 }
 
 /**

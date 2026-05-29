@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y \
 # Install PHP extensions required by Moodle
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd mysqli pdo_mysql zip intl soap opcache \
-    && a2enmod rewrite
+    && a2enmod rewrite \
+    && echo "Timeout 600" >> /etc/apache2/apache2.conf
 
 # Set working directory
 WORKDIR /var/www/html

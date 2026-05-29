@@ -7,6 +7,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import logging
+import time
+import threading
+import requests as http_requests
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -28,6 +31,10 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 LOCAL_LLM_URL = os.getenv('LOCAL_LLM_URL', 'http://localhost:11434')  # Ollama default
 MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', '20'))
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', 'en')
+LOCAL_LLM_TIMEOUT = int(os.getenv('LOCAL_LLM_TIMEOUT', '1200'))
+MAX_LESSON_CONTEXT_CHARS = int(os.getenv('MAX_LESSON_CONTEXT_CHARS', '12000'))
+LOCAL_GEN_BATCH_SIZE = int(os.getenv('LOCAL_GENERATION_BATCH_SIZE', '3'))
+WEBHOOK_TIMEOUT = int(os.getenv('WEBHOOK_TIMEOUT', '30'))
 # Optional: comma-separated list of Ollama models to pre-pull on startup
 OLLAMA_PRELOAD_MODELS = os.getenv('OLLAMA_PRELOAD_MODELS', '').strip()
 
@@ -38,7 +45,7 @@ class QuestionRequest(BaseModel):
     n_questions: int = Field(default=1, ge=1, le=MAX_QUESTIONS, description="Number of questions")
     language: str = Field(default=DEFAULT_LANGUAGE, description="Language code: en, km")
     bloom_level: Optional[str] = Field(default=None, description="Bloom's taxonomy level")
-    context: Optional[str] = Field(default=None, description="Additional context")
+    context: Optional[str] = Field(default=None, description="Optional lesson material to base questions on")
     backend: Optional[str] = Field(default=None, description="LLM backend: openai, gemini, local")
     model: Optional[str] = Field(default=None, description="Override model name for local backend")
     openai_api_key: Optional[str] = Field(default=None, description="Per-request OpenAI API key override")
@@ -62,6 +69,12 @@ class Question(BaseModel):
 class QuestionResponse(BaseModel):
     questions: List[Question]
     metadata: dict
+
+
+class AsyncGenerateRequest(QuestionRequest):
+    request_uuid: str = Field(..., description="Job id shared with Moodle")
+    webhook_url: str = Field(..., description="Moodle callback URL when generation finishes")
+    webhook_token: str = Field(..., description="Shared secret for webhook auth")
 
 
 def _preload_ollama_models():
@@ -120,6 +133,22 @@ def _preload_ollama_models():
         logger.error(f"Error during Ollama preload: {e}", exc_info=True)
 
 
+def format_lesson_context(context: Optional[str]) -> str:
+    """Format optional pasted lesson text for inclusion in generation prompts."""
+    if not context or not str(context).strip():
+        return ''
+    text = str(context).strip()
+    if len(text) > MAX_LESSON_CONTEXT_CHARS:
+        text = text[:MAX_LESSON_CONTEXT_CHARS] + "\n[... lesson truncated for length ...]"
+    return (
+        "\n- Base questions primarily on the following lesson material "
+        "(stay faithful to the content; do not invent facts beyond it):\n"
+        "---\n"
+        f"{text}\n"
+        "---\n"
+    )
+
+
 def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None) -> List[Question]:
     """Generate questions using OpenAI API"""
     try:
@@ -136,7 +165,7 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
-{f'- Additional context: {context}' if context else ''}
+{format_lesson_context(context)}
 
 For each question, provide:
 1. A clear question text
@@ -234,7 +263,7 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
-{f'- Additional context: {context}' if context else ''}
+{format_lesson_context(context)}
 
 For each question, provide:
 1. A clear question text
@@ -315,7 +344,7 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
-{f'- Additional context: {context}' if context else ''}
+{format_lesson_context(context)}
 
 For each question, provide:
 1. A clear question text
@@ -356,7 +385,7 @@ IMPORTANT:
                 "prompt": prompt,
                 "stream": False
             },
-            timeout=180  # Increased timeout for local LLMs
+            timeout=LOCAL_LLM_TIMEOUT
         )
         
         if response.status_code != 200:
@@ -462,7 +491,7 @@ IMPORTANT:
         logger.error(error_msg)
         raise Exception(f"Local LLM generation error: {error_msg} - {str(e)}")
     except requests.exceptions.Timeout as e:
-        error_msg = f"Ollama request timed out after 180 seconds"
+        error_msg = f"Ollama request timed out after {LOCAL_LLM_TIMEOUT} seconds"
         logger.error(error_msg)
         raise Exception(f"Local LLM generation error: {error_msg}")
     except Exception as e:
@@ -547,44 +576,208 @@ def pull_ollama_model():
         return jsonify({'error': str(e)}), 500
 
 
+def execute_generation(req: QuestionRequest) -> List[Question]:
+    """Run generation for one request (batched for slow local models)."""
+    backend = req.backend or LLM_BACKEND
+    if backend == 'local' and req.n_questions > LOCAL_GEN_BATCH_SIZE:
+        all_questions: List[Question] = []
+        remaining = req.n_questions
+        batch_num = 0
+        batch_total = (req.n_questions + LOCAL_GEN_BATCH_SIZE - 1) // LOCAL_GEN_BATCH_SIZE
+        while remaining > 0:
+            batch_num += 1
+            n = min(LOCAL_GEN_BATCH_SIZE, remaining)
+            logger.info(
+                "LLM batch %s/%s n=%s",
+                batch_num,
+                batch_total,
+                n,
+            )
+            batch_req = req.model_copy(update={'n_questions': n})
+            all_questions.extend(execute_generation_single(batch_req))
+            remaining -= n
+        return all_questions
+    return execute_generation_single(req)
+
+
+def execute_generation_single(req: QuestionRequest) -> List[Question]:
+    backend = req.backend or LLM_BACKEND
+    if backend == 'openai':
+        effective_openai_key = req.openai_api_key or OPENAI_API_KEY
+        if not effective_openai_key:
+            raise ValueError('OpenAI API key not configured')
+        return generate_with_openai(
+            req.topic, req.level, req.n_questions,
+            req.language, req.bloom_level, req.context,
+            api_key_override=req.openai_api_key,
+        )
+    if backend == 'gemini':
+        effective_gemini_key = req.gemini_api_key or GEMINI_API_KEY
+        if not effective_gemini_key:
+            raise ValueError('Gemini API key not configured')
+        return generate_with_gemini(
+            req.topic, req.level, req.n_questions,
+            req.language, req.bloom_level, req.context,
+            api_key_override=req.gemini_api_key,
+        )
+    if backend == 'local':
+        return generate_with_local_llm(
+            req.topic, req.level, req.n_questions,
+            req.language, req.bloom_level, req.context,
+            model=req.model,
+        )
+    raise ValueError(f'Unknown backend: {backend}')
+
+
+def post_moodle_webhook(webhook_url: str, webhook_token: str, body: dict) -> None:
+    """POST status/result to Moodle complete_generation_job.php."""
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Worker-Token': webhook_token,
+    }
+    logger.info(
+        "Webhook → Moodle status=%s request_uuid=%s",
+        body.get('status'),
+        body.get('request_uuid'),
+    )
+    resp = http_requests.post(
+        webhook_url,
+        json=body,
+        headers=headers,
+        timeout=WEBHOOK_TIMEOUT,
+    )
+    if resp.status_code >= 400:
+        raise RuntimeError(f'Moodle webhook HTTP {resp.status_code}: {resp.text[:300]}')
+    data = resp.json()
+    if data.get('success') is False:
+        raise RuntimeError(data.get('error') or 'Moodle webhook reported failure')
+
+
+def _async_generation_worker(payload: dict) -> None:
+    """Background thread: generate questions and webhook Moodle."""
+    request_uuid = payload['request_uuid']
+    webhook_url = payload['webhook_url']
+    webhook_token = payload['webhook_token']
+    gen_start = time.time()
+
+    try:
+        req = QuestionRequest(**{k: v for k, v in payload.items() if k in QuestionRequest.model_fields})
+        backend = req.backend or LLM_BACKEND
+
+        post_moodle_webhook(webhook_url, webhook_token, {
+            'request_uuid': request_uuid,
+            'status': 'processing',
+        })
+
+        logger.info(
+            "LLM async START request_uuid=%s backend=%s n=%s topic=%r",
+            request_uuid,
+            backend,
+            req.n_questions,
+            (req.topic or '')[:80],
+        )
+
+        questions = execute_generation(req)
+        duration_ms = int((time.time() - gen_start) * 1000)
+
+        question_payload = []
+        for q in questions:
+            question_payload.append({
+                'question': q.question,
+                'choices': [{'text': c.text, 'is_correct': c.is_correct} for c in q.choices],
+                'correct_index': q.correct_index,
+                'difficulty': q.difficulty,
+                'bloom_level': q.bloom_level,
+                'explanation': q.explanation,
+            })
+
+        post_moodle_webhook(webhook_url, webhook_token, {
+            'request_uuid': request_uuid,
+            'status': 'success',
+            'questions': question_payload,
+            'generated_count': len(question_payload),
+            'duration_ms': duration_ms,
+        })
+
+        logger.info(
+            "LLM async END request_uuid=%s count=%s duration=%.2fs",
+            request_uuid,
+            len(question_payload),
+            duration_ms / 1000.0,
+        )
+    except Exception as e:
+        duration_ms = int((time.time() - gen_start) * 1000)
+        logger.error("LLM async FAIL request_uuid=%s: %s", request_uuid, e, exc_info=True)
+        try:
+            post_moodle_webhook(webhook_url, webhook_token, {
+                'request_uuid': request_uuid,
+                'status': 'error',
+                'error_message': str(e),
+                'duration_ms': duration_ms,
+            })
+        except Exception as webhook_err:
+            logger.error(
+                "Failed to send error webhook for %s: %s",
+                request_uuid,
+                webhook_err,
+            )
+
+
+@app.route('/generate/async', methods=['POST'])
+def generate_questions_async():
+    """Accept generation job and process in background; webhook Moodle when done."""
+    try:
+        data = request.json or {}
+        async_req = AsyncGenerateRequest(**data)
+        thread = threading.Thread(
+            target=_async_generation_worker,
+            args=(data,),
+            daemon=True,
+        )
+        thread.start()
+        logger.info(
+            "LLM async ACCEPTED request_uuid=%s webhook=%s",
+            async_req.request_uuid,
+            async_req.webhook_url,
+        )
+        return jsonify({
+            'status': 'accepted',
+            'request_uuid': async_req.request_uuid,
+            'message': 'Generation started; results will be sent via webhook',
+        }), 202
+    except Exception as e:
+        logger.error(f"Error accepting async generation: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/generate', methods=['POST'])
 def generate_questions():
-    """Generate MCQ questions"""
+    """Generate MCQ questions (synchronous)."""
     try:
         data = request.json
         req = QuestionRequest(**data)
-        
-        # Use backend from request, fallback to environment default
+
         backend = req.backend or LLM_BACKEND
-        
-        # Generate questions based on backend
-        if backend == 'openai':
-            effective_openai_key = req.openai_api_key or OPENAI_API_KEY
-            if not effective_openai_key:
-                return jsonify({'error': 'OpenAI API key not configured'}), 500
-            questions = generate_with_openai(
-                req.topic, req.level, req.n_questions, 
-                req.language, req.bloom_level, req.context,
-                api_key_override=req.openai_api_key,
-            )
-        elif backend == 'gemini':
-            effective_gemini_key = req.gemini_api_key or GEMINI_API_KEY
-            if not effective_gemini_key:
-                return jsonify({'error': 'Gemini API key not configured'}), 500
-            questions = generate_with_gemini(
-                req.topic, req.level, req.n_questions,
-                req.language, req.bloom_level, req.context,
-                api_key_override=req.gemini_api_key,
-            )
-        elif backend == 'local':
-            questions = generate_with_local_llm(
-                req.topic, req.level, req.n_questions,
-                req.language, req.bloom_level, req.context,
-                model=req.model,
-            )
-        else:
-            return jsonify({'error': f'Unknown backend: {backend}'}), 400
-        
+        gen_start = time.time()
+        logger.info(
+            "LLM generate START backend=%s topic=%r n_questions=%s language=%s has_context=%s",
+            backend,
+            req.topic[:80] if req.topic else '',
+            req.n_questions,
+            req.language,
+            bool(req.context),
+        )
+
+        questions = execute_generation(req)
+
+        duration_s = time.time() - gen_start
+        logger.info(
+            "LLM generate END backend=%s count=%s duration=%.2fs",
+            backend,
+            len(questions),
+            duration_s,
+        )
+
         response = QuestionResponse(
             questions=questions,
             metadata={
@@ -594,9 +787,9 @@ def generate_questions():
                 'backend': backend
             }
         )
-        
+
         return jsonify(response.model_dump()), 200
-        
+
     except Exception as e:
         logger.error(f"Error generating questions: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500

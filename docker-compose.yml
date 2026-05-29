@@ -54,6 +54,8 @@ services:
       OLLAMA_MODEL: ${OLLAMA_MODEL:-deepseek-coder:latest}
       MAX_QUESTIONS: 20
       DEFAULT_LANGUAGE: en
+      LOCAL_LLM_TIMEOUT: ${LOCAL_LLM_TIMEOUT:-1200}
+      MAX_LESSON_CONTEXT_CHARS: ${MAX_LESSON_CONTEXT_CHARS:-12000}
     ports:
       - "${LLM_API_PORT:-5001}:5001"
     networks:
@@ -82,6 +84,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
       NODE_ENV: production
+      GENERATION_WORKER_SECRET: ${GENERATION_WORKER_SECRET:-gamified-generation-secret}
+      MOODLE_INTERNAL_URL: http://moodle
+      GENERATION_QUEUE_KEY: gamifiedquiz:generation:queue
+      LOCAL_GENERATION_BATCH_SIZE: 3
+      LLM_FETCH_TIMEOUT_MS: ${LLM_FETCH_TIMEOUT_MS:-1200000}
     ports:
       - "${WS_PORT:-3001}:3001"
     networks:
@@ -111,6 +118,8 @@ services:
       MOODLE_DATABASE_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
       MOODLE_DATABASE_NAME: ${MYSQL_DATABASE:-moodle}
       MOODLE_HOST: ${MOODLE_URL:-http://localhost:8080}
+      # Used by complete_generation_job.php to match $CFG->wwwroot for worker callbacks
+      GAMIFIEDQUIZ_WORKER_TOKEN: ${GENERATION_WORKER_SECRET:-gamified-generation-secret}
     ports:
       - "8080:80"
     volumes:

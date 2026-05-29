@@ -14,6 +14,9 @@ ini_set('log_errors', 1);
 // Set JSON header early to ensure proper output
 header('Content-Type: application/json');
 
+// Local LLM generation can take several minutes (especially with lesson text).
+@set_time_limit(600);
+
 try {
     require_once('../../../config.php');
     require_once($CFG->dirroot . '/mod/gamifiedquiz/lib.php');
@@ -38,6 +41,9 @@ $prompt = optional_param('prompt', '', PARAM_TEXT);
 $data = optional_param('data', '', PARAM_TEXT);
 $difficulty = optional_param('difficulty', '', PARAM_TEXT);
 $count = optional_param('count', 5, PARAM_INT);
+$async = optional_param('async', 1, PARAM_INT);
+$batchid = optional_param('batch_id', '', PARAM_TEXT);
+$categoryname = optional_param('category_name', '', PARAM_TEXT);
 // Must match llmapi MAX_QUESTIONS (docker-compose / .env).
 $maxquestionsperrequest = 20;
 $count = min(max(1, (int)$count), $maxquestionsperrequest);
@@ -88,7 +94,48 @@ try {
     $llmmodel = property_exists($gamifiedquiz, 'llm_model') ? $gamifiedquiz->llm_model : '';
     $userapikey = gamifiedquiz_get_user_llm_api_key($backend, $USER->id);
 
-    // Insert initial log row before calling LLM service.
+    // Background generation (default): queue job and return immediately.
+    if ($async) {
+        if (empty($batchid)) {
+            $batchid = gamifiedquiz_new_uuid();
+        }
+        $queued = gamifiedquiz_enqueue_generation_job(
+            $gamifiedquiz,
+            $USER->id,
+            $cmid,
+            $topic,
+            $level,
+            $count,
+            $gamifiedquiz->language,
+            $backend,
+            $predefined_data,
+            $llmmodel,
+            $userapikey,
+            $categoryname,
+            $batchid
+        );
+        if (isset($queued['error'])) {
+            http_response_code(500);
+            echo json_encode(array(
+                'success' => false,
+                'error' => $queued['error'],
+                'batch_id' => $batchid,
+            ));
+            exit;
+        }
+        echo json_encode(array(
+            'success' => true,
+            'async' => true,
+            'job_id' => $queued['job_id'],
+            'batch_id' => $batchid,
+            'status' => $queued['status'],
+            'status_label' => gamifiedquiz_generation_status_label($queued['status']),
+            'message' => get_string('generation_sent', 'mod_gamifiedquiz'),
+        ));
+        exit;
+    }
+
+    // Insert initial log row before calling LLM service (synchronous path).
     $logrecord = new stdClass();
     $logrecord->gamifiedquizid = $gamifiedquiz->id;
     $logrecord->userid = $USER->id;
@@ -174,50 +221,15 @@ try {
         exit;
     }
 
-    // Get category name (optional parameter)
-    $category_name = optional_param('category_name', '', PARAM_TEXT);
-    
-    // Save questions to gamifiedquiz_questions table only
+    $category_name = $categoryname;
     $session_id = 'session_' . $gamifiedquiz->id . '_' . ($cmid ?: time());
-    $saved_count = 0;
-    
-    foreach ($questions as $index => $question) {
-        // Handle different question formats
-        $question_text = $question['question'] ?? $question['question_text'] ?? '';
-        $choices = $question['choices'] ?? array();
-        
-        if (empty($question_text) || empty($choices)) {
-            continue; // Skip invalid questions
-        }
-        
-        // Auto-calculate correct_index from is_correct if not provided
-        $correct_index = $question['correct_index'] ?? null;
-        if ($correct_index === null) {
-            foreach ($choices as $idx => $choice) {
-                if (is_array($choice) && isset($choice['is_correct']) && $choice['is_correct'] === true) {
-                    $correct_index = $idx;
-                    break;
-                }
-            }
-            if ($correct_index === null) {
-                $correct_index = 0;
-            }
-        }
-        
-        // Save to gamifiedquiz_questions table
-        $record = new stdClass();
-        $record->gamifiedquizid = $gamifiedquiz->id;
-        $record->session_id = $session_id;
-        $record->question_text = $question_text;
-        $record->choices = json_encode($choices);
-        $record->correct_index = $correct_index;
-        $record->difficulty = $gamifiedquiz->difficulty;
-        $record->category_name = $category_name; // Store category name
-        $record->timecreated = time();
-        
-        $DB->insert_record('gamifiedquiz_questions', $record);
-        $saved_count++;
-    }
+    $saved_count = gamifiedquiz_save_generated_questions(
+        $gamifiedquiz->id,
+        $questions,
+        $category_name,
+        $session_id,
+        $gamifiedquiz->difficulty
+    );
 
     $generatedcount = count($questions);
     $durationms = (int)round((microtime(true) - $requeststart) * 1000);

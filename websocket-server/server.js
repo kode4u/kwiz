@@ -9,6 +9,10 @@ const { Server } = require('socket.io');
 const redis = require('redis');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const {
+  registerGenerationRoutes,
+  startGenerationWorker,
+} = require('./generation-worker');
 require('dotenv').config();
 
 const app = express();
@@ -34,14 +38,19 @@ const io = new Server(server, {
   transports: ['websocket', 'polling']
 });
 
-// Redis client
+// Redis clients: one for normal commands, one for blocking BLPOP in the generation worker.
 const redisClient = redis.createClient({ url: REDIS_URL });
+const redisWorkerClient = redis.createClient({ url: REDIS_URL });
 
 redisClient.on('error', (err) => console.error('Redis Client Error', err));
+redisWorkerClient.on('error', (err) => console.error('Redis Worker Client Error', err));
 redisClient.on('connect', () => console.log('Redis connected'));
 
-// Connect to Redis
-redisClient.connect().catch(console.error);
+Promise.all([redisClient.connect(), redisWorkerClient.connect()])
+  .then(() => {
+    registerGenerationRoutes(app, redisClient, io);
+  })
+  .catch(console.error);
 
 // Session storage (in-memory, can be moved to Redis)
 const sessions = new Map();
@@ -208,6 +217,7 @@ io.on('connection', async (socket) => {
   
   // Join room
   socket.join(room);
+  socket.join(`user:${socket.userId}`);
 
   // Research / ops: round-trip latency measurement (ack callback)
   socket.on('eval:ping', (cb) => {
@@ -560,12 +570,15 @@ io.on('connection', async (socket) => {
 server.listen(PORT, () => {
   console.log(`WebSocket server running on port ${PORT}`);
   console.log(`CORS origin: ${CORS_ORIGIN}`);
+  startGenerationWorker(redisWorkerClient, io).catch((err) => {
+    console.error('[generation] Worker failed to start:', err);
+  });
 });
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
-  await redisClient.quit();
+  await Promise.allSettled([redisClient.quit(), redisWorkerClient.quit()]);
   server.close(() => {
     console.log('Server closed');
     process.exit(0);

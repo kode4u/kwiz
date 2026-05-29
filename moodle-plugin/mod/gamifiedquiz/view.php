@@ -209,6 +209,12 @@ if ($is_teacher) {
     echo '<div id="category-list" style="margin-bottom: 15px;"></div>';
     echo '<button id="add-category-btn" class="btn btn-primary gq-btn gq-btn-primary" style="margin-top: 10px;">Add Category</button>';
     echo '</div>';
+
+    echo '<div id="lesson-content-section" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #ddd;">';
+    echo '<label for="generate-lesson-content" style="display: block; margin-bottom: 5px; font-weight: bold;">' . get_string('lesson_content', 'mod_gamifiedquiz') . ' <span style="font-weight: normal; color: #666;">(' . get_string('optional', 'core') . ')</span></label>';
+    echo '<textarea id="generate-lesson-content" name="lesson" rows="8" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;" placeholder="' . s(get_string('lesson_content_placeholder', 'mod_gamifiedquiz')) . '"></textarea>';
+    echo '<p style="margin: 8px 0 0; font-size: 13px; color: #666;">' . get_string('lesson_content_help', 'mod_gamifiedquiz') . '</p>';
+    echo '</div>';
     
     echo '<div style="margin-top: 20px; text-align: right; border-top: 2px solid #ddd; padding-top: 15px;">';
     echo '<button id="generate-all-btn" class="btn btn-success gq-btn gq-btn-success">Generate All Questions</button>';
@@ -228,8 +234,9 @@ if ($is_teacher) {
     echo '<textarea id="generate-prompt" name="prompt" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" placeholder="Enter topic or prompt for question generation (e.g., \'Mathematics: Algebra\')">' . s($gamifiedquiz->topic) . '</textarea>';
     echo '</div>';
     echo '<div style="margin-bottom: 20px;">';
-    echo '<label for="generate-data" style="display: block; margin-bottom: 5px; font-weight: bold;">Data/Context (Optional):</label>';
-    echo '<textarea id="generate-data" name="data" rows="5" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" placeholder="Enter additional context or predefined data for question generation"></textarea>';
+    echo '<label for="generate-data" style="display: block; margin-bottom: 5px; font-weight: bold;">' . get_string('lesson_content', 'mod_gamifiedquiz') . ' <span style="font-weight: normal; color: #666;">(' . get_string('optional', 'core') . ')</span></label>';
+    echo '<textarea id="generate-data" name="data" rows="8" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;" placeholder="' . s(get_string('lesson_content_placeholder', 'mod_gamifiedquiz')) . '"></textarea>';
+    echo '<p style="margin: 8px 0 0; font-size: 13px; color: #666;">' . get_string('lesson_content_help', 'mod_gamifiedquiz') . '</p>';
     echo '</div>';
     echo '<div style="margin-bottom: 20px;">';
     echo '<label for="generate-difficulty" style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty Level:</label>';
