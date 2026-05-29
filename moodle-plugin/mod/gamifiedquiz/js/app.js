@@ -600,6 +600,10 @@
                 <button type="button" class="remove-question-btn gq-btn gq-btn-sm gq-btn-danger" data-index="${index}">Remove Question</button>
             `;
             
+            if (question && question.id) {
+                questionDiv.dataset.questionId = String(question.id);
+            }
+
             form.appendChild(questionDiv);
             
             const urlInput = questionDiv.querySelector('.question-image-url-input');
@@ -753,6 +757,10 @@
                         correct_index: correctIndex,
                         difficulty: config.difficulty || 'medium'
                     };
+                    const questionId = item.dataset.questionId;
+                    if (questionId) {
+                        saved.id = parseInt(questionId, 10);
+                    }
                     if (questionImage) saved.question_image = questionImage;
                     savedQuestions.push(saved);
                 }
@@ -1165,29 +1173,6 @@
             return q;
         }
         
-        // Check for edited questions
-        if (config.questionsData) {
-            try {
-                const edited = JSON.parse(config.questionsData);
-                if (Array.isArray(edited) && edited.length > 0) {
-                    // Normalize questions to ensure correct_index is set
-                    questions = edited.map(normalizeQuestion);
-                    // Don't display questions preview
-                    // displayQuestions(questions);
-                    if (startBtn) startBtn.disabled = false;
-                    // Reset question index
-                    currentQuestionIndex = 0;
-                }
-            } catch (e) {
-                console.error('Error parsing questions data:', e);
-            }
-        }
-        
-        // Load questions from database if none found
-        if (questions.length === 0) {
-            loadQuestionsFromDB(config);
-        }
-        
         // Function to load questions from database
         async function loadQuestionsFromDB(config) {
             try {
@@ -1209,6 +1194,25 @@
                 console.error('Error loading questions from DB:', error);
             }
         }
+
+        // Load from gamifiedquiz_questions (source of truth); fall back to legacy questions_data.
+        (async () => {
+            await loadQuestionsFromDB(config);
+            if (questions.length === 0 && config.questionsData) {
+                try {
+                    const edited = JSON.parse(config.questionsData);
+                    if (Array.isArray(edited) && edited.length > 0) {
+                        questions = edited.map(normalizeQuestion);
+                        window.currentQuestions = questions;
+                        displayQuestions(questions);
+                        if (startBtn) startBtn.disabled = false;
+                        currentQuestionIndex = 0;
+                    }
+                } catch (e) {
+                    console.error('Error parsing questions data:', e);
+                }
+            }
+        })();
 
         // Generate questions dialog elements
         const generateModal = document.getElementById('generate-questions-modal');

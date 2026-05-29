@@ -644,6 +644,107 @@ function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $cat
 }
 
 /**
+ * Replace the quiz question set in gamifiedquiz_questions (and mirror to questions_data).
+ * Removes rows not present in the saved list; updates by id when provided.
+ *
+ * @param int $gamifiedquizid Quiz instance id
+ * @param array $questions Question payloads from the editor
+ * @return array Saved questions (with ids)
+ */
+function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
+    global $DB;
+
+    $transaction = $DB->start_delegated_transaction();
+
+    $existing = $DB->get_records('gamifiedquiz_questions', array('gamifiedquizid' => $gamifiedquizid), '', 'id');
+    $keptids = array();
+    $defaultsession = 'editor_' . $gamifiedquizid;
+    $savedforjson = array();
+
+    foreach ($questions as $question) {
+        $questiontext = trim($question['question'] ?? $question['question_text'] ?? '');
+        if ($questiontext === '') {
+            continue;
+        }
+
+        $choices = $question['choices'] ?? array();
+        $correctindex = isset($question['correct_index']) ? (int) $question['correct_index'] : null;
+        $normalized = array();
+        foreach ($choices as $idx => $choice) {
+            if (is_string($choice)) {
+                $normalized[] = array('text' => $choice, 'is_correct' => ($correctindex === $idx));
+            } else {
+                $text = trim($choice['text'] ?? '');
+                if ($text === '') {
+                    continue;
+                }
+                $normalized[] = array(
+                    'text' => $text,
+                    'is_correct' => !empty($choice['is_correct']),
+                );
+            }
+        }
+        if (count($normalized) < 2) {
+            continue;
+        }
+        if ($correctindex === null) {
+            foreach ($normalized as $idx => $choice) {
+                if (!empty($choice['is_correct'])) {
+                    $correctindex = $idx;
+                    break;
+                }
+            }
+        }
+        if ($correctindex === null) {
+            $correctindex = 0;
+        }
+
+        $record = new stdClass();
+        $record->gamifiedquizid = $gamifiedquizid;
+        $record->question_text = $questiontext;
+        $record->choices = json_encode($normalized);
+        $record->correct_index = $correctindex;
+        $record->difficulty = $question['difficulty'] ?? 'medium';
+        if (!empty($question['category_name'])) {
+            $record->category_name = $question['category_name'];
+        }
+
+        $questionid = !empty($question['id']) ? (int) $question['id'] : 0;
+        if ($questionid && isset($existing[$questionid])) {
+            $record->id = $questionid;
+            $record->session_id = $existing[$questionid]->session_id ?: $defaultsession;
+            $DB->update_record('gamifiedquiz_questions', $record);
+            $keptids[] = $questionid;
+            $question['id'] = $questionid;
+        } else {
+            $record->session_id = $defaultsession;
+            $record->timecreated = time();
+            $newid = $DB->insert_record('gamifiedquiz_questions', $record);
+            $keptids[] = $newid;
+            $question['id'] = $newid;
+        }
+        $savedforjson[] = $question;
+    }
+
+    foreach (array_keys($existing) as $oldid) {
+        if (!in_array($oldid, $keptids)) {
+            $DB->delete_records('gamifiedquiz_responses', array('questionid' => $oldid));
+            $DB->delete_records('gamifiedquiz_questions', array('id' => $oldid));
+        }
+    }
+
+    $gq = new stdClass();
+    $gq->id = $gamifiedquizid;
+    $gq->questions_data = json_encode($savedforjson);
+    $gq->timemodified = time();
+    $DB->update_record('gamifiedquiz', $gq);
+
+    $transaction->allow_commit();
+
+    return $savedforjson;
+}
+
+/**
  * Queue a background generation job (DB row + Redis via WebSocket server).
  *
  * @param stdClass $gamifiedquiz Quiz instance

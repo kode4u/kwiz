@@ -47,39 +47,27 @@ if ($cmid) {
 require_sesskey();
 
 try {
-    // Parse questions JSON
     $questions = json_decode($questions_json, true);
-    
-    // Debug log
-    error_log('save_questions.php - Received JSON: ' . $questions_json);
-    error_log('save_questions.php - Parsed questions count: ' . (is_array($questions) ? count($questions) : 'not array'));
-    
+
     if (!is_array($questions)) {
         throw new Exception('Invalid questions data');
     }
-    
-    // Validate questions (only if not empty)
+
     foreach ($questions as $q) {
         if (empty($q['question']) || empty($q['choices']) || count($q['choices']) < 2) {
             throw new Exception('Each question must have text and at least 2 choices');
         }
     }
-    
-    // Save questions_data to quiz instance
-    $record = new stdClass();
-    $record->id = $gamifiedquiz->id;
-    $record->questions_data = json_encode($questions);
-    $record->timemodified = time();
-    
-    $DB->update_record('gamifiedquiz', $record);
-    
+
+    $saved = gamifiedquiz_sync_questions($gamifiedquiz->id, $questions);
+
     echo json_encode(array(
         'success' => true,
-        'questions' => $questions,
-        'count' => count($questions),
+        'questions' => $saved,
+        'count' => count($saved),
         'message' => 'Questions saved successfully'
     ));
-    
+
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(array(
@@ -87,4 +75,3 @@ try {
         'error' => $e->getMessage()
     ));
 }
-
