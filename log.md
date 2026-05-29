@@ -27,9 +27,6 @@ $env:OLLAMA_MODEL="deepseek-r1:8b"
 
 docker compose up -d llmapi
 python evaluate/llm-evaluation/run_batch_evaluation.py
-
-# If some jobs fail (timeouts/JSON errors), resume without redoing successes:
-python evaluate/llm-evaluation/run_batch_evaluation.py --resume
 ```
 
 **125 questions** = 5 domains × **25 questions/domain** (5 subtopics × 5 each).
