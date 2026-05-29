@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Cross Cultural Literacy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is cross-cultural literacy?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Ability to speak multiple languages</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Understanding how cultural differences affect business practices</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Knowing only your own culture</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoiding all cultural differences</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Definition of Values</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In cultural terms, values are defined as:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Social punishments</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Abstract ideas about what a group considers right or desirable</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Legal rules</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Personal preferences only</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Folkway Example</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is a folkway rather than a more?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Laws against stealing</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Dress code at a business meeting</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Religious ban on eating certain foods</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Rules about marriage</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Individualistic Societies</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In individualistic societies like the U.S., which is MOST valued?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Group harmony</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Lifetime employment</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Personal achievement</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Obedience to elders</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Caste System</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which statement about a caste system is TRUE?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Individuals can easily change their position</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Stratification is temporary</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Social position is determined at birth and rarely changed</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It promotes high social mobility</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Economic Implication of Islam</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the key economic implication of Islam?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Wealth should be accumulated endlessly</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Property is owned by individuals permanently</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>People act as stewards for God and must handle resources responsibly</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Interest charging is always encouraged</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Protestant Work Ethic</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which religion is MOST strongly linked to the “Protestant work ethic”?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Hinduism</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Christianity</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Buddhism</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Confucianism</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Power Distance</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>According to Hofstede, power distance refers to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Gender roles in society</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Tolerance for uncertainty</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>How societies handle inequality in power</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Distance between offices in a company</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Unspoken Language</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is an example of unspoken language?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Written contracts</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Hand gestures</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Email communication</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Phone calls only</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Importance of Cross Cultural Literacy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Why is cross-cultural literacy important in international business?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>It allows companies to ignore local customs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>It helps companies adapt management practices to local values</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It removes the need for translation</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It eliminates business risks entirely</text>
+    </answer>
+</question>
+
+</quiz>

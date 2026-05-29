@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Promise of Exporting</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the main promise of exporting for firms?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>It eliminates the need for local distributors</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Large revenue and profit opportunities in foreign markets</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Guarantees first-mover advantages</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoids all risks in foreign markets</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Common Pitfall of Exporting</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A common pitfall of exporting is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Using letters of credit</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Poor market analysis and inadequate understanding of foreign competition</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Hiring local staff</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Small-scale entry</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Improving Export Performance</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following can improve export performance?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Ignoring market differences</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Using the global EDGE™ diagnostic tool and hiring experienced export consultants</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Entering many markets at once</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoiding all local partnerships</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Export Management Company</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>An Export Management Company (EMC) primarily:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Provides domestic financing</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Acts like an internal exporting department handling export documents, sales, and distribution</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Manufactures goods abroad</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Issues letters of credit</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Guideline for Novice Exporter</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A key guideline for a novice exporter is to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Focus on a few markets and enter on a small scale</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Invest heavily in all markets simultaneously</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoid hiring local personnel</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Ignore local production options</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Financial Instruments in Trade</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is a financial instrument used in export-import transactions?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Equity shares</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Letter of credit, draft, and bill of lading</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Bonds</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Barter agreements</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Sight Draft</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A sight draft is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Payable immediately upon presentation</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Payable after 90 days</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Used only in countertrade</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A type of export credit insurance</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Bankers Acceptance</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A time draft becomes a banker’s acceptance when:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>The exporter issues it</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>The drawee bank accepts it</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The importer refuses it</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Payment is made in cash immediately</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Export Credit Insurance</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Export credit insurance is used to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Ensure profits from domestic sales</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Cover losses in case an importer defaults on payment</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Replace letters of credit entirely</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoid the use of drafts</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Purpose of Countertrade</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Countertrade is used primarily because:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>It is simpler than cash transactions</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Traditional payment methods are unavailable or too costly</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It guarantees higher profits</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It eliminates export risks</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>Types of Countertrade</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is a type of countertrade?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Barter</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Export credit insurance</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Letter of credit</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Draft</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Counter Purchase Agreement</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In a counter purchase agreement:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>The buyer pays cash only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The seller invests in a plant in the buyer’s country</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>The buyer agrees to purchase other goods/services from the seller</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A third party facilitates the trade</text>
+    </answer>
+</question>
+
+<!-- Question 13 -->
+<question type="multichoice">
+    <name>
+        <text>Switch Trading</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Switch trading involves:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Direct barter between two firms</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A third-party trading house facilitating the exchange of goods/services</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Export credit insurance</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Letters of credit</text>
+    </answer>
+</question>
+
+<!-- Question 14 -->
+<question type="multichoice">
+    <name>
+        <text>Buyback Compensation Agreements</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Buyback or compensation agreements involve:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Exchanging cash for goods</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Receiving payment in the form of goods, services, or output from a plant built by the exporter</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Letters of credit only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Direct barter</text>
+    </answer>
+</question>
+
+<!-- Question 15 -->
+<question type="multichoice">
+    <name>
+        <text>Disadvantages of Countertrade</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A potential disadvantage of countertrade is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Reduced need for a trading department</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Receiving unusable or low-quality goods that are hard to resell</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Eliminates currency risks</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Guarantees cash profits</text>
+    </answer>
+</question>
+
+</quiz>

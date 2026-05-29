@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Regional Economic Integration</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Regional economic integration refers to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Agreements among countries to increase tariffs on each other’s goods</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Agreements among countries to reduce and remove barriers to free flow of goods, services, and factors of production</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Imposing common taxes on all member states</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Creating a single political union immediately</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Free Trade Area</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A free trade area (FTA) is characterized by:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Removing barriers among members but keeping independent external trade policies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Complete economic and political union</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Adoption of a common currency</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Full harmonization of tax policies</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Customs Union</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is a customs union?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Norway, Iceland, Liechtenstein, Switzerland</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A group of countries removing internal trade barriers and having a common external trade policy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>ASEAN</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>NAFTA</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Trade Diversion</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Trade diversion occurs when:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>High-cost domestic producers are replaced by low-cost producers within the FTA</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Lower-cost external suppliers are replaced by higher-cost suppliers within the FTA</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Domestic firms export more products</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Imports are completely banned</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Single European Act</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The Single European Act aimed to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Introduce the euro immediately</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Create a single market by removing frontier controls, mutual recognition of standards, and lifting restrictions on trade</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Dissolve the European Union</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Restrict foreign investment</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Maastricht Treaty</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The Maastricht Treaty led to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Formation of NAFTA</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Commitment of EU members to a closer economic and political union</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Dissolution of the European Free Trade Association</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Establishment of ASEAN</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Benefits of Euro</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>One key benefit of adopting the euro is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Greater difficulty in comparing prices</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Lower foreign exchange and hedging costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Increased protectionism</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Isolation from global financial markets</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Replacement of NAFTA</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>NAFTA was replaced by:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>ASEAN</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>USMCA</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>RCEP</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Mercosur</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Andean Community</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The Andean Community is a:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Free trade area among Canada, Mexico, and the U.S.</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Customs union among Bolivia, Chile, Ecuador, Colombia, and Peru</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>European trade bloc</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>ASEAN free trade agreement</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>MERCOSUR</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>MERCOSUR is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A political union in Europe</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A free trade area among Argentina, Brazil, Paraguay, and Uruguay</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A customs union in Africa</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Part of USMCA</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>ASEAN China FTA</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>ASEAN signed a free trade agreement with China that removes tariffs on:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>50% of goods</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>90% of traded goods</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>All agricultural goods only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>None of the goods</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Managerial Implications of Regional Integration</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>One managerial implication of regional economic integration is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Firms can ignore competition from local markets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Firms have opportunities to grow market access and reduce costs, but face higher competition</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Firms can only operate in domestic markets</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Regional integration eliminates all business threats</text>
+    </answer>
+</question>
+
+</quiz>

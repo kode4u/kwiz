@@ -52,7 +52,7 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       LOCAL_LLM_URL: ${LOCAL_LLM_URL:-http://host.docker.internal:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-deepseek-coder:latest}
-      MAX_QUESTIONS: 10
+      MAX_QUESTIONS: 20
       DEFAULT_LANGUAGE: en
     ports:
       - "${LLM_API_PORT:-5001}:5001"

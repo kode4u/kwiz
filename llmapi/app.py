@@ -26,7 +26,7 @@ LLM_BACKEND = os.getenv('LLM_BACKEND', 'openai')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 LOCAL_LLM_URL = os.getenv('LOCAL_LLM_URL', 'http://localhost:11434')  # Ollama default
-MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', '10'))
+MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', '20'))
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', 'en')
 # Optional: comma-separated list of Ollama models to pre-pull on startup
 OLLAMA_PRELOAD_MODELS = os.getenv('OLLAMA_PRELOAD_MODELS', '').strip()

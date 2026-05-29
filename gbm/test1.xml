@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>What is globalization?</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is globalization?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>The increase of government control over markets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>The shift toward an integrated and interdependent world economy</text>
+        <feedback><text>Correct!</text></feedback>
+    </answer>
+
+    <answer fraction="0">
+        <text>The separation of national markets</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The replacement of technology with manual labor</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Globalization of Markets</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The globalization of markets refers to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Producing only for local consumers</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Merging separate national markets into one large global marketplace</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Making products different for every country</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Increasing tariffs between countries</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Globalization of Production</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is an example of globalization of production?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A company producing everything in its home country</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A firm sourcing components from multiple countries to reduce costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A government limiting imports</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Consumers buying only local brands</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>World Trading System</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which institution is responsible for policing the world trading system?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>United Nations (UN)</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>World Trade Organization (WTO)</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>World Bank</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>International Criminal Court</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Purpose of IMF</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What was the IMF originally created to do?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Promote peace negotiations</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Maintain order in the international monetary system</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Regulate oil prices</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Manage shipping logistics</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Drivers of Globalization</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which factor is NOT a key driver of globalization?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Declining trade barriers</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Technological change</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Increased military spending</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Foreign direct investment</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Electronic Global Marketplace</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which technology has been especially important for creating an electronic global marketplace?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Typewriters</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Internet and telecommunications</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Steam engines</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Fax machines only</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Definition of MNE</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A multinational enterprise (MNE) is defined as:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A company with at least 1 employee abroad</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A company operating in two or more countries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Any company listed on the stock market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only very large corporations</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Critics of Globalization</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which group is MOST LIKELY to criticize globalization?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Free market economists</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Anti-globalization protestors concerned about job losses</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Exporters</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Technology companies</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>National Sovereignty Concern</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the main concern of globalization critics regarding national sovereignty?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Governments gaining too much control</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Supranational organizations like the WTO gaining too much influence</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Too much democracy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Decrease in international cooperation</text>
+    </answer>
+</question>
+
+</quiz>

@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Marketing Mix</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The marketing mix consists of:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Product, Price, Promotion, Place</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Production, Purchasing, Planning, Pricing</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>People, Process, Promotion, Place</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Product, Profit, Planning, Positioning</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Market Segmentation</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Market segmentation aims to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Reduce marketing costs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Identify distinct consumer groups with different purchasing behavior</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Standardize products globally</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Focus only on domestic markets</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Intermarket Segment</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>An intermarket segment is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A group of consumers in one country</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A segment that transcends national borders</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A segment defined only by income</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A segment focused on technology users</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Predictive Analytics</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which type of analytics helps predict trends and relationships for decision-making?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Descriptive Analytics</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Predictive Analytics</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Prescriptive Analytics</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Historical Analytics</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Prescriptive Analytics</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Prescriptive analytics focuses on:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Summarizing past data</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Optimizing resource allocation and recommending actions</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Collecting primary data only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Tracking competitors’ prices</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Factors Affecting Product Attributes</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Key factors affecting product attributes include:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Consumer needs, culture, and economic development</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Transportation and logistics only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Pricing strategy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Employee training</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Fragmented Retail Systems</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In countries with fragmented retail systems:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Retail concentration is high and channels are short</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Retail concentration is low and channel length is longer</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Retail concentration is high and exclusive</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Retail systems are homogeneous</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Push Communication Strategy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A push communication strategy emphasizes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Mass media advertising</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Personal selling and direct promotion</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Online advertising only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Standardized campaigns</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Pull Communication Strategy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A pull communication strategy is most suitable when:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Selling industrial products</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Distribution channels are short and few media are available</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Selling consumer goods with long distribution channels and sufficient media</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The firm has limited advertising budget</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Price Discrimination</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Price discrimination occurs when:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Firms charge the same price globally</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Firms charge consumers in different countries different prices</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Firms ignore national markets</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Firms sell only to wholesale customers</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>Experience Curve Pricing</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Experience curve pricing:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Relies on competitors’ pricing in other markets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Prices low worldwide to rapidly build global sales volume</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Focuses on local market pricing</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Uses predatory pricing only</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Multi Point Pricing</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Multi-point pricing means:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Pricing is based on experience curve only</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A firm’s pricing in one market affects a rival’s pricing in another market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Firms always use uniform global pricing</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Price discrimination across products</text>
+    </answer>
+</question>
+
+<!-- Question 13 -->
+<question type="multichoice">
+    <name>
+        <text>Standardized Advertising</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A firm should standardize advertising worldwide when:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Cultural differences are significant</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Brand names are global and creative talent is scarce</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>National advertising regulations block campaigns</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Local markets demand unique messages</text>
+    </answer>
+</question>
+
+<!-- Question 14 -->
+<question type="multichoice">
+    <name>
+        <text>Cross Functional Teams</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Cross-functional teams in global R&amp;D include representatives from:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Marketing, Finance, and HR</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>R&amp;D, Marketing, and Production</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Sales, Logistics, and Accounting</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Production, IT, and Distribution</text>
+    </answer>
+</question>
+
+<!-- Question 15 -->
+<question type="multichoice">
+    <name>
+        <text>Macro Environment Factors</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A macro environment factor influencing global marketing today includes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Growth of global media and social media platforms</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Universal product demand</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Domestic-only trade regulations</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Standardized cultural norms worldwide</text>
+    </answer>
+</question>
+
+</quiz>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Trade Policy Instruments</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is NOT a main instrument of trade policy?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Tariffs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Subsidies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Local Content Requirements</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Stock Buybacks</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Purpose of Import Tariff</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the primary purpose of an import tariff?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>To punish domestic producers</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>To protect domestic producers and raise government revenue</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>To encourage exports</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>To eliminate quotas</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Voluntary Export Restraint</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A voluntary export restraint (VER) is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A tariff imposed by the importing country</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A quota on exports imposed by the exporting country at the request of the importing country</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A subsidy for domestic producers</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A ban on imports</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Local Content Requirements</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Local content requirements (LCRs) are used to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Encourage foreign investment only</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Require a fraction of a product to be produced domestically</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Reduce tariffs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Promote dumping</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Antidumping Policies</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Antidumping policies are designed to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Protect domestic producers from unfair foreign competition</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Reduce government subsidies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Encourage exports</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Limit domestic production</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Political Arguments for Intervention</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Political arguments for government intervention include all EXCEPT:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Protecting jobs and industries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Protecting national security</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Maximizing absolute efficiency in production</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Furthering foreign policy objectives</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Economic Arguments for Intervention</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Economic arguments for government intervention include:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Strategic trade policy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Export bans</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Voluntary export restraints</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Administrative policies</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Uruguay Round of GATT</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The Uruguay Round of GATT included which of the following provisions?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Reduce tariffs on industrial goods by more than one-third</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Eliminate all domestic subsidies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Remove all intellectual property protections</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Abolish the WTO</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Challenges Facing WTO</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is a challenge currently facing the WTO?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Antidumping actions</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Universal agreement on trade</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Lack of any trade disputes</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Elimination of tariffs globally</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Managerial Implications of Trade Barriers</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Managerial implications of trade barriers include:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Firms can export at the same cost as domestic production</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>VERs and local content requirements can raise a firm’s costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Trade barriers always reduce firm costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Protectionist policies have no long-term impact</text>
+    </answer>
+</question>
+
+</quiz>

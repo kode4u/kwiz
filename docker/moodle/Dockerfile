@@ -24,11 +24,12 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # Set working directory
 WORKDIR /var/www/html
 
-# Download and install Moodle 4.3
-RUN curl -L https://download.moodle.org/download.php/direct/stable403/moodle-latest-403.tgz | tar -xz \
-    && mv moodle/* . \
-    && mv moodle/.[!.]* . 2>/dev/null || true \
-    && rmdir moodle \
+# Download and install Moodle 4.3 (GitHub; moodle.org/packaging.moodle.org blocks curl with 403)
+RUN curl -fsSL "https://codeload.github.com/moodle/moodle/tar.gz/refs/heads/MOODLE_403_STABLE" -o /tmp/moodle.tgz \
+    && mkdir -p /tmp/moodle-src \
+    && tar -xzf /tmp/moodle.tgz -C /tmp/moodle-src --strip-components=1 \
+    && cp -a /tmp/moodle-src/. /var/www/html/ \
+    && rm -rf /tmp/moodle.tgz /tmp/moodle-src \
     && chown -R www-data:www-data /var/www/html
 
 # Configure PHP for Moodle

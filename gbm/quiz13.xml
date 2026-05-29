@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Human Resource Management Activities</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Human Resource Management (HRM) includes all of the following activities EXCEPT:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Staffing</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Performance evaluation</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Compensation</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Product pricing</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Ethnocentric Staffing Policy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The ethnocentric staffing policy:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Uses host-country nationals for all key management positions</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Fills key positions with parent-country nationals</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Seeks the best people regardless of nationality</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Encourages only local management development</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Localization Strategy Staffing</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which staffing approach is most consistent with a localization strategy?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Ethnocentric</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Polycentric</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Geocentric</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Regiocentric</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Disadvantage of Polycentric Policy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A disadvantage of the polycentric staffing policy is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Cultural myopia</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>High implementation costs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Limited career progression for host-country managers</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Difficulty in selecting qualified expatriates</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Geocentric Staffing Approach</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The geocentric approach to staffing:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Prefers parent-country nationals for all key jobs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Seeks the best people regardless of nationality</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only hires local managers</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Focuses exclusively on cost reduction</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Dimensions Predicting Expatriate Success</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which factor is NOT one of the four dimensions predicting expatriate success?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Self-orientation</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Others-orientation</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Technical expertise</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Cultural toughness</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Importance of Global Mindset</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A global mindset is important because:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>It ensures compliance with local labor laws</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>It helps managers work effectively across multiple cultures</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It reduces expatriate salaries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It eliminates the need for training</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Training Focus</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Training focuses on:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Preparing managers for a specific job</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Developing long-term managerial skills</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Compensation planning</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Labor relations</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Management Development</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Management development is concerned with:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Hiring expatriate managers</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Developing the manager’s skills over their career</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Standardizing compensation</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Legal compliance</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Reducing Bias in Expatriate Appraisal</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>To reduce bias in expatriate performance appraisal:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Only home office managers should evaluate performance</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Former expatriates at the same location can be involved</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Host-country managers should not participate</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Use only quantitative metrics</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>Balance Sheet Approach</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The balance sheet approach in expatriate compensation:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Pays the same nominal salary as at home</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Equalizes purchasing power across countries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Focuses only on base salary</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Ignores tax differentials</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Benefits of Workforce Diversity</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Benefits of a diverse global workforce include all EXCEPT:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Improved understanding of diverse customer needs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Underutilization of talent</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Enhanced brand image</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Higher employee satisfaction</text>
+    </answer>
+</question>
+
+<!-- Question 13 -->
+<question type="multichoice">
+    <name>
+        <text>International Labor Relations Challenge</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In international labor relations, the main challenge for firms is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Lack of qualified managers</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Cultural differences in customers</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Limiting constraints imposed by organized labor</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Communication barriers</text>
+    </answer>
+</question>
+
+<!-- Question 14 -->
+<question type="multichoice">
+    <name>
+        <text>Organized Labor Response</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Organized labor responds to multinational corporations by:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Reducing wages globally</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Setting up international organizations and lobbying for legislation</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Replacing local managers with expatriates</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Eliminating workforce diversity</text>
+    </answer>
+</question>
+
+<!-- Question 15 -->
+<question type="multichoice">
+    <name>
+        <text>Cultural and Language Training</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Cultural and language training for expatriate managers:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Has no impact on expatriate success</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Helps reduce expatriate failure</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Is required only for short-term assignments</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Is less important than compensation</text>
+    </answer>
+</question>
+
+</quiz>

@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Foreign Market Entry Decisions</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is NOT one of the three basic decisions when entering a foreign market?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Which markets to enter</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>When to enter those markets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>How much to pay employees in the host country</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>On what scale to enter those markets</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>First Mover Advantage</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A first-mover advantage includes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Higher pioneering costs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Ability to pre-empt rivals and establish a strong brand</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Risk of making major mistakes due to ignorance</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>All of the above</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Pioneering Costs</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Pioneering costs refer to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Expenses incurred from marketing and training customers in a new foreign market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Cost savings from early entry</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Taxes imposed by host governments</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Profits gained from exporting</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Exporting Entry Mode</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which entry mode involves selling a product from the home country to a foreign market?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Licensing</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Exporting</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Franchising</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Joint venture</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Turnkey Projects</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A turnkey project is most suitable for:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Simple consumer goods</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Complex industries such as chemical, pharmaceutical, petroleum refining</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Retail franchises</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Small-scale service firms</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Disadvantage of Turnkey Projects</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A disadvantage of turnkey projects is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>The firm has no long-term interest in the foreign market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>High transport costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Lack of franchising options</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Inability to share fixed costs</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Advantages of Licensing</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Licensing is attractive because:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>It requires high capital investment</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>It avoids development costs and risks of entering a foreign market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It ensures tight control over global operations</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It eliminates competition in the host market</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Disadvantages of Licensing</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A disadvantage of licensing includes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>The firm cannot control manufacturing and marketing tightly</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It is high-risk financially</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It requires significant fixed costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It is only for service firms</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Franchising vs Licensing</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Franchising differs from licensing mainly in that:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Franchising is only for manufacturing firms</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Franchising includes strict rules on how the business is run and ongoing support from the franchiser</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Franchising does not require royalty payments</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Licensing requires a local partner</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Joint Venture</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A joint venture is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A firm fully owned by a multinational company</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A cooperative firm jointly owned by two or more independent firms</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A method of exporting</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A type of turnkey project</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>Wholly Owned Subsidiaries</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Wholly owned subsidiaries are attractive because:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>They reduce the risk of losing control over core competencies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>They are inexpensive to establish</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>They require a local partner</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>They are mainly used for small-scale operations</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Strategic Alliances</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Strategic alliances are:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Always 50:50 joint ventures</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Cooperative agreements between potential or actual competitors</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Exclusive to franchising operations</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only used in developed markets</text>
+    </answer>
+</question>
+
+<!-- Question 13 -->
+<question type="multichoice">
+    <name>
+        <text>Advantages of Strategic Alliances</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>One advantage of strategic alliances is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>They allow firms to share fixed costs and risks</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>They guarantee full control over foreign subsidiaries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>They prevent competitors from learning new technologies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>They eliminate all market risks</text>
+    </answer>
+</question>
+
+<!-- Question 14 -->
+<question type="multichoice">
+    <name>
+        <text>Successful Strategic Alliances</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A key factor for making strategic alliances work is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Choosing a partner with complementary skills and shared vision</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoiding any contractual agreement</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Limiting communication between partners</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Ignoring differences in corporate culture</text>
+    </answer>
+</question>
+
+</quiz>

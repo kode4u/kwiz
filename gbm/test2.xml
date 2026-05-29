@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Political Economy Definition</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What does the term “political economy” refer to?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Only the political system of a country</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only the economic performance of a country</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Interaction of political, economic, and legal systems</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The tax collection strategy of a nation</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Collectivism Concept</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Collectivism emphasizes:</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Individual freedom over group goals</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Equal balance between group and individual goals</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Primacy of collective goals over individual goals</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Total absence of government</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Communism and Revolution</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which branch of socialism believes change must happen through violent revolution?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Social democracy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Capitalism</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Communism</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Market liberalism</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Individualism and Systems</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Individualism is MOST closely associated with which type of system?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Totalitarian and command economy</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Democracy and free market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Theocracy and monopoly</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Tribal governance</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Forms of Totalitarianism</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is NOT a form of totalitarianism listed in the text?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Communist totalitarianism</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Theocratic totalitarianism</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Military totalitarianism</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Right-wing totalitarianism</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Command Economy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In a command economy, who decides what to produce?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Private companies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Consumers</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Government</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Foreign investors</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Common Law System</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which legal system is based on tradition, precedent, and custom?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Civil law</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Common law</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Theocratic law</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Contract law</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Civil Law Contracts</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Under a civil law system, contracts tend to be:</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Very long and detailed</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Very short and less specific</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Illegal without court approval</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only verbal agreements</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Intellectual Property</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is NOT an example of intellectual property?</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A music composition</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A patented invention</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>A company logo</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A factory building</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Political Risk</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Political risk refers to:</p>]]></text>
+    </questiontext>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Chance of currency losing value</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Risk that political forces will disrupt business</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Risk of low product demand</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Legal disputes between companies only</text>
+    </answer>
+</question>
+
+</quiz>

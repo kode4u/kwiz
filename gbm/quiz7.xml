@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Flow of FDI</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The “flow of FDI” refers to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>The total accumulated value of foreign-owned assets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>The amount of FDI undertaken over a specific period</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The amount of exports from a country</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The inflow minus outflow of trade</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Largest Share of FDI</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which region has historically received the largest share of FDI?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Latin America</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Developed nations, especially the United States</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Africa</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Southeast Asia</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Acquisitions vs Greenfield Investments</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Why do firms often prefer acquisitions over greenfield investments?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Acquisitions are slower but cheaper</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Acquisitions are quicker, less risky, and allow efficiency improvements</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Greenfield investments always require less capital</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Greenfield investments offer immediate profits</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Internalization Theory</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>According to internalization theory, licensing may be disadvantageous because:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>It requires high capital expenditure</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>It may result in giving away valuable technology and limits control over foreign operations</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It is only allowed in developed countries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>It leads to automatic government regulation</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Product Life Cycle and FDI</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Vernon’s product life-cycle theory suggests that firms undertake FDI:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Only in developing countries</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>At different stages of the product life cycle, shifting production as markets mature</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>To avoid domestic taxes exclusively</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only in oligopolistic markets</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Eclectic Paradigm</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The eclectic paradigm of FDI emphasizes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Home-country labor advantages</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Location-specific advantages and externalities</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Tariff avoidance</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Short-term profit maximization</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Radical View of FDI</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Radical view of FDI is characterized by:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Encouragement of free market investment</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Viewing MNEs as a threat to national sovereignty</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Pragmatic incentives for foreign investors</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Ignoring political risks</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Benefits of FDI for Host Country</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>One main benefit of FDI for a host country is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Loss of domestic jobs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Resource transfer effects, such as capital, technology, and management skills</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Decrease in local competition</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Reduction in exports</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Cost of FDI for Home Country</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>One potential cost of FDI for the home country is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Capital outflow required to finance FDI</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Increase in domestic employment</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Technology gains</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Improved balance-of-payments</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Encouraging Inward FDI</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Governments can encourage inward FDI by:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Imposing ownership restraints</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Offering incentives to foreign investors</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Limiting capital inflows</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Increasing tariffs on imports</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>Offshore Production</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Offshore production refers to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Producing goods abroad to serve foreign markets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Producing goods abroad to serve the home market</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Producing goods domestically for export</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only greenfield investments</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Managerial Implications of FDI</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Managerial implication of FDI includes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Ignoring local regulations to maximize profit</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Considering trade theory and government policy when making FDI decisions</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Assuming all markets are identical</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoiding foreign competition at all costs</text>
+    </answer>
+</question>
+
+</quiz>

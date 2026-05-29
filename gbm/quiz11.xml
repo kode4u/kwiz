@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Supply Chain Management</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the main focus of supply chain management (SCM)?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Only purchasing raw materials</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Integration and coordination of logistics, purchasing, operations, and market channels from raw material to end-customer</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Marketing and sales of finished goods only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Outsourcing all production</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Total Quality Management</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Total Quality Management (TQM) emphasizes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Reducing labor costs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Improving the quality of a company’s products and services</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Centralizing production</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Outsourcing non-core activities</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Technological Factors in Production</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is a key technological factor influencing production location?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Country’s political stability</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Minimum efficient scale and flexible manufacturing technologies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Trade barriers</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Labor union policies</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>High Value to Weight Ratio</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A product with a high value-to-weight ratio is typically:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Cheap and heavy</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Expensive and lightweight, allowing centralized production</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Cheap and lightweight</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Heavy and requires multiple production sites</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Centralized Production</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Centralized production is most appropriate when:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Trade barriers are high and local differences are large</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Products have low value-to-weight ratio</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Fixed costs are high and products serve universal needs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Flexible manufacturing technology is unavailable</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Lead Factory Purpose</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the main purpose of a lead factory?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Produce low-cost goods with minimal technology</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Develop innovative processes, products, and technologies for global use</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Gather intelligence on competitors</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Serve only regional markets</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Reverse Logistics</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Reverse logistics refers to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Shipping finished goods to customers</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Planning and controlling the flow of materials from point of consumption back to origin for recapturing value or disposal</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Standard transportation of raw materials</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Outsourcing production to foreign suppliers</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Global Distribution Center</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A global distribution center (DC) primarily:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Manufactures finished goods</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Stores, customizes, and distributes products to wholesalers, retailers, or consumers globally</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Provides only domestic shipping</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Focuses on raw material extraction</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Just in Time Inventory</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Just-in-time (JIT) inventory systems aim to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Keep maximum stock for all products</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Minimize inventory holding costs and deliver materials exactly when needed</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Reduce product quality control</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Centralize production in one country</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Make or Buy Decisions</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which factor is NOT directly considered in make-or-buy decisions?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Product quality and technology</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Cost and production capacity</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Supplier expertise and availability</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Exchange rates for foreign currencies</text>
+    </answer>
+</question>
+
+<!-- Question 11 -->
+<question type="multichoice">
+    <name>
+        <text>Global Purchasing Strategy</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following represents a proactive global purchasing strategy?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Level I – Domestic purchasing only</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Level III – Proactive international purchasing integrated with the overall supply chain</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Level II – Reactive international purchasing</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Level IV – Domestic internal purchasing</text>
+    </answer>
+</question>
+
+<!-- Question 12 -->
+<question type="multichoice">
+    <name>
+        <text>Value of Relationships</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The value of upstream or downstream relationships is mainly determined by:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>The location of production facilities</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Balance of costs and quality received</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Number of factories owned</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Fixed transportation costs</text>
+    </answer>
+</question>
+
+<!-- Question 13 -->
+<question type="multichoice">
+    <name>
+        <text>Offshore Factories</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Offshore factories are primarily established to:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Reduce costs by producing parts or goods at lower cost than domestic production</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Conduct market research only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Develop global innovations</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Serve local markets exclusively</text>
+    </answer>
+</question>
+
+<!-- Question 14 -->
+<question type="multichoice">
+    <name>
+        <text>Server Factory Role</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>A server factory’s strategic role is:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Maximize cost savings without considering market needs</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Serve specific regional markets and reduce supply chain costs</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Innovate for global technology rollout</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Gather competitor intelligence</text>
+    </answer>
+</question>
+
+<!-- Question 15 -->
+<question type="multichoice">
+    <name>
+        <text>Macro Factors in Supply Chain</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which macro factor has recently impacted global supply chain decisions?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Global standardization of technology</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>International trade changes (e.g., tariffs, trade wars, Brexit)</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Low fuel prices</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Stable labor markets</text>
+    </answer>
+</question>
+
+</quiz>

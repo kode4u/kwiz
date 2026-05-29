@@ -38,6 +38,9 @@ $prompt = optional_param('prompt', '', PARAM_TEXT);
 $data = optional_param('data', '', PARAM_TEXT);
 $difficulty = optional_param('difficulty', '', PARAM_TEXT);
 $count = optional_param('count', 5, PARAM_INT);
+// Must match llmapi MAX_QUESTIONS (docker-compose / .env).
+$maxquestionsperrequest = 20;
+$count = min(max(1, (int)$count), $maxquestionsperrequest);
 
 // Get quiz instance
 $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $quizid), '*', MUST_EXIST);

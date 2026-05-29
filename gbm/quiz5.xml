@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>Mercantilism Theory</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the main idea of mercantilism?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Trade is mutually beneficial for all nations</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A country should export more than it imports</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Countries should specialize according to comparative advantage</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Free trade always increases wealth</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Absolute Advantage</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Adam Smith’s theory of absolute advantage suggests:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Countries should produce goods in which they are more efficient than other countries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Countries should import goods they can produce efficiently</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Trade is zero-sum</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Specialization is not necessary</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Comparative Advantage</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Ricardo’s theory of comparative advantage indicates:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>A country should produce everything it can efficiently</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>A country should specialize in goods with the greatest efficiency relative to other goods</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Trade is only beneficial if countries have identical technologies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Absolute efficiency determines trade patterns</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>Limits of Free Trade</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following may limit the benefits of unrestricted free trade?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Immobile resources</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Abundant capital</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Global communication networks</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Free-market policies</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>Heckscher Ohlin Theory</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>The Heckscher–Ohlin theory emphasizes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Differences in national factor endowments like land, labor, and capital</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The size of domestic markets only</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>The timing of product introduction</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Trade barriers as beneficial</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Leontief Paradox</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the Leontief Paradox?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>The U.S. exports more capital-intensive goods than predicted</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>The U.S. exports less capital-intensive goods than predicted</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Free trade harms all countries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Comparative advantage always fails</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Product Life Cycle Theory</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>According to the product life-cycle theory:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Products are introduced simultaneously worldwide</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Production and sales locations change as a product matures</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Comparative advantage determines all trade</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Economies of scale do not matter</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>New Trade Theory</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>New trade theory emphasizes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>First-mover advantages and economies of scale</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Absolute advantage in all industries</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Only factor endowments determine trade</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Trade is always zero-sum</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Porters Diamond</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Porter’s diamond of national competitive advantage includes:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="100">
+        <text>Factor endowments, demand conditions, related and supporting industries, and firm strategy/rivalry</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Tariffs, quotas, subsidies, and labor laws</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Absolute advantage, comparative advantage, product life cycle, and new trade theory</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Export surplus, import surplus, domestic investment, and GDP</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Managerial Implications</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Managerial implications of trade theory include:</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Ignoring location differences and focusing only on domestic markets</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Dispersing production to countries where activities are most efficient</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Avoiding first-mover strategies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Limiting lobbying for government trade policies</text>
+    </answer>
+</question>
+
+</quiz>

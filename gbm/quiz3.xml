@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- Question 1 -->
+<question type="multichoice">
+    <name>
+        <text>GDP per Capita</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What does GDP per capita measure?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Total exports of a country</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Total value of goods and services divided by population</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Average income after taxes</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Purchasing power of currency</text>
+    </answer>
+</question>
+
+<!-- Question 2 -->
+<question type="multichoice">
+    <name>
+        <text>Highest GDP per Capita 2020</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>In 2020, which country had the highest GDP per capita according to the text?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>China</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>India</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Switzerland</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Vietnam</text>
+    </answer>
+</question>
+
+<!-- Question 3 -->
+<question type="multichoice">
+    <name>
+        <text>Purpose of PPP</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is the main purpose of Purchasing Power Parity (PPP)?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>To calculate inflation rate</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>To adjust GDP for differences in cost of living</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>To measure tax collection</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>To compare exchange rates only</text>
+    </answer>
+</question>
+
+<!-- Question 4 -->
+<question type="multichoice">
+    <name>
+        <text>HDI Indicators</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is NOT one of the three indicators in the Human Development Index (HDI)?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Life expectancy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Literacy &amp; education level</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>PPP-based income</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Political freedom</text>
+    </answer>
+</question>
+
+<!-- Question 5 -->
+<question type="multichoice">
+    <name>
+        <text>High Human Development</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>According to the HDI scale, which score indicates high human development?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>0.30</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>0.55</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>0.75</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>0.85</text>
+    </answer>
+</question>
+
+<!-- Question 6 -->
+<question type="multichoice">
+    <name>
+        <text>Amartya Sen View</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which statement best reflects Amartya Sen’s view on development?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Development should be measured only by economic growth</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Development is about expanding human capabilities and quality of life</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Development is only about industrialization</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>GDP per capita is enough to judge welfare</text>
+    </answer>
+</question>
+
+<!-- Question 7 -->
+<question type="multichoice">
+    <name>
+        <text>Innovation and Entrepreneurship</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which condition is MOST essential for innovation and entrepreneurship according to the text?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>High population</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Strong property rights</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Military power</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Natural resources</text>
+    </answer>
+</question>
+
+<!-- Question 8 -->
+<question type="multichoice">
+    <name>
+        <text>Political Trend 1980s 1990s</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What major political trend occurred in the late 1980s and early 1990s?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Rise of communism</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Return to monarchy</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Spread of democracy</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Global economic recession</text>
+    </answer>
+</question>
+
+<!-- Question 9 -->
+<question type="multichoice">
+    <name>
+        <text>Deregulation Definition</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>What is deregulation?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Increasing government control over prices</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Removing legal restrictions to allow free market activity</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Raising taxes on private companies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Nationalizing industries</text>
+    </answer>
+</question>
+
+<!-- Question 10 -->
+<question type="multichoice">
+    <name>
+        <text>Political Risk Example</text>
+    </name>
+    <questiontext format="html">
+        <text><![CDATA[<p>Which of the following is considered a political risk for international businesses?</p>]]></text>
+    </questiontext>
+
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+
+    <answer fraction="0">
+        <text>Poor infrastructure</text>
+    </answer>
+
+    <answer fraction="100">
+        <text>Sudden change of government policies</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>High transportation cost</text>
+    </answer>
+
+    <answer fraction="0">
+        <text>Low literacy rate</text>
+    </answer>
+</question>
+
+</quiz>
