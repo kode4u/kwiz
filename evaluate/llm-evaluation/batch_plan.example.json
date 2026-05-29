@@ -1,0 +1,57 @@
+{
+  "description": "5 domains × 25 questions per domain = 125 MCQs total. Each domain: 5 subtopics × 5 questions per subtopic = 25.",
+  "questions_per_domain": 25,
+  "questions_per_subtopic": 5,
+  "domains": [
+    {
+      "domain": "C++ Programming",
+      "subtopics": [
+        { "name": "Variables & Data Types", "topic": "C++ Programming: variables and data types (declaration, int/float/char, const, scope)", "difficulty": "easy" },
+        { "name": "Control Structures", "topic": "C++ Programming: control structures (if/else, for, while, switch, break/continue)", "difficulty": "medium" },
+        { "name": "Functions", "topic": "C++ Programming: functions (declaration, parameters, return values, call by value/reference)", "difficulty": "medium" },
+        { "name": "Arrays & Strings", "topic": "C++ Programming: arrays and strings (indexing, C-strings, basic string operations)", "difficulty": "medium" },
+        { "name": "OOP", "topic": "C++ Programming: object-oriented programming (classes, objects, encapsulation, constructors)", "difficulty": "hard" }
+      ]
+    },
+    {
+      "domain": "Python Programming",
+      "subtopics": [
+        { "name": "Variables & Data Types", "topic": "Python Programming: variables and data types (assignment, int/float/str/bool, type basics)", "difficulty": "easy" },
+        { "name": "Conditions & Loops", "topic": "Python Programming: conditions and loops (if/elif/else, for, while, indentation)", "difficulty": "medium" },
+        { "name": "Functions", "topic": "Python Programming: functions (def, parameters, return, scope, lambda intro)", "difficulty": "medium" },
+        { "name": "Lists & Dictionaries", "topic": "Python Programming: lists and dictionaries (indexing, methods, keys/values, iteration)", "difficulty": "medium" },
+        { "name": "OOP", "topic": "Python Programming: object-oriented programming (class, __init__, methods, inheritance basics)", "difficulty": "hard" }
+      ]
+    },
+    {
+      "domain": "Java Programming",
+      "subtopics": [
+        { "name": "Variables & Data Types", "topic": "Java Programming: variables and data types (primitives, reference types, final, scope)", "difficulty": "easy" },
+        { "name": "Control Structures", "topic": "Java Programming: control structures (if/else, for, while, switch)", "difficulty": "medium" },
+        { "name": "Classes & Objects", "topic": "Java Programming: classes and objects (class definition, fields, methods, instantiation)", "difficulty": "medium" },
+        { "name": "Inheritance", "topic": "Java Programming: inheritance (extends, super, overriding, polymorphism basics)", "difficulty": "hard" },
+        { "name": "Collections", "topic": "Java Programming: collections (ArrayList, HashMap, List/Map interfaces, basic operations)", "difficulty": "hard" }
+      ]
+    },
+    {
+      "domain": "Data Structures",
+      "subtopics": [
+        { "name": "Arrays", "topic": "Data Structures: arrays (static/dynamic arrays, indexing, traversal, time complexity intro)", "difficulty": "easy" },
+        { "name": "Linked Lists", "topic": "Data Structures: linked lists (singly/doubly linked, insertion, deletion, traversal)", "difficulty": "medium" },
+        { "name": "Stacks & Queues", "topic": "Data Structures: stacks and queues (LIFO/FIFO, push/pop, enqueue/dequeue, applications)", "difficulty": "medium" },
+        { "name": "Trees", "topic": "Data Structures: trees (binary trees, BST basics, traversal in-order/pre-order/post-order)", "difficulty": "hard" },
+        { "name": "Hash Tables", "topic": "Data Structures: hash tables (hash function, collision handling, load factor, average O(1) lookup)", "difficulty": "hard" }
+      ]
+    },
+    {
+      "domain": "Database Systems",
+      "subtopics": [
+        { "name": "ER Model", "topic": "Database Systems: entity-relationship model (entities, attributes, relationships, cardinality)", "difficulty": "easy" },
+        { "name": "Primary/Foreign Keys", "topic": "Database Systems: primary keys and foreign keys (constraints, referential integrity)", "difficulty": "medium" },
+        { "name": "Normalization", "topic": "Database Systems: normalization (1NF, 2NF, 3NF, functional dependencies, decomposition)", "difficulty": "medium" },
+        { "name": "SQL Queries", "topic": "Database Systems: SQL queries (SELECT, WHERE, INSERT, UPDATE, DELETE, aggregate functions)", "difficulty": "medium" },
+        { "name": "Joins", "topic": "Database Systems: SQL joins (INNER, LEFT, RIGHT, FULL, multiple tables, join conditions)", "difficulty": "hard" }
+      ]
+    }
+  ]
+}

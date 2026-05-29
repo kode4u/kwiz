@@ -97,6 +97,15 @@ if ($status === 'error') {
     $update->status = 'error';
     $update->error_message = core_text::substr((string)$errormessage, 0, 1333);
     $DB->update_record('gamifiedquiz_generation_logs', $update);
+    gamifiedquiz_append_metrics_log('moodle_job_complete', array(
+        'request_uuid' => $requestuuid,
+        'gamifiedquizid' => (int) $gamifiedquiz->id,
+        'category_name' => $log->category_name ?? '',
+        'topic' => $log->topic ?? '',
+        'duration_ms' => $durationms !== null ? $durationms : 0,
+        'status' => 'error',
+        'error_message' => core_text::substr((string)$errormessage, 0, 500),
+    ));
     echo json_encode(array('success' => true, 'status' => 'error'));
     exit;
 }
@@ -126,6 +135,26 @@ $update->generated_count = count($questions);
 $update->saved_count = $saved;
 $update->status = 'success';
 $DB->update_record('gamifiedquiz_generation_logs', $update);
+
+$durationms = $durationms !== null ? $durationms : 0;
+$gencount = count($questions);
+gamifiedquiz_append_metrics_log('moodle_job_complete', array(
+    'request_uuid' => $requestuuid,
+    'gamifiedquizid' => (int) $gamifiedquiz->id,
+    'category_name' => $categoryname,
+    'topic' => $log->topic ?? '',
+    'difficulty' => $difficulty,
+    'backend' => $log->backend ?? '',
+    'llm_model' => $log->llm_model ?? '',
+    'n_questions_requested' => (int) $log->requested_count,
+    'n_questions_generated' => $gencount,
+    'n_questions_saved' => (int) $saved,
+    'duration_ms' => $durationms,
+    'duration_s' => round($durationms / 1000.0, 3),
+    'seconds_per_question' => ($gencount > 0 && $durationms > 0)
+        ? round(($durationms / 1000.0) / $gencount, 4) : null,
+    'status' => 'success',
+));
 
 echo json_encode(array(
     'success' => true,

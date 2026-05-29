@@ -5,6 +5,16 @@
 Evaluate generated MCQ quality with expert raters for publication.
 This module complements system metrics (latency, throughput, errors).
 
+## 125-question study (2 experts, binary rubric)
+
+For the main evaluation (**5 domains × 25 questions = 125**):
+
+1. Generate: [../llm-evaluation/README.md](../llm-evaluation/README.md)  
+2. Export sheets: `python3 evaluate/llm-evaluation/export_rating_sheets.py`  
+3. Rubric (4 criteria, 0/1): [rubric_binary_mcq.md](rubric_binary_mcq.md)  
+4. Analyze: `calculate_binary_rubric_scores.py` on `rating_sheet_expert1.csv` + `rating_sheet_expert2.csv`  
+5. Consensus: resolve disagreements → `rating_sheet_consensus.csv`  
+
 ## Files
 
 - `rubric_template.md`: scoring rubric and rating instructions

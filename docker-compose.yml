@@ -56,6 +56,13 @@ services:
       DEFAULT_LANGUAGE: en
       LOCAL_LLM_TIMEOUT: ${LOCAL_LLM_TIMEOUT:-1200}
       MAX_LESSON_CONTEXT_CHARS: ${MAX_LESSON_CONTEXT_CHARS:-12000}
+      METRICS_LOG_PATH: /logs/evaluation/metrics.jsonl
+      EVAL_GPU: ${EVAL_GPU:-}
+      EVAL_CPU: ${EVAL_CPU:-}
+      EVAL_RAM_GB: ${EVAL_RAM_GB:-}
+      EVAL_OS: ${EVAL_OS:-}
+    volumes:
+      - ./logs:/logs
     ports:
       - "${LLM_API_PORT:-5001}:5001"
     networks:
@@ -120,12 +127,14 @@ services:
       MOODLE_HOST: ${MOODLE_URL:-http://localhost:8080}
       # Used by complete_generation_job.php to match $CFG->wwwroot for worker callbacks
       GAMIFIEDQUIZ_WORKER_TOKEN: ${GENERATION_WORKER_SECRET:-gamified-generation-secret}
+      GAMIFIEDQUIZ_METRICS_LOG: /logs/evaluation/metrics.jsonl
     ports:
       - "8080:80"
     volumes:
       - moodle_data:/var/www/html
       - moodle_data_dir:/var/www/moodledata
       - ./moodle-plugin/mod/gamifiedquiz:/var/www/html/mod/gamifiedquiz
+      - ./logs:/logs
     networks:
       - jica-network
     depends_on:

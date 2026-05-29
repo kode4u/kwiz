@@ -9,6 +9,8 @@ This folder contains **separate evaluation modules** for the paper: each subfold
 | Folder | What it validates | Paper claim |
 |--------|-------------------|-------------|
 | [`llm-response-time/`](llm-response-time/) | LLM API end-to-end latency for `/generate` | ~2.5–4.0 s per question (report mean, min, max, percentiles) |
+| [`llm-evaluation/`](llm-evaluation/) | **File log** + 125-Q batch run + **expert workflow** (2 raters) | JSONL metrics, export CSV, quality % + κ |
+| [`quality-expert/`](quality-expert/) | Binary rubric (topic, semantics, answer key, clarity) | Expert1/2 CSVs, consensus, references |
 | [`websocket-latency/`](websocket-latency/) | Round-trip / server responsiveness | &lt; 150 ms under your network |
 | [`sus-usability/`](sus-usability/) | System Usability Scale (survey + score) | SUS score and interpretation |
 | [`load-testing-jmeter/`](load-testing-jmeter/) | Apache JMeter load & scalability | Up to ~200 concurrent users (your environment) |

@@ -540,6 +540,29 @@ function gamifiedquiz_worker_token() {
 }
 
 /**
+ * Append one JSON line to the evaluation metrics log (research / poster).
+ *
+ * @param string $event Event name (e.g. generation, moodle_job_complete)
+ * @param array $data Additional fields
+ */
+function gamifiedquiz_append_metrics_log($event, array $data = array()) {
+    $path = getenv('GAMIFIEDQUIZ_METRICS_LOG');
+    if (empty($path)) {
+        return;
+    }
+    $dir = dirname($path);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+    $row = array_merge(array(
+        'event' => $event,
+        'timestamp' => gmdate('c'),
+        'source' => 'moodle',
+    ), $data);
+    @file_put_contents($path, json_encode($row, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX);
+}
+
+/**
  * Moodle base URL reachable from Docker (llmapi / websocket containers).
  *
  * @return string

@@ -15,6 +15,12 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import json
 
+from metrics_logger import (
+    append_metric,
+    log_generation,
+    log_hardware_once,
+)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,6 +43,9 @@ LOCAL_GEN_BATCH_SIZE = int(os.getenv('LOCAL_GENERATION_BATCH_SIZE', '3'))
 WEBHOOK_TIMEOUT = int(os.getenv('WEBHOOK_TIMEOUT', '30'))
 # Optional: comma-separated list of Ollama models to pre-pull on startup
 OLLAMA_PRELOAD_MODELS = os.getenv('OLLAMA_PRELOAD_MODELS', '').strip()
+OLLAMA_MODEL_DEFAULT = os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+
+log_hardware_once(LOCAL_LLM_URL, OLLAMA_MODEL_DEFAULT, LLM_BACKEND)
 
 
 class QuestionRequest(BaseModel):
@@ -593,8 +602,27 @@ def execute_generation(req: QuestionRequest) -> List[Question]:
                 batch_total,
                 n,
             )
+            batch_start = time.time()
             batch_req = req.model_copy(update={'n_questions': n})
-            all_questions.extend(execute_generation_single(batch_req))
+            batch_questions = execute_generation_single(batch_req)
+            batch_ms = int((time.time() - batch_start) * 1000)
+            log_generation(
+                request_uuid=getattr(req, 'request_uuid', '') or f"sync-batch-{batch_num}",
+                mode='sync_batch',
+                backend=backend,
+                model=getattr(req, 'model', None) or OLLAMA_MODEL_DEFAULT,
+                topic=req.topic,
+                level=req.level,
+                language=req.language,
+                n_questions_requested=n,
+                n_questions_generated=len(batch_questions),
+                duration_ms=batch_ms,
+                status='success',
+                batch_index=batch_num,
+                batch_total=batch_total,
+                has_lesson_context=bool(req.context),
+            )
+            all_questions.extend(batch_questions)
             remaining -= n
         return all_questions
     return execute_generation_single(req)
@@ -680,6 +708,21 @@ def _async_generation_worker(payload: dict) -> None:
         questions = execute_generation(req)
         duration_ms = int((time.time() - gen_start) * 1000)
 
+        log_generation(
+            request_uuid=request_uuid,
+            mode='async',
+            backend=backend,
+            model=payload.get('model') or OLLAMA_MODEL_DEFAULT,
+            topic=req.topic,
+            level=req.level,
+            language=req.language,
+            n_questions_requested=req.n_questions,
+            n_questions_generated=len(questions),
+            duration_ms=duration_ms,
+            status='success',
+            has_lesson_context=bool(req.context),
+        )
+
         question_payload = []
         for q in questions:
             question_payload.append({
@@ -707,6 +750,25 @@ def _async_generation_worker(payload: dict) -> None:
         )
     except Exception as e:
         duration_ms = int((time.time() - gen_start) * 1000)
+        try:
+            req = QuestionRequest(**{k: v for k, v in payload.items() if k in QuestionRequest.model_fields})
+            log_generation(
+                request_uuid=request_uuid,
+                mode='async',
+                backend=req.backend or LLM_BACKEND,
+                model=payload.get('model') or OLLAMA_MODEL_DEFAULT,
+                topic=req.topic,
+                level=req.level,
+                language=req.language,
+                n_questions_requested=req.n_questions,
+                n_questions_generated=0,
+                duration_ms=duration_ms,
+                status='error',
+                error_message=str(e),
+                has_lesson_context=bool(req.context),
+            )
+        except Exception:
+            pass
         logger.error("LLM async FAIL request_uuid=%s: %s", request_uuid, e, exc_info=True)
         try:
             post_moodle_webhook(webhook_url, webhook_token, {
@@ -771,6 +833,21 @@ def generate_questions():
         questions = execute_generation(req)
 
         duration_s = time.time() - gen_start
+        duration_ms = int(duration_s * 1000)
+        log_generation(
+            request_uuid=data.get('request_uuid', '') or f"sync-{int(gen_start)}",
+            mode='sync',
+            backend=backend,
+            model=data.get('model') or OLLAMA_MODEL_DEFAULT,
+            topic=req.topic,
+            level=req.level,
+            language=req.language,
+            n_questions_requested=req.n_questions,
+            n_questions_generated=len(questions),
+            duration_ms=duration_ms,
+            status='success',
+            has_lesson_context=bool(req.context),
+        )
         logger.info(
             "LLM generate END backend=%s count=%s duration=%.2fs",
             backend,
@@ -792,6 +869,26 @@ def generate_questions():
 
     except Exception as e:
         logger.error(f"Error generating questions: {str(e)}", exc_info=True)
+        try:
+            data = request.json or {}
+            req = QuestionRequest(**data)
+            log_generation(
+                request_uuid=data.get('request_uuid', '') or 'sync-error',
+                mode='sync',
+                backend=req.backend or LLM_BACKEND,
+                model=data.get('model') or OLLAMA_MODEL_DEFAULT,
+                topic=req.topic,
+                level=req.level,
+                language=req.language,
+                n_questions_requested=req.n_questions,
+                n_questions_generated=0,
+                duration_ms=0,
+                status='error',
+                error_message=str(e),
+                has_lesson_context=bool(req.context),
+            )
+        except Exception:
+            pass
         return jsonify({'error': str(e)}), 500
 
 
@@ -808,7 +905,6 @@ def validate_question():
 
 
 if __name__ == '__main__':
-    # Optionally pull common Ollama models on startup
     _preload_ollama_models()
     port = int(os.getenv('FLASK_PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=os.getenv('NODE_ENV') == 'development')
