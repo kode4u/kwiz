@@ -420,6 +420,31 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010117, 'gamifiedquiz');
     }
 
+    if ($oldversion < 2025010118) {
+        $table = new xmldb_table('gamifiedquiz_questions');
+        $field = new xmldb_field('topic', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'category_name');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('gamifiedquiz');
+        $field = new xmldb_field('categories_data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'questions_data');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Backfill topic on questions from generation logs where possible.
+        $DB->execute("
+            UPDATE {gamifiedquiz_questions} q
+            INNER JOIN {gamifiedquiz_generation_logs} l ON l.session_id = q.session_id
+            SET q.topic = l.topic
+            WHERE (q.topic IS NULL OR q.topic = '')
+              AND l.topic IS NOT NULL AND l.topic <> ''
+        ");
+
+        upgrade_mod_savepoint(true, 2025010118, 'gamifiedquiz');
+    }
+
     // Return true to indicate upgrade was successful
     return true;
 }

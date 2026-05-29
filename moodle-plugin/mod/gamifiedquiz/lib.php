@@ -601,9 +601,10 @@ function gamifiedquiz_new_uuid() {
  * @param string $categoryname Category label
  * @param string $sessionid Session id for this job/batch
  * @param string $difficulty Difficulty stored on rows
+ * @param string $topic Generation topic/prompt
  * @return int Number saved
  */
-function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $categoryname, $sessionid, $difficulty) {
+function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $categoryname, $sessionid, $difficulty, $topic = '') {
     global $DB;
 
     $saved = 0;
@@ -634,13 +635,36 @@ function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $cat
         $record->choices = json_encode($choices);
         $record->correct_index = $correctindex;
         $record->difficulty = $difficulty;
-        $record->category_name = $categoryname;
+        $record->category_name = core_text::substr((string)$categoryname, 0, 255);
+        $record->topic = core_text::substr((string)($topic ?: ($question['topic'] ?? '')), 0, 255);
         $record->timecreated = time();
         $DB->insert_record('gamifiedquiz_questions', $record);
         $saved++;
     }
 
     return $saved;
+}
+
+/**
+ * Persist multi-category generation form (categories + optional lesson text).
+ *
+ * @param int $gamifiedquizid Quiz instance id
+ * @param array $categories Category rows from UI
+ * @param string $lessoncontent Optional lesson paste
+ */
+function gamifiedquiz_save_generation_preferences($gamifiedquizid, array $categories, $lessoncontent = '') {
+    global $DB;
+
+    $payload = array(
+        'categories' => array_values($categories),
+        'lesson' => (string)$lessoncontent,
+    );
+
+    $record = new stdClass();
+    $record->id = $gamifiedquizid;
+    $record->categories_data = json_encode($payload);
+    $record->timemodified = time();
+    $DB->update_record('gamifiedquiz', $record);
 }
 
 /**
@@ -708,11 +732,20 @@ function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
         if (!empty($question['category_name'])) {
             $record->category_name = $question['category_name'];
         }
+        if (!empty($question['topic'])) {
+            $record->topic = core_text::substr((string)$question['topic'], 0, 255);
+        }
 
         $questionid = !empty($question['id']) ? (int) $question['id'] : 0;
         if ($questionid && isset($existing[$questionid])) {
             $record->id = $questionid;
             $record->session_id = $existing[$questionid]->session_id ?: $defaultsession;
+            if (empty($record->category_name) && !empty($existing[$questionid]->category_name)) {
+                $record->category_name = $existing[$questionid]->category_name;
+            }
+            if (empty($record->topic) && !empty($existing[$questionid]->topic)) {
+                $record->topic = $existing[$questionid]->topic;
+            }
             $DB->update_record('gamifiedquiz_questions', $record);
             $keptids[] = $questionid;
             $question['id'] = $questionid;
@@ -972,7 +1005,8 @@ function gamifiedquiz_load_questions_for_session($sessionid) {
             'choices' => is_array($choices) ? $choices : array(),
             'correct_index' => (int)$q->correct_index,
             'difficulty' => $q->difficulty,
-            'category_name' => $q->category_name,
+            'category_name' => $q->category_name ?? '',
+            'topic' => $q->topic ?? '',
         );
     }
     return $questions;
@@ -1010,6 +1044,7 @@ function gamifiedquiz_format_generation_job_status($log) {
         'job_id' => $log->request_uuid,
         'batch_id' => $log->batch_id ?? null,
         'category_name' => $log->category_name ?? '',
+        'topic' => $log->topic ?? '',
         'status' => $status,
         'status_label' => $statuslabel,
         'complete' => $complete,

@@ -109,6 +109,7 @@ if ($status !== 'success' || !is_array($questions)) {
 
 $sessionid = $log->session_id ?: ('genjob_' . $requestuuid);
 $categoryname = $log->category_name ?? '';
+$topic = $log->topic ?? '';
 $difficulty = $log->difficulty ?: $gamifiedquiz->difficulty;
 
 $saved = gamifiedquiz_save_generated_questions(
@@ -116,7 +117,8 @@ $saved = gamifiedquiz_save_generated_questions(
     $questions,
     $categoryname,
     $sessionid,
-    $difficulty
+    $difficulty,
+    $topic
 );
 
 $update->session_id = $sessionid;

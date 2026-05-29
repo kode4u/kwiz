@@ -577,9 +577,12 @@
             const correctIndex = question ? (question.correct_index || 0) : 0;
             const questionImage = question && question.question_image ? question.question_image : '';
             const imageIsUrl = questionImage && !questionImage.startsWith('data:');
+            const categoryName = question && question.category_name ? question.category_name : '';
+            const questionTopic = question && question.topic ? question.topic : '';
             
             questionDiv.innerHTML = `
                 <h4>Question ${index + 1}</h4>
+                ${categoryName || questionTopic ? `<p class="question-meta" style="font-size: 13px; color: #555; margin: 0 0 8px;">${categoryName ? `<strong>Category:</strong> ${escapeHtml(categoryName)}` : ''}${categoryName && questionTopic ? ' | ' : ''}${questionTopic ? `<strong>Topic:</strong> ${escapeHtml(questionTopic)}` : ''}</p>` : ''}
                 <label>Question Text:</label>
                 <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;">${escapeHtml(qText)}</textarea>
                 <label>Question Image (optional):</label>
@@ -602,6 +605,12 @@
             
             if (question && question.id) {
                 questionDiv.dataset.questionId = String(question.id);
+            }
+            if (categoryName) {
+                questionDiv.dataset.categoryName = categoryName;
+            }
+            if (questionTopic) {
+                questionDiv.dataset.topic = questionTopic;
             }
 
             form.appendChild(questionDiv);
@@ -761,6 +770,12 @@
                     if (questionId) {
                         saved.id = parseInt(questionId, 10);
                     }
+                    if (item.dataset.categoryName) {
+                        saved.category_name = item.dataset.categoryName;
+                    }
+                    if (item.dataset.topic) {
+                        saved.topic = item.dataset.topic;
+                    }
                     if (questionImage) saved.question_image = questionImage;
                     savedQuestions.push(saved);
                 }
@@ -822,6 +837,12 @@
                 qDiv.className = 'question-preview';
                 const qText = q.question || q.question_text || '';
                 const choices = q.choices || [];
+                const metaParts = [];
+                if (q.category_name) metaParts.push(`Category: ${escapeHtml(q.category_name)}`);
+                if (q.topic) metaParts.push(`Topic: ${escapeHtml(q.topic)}`);
+                const metaHtml = metaParts.length
+                    ? `<p style="font-size: 13px; color: #666; margin: 0 0 8px;">${metaParts.join(' | ')}</p>`
+                    : '';
                 
                 let choicesHtml = '<ul>';
                 choices.forEach((choice, cIndex) => {
@@ -834,6 +855,7 @@
                 const imgHtml = (q.question_image || q.image) ? `<div style="margin-bottom: 12px;"><img src="${(q.question_image || q.image).replace(/"/g, '&quot;')}" alt="Question" style="max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #ddd;"></div>` : '';
                 qDiv.innerHTML = `
                     <h4>Question ${index + 1}</h4>
+                    ${metaHtml}
                     ${imgHtml}
                     <p>${qText}</p>
                     ${choicesHtml}
@@ -845,6 +867,76 @@
         // Multi-Category Generation functionality
         let categories = []; // Array of {name, topic, difficulty, count}
         let activeGenerationBatchId = null;
+        let multiCategoryInitDone = false;
+
+        async function saveGenerationPrefs(config, categoriesList, lessonText) {
+            try {
+                const wwwroot = config.wwwroot || '';
+                const prefs = JSON.stringify({
+                    categories: categoriesList,
+                    lesson: lessonText || ''
+                });
+                await fetch(wwwroot + '/mod/gamifiedquiz/ajax/save_generation_prefs.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `quizid=${config.quizId}&cmid=${config.cmId}&sesskey=${config.sesskey}&prefs=${encodeURIComponent(prefs)}`
+                });
+                config.categoriesData = prefs;
+            } catch (err) {
+                console.warn('Could not save generation preferences:', err);
+            }
+        }
+
+        function restoreCategoryForm(config) {
+            const categoryList = document.getElementById('category-list');
+            const lessonField = document.getElementById('generate-lesson-content');
+            if (!categoryList) return;
+
+            categoryList.innerHTML = '';
+            categories = [];
+
+            let restored = [];
+            try {
+                if (config.categoriesData) {
+                    const parsed = typeof config.categoriesData === 'string'
+                        ? JSON.parse(config.categoriesData)
+                        : config.categoriesData;
+                    if (parsed && Array.isArray(parsed.categories)) {
+                        restored = parsed.categories;
+                    }
+                    if (lessonField && parsed && parsed.lesson) {
+                        lessonField.value = parsed.lesson;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not parse saved categories:', e);
+            }
+
+            if (restored.length === 0 && window.currentQuestions && window.currentQuestions.length > 0) {
+                const seen = new Map();
+                window.currentQuestions.forEach((q) => {
+                    const name = q.category_name || '';
+                    const topic = q.topic || '';
+                    if (!name) return;
+                    const key = `${name}|${topic}`;
+                    if (!seen.has(key)) {
+                        seen.set(key, {
+                            name,
+                            topic: topic || config.topic || '',
+                            difficulty: q.difficulty || config.difficulty || 'medium',
+                            count: 5
+                        });
+                    }
+                });
+                restored = Array.from(seen.values());
+            }
+
+            if (restored.length > 0) {
+                restored.forEach((cat) => addCategoryRow(cat));
+            } else {
+                addCategoryRow();
+            }
+        }
 
         function sleep(ms) {
             return new Promise((resolve) => setTimeout(resolve, ms));
@@ -922,90 +1014,89 @@
             const generateAllBtn = document.getElementById('generate-all-btn');
             const cancelBtn = document.getElementById('cancel-generate-btn');
             const closeBtn = modal ? modal.querySelector('.generate-questions-close') : null;
-            const categoryList = document.getElementById('category-list');
             
             if (!modal || !addCategoryBtn || !generateAllBtn) {
                 console.error('Multi-category generation elements not found');
                 return;
             }
-            
-            // Add category button
-            addCategoryBtn.addEventListener('click', () => {
-                addCategoryRow();
-            });
-            
-            // Generate all button
-            generateAllBtn.addEventListener('click', async () => {
-                await generateAllCategories(config);
-            });
-            
-            // Cancel/Close buttons
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                    categories = [];
+
+            if (!multiCategoryInitDone) {
+                addCategoryBtn.addEventListener('click', () => {
+                    addCategoryRow();
                 });
-            }
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                    categories = [];
+
+                generateAllBtn.addEventListener('click', async () => {
+                    await generateAllCategories(config);
                 });
-            }
-            
-            // Close on outside click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    categories = [];
+
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        modal.style.display = 'none';
+                    });
                 }
-            });
-            
-            // Add initial category
-            addCategoryRow();
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.style.display = 'none';
+                    });
+                }
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+
+                multiCategoryInitDone = true;
+            }
+
+            restoreCategoryForm(config);
         }
         
-        function addCategoryRow() {
+        function addCategoryRow(cat = null) {
             const categoryList = document.getElementById('category-list');
             if (!categoryList) return;
             
-            const categoryIndex = categories.length;
+            const categoryIndex = categoryList.querySelectorAll('.category-row').length;
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'category-row gq-container';
             categoryDiv.style.marginBottom = '15px';
             categoryDiv.style.padding = '15px';
+            const nameValue = cat && cat.name ? cat.name : `Category ${categoryIndex + 1}`;
+            const topicValue = cat && cat.topic ? cat.topic : (config.topic || '');
+            const difficultyValue = cat && cat.difficulty ? cat.difficulty : (config.difficulty || 'medium');
+            const countValue = cat && cat.count ? String(cat.count) : '5';
             categoryDiv.innerHTML = `
                 <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center;">
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Category Name:</label>
                         <input type="text" class="category-name-input" placeholder="e.g., Variables" 
                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" 
-                               value="Category ${categoryIndex + 1}">
+                               value="${escapeAttr(nameValue)}">
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Topic:</label>
                         <input type="text" class="category-topic-input" placeholder="Topic" 
                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-                               value="${config.topic || ''}">
+                               value="${escapeAttr(topicValue)}">
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty:</label>
                         <select class="category-difficulty-input" 
                                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="easy" ${config.difficulty === 'easy' ? 'selected' : ''}>Easy</option>
-                            <option value="medium" ${config.difficulty === 'medium' ? 'selected' : ''}>Medium</option>
-                            <option value="hard" ${config.difficulty === 'hard' ? 'selected' : ''}>Hard</option>
+                            <option value="easy" ${difficultyValue === 'easy' ? 'selected' : ''}>Easy</option>
+                            <option value="medium" ${difficultyValue === 'medium' ? 'selected' : ''}>Medium</option>
+                            <option value="hard" ${difficultyValue === 'hard' ? 'selected' : ''}>Hard</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Count:</label>
                         <select class="category-count-input" 
                                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="3">3</option>
-                            <option value="5" selected>5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
+                            <option value="3" ${countValue === '3' ? 'selected' : ''}>3</option>
+                            <option value="5" ${countValue === '5' ? 'selected' : ''}>5</option>
+                            <option value="10" ${countValue === '10' ? 'selected' : ''}>10</option>
+                            <option value="15" ${countValue === '15' ? 'selected' : ''}>15</option>
+                            <option value="20" ${countValue === '20' ? 'selected' : ''}>20</option>
                         </select>
                     </div>
                     <div>
@@ -1047,6 +1138,9 @@
                 alert('Please add at least one category with a topic.');
                 return;
             }
+
+            const sharedLessonText = document.getElementById('generate-lesson-content')?.value.trim() || '';
+            await saveGenerationPrefs(config, categories, sharedLessonText);
             
             // Show loading
             const loadingModal = document.getElementById('loading-modal');
@@ -1058,9 +1152,6 @@
             const allQuestions = [];
             const wwwroot = config.wwwroot || '';
             const sesskey = config.sesskey || '';
-            
-            const lessonEl = document.getElementById('generate-lesson-content');
-            const lessonContent = lessonEl ? lessonEl.value.trim() : '';
 
             const loadingStatus = loadingModal ? loadingModal.querySelector('p') : null;
             const batchId = (typeof crypto !== 'undefined' && crypto.randomUUID)
@@ -1085,8 +1176,8 @@
                     formData.append('category_name', category.name);
                     formData.append('async', '1');
                     formData.append('batch_id', batchId);
-                    if (lessonContent) {
-                        formData.append('data', lessonContent);
+                    if (sharedLessonText) {
+                        formData.append('data', sharedLessonText);
                     }
 
                     const response = await fetch(wwwroot + '/mod/gamifiedquiz/ajax/generate.php', {
@@ -1221,14 +1312,7 @@
         const cancelGenerateBtn = document.getElementById('cancel-generate-btn');
         const loadingModal = document.getElementById('loading-modal');
         
-        // Show generate questions dialog
-        generateBtn.addEventListener('click', () => {
-            if (generateModal) {
-                generateModal.style.display = 'flex';
-            }
-        });
-        
-        // Close generate dialog
+        // Close generate dialog (open handled above with initMultiCategoryGeneration)
         if (generateCloseBtn) {
             generateCloseBtn.addEventListener('click', () => {
                 if (generateModal) {

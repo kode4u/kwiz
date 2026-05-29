@@ -120,6 +120,7 @@ window.GAMIFIED_QUIZ_CONFIG = {
     colorPalette: ' . json_encode(isset($gamifiedquiz->color_palette) ? $gamifiedquiz->color_palette : 'kahoot') . ',
     llmBackend: ' . json_encode(isset($gamifiedquiz->llm_backend) ? $gamifiedquiz->llm_backend : 'openai') . ',
     questionsData: ' . json_encode(isset($gamifiedquiz->questions_data) ? $gamifiedquiz->questions_data : '') . ',
+    categoriesData: ' . json_encode(isset($gamifiedquiz->categories_data) ? $gamifiedquiz->categories_data : '') . ',
     timeLimitPerQuestion: ' . (isset($gamifiedquiz->time_limit_per_question) ? intval($gamifiedquiz->time_limit_per_question) : 60) . ',
     leaderboardTopN: ' . (isset($gamifiedquiz->leaderboard_top_n) ? intval($gamifiedquiz->leaderboard_top_n) : 3) . ',
     questionBackgroundStyle: ' . json_encode($background_style) . '
@@ -312,8 +313,10 @@ if ($is_teacher) {
 
 // Include Socket.IO from CDN if not available
 echo '<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>';
-// Include the app JavaScript
-$PAGE->requires->js('/mod/gamifiedquiz/js/app.js');
+// Cache-bust app.js when the file changes (do not require version.php — $plugin is unset outside upgrade).
+$appjspath = $CFG->dirroot . '/mod/gamifiedquiz/js/app.js';
+$appjsver = is_readable($appjspath) ? filemtime($appjspath) : time();
+$PAGE->requires->js('/mod/gamifiedquiz/js/app.js?v=' . $appjsver);
 
 echo $OUTPUT->footer();
 

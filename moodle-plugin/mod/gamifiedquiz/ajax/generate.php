@@ -228,7 +228,8 @@ try {
         $questions,
         $category_name,
         $session_id,
-        $gamifiedquiz->difficulty
+        $level,
+        $topic
     );
 
     $generatedcount = count($questions);

@@ -76,7 +76,9 @@ try {
                 'question_text' => $q->question_text,
                 'choices' => $choices,
                 'correct_index' => $q->correct_index,
-                'difficulty' => $q->difficulty
+                'difficulty' => $q->difficulty,
+                'category_name' => $q->category_name ?? '',
+                'topic' => $q->topic ?? '',
             );
         }
         
