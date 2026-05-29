@@ -51,6 +51,10 @@ export LLM_BACKEND=local
 docker compose up -d --build llmapi
 python3 evaluate/llm-evaluation/run_batch_evaluation.py --dry-run   # verify 25/domain
 python3 evaluate/llm-evaluation/run_batch_evaluation.py
+
+# Retries: up to 3 attempts per failed/partial job (default). Fill gaps from a prior export:
+python3 evaluate/llm-evaluation/run_batch_evaluation.py --resume
+python3 evaluate/llm-evaluation/run_batch_evaluation.py --max-retries 5 --retry-delay 15
 ```
 
 **Outputs:**

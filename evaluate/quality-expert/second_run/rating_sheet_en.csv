@@ -1,0 +1,3 @@
+item_id,language,topic,difficulty,model_name,backend,question_text,choice_a,choice_b,choice_c,choice_d,correct_choice_label,explanation,rater_id,factual_correctness,question_clarity,distractor_quality,difficulty_alignment,language_quality,context_relevance,acceptable,hard_fail_fact_error,hard_fail_multi_correct_or_none,hard_fail_unreadable_language,notes
+EN_001,en,Sample Topic,medium,REDACTED,local,"Sample question text in English?","Option A","Option B","Option C","Option D",A,"Sample explanation",R1,,,,,,,,,,, 
+EN_001,en,Sample Topic,medium,REDACTED,local,"Sample question text in English?","Option A","Option B","Option C","Option D",A,"Sample explanation",R2,,,,,,,,,,, 
