@@ -3,16 +3,13 @@
 Automated LLM evaluation: generate N questions across categories, log metrics to JSONL.
 
 Run from repository root:
-  python3 evaluate/llm-evaluation/run_batch_evaluation.py --total-questions 125
+  python evaluate/llm-evaluation/run_batch_evaluation.py
+
+Plan default: 5 domains × 5 subtopics × 5 questions = 125 MCQs.
+Failed or partial jobs are run once more automatically at the end (no multi-retry loop).
 
 Log file (default): logs/evaluation/metrics.jsonl
 Also writes: logs/evaluation/run_<timestamp>.jsonl (copy of this run only)
-
-Set hardware for poster (when auto-detect is wrong, e.g. Mac + Docker):
-  export EVAL_GPU="NVIDIA RTX 3090 24 GB"
-  export EVAL_CPU="AMD Ryzen 9 5950X"
-  export EVAL_RAM_GB="64"
-  export EVAL_OS="macOS 14 / Ubuntu 22.04"
 """
 from __future__ import annotations
 
@@ -25,12 +22,13 @@ import time
 import urllib.error
 import urllib.request
 import uuid
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
-# Allow imports from same package directory
 sys.path.insert(0, os.path.dirname(__file__))
 from evaluation_logger import append_event, default_log_path
 from hardware_snapshot import collect_hardware, poster_table_markdown
+
+QUESTIONS_PER_SUBTOPIC = 5
 
 
 def post_generate(base_url: str, payload: Dict[str, Any], timeout: int) -> Dict[str, Any]:
@@ -65,10 +63,16 @@ def post_generate(base_url: str, payload: Dict[str, Any], timeout: int) -> Dict[
 def load_plan(path: str) -> List[Dict[str, Any]]:
     with open(path, encoding="utf-8") as fh:
         doc = json.load(fh)
+    per_sub = int(doc.get("questions_per_subtopic", QUESTIONS_PER_SUBTOPIC))
     if doc.get("categories"):
-        return list(doc["categories"])
+        categories = []
+        for cat in doc["categories"]:
+            c = dict(cat)
+            c["count"] = int(c.get("count", per_sub))
+            categories.append(c)
+        return categories
+
     per_domain = int(doc.get("questions_per_domain", 0))
-    default_per_sub = int(doc.get("questions_per_subtopic", 5))
     categories: List[Dict[str, Any]] = []
     for block in doc.get("domains") or []:
         domain = block.get("domain", "General")
@@ -78,7 +82,7 @@ def load_plan(path: str) -> List[Dict[str, Any]]:
             base, rem = divmod(per_domain, n_sub)
             per_counts = [base + (1 if i < rem else 0) for i in range(n_sub)]
         else:
-            per_counts = [default_per_sub] * n_sub
+            per_counts = [per_sub] * n_sub
         for i, sub in enumerate(subtopics):
             subname = sub.get("name", "Subtopic")
             count = int(sub.get("count", per_counts[i]))
@@ -108,9 +112,7 @@ def plan_totals(categories: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def scale_plan(categories: List[Dict[str, Any]], total: int) -> List[Dict[str, Any]]:
     current = sum(int(c.get("count", 0)) for c in categories)
-    if current <= 0:
-        return categories
-    if total <= 0 or total == current:
+    if current <= 0 or total <= 0 or total == current:
         return categories
     ratio = total / current
     scaled = []
@@ -149,6 +151,156 @@ def summarize_run(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+def renumber_questions(categories: List[Dict[str, Any]], by_category: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
+    ordered: List[Dict[str, Any]] = []
+    for cat in categories:
+        name = cat.get("name", "")
+        for q in by_category.get(name, []):
+            row = dict(q)
+            row["item_id"] = f"Q{len(ordered) + 1:03d}"
+            ordered.append(row)
+    return ordered
+
+
+def parse_questions_from_response(
+    res: Dict[str, Any],
+    cat: Dict[str, Any],
+    name: str,
+    topic: str,
+    level: str,
+    request_uuid: str,
+    args: argparse.Namespace,
+) -> Tuple[List[Dict[str, Any]], str]:
+    if not res["ok"]:
+        return [], res["body"][:500]
+
+    try:
+        body = json.loads(res["body"])
+    except json.JSONDecodeError:
+        return [], "Invalid JSON response"
+
+    if body.get("error"):
+        return [], str(body["error"])[:500]
+
+    qlist = body.get("questions") or []
+    rows: List[Dict[str, Any]] = []
+    labels = ["A", "B", "C", "D", "E", "F"]
+    for q in qlist:
+        choices = q.get("choices") or []
+        choice_texts = []
+        correct_label = ""
+        for ci, ch in enumerate(choices[:6]):
+            text = ch.get("text", ch) if isinstance(ch, dict) else str(ch)
+            choice_texts.append(text)
+            if isinstance(ch, dict) and ch.get("is_correct"):
+                correct_label = labels[ci]
+        if not correct_label and q.get("correct_index") is not None:
+            idx = int(q["correct_index"])
+            if 0 <= idx < len(labels):
+                correct_label = labels[idx]
+        rows.append({
+            "domain": cat.get("domain", ""),
+            "subtopic": cat.get("subtopic", ""),
+            "category_name": name,
+            "topic": topic,
+            "difficulty": level,
+            "request_uuid": request_uuid,
+            "language": args.language,
+            "model_name": args.model or os.environ.get("OLLAMA_MODEL", ""),
+            "backend": args.backend,
+            "question_text": q.get("question", ""),
+            "choice_a": choice_texts[0] if len(choice_texts) > 0 else "",
+            "choice_b": choice_texts[1] if len(choice_texts) > 1 else "",
+            "choice_c": choice_texts[2] if len(choice_texts) > 2 else "",
+            "choice_d": choice_texts[3] if len(choice_texts) > 3 else "",
+            "correct_choice_label": correct_label,
+            "explanation": q.get("explanation", "") or "",
+        })
+    return rows, ""
+
+
+def run_one_job(
+    job_i: int,
+    cat: Dict[str, Any],
+    n_questions: int,
+    target: int,
+    payload_base: Dict[str, Any],
+    args: argparse.Namespace,
+    run_id: str,
+    log_event: Callable[[str, Dict[str, Any]], None],
+    phase: str,
+    jobs_total: int,
+) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    name = cat.get("name", f"Category {job_i}")
+    topic = cat.get("topic", "General topic")
+    level = cat.get("difficulty", "medium")
+    request_uuid = str(uuid.uuid4())
+
+    label = "regenerate" if phase == "regenerate" else "generate"
+    print(f"[{job_i}/{jobs_total}] {name} ({label}, need {n_questions}): {topic!r} ...")
+
+    payload = {
+        **payload_base,
+        "topic": topic,
+        "level": level,
+        "n_questions": n_questions,
+        "request_uuid": request_uuid,
+    }
+
+    res = post_generate(args.base_url, payload, args.timeout)
+    duration_s = res["elapsed_ms"] / 1000.0
+    new_rows, err = parse_questions_from_response(res, cat, name, topic, level, request_uuid, args)
+
+    complete = len(new_rows) >= n_questions
+    status = "success" if complete and not err else "error"
+    if not err and not complete:
+        err = f"Partial batch: got {len(new_rows)}/{n_questions} questions"
+    if err and len(new_rows) > 0 and len(new_rows) < n_questions:
+        status = "error"
+
+    sec_per_q = round(duration_s / len(new_rows), 4) if new_rows else None
+    record = {
+        "run_id": run_id,
+        "request_uuid": request_uuid,
+        "job_index": job_i,
+        "domain": cat.get("domain", ""),
+        "subtopic": cat.get("subtopic", ""),
+        "category_name": name,
+        "topic": topic,
+        "difficulty": level,
+        "n_questions_requested": n_questions,
+        "n_questions_generated": len(new_rows),
+        "n_questions_target_category": target,
+        "duration_ms": int(res["elapsed_ms"]),
+        "duration_s": round(duration_s, 3),
+        "seconds_per_question": sec_per_q,
+        "status": status,
+        "error_message": err,
+        "phase": phase,
+        "mode": "batch_evaluation",
+    }
+    log_event("generation", record)
+
+    if err:
+        log_event(
+            "generation_error",
+            {
+                "run_id": run_id,
+                "job_index": job_i,
+                "category_name": name,
+                "topic": topic,
+                "phase": phase,
+                "error_message": err,
+                "http_status": res.get("status"),
+            },
+        )
+        print(f"    -> ERROR: {err[:200]}", file=sys.stderr)
+    else:
+        print(f"    -> ok: {len(new_rows)} question(s) in {duration_s:.1f}s")
+
+    return record, new_rows
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Batch LLM evaluation with file metrics log")
     parser.add_argument("--base-url", default=os.environ.get("LLMAPI_URL", "http://localhost:5001"))
@@ -156,23 +308,20 @@ def main() -> int:
     parser.add_argument(
         "--total-questions",
         type=int,
-        default=0,
-        help="If > 0, scale all counts to this total. Default 0 = use plan as-is (125 = 5 domains × 25).",
+        default=125,
+        help="Target total questions (default 125). Use 0 to keep plan counts as-is.",
     )
     parser.add_argument("--backend", default=os.environ.get("LLM_BACKEND", "local"))
     parser.add_argument("--model", default=os.environ.get("OLLAMA_MODEL", ""))
     parser.add_argument("--language", default="en")
     parser.add_argument("--timeout", type=int, default=1200)
-    parser.add_argument("--warmup", type=int, default=1, help="Warmup requests (1 question each)")
+    parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--log", default="", help="Override metrics log path")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     log_path = args.log or default_log_path()
-    run_path = os.path.join(
-        os.path.dirname(log_path),
-        f"run_{time.strftime('%Y%m%d_%H%M%S')}.jsonl",
-    )
+    run_path = os.path.join(os.path.dirname(log_path), f"run_{time.strftime('%Y%m%d_%H%M%S')}.jsonl")
 
     def log_event(event: str, data: Dict[str, Any]) -> None:
         append_event(event, data, log_path)
@@ -185,17 +334,20 @@ def main() -> int:
     )
 
     categories = load_plan(args.plan)
+    if args.total_questions > 0:
+        current = plan_totals(categories)["total_questions"]
+        if current != args.total_questions:
+            categories = scale_plan(categories, args.total_questions)
     totals = plan_totals(categories)
-    if args.total_questions > 0 and args.total_questions != totals["total_questions"]:
-        categories = scale_plan(categories, args.total_questions)
-        totals = plan_totals(categories)
     run_id = str(uuid.uuid4())
+    jobs_total = len(categories)
 
     log_event(
         "evaluation_run_start",
         {
             "run_id": run_id,
             "total_questions_target": totals["total_questions"],
+            "questions_per_subtopic": QUESTIONS_PER_SUBTOPIC,
             "questions_per_domain": totals["per_domain"],
             "categories": categories,
             "base_url": args.base_url,
@@ -211,148 +363,86 @@ def main() -> int:
     print()
     print(f"Log file: {log_path}")
     print(f"This run only: {run_path}")
-    print(f"Domains: {totals['domains']} | LLM jobs: {totals['jobs']} | Total questions: {totals['total_questions']}")
+    print(f"Domains: {totals['domains']} | Subtopics: {totals['jobs']} | Total: {totals['total_questions']} questions")
+    print("(5 questions per subtopic × 5 subtopics × 5 domains = 125)")
     print("Questions per domain:")
     for domain, n in totals["per_domain"].items():
         print(f"  - {domain}: {n}")
     print()
 
     if args.dry_run:
-        current_domain = None
         for cat in categories:
-            if cat.get("domain") != current_domain:
-                current_domain = cat.get("domain")
-                domain_total = totals["per_domain"].get(current_domain, 0)
-                print(f"\n[{current_domain}] — {domain_total} questions total")
-            print(f"    {cat.get('subtopic', cat['name'])}: {cat['count']} questions — {cat['topic'][:70]}...")
+            print(f"  {cat['count']} — {cat['name']}")
         return 0
 
-    payload_base: Dict[str, Any] = {
-        "backend": args.backend,
-        "language": args.language,
-    }
+    payload_base: Dict[str, Any] = {"backend": args.backend, "language": args.language}
     if args.model:
         payload_base["model"] = args.model
 
     for w in range(args.warmup):
         print(f"Warmup {w + 1}/{args.warmup}...")
-        payload = {
-            **payload_base,
-            "topic": "Warmup evaluation topic",
-            "level": "medium",
-            "n_questions": 1,
-        }
-        res = post_generate(args.base_url, payload, args.timeout)
+        res = post_generate(
+            args.base_url,
+            {**payload_base, "topic": "Warmup evaluation topic", "level": "medium", "n_questions": 1},
+            args.timeout,
+        )
         if not res["ok"]:
             print("Warmup failed:", res["body"][:300], file=sys.stderr)
             return 1
 
     job_records: List[Dict[str, Any]] = []
-    question_index = 0
-    exported_questions: List[Dict[str, Any]] = []
+    by_category: Dict[str, List[Dict[str, Any]]] = {cat["name"]: [] for cat in categories}
 
+    print("=== Pass 1: initial generation ===")
     for job_i, cat in enumerate(categories, start=1):
-        name = cat.get("name", f"Category {job_i}")
-        topic = cat.get("topic", "General topic")
-        level = cat.get("difficulty", "medium")
-        count = int(cat.get("count", 1))
-        request_uuid = str(uuid.uuid4())
-
-        print(f"[{job_i}/{len(categories)}] {name}: {count} questions — {topic!r} ...")
-
-        payload = {
-            **payload_base,
-            "topic": topic,
-            "level": level,
-            "n_questions": count,
-            "request_uuid": request_uuid,
-        }
-
-        res = post_generate(args.base_url, payload, args.timeout)
-        elapsed_ms = res["elapsed_ms"]
-        duration_s = elapsed_ms / 1000.0
-
-        n_gen = 0
-        status = "error"
-        err = ""
-        if res["ok"]:
-            try:
-                body = json.loads(res["body"])
-                qlist = body.get("questions") or []
-                n_gen = len(qlist)
-                status = "success"
-                for qi, q in enumerate(qlist):
-                    choices = q.get("choices") or []
-                    labels = ["A", "B", "C", "D", "E", "F"]
-                    choice_texts = []
-                    correct_label = ""
-                    for ci, ch in enumerate(choices[:6]):
-                        text = ch.get("text", ch) if isinstance(ch, dict) else str(ch)
-                        choice_texts.append(text)
-                        if isinstance(ch, dict) and ch.get("is_correct"):
-                            correct_label = labels[ci]
-                    if not correct_label and q.get("correct_index") is not None:
-                        idx = int(q["correct_index"])
-                        if 0 <= idx < len(labels):
-                            correct_label = labels[idx]
-                    exported_questions.append({
-                        "item_id": f"Q{question_index + qi + 1:03d}",
-                        "domain": cat.get("domain", ""),
-                        "subtopic": cat.get("subtopic", ""),
-                        "category_name": name,
-                        "topic": topic,
-                        "difficulty": level,
-                        "request_uuid": request_uuid,
-                        "language": args.language,
-                        "model_name": args.model or os.environ.get("OLLAMA_MODEL", ""),
-                        "backend": args.backend,
-                        "question_text": q.get("question", ""),
-                        "choice_a": choice_texts[0] if len(choice_texts) > 0 else "",
-                        "choice_b": choice_texts[1] if len(choice_texts) > 1 else "",
-                        "choice_c": choice_texts[2] if len(choice_texts) > 2 else "",
-                        "choice_d": choice_texts[3] if len(choice_texts) > 3 else "",
-                        "correct_choice_label": correct_label,
-                        "explanation": q.get("explanation", "") or "",
-                    })
-            except json.JSONDecodeError:
-                err = "Invalid JSON response"
-        else:
-            err = res["body"][:500]
-
-        sec_per_q = round(duration_s / n_gen, 4) if n_gen > 0 else None
-        record = {
-            "run_id": run_id,
-            "request_uuid": request_uuid,
-            "job_index": job_i,
-            "domain": cat.get("domain", ""),
-            "subtopic": cat.get("subtopic", ""),
-            "category_name": name,
-            "topic": topic,
-            "difficulty": level,
-            "n_questions_requested": count,
-            "n_questions_generated": n_gen,
-            "duration_ms": int(elapsed_ms),
-            "duration_s": round(duration_s, 3),
-            "seconds_per_question": sec_per_q,
-            "status": status,
-            "error_message": err,
-            "question_index_start": question_index + 1,
-            "question_index_end": question_index + n_gen,
-        }
-        question_index += n_gen
+        target = int(cat.get("count", QUESTIONS_PER_SUBTOPIC))
+        record, rows = run_one_job(
+            job_i, cat, target, target, payload_base, args, run_id, log_event, "initial", jobs_total
+        )
+        by_category[cat["name"]] = rows[:target]
         job_records.append(record)
 
-        log_event("generation", {**record, "mode": "batch_evaluation"})
-        print(
-            f"    -> {status}: {n_gen}/{count} questions in {duration_s:.1f}s"
-            + (f" ({sec_per_q}s/question)" if sec_per_q else "")
-        )
+    incomplete = [
+        (job_i, cat)
+        for job_i, cat in enumerate(categories, start=1)
+        if len(by_category[cat["name"]]) < int(cat.get("count", QUESTIONS_PER_SUBTOPIC))
+    ]
+    if incomplete:
+        print()
+        print(f"=== Pass 2: regenerate {len(incomplete)} incomplete subtopic(s) ===")
+        for job_i, cat in incomplete:
+            name = cat["name"]
+            target = int(cat.get("count", QUESTIONS_PER_SUBTOPIC))
+            have = len(by_category[name])
+            need = target - have
+            record, rows = run_one_job(
+                job_i, cat, need, target, payload_base, args, run_id, log_event, "regenerate", jobs_total
+            )
+            job_records.append(record)
+            if rows:
+                by_category[name] = (by_category[name] + rows)[:target]
+
+    exported_questions = renumber_questions(categories, by_category)
+    still_missing = [
+        cat["name"]
+        for cat in categories
+        if len(by_category[cat["name"]]) < int(cat.get("count", QUESTIONS_PER_SUBTOPIC))
+    ]
 
     summary = summarize_run(job_records)
     summary["run_id"] = run_id
     summary["hardware"] = hardware
     summary["questions_exported"] = len(exported_questions)
+    summary["questions_target"] = totals["total_questions"]
+    summary["questions_missing"] = max(0, totals["total_questions"] - len(exported_questions))
+    summary["incomplete_categories"] = still_missing
     log_event("evaluation_run_end", summary)
+
+    if still_missing:
+        log_event(
+            "evaluation_run_incomplete",
+            {"run_id": run_id, "incomplete_categories": still_missing, "questions_missing": summary["questions_missing"]},
+        )
 
     export_path = os.path.join(os.path.dirname(log_path), "questions_export.json")
     with open(export_path, "w", encoding="utf-8") as fh:
@@ -362,6 +452,7 @@ def main() -> int:
                 "model": args.model or os.environ.get("OLLAMA_MODEL", ""),
                 "backend": args.backend,
                 "total_questions": len(exported_questions),
+                "questions_target": totals["total_questions"],
                 "questions": exported_questions,
             },
             fh,
@@ -373,10 +464,16 @@ def main() -> int:
     print("=== Run summary ===")
     print(json.dumps(summary, indent=2))
     print()
-    print(f"Questions export: {export_path} ({len(exported_questions)} items)")
-    print("Next: python3 evaluate/llm-evaluation/export_rating_sheets.py")
-    print("      (creates expert rating CSVs for 2 instructors)")
-    return 0 if summary["jobs_failed"] == 0 else 1
+    print(f"Questions export: {export_path} ({len(exported_questions)}/{totals['total_questions']})")
+    if still_missing:
+        print("Still incomplete after regenerate pass:")
+        for name in still_missing:
+            have = len(by_category[name])
+            target = next(int(c["count"]) for c in categories if c["name"] == name)
+            print(f"  - {name}: {have}/{target}")
+        print("Check logs/evaluation/metrics.jsonl for generation_error events.")
+    print("Next: python evaluate/llm-evaluation/export_rating_sheets.py")
+    return 0 if not still_missing else 1
 
 
 if __name__ == "__main__":

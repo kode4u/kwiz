@@ -6,14 +6,27 @@
 
 ```bash
 # Optional: poster hardware (edit to your machine)
-export EVAL_GPU="your GPU"
-export EVAL_CPU="your CPU"
+# Linux/macOS:
+export EVAL_GPU="RTX 3090"
+export EVAL_CPU="Intel Core i7 12700KF"
 export EVAL_RAM_GB="64"
-export EVAL_OS="your OS"
+export EVAL_OS="Window 11"
 export OLLAMA_MODEL="deepseek-r1:8b"
 
 docker compose up -d llmapi
 python3 evaluate/llm-evaluation/run_batch_evaluation.py
+```
+
+```powershell
+# Windows (PowerShell) — use python, not python3
+$env:EVAL_GPU="RTX 3090"
+$env:EVAL_CPU="Intel Core i7 12700KF"
+$env:EVAL_RAM_GB="64"
+$env:EVAL_OS="Windows 11"
+$env:OLLAMA_MODEL="deepseek-r1:8b"
+
+docker compose up -d llmapi
+python evaluate/llm-evaluation/run_batch_evaluation.py
 ```
 
 **125 questions** = 5 domains × **25 questions/domain** (5 subtopics × 5 each).
@@ -28,6 +41,11 @@ python3 evaluate/llm-evaluation/run_batch_evaluation.py
 ```bash
 python3 evaluate/llm-evaluation/summarize_metrics.py
 tail -20 logs/evaluation/metrics.jsonl
+```
+
+```powershell
+python evaluate/llm-evaluation/summarize_metrics.py
+Get-Content logs/evaluation/metrics.jsonl -Tail 20
 ```
 
 Full docs: [evaluate/llm-evaluation/README.md](evaluate/llm-evaluation/README.md)
