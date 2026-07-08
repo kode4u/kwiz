@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
 """
-Evaluate expert review CSVs (binary rubric) for the 125-MCQ study.
+Evaluate expert review CSVs (binary rubric) for L3M-RAG study.
+Supports 1, 2, or 3+ expert rating sheets dynamically.
 
-Expected layout:
-  data/reviews/rating_sheet_expert1.csv
-  data/reviews/rating_sheet_expert2.csv
+Expected layout inside reviews directory (e.g., data/reviews/):
+  rating_sheet_expert1.csv
+  rating_sheet_expert2.csv
+  rating_sheet_expert3.csv
 
 Usage:
   python3 data/check_validity.py
-  python3 data/check_validity.py --reviews-dir data/reviews --target 125
+  python3 data/check_validity.py --reviews-dir data/reviews --target 100
   python3 data/check_validity.py --json > data/reviews/quality_summary.json
-
-Poster / reviewer metrics:
-  - Prompt adherence  = topic_relevance pass rate (%)
-  - Accuracy          = acceptable pass rate (%)
-  - Per-criterion pass rates
-  - Precision / Recall / F1 (inter-rater on 'acceptable', or vs consensus)
-  - Cohen's kappa (two experts)
 """
 from __future__ import annotations
 
@@ -59,6 +54,7 @@ def parse01(value: str, field: str, row: int, required: bool = True) -> Optional
 
 
 def cohen_kappa(pairs: List[Tuple[int, int]]) -> float:
+    """Compute Cohen's Kappa for 2 raters."""
     if not pairs:
         return float("nan")
     n = len(pairs)
@@ -67,8 +63,40 @@ def cohen_kappa(pairs: List[Tuple[int, int]]) -> float:
     pb1 = sum(1 for _, b in pairs if b == 1) / n
     pe = pa1 * pb1 + (1 - pa1) * (1 - pb1)
     if abs(1.0 - pe) < 1e-12:
-        return float("nan")
+        return 0.0
     return (p0 - pe) / (1.0 - pe)
+
+
+def fleiss_kappa(ratings_matrix: List[List[int]], num_categories: int = 2) -> float:
+    """
+    Compute Fleiss' Kappa for any number of raters (n >= 2).
+    ratings_matrix: List of lists, where each list contains category counts for item i.
+                    e.g., [[count_cat0, count_cat1], [count_cat0, count_cat1], ...]
+    """
+    N = len(ratings_matrix)
+    if N == 0:
+        return float("nan")
+    n = sum(ratings_matrix[0])  # Number of raters
+    if n <= 1:
+        return float("nan")
+
+    # Calculate pj (proportion of all assignments to category j)
+    pj = [0.0] * num_categories
+    for j in range(num_categories):
+        pj[j] = sum(row[j] for row in ratings_matrix) / (N * n)
+
+    # Calculate Pi (agreement extent for each subject i)
+    Pi = [0.0] * N
+    for i in range(N):
+        sum_sq = sum(count * count for count in ratings_matrix[i])
+        Pi[i] = (sum_sq - n) / (n * (n - 1))
+
+    P_bar = sum(Pi) / N
+    Pe_bar = sum(p * p for p in pj)
+
+    if abs(1.0 - Pe_bar) < 1e-12:
+        return 0.0
+    return (P_bar - Pe_bar) / (1.0 - Pe_bar)
 
 
 def prf(y_true: List[int], y_pred: List[int]) -> Dict[str, Any]:
@@ -92,32 +120,16 @@ def prf(y_true: List[int], y_pred: List[int]) -> Dict[str, Any]:
     }
 
 
-def find_review_files(reviews_dir: str) -> Tuple[Optional[str], Optional[str]]:
+def find_review_files(reviews_dir: str) -> List[str]:
+    """Find all CSV expert sheets sorted by name/number."""
     if not os.path.isdir(reviews_dir):
-        return None, None
+        return []
     csvs = sorted(
         f
         for f in os.listdir(reviews_dir)
         if f.lower().endswith(".csv") and not f.startswith(".")
     )
-    expert1 = expert2 = None
-    for name in csvs:
-        low = name.lower()
-        path = os.path.join(reviews_dir, name)
-        if re.search(r"expert\s*1|expert1|rater\s*1", low):
-            expert1 = path
-        elif re.search(r"expert\s*2|expert2|rater\s*2", low):
-            expert2 = path
-    # Fallback: first two CSVs by name
-    if not expert1 and csvs:
-        expert1 = os.path.join(reviews_dir, csvs[0])
-    if not expert2 and len(csvs) > 1:
-        for name in csvs:
-            path = os.path.join(reviews_dir, name)
-            if path != expert1:
-                expert2 = path
-                break
-    return expert1, expert2
+    return [os.path.join(reviews_dir, name) for name in csvs]
 
 
 def load_rating_csv(path: str) -> List[Dict[str, Any]]:
@@ -144,7 +156,6 @@ def load_rating_csv(path: str) -> List[Dict[str, Any]]:
             for c in CRITERIA + ["acceptable"]:
                 scores[c] = parse01(row.get(c, ""), c, idx, required=True)
             item.update(scores)
-            # Rubric: acceptable should equal all-four AND
             derived = 1 if all(scores[c] == 1 for c in CRITERIA) else 0
             item["acceptable_derived"] = derived
             item["acceptable_mismatch"] = derived != scores["acceptable"]
@@ -153,7 +164,6 @@ def load_rating_csv(path: str) -> List[Dict[str, Any]]:
 
 
 def structural_valid(row: Dict[str, Any]) -> bool:
-    """Automated MCQ shape check (not semantic quality)."""
     if len(row.get("question_text", "")) < 10:
         return False
     choices = [row.get("choice_a"), row.get("choice_b"), row.get("choice_c"), row.get("choice_d")]
@@ -232,7 +242,6 @@ def latency_from_metrics(path: str) -> Dict[str, Any]:
         "mean_s": round(statistics.mean(per_q), 3),
         "median_s": round(statistics.median(per_q), 3),
         "p95_s": round(s[int(0.95 * (len(s) - 1))], 3),
-        "note": "From full metrics.jsonl; prefer one clean batch run for poster.",
     }
 
 
@@ -248,164 +257,149 @@ def study_design_advice(
     if n_reviewed >= target:
         use_verdict = "ok_full"
         message = f"You have {n_reviewed} expert-rated items (target {target}). Report metrics on all {target}."
-    elif n_reviewed >= 100:
+    elif n_reviewed >= 80:
         use_verdict = "ok_partial_report"
         message = (
             f"You have {n_reviewed}/{target} rated MCQs ({missing} short). "
-            "For the poster you MAY report metrics on the reviewed set (state n clearly, e.g. "
-            f"'{n_reviewed} prompts across 5 domains'). For a strict '125 prompts' claim, "
-            "generate and rate the missing items."
-        )
-    elif n_reviewed >= 80:
-        use_verdict = "partial_recommend_more"
-        message = (
-            f"Only {n_reviewed}/{target} rated. Usable for pilot analysis; "
-            "reviewers expect ~100+ with clear n — add generation + expert review for gaps."
+            f"For the paper you can report metrics on this reviewed set (n={n_reviewed})."
         )
     else:
         use_verdict = "insufficient"
-        message = f"Only {n_reviewed}/{target} rated — add more LLM output and expert scores before poster."
+        message = f"Only {n_reviewed}/{target} rated — please complete more expert reviews."
 
-    sparse_domains = [d for d, c in domains.items() if c < 20 and target == 125]
     return {
         "target_n": target,
         "reviewed_n": n_reviewed,
         "missing_for_target": max(0, missing),
         "export_n": export_n or None,
-        "missing_from_export": export_gap if export_n else None,
         "verdict": use_verdict,
         "message": message,
-        "domains_below_25": sparse_domains,
-        "recommendation": (
-            "Generate missing subtopics (re-run batch or fill gaps), then "
-            "python3 evaluate/llm-evaluation/export_rating_sheets.py and complete expert CSVs."
-            if missing > 0
-            else "Proceed to consensus and poster numbers."
-        ),
+        "recommendation": "Proceed to consensus and report statistics." if missing <= 0 else "Fill evaluation gaps.",
     }
 
 
-def build_consensus(
-    rows1: List[Dict[str, Any]], rows2: List[Dict[str, Any]]
+def build_consensus_multi(
+    expert_data: List[List[Dict[str, Any]]], expert_labels: List[str]
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
-    m1 = {r["item_id"]: r for r in rows1}
-    m2 = {r["item_id"]: r for r in rows2}
-    common = sorted(set(m1) & set(m2))
+    """Build consensus using majority vote across all loaded experts."""
+    # Build maps of item_id -> row
+    maps = [{r["item_id"]: r for r in rows} for rows in expert_data]
+    # Find common item_ids
+    common = set(maps[0].keys())
+    for m in maps[1:]:
+        common = common & set(m.keys())
+    common_sorted = sorted(common)
+
+    num_raters = len(expert_data)
     consensus_rows = []
-    for iid in common:
-        a, b = m1[iid], m2[iid]
-        acc = 1 if (a["acceptable"] + b["acceptable"]) >= 2 else 0  # both must be 1
-        # Strict consensus: both agree acceptable=1
-        if a["acceptable"] == 1 and b["acceptable"] == 1:
-            acc = 1
-        else:
-            acc = 0
-        topic = 1 if (a["topic_relevance"] + b["topic_relevance"]) >= 2 else 0
-        if a["topic_relevance"] == 1 and b["topic_relevance"] == 1:
-            topic = 1
-        else:
-            topic = 0
+    
+    # Track pairs for pairwise kappa (if exactly 2 experts) or Fleiss' Kappa matrix
+    fleiss_matrix_acc = []
+    fleiss_matrix_top = []
+
+    for iid in common_sorted:
+        votes_acc = [m[iid]["acceptable"] for m in maps]
+        votes_top = [m[iid]["topic_relevance"] for m in maps]
+
+        # Majority Vote Consensus
+        acc_consensus = 1 if sum(votes_acc) > (num_raters / 2.0) else 0
+        top_consensus = 1 if sum(votes_top) > (num_raters / 2.0) else 0
+
         consensus_rows.append(
             {
                 "item_id": iid,
-                "domain": a["domain"],
-                "acceptable": acc,
-                "topic_relevance": topic,
+                "domain": maps[0][iid]["domain"],
+                "acceptable": acc_consensus,
+                "topic_relevance": top_consensus,
             }
         )
 
-    pairs_acc = [(m1[i]["acceptable"], m2[i]["acceptable"]) for i in common]
-    pairs_top = [(m1[i]["topic_relevance"], m2[i]["topic_relevance"]) for i in common]
-    y_ref = [a for a, _ in pairs_acc]
-    y_pred = [b for _, b in pairs_acc]
+        # Build category count lists for Fleiss Kappa: [count_of_0, count_of_1]
+        fleiss_matrix_acc.append([votes_acc.count(0), votes_acc.count(1)])
+        fleiss_matrix_top.append([votes_top.count(0), votes_top.count(1)])
 
-    return consensus_rows, {
-        "n_common": len(common),
-        "only_expert1": sorted(set(m1) - set(m2)),
-        "only_expert2": sorted(set(m2) - set(m1)),
-        "acceptable_agreement_pct": round(100.0 * sum(1 for a, b in pairs_acc if a == b) / len(common), 2)
-        if common
-        else None,
-        "cohen_kappa_acceptable": round(cohen_kappa(pairs_acc), 4) if common else None,
-        "cohen_kappa_topic_relevance": round(cohen_kappa(pairs_top), 4) if common else None,
-        "inter_rater_prf_acceptable_expert2_vs_expert1": {
-            **prf(y_ref, y_pred),
-            "description": "Expert 2 predicted, Expert 1 reference (acceptable)",
-        },
+    # Inter-rater agreement statistics
+    agreement_acc = fleiss_kappa(fleiss_matrix_acc, 2)
+    agreement_top = fleiss_kappa(fleiss_matrix_top, 2)
+
+    stats = {
+        "n_common": len(common_sorted),
+        "raters_count": num_raters,
+        "raters_labels": expert_labels,
+        "fleiss_kappa_acceptable": round(agreement_acc, 4) if not float("nan") else None,
+        "fleiss_kappa_topic_relevance": round(agreement_top, 4) if not float("nan") else None,
         "consensus_accuracy_pct": round(
             100.0 * sum(r["acceptable"] for r in consensus_rows) / len(consensus_rows), 2
-        )
-        if consensus_rows
-        else None,
+        ) if consensus_rows else None,
         "consensus_prompt_adherence_pct": round(
             100.0 * sum(r["topic_relevance"] for r in consensus_rows) / len(consensus_rows), 2
-        )
-        if consensus_rows
-        else None,
+        ) if consensus_rows else None,
     }
+
+    # If exactly two experts, calculate pairwise Cohen's Kappa & PRF for backwards compatibility
+    if num_raters == 2:
+        pairs_acc = [(maps[0][i]["acceptable"], maps[1][i]["acceptable"]) for i in common_sorted]
+        pairs_top = [(maps[0][i]["topic_relevance"], maps[1][i]["topic_relevance"]) for i in common_sorted]
+        stats.update({
+            "cohen_kappa_acceptable": round(cohen_kappa(pairs_acc), 4),
+            "cohen_kappa_topic_relevance": round(cohen_kappa(pairs_top), 4),
+            "acceptable_agreement_pct": round(100.0 * sum(1 for a, b in pairs_acc if a == b) / len(common_sorted), 2),
+            "inter_rater_prf_acceptable_expert2_vs_expert1": prf(
+                [a for a, _ in pairs_acc], [b for _, b in pairs_acc]
+            )
+        })
+
+    return consensus_rows, stats
 
 
 def print_report(report: Dict[str, Any]) -> None:
     print("=" * 60)
-    print("EXPERT REVIEW EVALUATION")
+    print("L3M-RAG EXPERT REVIEW EVALUATION")
     print("=" * 60)
 
     adv = report["study_design"]
-    print("\n## Study design")
+    print("\n## Study Design Advice")
     print(adv["message"])
     print("Recommendation:", adv["recommendation"])
-    if adv.get("domains_below_25"):
-        print("Domains with <25 items in reviews:", ", ".join(adv["domains_below_25"]))
 
     cov = report["coverage"]
-    print("\n## Coverage")
-    print(f"  Target:     {cov['target_n']}")
-    print(f"  Expert 1:   {cov.get('expert1_n', 0)} items")
-    print(f"  Expert 2:   {cov.get('expert2_n', '—')}")
-    print(f"  Export file:{cov.get('export_n', '—')} items")
-    if cov.get("only_expert1"):
-        print(f"  Only in expert1 ({len(cov['only_expert1'])}):", ", ".join(cov["only_expert1"][:5]), "...")
+    print("\n## Evaluation Coverage")
+    print(f"  Target Size: {cov['target_n']} questions")
+    print(f"  Expert Sheets Loaded: {cov['expert_sheets_count']}")
+    for name, count in cov["expert_item_counts"].items():
+        print(f"    - {name}: {count} items")
 
     lat = report.get("latency") or {}
     if lat:
-        print("\n## LLM latency (from metrics log)")
-        print(f"  mean {lat.get('mean_s')} s | median {lat.get('median_s')} s | p95 {lat.get('p95_s')} s (n={lat.get('n_samples')})")
+        print("\n## Generation Latency (Metrics Log)")
+        print(f"  Mean: {lat.get('mean_s')} s | Median: {lat.get('median_s')} s | p95: {lat.get('p95_s')} s (n={lat.get('n_samples')} requests)")
 
-    for key in ("expert1", "expert2", "consensus"):
-        block = report.get(key)
-        if not block:
-            continue
-        print(f"\n## {block['label']}")
-        print(f"  n reviewed:          {block['n_reviewed']}")
-        print(f"  Accuracy (acceptable): {block['accuracy_pct']}%  ({block['acceptable_count']}/{block['n_reviewed']})")
-        print(f"  Prompt adherence:      {block['prompt_adherence_pct']}%  (topic relevance)")
-        print(f"  Semantic correctness:{block['semantic_correctness_pct']}%")
-        print(f"  Answer key:            {block['answer_key_correctness_pct']}%")
-        print(f"  Clarity:               {block['question_clarity_pct']}%")
-        if block.get("acceptable_mismatch_rows"):
-            print(f"  WARNING: {block['acceptable_mismatch_rows']} rows where acceptable != all-four-criteria")
+    # Print individual experts
+    for exp in report.get("experts", []):
+        print(f"\n## Expert: {exp['label']}")
+        print(f"  n reviewed:          {exp['n_reviewed']}")
+        print(f"  Accuracy (acceptable): {exp['accuracy_pct']}%  ({exp['acceptable_count']}/{exp['n_reviewed']})")
+        print(f"  Prompt adherence:      {exp['prompt_adherence_pct']}%  (topic relevance)")
+        print(f"  Semantic correctness:  {exp['semantic_correctness_pct']}%")
+        print(f"  Answer key check:      {exp['answer_key_correctness_pct']}%")
+        print(f"  Question clarity:      {exp['question_clarity_pct']}%")
 
-    ir = report.get("inter_rater")
-    if ir:
-        print("\n## Inter-rater (2 experts)")
-        print(f"  Common items:     {ir['n_common']}")
-        print(f"  Agreement:        {ir['acceptable_agreement_pct']}%")
-        print(f"  Cohen κ (acceptable): {ir['cohen_kappa_acceptable']}")
-        prf_a = ir["inter_rater_prf_acceptable_expert2_vs_expert1"]
-        print(
-            f"  P/R/F1 (acceptable): {prf_a['precision']} / {prf_a['recall']} / {prf_a['f1']} "
-            f"(accuracy {prf_a['accuracy']})"
-        )
-        if ir.get("only_expert1"):
-            print(f"  Items only expert1 rated: {len(ir['only_expert1'])}")
-        if ir.get("only_expert2"):
-            print(f"  Items only expert2 rated: {len(ir['only_expert2'])}")
-
-    poster = report.get("poster_snippet")
-    if poster:
-        print("\n## Poster bullets (copy)")
-        for line in poster:
-            print(" ", line)
+    # Consensus & Agreement
+    cons = report.get("consensus")
+    if cons:
+        print(f"\n## Consensus ({cons['raters_count']} Experts Majority Vote)")
+        print(f"  n common questions:   {cons['n_common']}")
+        print(f"  Consensus Accuracy:   {cons['consensus_accuracy_pct']}%")
+        print(f"  Consensus Adherence:  {cons['consensus_prompt_adherence_pct']}%")
+        
+        print("\n## Inter-Rater Reliability Agreement")
+        if cons["raters_count"] > 2:
+            print(f"  Fleiss' Kappa (Acceptability):     {cons['fleiss_kappa_acceptable']}")
+            print(f"  Fleiss' Kappa (Topic Relevance):   {cons['fleiss_kappa_topic_relevance']}")
+        else:
+            print(f"  Cohen's Kappa (Acceptability):     {cons.get('cohen_kappa_acceptable')}")
+            print(f"  Cohen's Kappa (Topic Relevance):   {cons.get('cohen_kappa_topic_relevance')}")
+            print(f"  Direct Percent Agreement:          {cons.get('acceptable_agreement_pct')}%")
 
     print("\n" + "=" * 60)
 
@@ -413,76 +407,52 @@ def print_report(report: Dict[str, Any]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Evaluate expert review CSVs")
     parser.add_argument("--reviews-dir", default=DEFAULT_REVIEWS)
-    parser.add_argument("--expert1", default="", help="Override expert1 CSV path")
-    parser.add_argument("--expert2", default="", help="Override expert2 CSV path")
     parser.add_argument("--export", default=DEFAULT_EXPORT, help="questions_export.json")
     parser.add_argument("--metrics", default=DEFAULT_METRICS, help="metrics.jsonl for latency")
-    parser.add_argument("--target", type=int, default=125, help="Planned study size")
+    parser.add_argument("--target", type=int, default=100, help="Planned study size")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--write-consensus", default="", help="Write consensus CSV path")
     args = parser.parse_args()
 
-    expert1_path = args.expert1
-    expert2_path = args.expert2
-    if not expert1_path or not expert2_path:
-        f1, f2 = find_review_files(args.reviews_dir)
-        expert1_path = expert1_path or f1 or ""
-        expert2_path = expert2_path or f2 or ""
-
-    if not expert1_path or not os.path.isfile(expert1_path):
-        print(f"No expert1 CSV in {args.reviews_dir}", file=sys.stderr)
-        print("Add: data/reviews/rating_sheet_expert1.csv", file=sys.stderr)
+    # Find all sheets inside review directory
+    expert_paths = find_review_files(args.reviews_dir)
+    if not expert_paths:
+        print(f"No rating CSV sheets found in {args.reviews_dir}", file=sys.stderr)
+        print("Add your expert review sheets to: data/reviews/", file=sys.stderr)
         return 1
 
-    rows1 = load_rating_csv(expert1_path)
-    rows2 = load_rating_csv(expert2_path) if expert2_path and os.path.isfile(expert2_path) else []
+    expert_data = []
+    expert_labels = []
+    for path in expert_paths:
+        label = os.path.basename(path)
+        expert_labels.append(label)
+        expert_data.append(load_rating_csv(path))
 
     export_ids = load_export_ids(args.export)
-    domains = Counter(r["domain"] for r in rows1)
+    domains = Counter(r["domain"] for r in expert_data[0])
 
     report: Dict[str, Any] = {
-        "expert1_file": expert1_path,
-        "expert2_file": expert2_path or None,
+        "expert_files": expert_paths,
         "study_design": study_design_advice(
-            n_reviewed=len(rows1),
+            n_reviewed=len(expert_data[0]),
             target=args.target,
             export_n=len(export_ids),
             domains=domains,
         ),
         "coverage": {
             "target_n": args.target,
-            "expert1_n": len(rows1),
-            "expert2_n": len(rows2) if rows2 else None,
+            "expert_sheets_count": len(expert_data),
+            "expert_item_counts": {label: len(data) for label, data in zip(expert_labels, expert_data)},
             "export_n": len(export_ids) if export_ids else None,
-            "export_missing_vs_target": max(0, args.target - len(export_ids)) if export_ids else None,
         },
         "latency": latency_from_metrics(args.metrics),
-        "expert1": summarize_rater(rows1, os.path.basename(expert1_path)),
+        "experts": [summarize_rater(data, label) for data, label in zip(expert_data, expert_labels)],
     }
 
-    if rows2:
-        report["expert2"] = summarize_rater(rows2, os.path.basename(expert2_path))
-        consensus_rows, ir = build_consensus(rows1, rows2)
-        report["inter_rater"] = ir
-        report["coverage"]["only_expert1"] = ir.get("only_expert1", [])
-        report["coverage"]["only_expert2"] = ir.get("only_expert2", [])
-        n_cons = len(consensus_rows)
-        acc_c = sum(r["acceptable"] for r in consensus_rows)
-        top_c = sum(r["topic_relevance"] for r in consensus_rows)
-        report["consensus"] = {
-            "label": "Consensus (both experts acceptable=1)",
-            "n_reviewed": n_cons,
-            "acceptable_count": acc_c,
-            "accuracy_pct": round(100.0 * acc_c / n_cons, 2) if n_cons else float("nan"),
-            "prompt_adherence_pct": round(100.0 * top_c / n_cons, 2) if n_cons else float("nan"),
-            "criteria_pct": {},
-            "semantic_correctness_pct": None,
-            "answer_key_correctness_pct": None,
-            "question_clarity_pct": None,
-            "acceptable_mismatch_rows": 0,
-            "structural_valid_pct": None,
-            "by_domain": {},
-        }
+    if len(expert_data) >= 2:
+        consensus_rows, cons_stats = build_consensus_multi(expert_data, expert_labels)
+        report["consensus"] = cons_stats
+        
         if args.write_consensus:
             os.makedirs(os.path.dirname(args.write_consensus) or ".", exist_ok=True)
             with open(args.write_consensus, "w", encoding="utf-8", newline="") as fh:
@@ -493,24 +463,6 @@ def main() -> int:
                 w.writeheader()
                 w.writerows(consensus_rows)
             report["consensus_csv"] = args.write_consensus
-
-    # Poster snippet from best available summary
-    primary = report.get("consensus") or report["expert1"]
-    n = primary["n_reviewed"]
-    lat = report.get("latency") or {}
-    mean_s = lat.get("mean_s", "[X.X]")
-    report["poster_snippet"] = [
-        f"Ollama + [model] on [GPU]",
-        f"{n} prompts (5 domains); mean {mean_s} s/Q",
-        f"Prompt adherence {primary['prompt_adherence_pct']}% | Accuracy {primary['accuracy_pct']}%",
-        "WebSocket: [N] clients, RTT [X] ms (p95 [X] ms)",
-    ]
-    if rows2 and report.get("inter_rater"):
-        ir = report["inter_rater"]
-        p = ir["inter_rater_prf_acceptable_expert2_vs_expert1"]
-        report["poster_snippet"].append(
-            f"P {p['precision']} R {p['recall']} F1 {p['f1']} | κ {ir['cohen_kappa_acceptable']}"
-        )
 
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False))

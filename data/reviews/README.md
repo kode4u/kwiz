@@ -1,13 +1,16 @@
 # Expert review files
 
-Place two completed rating sheets here:
+Place your completed rating sheets here (supports 1, 2, or 3+ experts):
 
 | File | Rater |
 |------|--------|
 | `rating_sheet_expert1.csv` | Expert 1 |
 | `rating_sheet_expert2.csv` | Expert 2 |
+| `rating_sheet_expert3.csv` | Expert 3 |
 
 Columns (0/1): `topic_relevance`, `semantic_correctness`, `answer_key_correctness`, `question_clarity`, `acceptable`.
+
+When 3+ experts are present, the system automatically uses **majority voting** for consensus and calculates **Fleiss' Kappa** for overall inter-rater reliability.
 
 ## Analyze
 

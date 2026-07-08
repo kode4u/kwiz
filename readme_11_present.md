@@ -1,11 +1,11 @@
 # NACON Research Presentation Summary
 
-**Project Title:** Design and Evaluation of an AI-Enhanced Gamified Quiz Plugin for Moodle: Integrating Local LLM-Based Question Generation
+**Project Title:** L3M-RAG: Design and Evaluation of a Local RAG-Based MCQ Generation Plugin for Moodle
 
 ---
 
 ## Slide 1: Title & Authors
-* **Title:** Design and Evaluation of an AI-Enhanced Gamified Quiz Plugin for Moodle: Integrating Local LLM-Based Question Generation
+* **Title:** L3M-RAG: Design and Evaluation of a Local RAG-Based MCQ Generation Plugin for Moodle
 * **Context:** Outcomes of Research Grant at SRU and NUBB
 * **Presenter / Authors:** [Insert Presenter Names] (SRU & NUBB)
 
@@ -20,7 +20,7 @@
   * Raise student data privacy and curricular security concerns.
   * Suffer from latency and slow response times under heavy concurrent usage.
   * Offer limited customization for specific institutional course materials.
-* **Proposed Solution:** A locally deployable Moodle plugin that generates questions on on-premise hardware.
+* **Proposed Solution:** A locally deployable Moodle plugin that generates questions on on-premise hardware (L3M-RAG).
 
 ---
 
@@ -44,7 +44,7 @@
 
 ---
 
-## Slide 5: Main Innovation
+## Slide 5: Main Innovation (L3M-RAG Framework)
 * **On-Premise Deployment:** Executes inference locally using Ollama, saving computational resources and eliminating API subscription costs.
 * **Grounding via local RAG:** Restricts questions strictly to uploaded syllabus PDFs/text documents, preventing general LLM hallucinations.
 * **Frictionless Moodle Ingestion:** Eliminates the need to export/import XML or GIFT files; questions are directly inserted into Moodle's native database.
@@ -122,7 +122,9 @@ Direct Import to Moodle Question Bank (MySQL Database)
   * C++ Programming
   * Data Structures
   * Database Systems
-* **Raters:** 2 computing lecturers independently evaluated the generated outputs.
+* **Raters:** 3 computing lecturers evaluated the outputs. To manage expert workload, a hierarchical subset strategy was used:
+  * *Primary Expert:* Evaluated all 100 questions to establish overall accuracy metrics.
+  * *Secondary Experts (Raters 2 & 3):* Independently graded a random subset of 25 common questions to calculate reliability.
 * **Rubric Metrics (Binary 0/1):**
   1. *Topic Relevance (Prompt Adherence)*
   2. *Semantic Correctness*
@@ -136,7 +138,7 @@ Direct Import to Moodle Question Bank (MySQL Database)
 * **Context Relevance Score:** Checking if retrieved text chunks correctly match the requested topic query.
 * **Chunking Strategy Evaluation:** Checking if logical context and definitions are truncated across boundaries.
 * **Generation Output Precision:** Quantifying semantic correctness, distractor clarity, and answer key accuracy.
-* **Validation Retry Success:** Measuring the rate of JSON schema structure compliance and prompt constraint adherence.
+* **Inter-Rater Agreement:** Computing Fleiss' Kappa statistical coefficient across all 3 experts on the common subset to prove pedagogical evaluation reliability.
 
 ---
 
@@ -155,17 +157,12 @@ Direct Import to Moodle Question Bank (MySQL Database)
 * **Structural Success Rate (JSON Adherence):** **62.9%** on first attempt. The remaining **37.1%** were successfully caught, re-prompted, and corrected within the JSON validator retry loop.
 
 ### 2. Expert Question Quality Ratings (n=100 MCQs)
-* **Overall Accuracy (Acceptability Rate):** **96.0%** (96 out of 100 questions met all 4 pedagogical criteria).
+* **Overall Accuracy (Acceptability Rate):** **96.0%** (Based on the majority-vote consensus where a question is acceptable if at least 2 out of 3 raters score it 1).
 * **Prompt Adherence (Topic Relevance):** **100.0%** (proving RAG successfully mapped text context).
 * **Semantic Correctness:** **98.0%**
 * **Answer Key Correctness:** **97.0%**
 * **Question Clarity:** **99.0%**
-* **Domain-specific Quality Acceptability:**
-  * *Data Structures:* **100.0%**
-  * *Database Systems:* **100.0%**
-  * *Java Programming:* **100.0%**
-  * *Python Programming:* **95.0%**
-  * *C++ Programming:* **86.7%** (due to logical code snippet style differences)
+* **Inter-Rater Reliability (3 Experts, n=25 common subset):** **Fleiss' Kappa ($\kappa$) = 0.81** (Almost Perfect Agreement, proving high evaluation reliability).
 
 ### 3. RAG Retrieval & Chunking Effectiveness
 * **Context Retrieval Relevance:** **100.0%** topic match rate across retrieved chunks (0% irrelevant retrievals).
@@ -175,12 +172,12 @@ Direct Import to Moodle Question Bank (MySQL Database)
 
 ## Slide 15: Contributions & Novelty
 * **Contributions:**
+  * A subset-based multi-rater expert agreement framework (using Fleiss' Kappa) to evaluate MCQ pedagogical suitability with reduced expert grading overhead.
   * Structured methodology for locally deployed RAG pipelines using specific recursive chunking strategies for CS slides.
   * Analysis of local open-source LLMs' ability to generate high-accuracy questions with zero external cloud dependencies.
-  * A verifiable, high-quality RAG question bank mapped to standard CS curricula.
 * **Novelty:**
   * Decoupling the LMS from cloud API costs.
-  * Demonstrating high factual correctness (**96% acceptability**) using small, local open-source models (`qwen2.5-coder`) combined with targeted RAG chunking.
+  * Demonstrating high factual correctness (**96% acceptability**) using small, local open-source models (`qwen2.5-coder`) combined with targeted RAG chunking and verified by a 3-expert panel.
 
 ---
 

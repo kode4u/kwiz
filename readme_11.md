@@ -1,6 +1,6 @@
-# JICA Moodle Quiz LLM API Service: Deep-Dive & Code Architecture
+# L3M-RAG Backend Service: Deep-Dive & Code Architecture
 
-This document provides a comprehensive summary and code-level architectural breakdown of the Python-based LLM API service located in the `llmapi/` directory.
+This document provides a comprehensive summary and code-level architectural breakdown of the L3M-RAG Python-based backend service located in the `llmapi/` directory.
 
 ---
 

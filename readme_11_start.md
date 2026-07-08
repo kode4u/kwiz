@@ -1,6 +1,6 @@
-# Project Start Guide: Local-First Setup (RAG + Ollama + Moodle)
+# Project Start Guide: L3M-RAG Local-First Setup (Ollama + Moodle)
 
-This guide walks you through starting the JICA Moodle Quiz system completely locally using **Docker Compose** for the infrastructure and **Ollama** for local-first, zero-cost question generation.
+This guide walks you through starting the L3M-RAG Moodle Quiz system completely locally using **Docker Compose** for the infrastructure and **Ollama** for local-first, zero-cost question generation.
 
 ---
 
@@ -83,7 +83,7 @@ You should see:
 
 ### Step 5: Configure Moodle Plugin Settings
 1. Log in as an administrator to Moodle.
-2. Navigate to: **Site Administration ➔ Plugins ➔ Activity Modules ➔ Gamified Quiz**.
+2. Navigate to: **Site Administration ➔ Plugins ➔ Activity Modules ➔ AI Quiz Generator**.
 3. Fill in the connection settings:
    * **LLM API Endpoint:** `http://jica-llmapi:5001` (Internal Docker network address) or `http://localhost:5001` (if debugging).
    * **WebSocket Server:** `ws://localhost:3001` (Direct client communication address).
@@ -147,6 +147,20 @@ curl -X POST http://localhost:5001/generate \
   ]
 }
 ```
+
+### Test 3: Run Expert Evaluation & Inter-Rater Reliability
+Once you have collected the expert rating CSV sheets from your lecturers, you can run the validation script to automatically calculate accuracy percentages, compile majority votes, and compute inter-rater agreement statistics (Cohen's Kappa for 2 experts, or Fleiss' Kappa for 3+ experts):
+
+1. Place your completed CSV files inside the `/data/reviews/` directory.
+   * *Example:* `rating_sheet_expert1.csv`, `rating_sheet_expert2.csv`, and `rating_sheet_expert3.csv`.
+2. Run the python evaluation script from the project root:
+   ```bash
+   python3 data/check_validity.py --target 100
+   ```
+3. To export the calculated consensus summary as a JSON file, run:
+   ```bash
+   python3 data/check_validity.py --json > data/reviews/quality_summary.json
+   ```
 
 ---
 

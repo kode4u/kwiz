@@ -8,14 +8,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'Gamified Quiz';
-$string['modulenameplural'] = 'Gamified Quizzes';
-$string['modulename_help'] = 'AI-enhanced real-time gamified quiz with leaderboards and instant feedback.';
-$string['pluginname'] = 'Gamified Quiz';
-$string['pluginadministration'] = 'Gamified Quiz administration';
-$string['gamifiedquiz:addinstance'] = 'Add a new Gamified Quiz';
-$string['gamifiedquiz:view'] = 'View Gamified Quiz';
-$string['gamifiedquiz:attempt'] = 'Attempt Gamified Quiz';
+$string['modulename'] = 'AI Quiz Generator';
+$string['modulenameplural'] = 'AI Quiz Generators';
+$string['modulename_help'] = 'AI-enhanced quiz generator with local RAG question generation directly from slide materials.';
+$string['pluginname'] = 'AI Quiz Generator';
+$string['pluginadministration'] = 'AI Quiz Generator administration';
+$string['gamifiedquiz:addinstance'] = 'Add a new AI Quiz Generator';
+$string['gamifiedquiz:view'] = 'View AI Quiz Generator';
+$string['gamifiedquiz:attempt'] = 'Attempt AI Quiz';
 
 // Settings
 $string['websocket_url'] = 'WebSocket Server URL';
@@ -114,7 +114,7 @@ $string['end_quiz'] = 'End Quiz';
 $string['questionbank'] = 'Question Bank';
 $string['questioncategory'] = 'Question Category';
 $string['questioncategory_help'] = 'Select a question category to use questions from the question bank. Questions generated will be added to this category.';
-$string['defaultcategory'] = 'Use default category (Gamified Quiz #X)';
+$string['defaultcategory'] = 'Use default category (AI Quiz Generator #X)';
 
 // Background image for question screen
 $string['background_image'] = 'Question screen background';
