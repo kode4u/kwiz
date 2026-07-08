@@ -164,6 +164,19 @@ For items where experts disagreed:
 
 ---
 
+## Poster (reviewer revision)
+
+After batch + expert + WebSocket runs, copy text and tables from:
+
+- **[POSTER_REVISED_CONTENT.md](POSTER_REVISED_CONTENT.md)** — slide-ready wording (local LLM, metrics, WebSocket)
+- **`generate_poster_report.py --markdown`** — auto-filled numbers from logs/CSVs
+
+```bash
+python3 evaluate/llm-evaluation/generate_poster_report.py --expert-default --markdown
+```
+
+---
+
 ## Part C — Final results table (paper / poster)
 
 Combine automated + expert results:
@@ -193,6 +206,18 @@ Optional merge with SQL exports: [../quality-expert/merge_speed_quality.py](../q
 ```
 
 Events: `hardware_environment`, `generation`, `moodle_job_complete`, `evaluation_run_start`, `evaluation_run_end`.
+
+---
+
+## Concurrent gamification WebSocket (real-time service)
+
+Not the same as LLM batch evaluation. See **[../websocket-latency/README.md](../websocket-latency/README.md)**:
+
+```bash
+cd evaluate/websocket-latency && npm install
+export JWT_SECRET=... WS_URL=http://localhost:3001
+node measure_concurrent_websocket.js --clients 50 --ramp-sec 10
+```
 
 ---
 

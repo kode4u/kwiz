@@ -2,30 +2,53 @@
 LLM API Service for Question Generation
 Generates structured MCQ questions using LLM backends
 """
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import logging
 import time
 import threading
-import requests as http_requests
+import requests
+import hashlib
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import json
 
 from metrics_logger import (
-    append_metric,
     log_generation,
     log_hardware_once,
 )
+
+# Persistent Embedding Cache setup
+EMBEDDINGS_CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "embeddings_cache.json")
+embedding_cache_lock = threading.Lock()
+embedding_cache = {}
+
+def load_embedding_cache():
+    global embedding_cache
+    if os.path.isfile(EMBEDDINGS_CACHE_FILE):
+        try:
+            with open(EMBEDDINGS_CACHE_FILE, 'r', encoding='utf-8') as fh:
+                embedding_cache = json.load(fh)
+            logger.info(f"Loaded {len(embedding_cache)} cached embeddings from {EMBEDDINGS_CACHE_FILE}")
+        except Exception as e:
+            logger.warning(f"Failed to load embedding cache: {e}")
+
+def save_embedding_cache():
+    try:
+        os.makedirs(os.path.dirname(EMBEDDINGS_CACHE_FILE), exist_ok=True)
+        with open(EMBEDDINGS_CACHE_FILE, 'w', encoding='utf-8') as fh:
+            json.dump(embedding_cache, fh)
+    except Exception as e:
+        logger.warning(f"Failed to save embedding cache: {e}")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+load_embedding_cache()
 
 app = Flask(__name__)
 CORS(app)
@@ -59,6 +82,7 @@ class QuestionRequest(BaseModel):
     model: Optional[str] = Field(default=None, description="Override model name for local backend")
     openai_api_key: Optional[str] = Field(default=None, description="Per-request OpenAI API key override")
     gemini_api_key: Optional[str] = Field(default=None, description="Per-request Gemini API key override")
+    learning_outcomes: Optional[str] = Field(default=None, description="Optional target learning outcomes")
 
 
 class Choice(BaseModel):
@@ -102,7 +126,6 @@ def _preload_ollama_models():
         return
 
     try:
-        import requests
         logger.info(f"Preloading Ollama models: {models}")
 
         # Get currently available models
@@ -158,7 +181,125 @@ def format_lesson_context(context: Optional[str]) -> str:
     )
 
 
-def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None) -> List[Question]:
+def format_learning_outcomes(learning_outcomes: Optional[str]) -> str:
+    """Format target learning outcomes for inclusion in generation prompts."""
+    if not learning_outcomes or not str(learning_outcomes).strip():
+        return ''
+    return f"- Target Learning Outcomes: {learning_outcomes}\n"
+
+
+import math
+
+def dot_product(v1, v2):
+    return sum(x * y for x, y in zip(v1, v2))
+
+def magnitude(v):
+    return math.sqrt(sum(x * x for x in v))
+
+def cosine_similarity(v1, v2):
+    mag1 = magnitude(v1)
+    mag2 = magnitude(v2)
+    if mag1 == 0 or mag2 == 0:
+        return 0.0
+    return dot_product(v1, v2) / (mag1 * mag2)
+
+def retrieve_relevant_context(query: str, document_text: str, backend: str, api_key_override: Optional[str] = None, local_model: Optional[str] = None) -> str:
+    """Perform pure-Python RAG vector retrieval using embeddings."""
+    if not document_text or not document_text.strip():
+        return ""
+    if len(document_text) <= 1500:
+        return document_text
+        
+    chunks = []
+    lines = document_text.split('\n')
+    current_chunk = []
+    current_len = 0
+    for line in lines:
+        if not line.strip():
+            continue
+        current_chunk.append(line)
+        current_len += len(line)
+        if current_len >= 500:
+            chunks.append("\n".join(current_chunk))
+            current_chunk = []
+            current_len = 0
+    if current_chunk:
+        chunks.append("\n".join(current_chunk))
+        
+    if not chunks:
+        return document_text
+        
+    def get_embedding(text: str) -> list[float]:
+        if backend == 'openai':
+            model_name = "text-embedding-3-small"
+        elif backend == 'gemini':
+            model_name = "models/text-embedding-004"
+        elif backend == 'local':
+            model_name = os.getenv('OLLAMA_EMBED_MODEL') or local_model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+        else:
+            model_name = "unknown"
+
+        hash_key = hashlib.sha256(f"{model_name}:{text}".encode('utf-8')).hexdigest()
+
+        with embedding_cache_lock:
+            if hash_key in embedding_cache:
+                return embedding_cache[hash_key]
+
+        embedding = []
+        try:
+            if backend == 'openai':
+                from openai import OpenAI
+                client = OpenAI(api_key=api_key_override or OPENAI_API_KEY)
+                resp = client.embeddings.create(input=[text], model=model_name)
+                embedding = resp.data[0].embedding
+            elif backend == 'gemini':
+                import google.generativeai as genai
+                genai.configure(api_key=api_key_override or GEMINI_API_KEY)
+                resp = genai.embed_content(model=model_name, content=text)
+                embedding = resp['embedding']
+            elif backend == 'local':
+                resp = requests.post(f"{LOCAL_LLM_URL}/api/embeddings", json={"model": model_name, "prompt": text})
+                resp.raise_for_status()
+                embedding = resp.json()['embedding']
+        except Exception as embed_err:
+            logger.warning(f"Failed to generate embedding for RAG text: {embed_err}")
+            return []
+
+        if embedding:
+            with embedding_cache_lock:
+                embedding_cache[hash_key] = embedding
+                save_embedding_cache()
+
+        return embedding
+
+    try:
+        logger.info(f"Generating query embedding for RAG query: '{query}'")
+        query_vector = get_embedding(query)
+        if not query_vector:
+            return document_text[:6000]
+            
+        chunk_vectors = []
+        valid_chunks = []
+        for c in chunks:
+            cv = get_embedding(c)
+            if cv:
+                chunk_vectors.append(cv)
+                valid_chunks.append(c)
+                
+        if not chunk_vectors:
+            return document_text[:6000]
+            
+        similarities = [cosine_similarity(query_vector, cv) for cv in chunk_vectors]
+        ranked_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)
+        top_k = min(3, len(ranked_indices))
+        relevant = [valid_chunks[idx] for idx in ranked_indices[:top_k]]
+        return "\n\n---\n\n".join(relevant)
+    except Exception as e:
+        logger.error(f"RAG failed: {e}", exc_info=True)
+        return document_text[:6000]
+
+
+def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
     """Generate questions using OpenAI API"""
     try:
         from openai import OpenAI
@@ -174,6 +315,7 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
+{format_learning_outcomes(learning_outcomes)}
 {format_lesson_context(context)}
 
 For each question, provide:
@@ -254,7 +396,7 @@ IMPORTANT:
         raise Exception(f"OpenAI generation error: {str(e)}")
 
 
-def generate_with_gemini(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None) -> List[Question]:
+def generate_with_gemini(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
     """Generate questions using Google Gemini API"""
     try:
         import google.generativeai as genai
@@ -272,6 +414,7 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
+{format_learning_outcomes(learning_outcomes)}
 {format_lesson_context(context)}
 
 For each question, provide:
@@ -339,11 +482,9 @@ IMPORTANT:
 
 def generate_with_local_llm(topic: str, level: str, n_questions: int, language: str,
                             bloom_level: Optional[str], context: Optional[str],
-                            model: Optional[str] = None) -> List[Question]:
+                            model: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
     """Generate questions using local LLM (Ollama)"""
     try:
-        import requests
-        
         ollama_model = model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
         logger.info(f"Connecting to Ollama at {LOCAL_LLM_URL} with model {ollama_model}")
         
@@ -353,6 +494,7 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
+{format_learning_outcomes(learning_outcomes)}
 {format_lesson_context(context)}
 
 For each question, provide:
@@ -522,7 +664,6 @@ def health():
 def list_ollama_models():
     """List models available in local Ollama."""
     try:
-        import requests
         resp = requests.get(f"{LOCAL_LLM_URL}/api/tags", timeout=10)
         resp.raise_for_status()
         return jsonify(resp.json()), 200
@@ -535,7 +676,6 @@ def list_ollama_models():
 def pull_ollama_model():
     """Trigger download (pull) of a specific Ollama model on demand."""
     try:
-        import requests
         data = request.get_json(force=True, silent=True) or {}
         model = data.get('model')
         stream = bool(data.get('stream', False))
@@ -630,31 +770,101 @@ def execute_generation(req: QuestionRequest) -> List[Question]:
 
 def execute_generation_single(req: QuestionRequest) -> List[Question]:
     backend = req.backend or LLM_BACKEND
-    if backend == 'openai':
-        effective_openai_key = req.openai_api_key or OPENAI_API_KEY
-        if not effective_openai_key:
-            raise ValueError('OpenAI API key not configured')
-        return generate_with_openai(
-            req.topic, req.level, req.n_questions,
-            req.language, req.bloom_level, req.context,
-            api_key_override=req.openai_api_key,
+    
+    # 1. RAG Vector Retrieval Step
+    if req.context and req.topic:
+        query = req.topic
+        if req.bloom_level:
+            query += " " + req.bloom_level
+        if req.learning_outcomes:
+            query += " " + req.learning_outcomes
+            
+        logger.info(f"Running RAG search with query: '{query}'")
+        
+        api_key = None
+        if backend == 'openai':
+            api_key = req.openai_api_key or OPENAI_API_KEY
+        elif backend == 'gemini':
+            api_key = req.gemini_api_key or GEMINI_API_KEY
+            
+        retrieved = retrieve_relevant_context(
+            query=query,
+            document_text=req.context,
+            backend=backend,
+            api_key_override=api_key,
+            local_model=req.model
         )
-    if backend == 'gemini':
-        effective_gemini_key = req.gemini_api_key or GEMINI_API_KEY
-        if not effective_gemini_key:
-            raise ValueError('Gemini API key not configured')
-        return generate_with_gemini(
-            req.topic, req.level, req.n_questions,
-            req.language, req.bloom_level, req.context,
-            api_key_override=req.gemini_api_key,
-        )
-    if backend == 'local':
-        return generate_with_local_llm(
-            req.topic, req.level, req.n_questions,
-            req.language, req.bloom_level, req.context,
-            model=req.model,
-        )
-    raise ValueError(f'Unknown backend: {backend}')
+        if retrieved:
+            req.context = retrieved
+            
+    # 2. Try generating with retry loop for code/syntax validation
+    from code_validator import validate_question
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            questions = []
+            if backend == 'openai':
+                effective_openai_key = req.openai_api_key or OPENAI_API_KEY
+                if not effective_openai_key:
+                    raise ValueError('OpenAI API key not configured')
+                questions = generate_with_openai(
+                    req.topic, req.level, req.n_questions,
+                    req.language, req.bloom_level, req.context,
+                    api_key_override=req.openai_api_key,
+                    learning_outcomes=req.learning_outcomes
+                )
+            elif backend == 'gemini':
+                effective_gemini_key = req.gemini_api_key or GEMINI_API_KEY
+                if not effective_gemini_key:
+                    raise ValueError('Gemini API key not configured')
+                questions = generate_with_gemini(
+                    req.topic, req.level, req.n_questions,
+                    req.language, req.bloom_level, req.context,
+                    api_key_override=req.gemini_api_key,
+                    learning_outcomes=req.learning_outcomes
+                )
+            elif backend == 'local':
+                questions = generate_with_local_llm(
+                    req.topic, req.level, req.n_questions,
+                    req.language, req.bloom_level, req.context,
+                    model=req.model,
+                    learning_outcomes=req.learning_outcomes
+                )
+            else:
+                raise ValueError(f'Unknown backend: {backend}')
+                
+            # 3. Validate generated questions
+            valid_questions = []
+            all_valid = True
+            for q in questions:
+                is_valid, err = validate_question(
+                    question_text=q.question,
+                    choices=[c.text for c in q.choices],
+                    correct_index=q.correct_index,
+                    topic=req.topic
+                )
+                if is_valid:
+                    valid_questions.append(q)
+                else:
+                    logger.warning(f"Generated question failed validation: {err}")
+                    all_valid = False
+            
+            if all_valid and len(valid_questions) == len(questions):
+                return questions
+            
+            if attempt == max_retries - 1:
+                logger.warning(f"Max retries reached. Returning {len(valid_questions)} valid questions.")
+                if not valid_questions:
+                    raise ValueError("All generated questions failed compilation/syntax validation checks.")
+                return valid_questions
+                
+            logger.info(f"Retrying question generation (attempt {attempt + 2}/{max_retries}) due to compilation/validation errors...")
+            
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise e
+            logger.warning(f"Error during attempt {attempt + 1}: {e}. Retrying...")
 
 
 def post_moodle_webhook(webhook_url: str, webhook_token: str, body: dict) -> None:
@@ -668,7 +878,7 @@ def post_moodle_webhook(webhook_url: str, webhook_token: str, body: dict) -> Non
         body.get('status'),
         body.get('request_uuid'),
     )
-    resp = http_requests.post(
+    resp = requests.post(
         webhook_url,
         json=body,
         headers=headers,

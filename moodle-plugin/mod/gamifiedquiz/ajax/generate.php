@@ -34,6 +34,75 @@ try {
 // Ensure we have database access
 global $DB, $CFG, $USER;
 
+// Check for action
+$action = optional_param('action', '', PARAM_ALPHAEXT);
+if ($action === 'get_structure') {
+    try {
+        require_login();
+        $target_cmid = required_param('target_cmid', PARAM_INT);
+        $cm = get_coursemodule_from_id('', $target_cmid, 0, false, MUST_EXIST);
+        
+        $structure = [];
+        if ($cm->modname === 'book') {
+            $chapters = $DB->get_records('book_chapters', array('bookid' => $cm->instance), 'pagenum ASC');
+            if ($chapters) {
+                $structure_list = [];
+                foreach ($chapters as $ch) {
+                    $structure_list[] = array(
+                        'id' => (int)$ch->id,
+                        'title' => $ch->title,
+                        'subchapter' => (int)$ch->subchapter,
+                        'subitems' => []
+                    );
+                }
+                
+                $nested = [];
+                $last_main_idx = -1;
+                foreach ($structure_list as $item) {
+                    if (!$item['subchapter']) {
+                        $nested[] = $item;
+                        $last_main_idx = count($nested) - 1;
+                    } else {
+                        if ($last_main_idx >= 0) {
+                            $nested[$last_main_idx]['subitems'][] = array(
+                                'id' => $item['id'],
+                                'title' => $item['title']
+                            );
+                        } else {
+                            $nested[] = $item;
+                        }
+                    }
+                }
+                $structure = $nested;
+            }
+        } else if ($cm->modname === 'lesson') {
+            $pages = $DB->get_records('lesson_pages', array('lessonid' => $cm->instance), 'id ASC');
+            if ($pages) {
+                foreach ($pages as $p) {
+                    $structure[] = array(
+                        'id' => (int)$p->id,
+                        'title' => $p->title,
+                        'subitems' => []
+                    );
+                }
+            }
+        }
+        
+        echo json_encode(array(
+            'success' => true,
+            'structure' => $structure
+        ));
+        exit;
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(array(
+            'success' => false,
+            'error' => $e->getMessage()
+        ));
+        exit;
+    }
+}
+
 // Get parameters
 $quizid = required_param('quizid', PARAM_INT);
 $cmid = optional_param('cmid', 0, PARAM_INT);
@@ -44,6 +113,11 @@ $count = optional_param('count', 5, PARAM_INT);
 $async = optional_param('async', 1, PARAM_INT);
 $batchid = optional_param('batch_id', '', PARAM_TEXT);
 $categoryname = optional_param('category_name', '', PARAM_TEXT);
+$learning_outcomes = optional_param('learning_outcomes', '', PARAM_TEXT);
+$rag_source = optional_param('rag_source', '', PARAM_TEXT);
+$rag_topic_id = optional_param('rag_topic_id', 0, PARAM_INT);
+$rag_subitem_id = optional_param('rag_subitem_id', 0, PARAM_INT);
+
 // Must match llmapi MAX_QUESTIONS (docker-compose / .env).
 $maxquestionsperrequest = 20;
 $count = min(max(1, (int)$count), $maxquestionsperrequest);
@@ -91,6 +165,27 @@ try {
     $topic = !empty($prompt) ? $prompt : $gamifiedquiz->topic;
     $level = !empty($difficulty) ? $difficulty : $gamifiedquiz->difficulty;
     $predefined_data = !empty($data) ? $data : '';
+    $learning_outcomes = !empty($learning_outcomes) ? $learning_outcomes : (isset($gamifiedquiz->learning_outcomes) ? $gamifiedquiz->learning_outcomes : '');
+
+    // Fetch RAG content if requested
+    if (!empty($rag_source)) {
+        $rag_text = '';
+        if ($rag_source === 'auto') {
+            $preceding_cmid = gamifiedquiz_get_preceding_activity_cmid($cmid ?: $quizid);
+            if ($preceding_cmid) {
+                $rag_text = gamifiedquiz_get_module_text_content($preceding_cmid);
+            }
+        } else if (strpos($rag_source, 'cmid_') === 0) {
+            $source_cmid = (int) substr($rag_source, 5);
+            if ($source_cmid > 0) {
+                $rag_text = gamifiedquiz_get_module_text_content($source_cmid, $rag_topic_id, $rag_subitem_id);
+            }
+        }
+        if (!empty($rag_text)) {
+            $predefined_data = $rag_text;
+        }
+    }
+
     $llmmodel = property_exists($gamifiedquiz, 'llm_model') ? $gamifiedquiz->llm_model : '';
     $userapikey = gamifiedquiz_get_user_llm_api_key($backend, $USER->id);
 
@@ -112,7 +207,8 @@ try {
             $llmmodel,
             $userapikey,
             $categoryname,
-            $batchid
+            $batchid,
+            $learning_outcomes
         );
         if (isset($queued['error'])) {
             http_response_code(500);
@@ -164,7 +260,8 @@ try {
         $backend,
         $predefined_data,
         $llmmodel,
-        $userapikey
+        $userapikey,
+        $learning_outcomes
     );
 
     // Check if result contains an error

@@ -3,7 +3,7 @@
 This guide provides step-by-step instructions for setting up the project on Windows.
 
 ## Prerequisites
-
+ 
 ### 1. Install Docker Desktop for Windows
 
 1. **Download Docker Desktop**:

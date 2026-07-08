@@ -95,6 +95,9 @@ async function callLlmGenerate(job, nQuestions, meta = {}) {
     language: job.language,
     backend: job.backend,
   };
+  if (job.learning_outcomes) {
+    payload.learning_outcomes = job.learning_outcomes;
+  }
   if (job.lesson_context) {
     payload.context = job.lesson_context;
   }

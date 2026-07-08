@@ -445,6 +445,16 @@ function xmldb_gamifiedquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025010118, 'gamifiedquiz');
     }
 
+    if ($oldversion < 2025010119) {
+        $table = new xmldb_table('gamifiedquiz');
+        $field = new xmldb_field('learning_outcomes', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'categories_data');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2025010119, 'gamifiedquiz');
+    }
+
     // Return true to indicate upgrade was successful
     return true;
 }

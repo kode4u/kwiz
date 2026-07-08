@@ -21,6 +21,7 @@ python3 evaluate/llm-evaluation/run_batch_evaluation.py
 - Domains: `evaluate/llm-evaluation/DOMAINS.md`
 - Full pipeline (metrics + 2 experts): `evaluate/llm-evaluation/README.md`
 - Rubric: `evaluate/quality-expert/rubric_binary_mcq.md`
+- Concurrent WebSocket: `evaluate/websocket-latency/README.md`
 
 ## Read results
 

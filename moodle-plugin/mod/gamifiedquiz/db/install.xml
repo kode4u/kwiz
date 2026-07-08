@@ -22,6 +22,7 @@
         <FIELD NAME="predefined_data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="questions_data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="categories_data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: saved multi-category generation form"/>
+        <FIELD NAME="learning_outcomes" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Target learning outcomes for the quiz"/>
         <FIELD NAME="time_limit_per_question" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="60" SEQUENCE="false" COMMENT="Time limit per question in seconds"/>
         <FIELD NAME="leaderboard_top_n" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="3" SEQUENCE="false" COMMENT="Number of top students to show in leaderboard"/>
         <FIELD NAME="question_category" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Question bank category ID"/>

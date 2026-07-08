@@ -1046,6 +1046,74 @@
                     }
                 });
 
+                // Initialize RAG nested selection logic
+                const ragSelect = document.getElementById('generate-rag-source');
+                const nestedContainer = document.getElementById('rag-nested-selection-container');
+                const topicSelect = document.getElementById('rag-topic-select');
+                const subitemWrapper = document.getElementById('rag-subitem-wrapper');
+                const subitemSelect = document.getElementById('rag-subitem-select');
+                
+                let currentStructure = null;
+                
+                if (ragSelect && nestedContainer && topicSelect && subitemWrapper && subitemSelect) {
+                    ragSelect.addEventListener('change', async () => {
+                        const val = ragSelect.value;
+                        if (val && val.startsWith('cmid_')) {
+                            const targetCmid = val.split('_')[1];
+                            topicSelect.innerHTML = '<option value="">-- Loading structure... --</option>';
+                            nestedContainer.style.display = 'flex';
+                            subitemWrapper.style.display = 'none';
+                            
+                            try {
+                                const response = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/generate.php?action=get_structure&target_cmid=${targetCmid}`);
+                                const data = await response.json();
+                                if (data.success && data.structure && data.structure.length > 0) {
+                                    currentStructure = data.structure;
+                                    
+                                    let topicOptions = '<option value="">-- All Topics / Full Book --</option>';
+                                    data.structure.forEach(item => {
+                                        topicOptions += `<option value="${item.id}">${escapeHtml(item.title)}</option>`;
+                                    });
+                                    topicSelect.innerHTML = topicOptions;
+                                } else {
+                                    nestedContainer.style.display = 'none';
+                                    currentStructure = null;
+                                }
+                            } catch (err) {
+                                console.error('Failed to load activity structure:', err);
+                                nestedContainer.style.display = 'none';
+                                currentStructure = null;
+                            }
+                        } else {
+                            nestedContainer.style.display = 'none';
+                            subitemWrapper.style.display = 'none';
+                            currentStructure = null;
+                        }
+                    });
+                    
+                    topicSelect.addEventListener('change', () => {
+                        const topicId = parseInt(topicSelect.value);
+                        if (!topicId || !currentStructure) {
+                            subitemWrapper.style.display = 'none';
+                            subitemSelect.innerHTML = '<option value="">-- All Subitems --</option>';
+                            return;
+                        }
+                        
+                        const selectedChapter = currentStructure.find(item => item.id === topicId);
+                        if (selectedChapter && selectedChapter.subitems && selectedChapter.subitems.length > 0) {
+                            let subitemOptions = '<option value="">-- All Subitems --</option>';
+                            selectedChapter.subitems.forEach(sub => {
+                                subitemOptions += `<option value="${sub.id}">${escapeHtml(sub.title)}</option>`;
+                            });
+                            subitemSelect.innerHTML = subitemOptions;
+                            subitemWrapper.style.display = 'block';
+                        } else {
+                            subitemWrapper.style.display = 'none';
+                            subitemSelect.innerHTML = '<option value="">-- All Subitems --</option>';
+                        }
+                    });
+                }
+
                 multiCategoryInitDone = true;
             }
 
@@ -1065,6 +1133,14 @@
             const topicValue = cat && cat.topic ? cat.topic : (config.topic || '');
             const difficultyValue = cat && cat.difficulty ? cat.difficulty : (config.difficulty || 'medium');
             const countValue = cat && cat.count ? String(cat.count) : '5';
+            const outcomesValue = cat && cat.learning_outcomes ? cat.learning_outcomes : (config.learningOutcomes || '');
+            let presetOptionsHtml = '<option value="">-- Load from course label or outcome --</option>';
+            if (config.courseOutcomesOptions && Array.isArray(config.courseOutcomesOptions)) {
+                config.courseOutcomesOptions.forEach(opt => {
+                    presetOptionsHtml += `<option value="${escapeAttr(opt.content)}">${escapeHtml(opt.name)}</option>`;
+                });
+            }
+
             categoryDiv.innerHTML = `
                 <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center;">
                     <div>
@@ -1104,6 +1180,20 @@
                                 style="margin-top: 25px;">Remove</button>
                     </div>
                 </div>
+                <div style="margin-top: 10px; display: grid; grid-template-columns: 2fr 1fr; gap: 10px; align-items: flex-end;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Learning Outcomes (Optional):</label>
+                        <input type="text" class="category-outcomes-input" placeholder="e.g., Explain polymorphism, solve inheritance problems" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" 
+                               value="${escapeAttr(outcomesValue)}">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Or load from preset:</label>
+                        <select class="category-outcomes-select" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            ${presetOptionsHtml}
+                        </select>
+                    </div>
+                </div>
             `;
             
             categoryList.appendChild(categoryDiv);
@@ -1113,6 +1203,17 @@
             removeBtn.addEventListener('click', () => {
                 categoryDiv.remove();
             });
+
+            // Preset dropdown change listener
+            const outcomesSelect = categoryDiv.querySelector('.category-outcomes-select');
+            const outcomesInput = categoryDiv.querySelector('.category-outcomes-input');
+            if (outcomesSelect && outcomesInput) {
+                outcomesSelect.addEventListener('change', () => {
+                    if (outcomesSelect.value) {
+                        outcomesInput.value = outcomesSelect.value;
+                    }
+                });
+            }
         }
         
         async function generateAllCategories(config) {
@@ -1126,11 +1227,12 @@
             categoryRows.forEach(row => {
                 const name = row.querySelector('.category-name-input')?.value.trim() || 'Default';
                 const topic = row.querySelector('.category-topic-input')?.value.trim() || config.topic || '';
+                const outcomes = row.querySelector('.category-outcomes-input')?.value.trim() || '';
                 const difficulty = row.querySelector('.category-difficulty-input')?.value || config.difficulty || 'medium';
                 const count = parseInt(row.querySelector('.category-count-input')?.value || '5');
                 
                 if (topic) {
-                    categories.push({ name, topic, difficulty, count });
+                    categories.push({ name, topic, learning_outcomes: outcomes, difficulty, count });
                 }
             });
             
@@ -1140,6 +1242,7 @@
             }
 
             const sharedLessonText = document.getElementById('generate-lesson-content')?.value.trim() || '';
+            const ragSource = document.getElementById('generate-rag-source')?.value || '';
             await saveGenerationPrefs(config, categories, sharedLessonText);
             
             // Show loading
@@ -1171,11 +1274,23 @@
                     formData.append('cmid', config.cmId);
                     formData.append('sesskey', sesskey);
                     formData.append('prompt', category.topic);
+                    formData.append('learning_outcomes', category.learning_outcomes || '');
                     formData.append('difficulty', category.difficulty);
                     formData.append('count', category.count);
                     formData.append('category_name', category.name);
                     formData.append('async', '1');
                     formData.append('batch_id', batchId);
+                    if (ragSource) {
+                        formData.append('rag_source', ragSource);
+                        const topicId = document.getElementById('rag-topic-select')?.value || '';
+                        const subitemId = document.getElementById('rag-subitem-select')?.value || '';
+                        if (topicId) {
+                            formData.append('rag_topic_id', topicId);
+                        }
+                        if (subitemId) {
+                            formData.append('rag_subitem_id', subitemId);
+                        }
+                    }
                     if (sharedLessonText) {
                         formData.append('data', sharedLessonText);
                     }

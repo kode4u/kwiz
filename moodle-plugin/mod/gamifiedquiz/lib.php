@@ -406,7 +406,7 @@ function gamifiedquiz_local_generation_batch_size() {
  * @param string $userapikey Optional per-user API key
  * @return array Generated questions or array with 'error' key
  */
-function gamifiedquiz_generate_questions_request($topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey) {
+function gamifiedquiz_generate_questions_request($topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes = '') {
     $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
     if (empty($api_url)) {
         $api_url = 'http://llmapi:5001';
@@ -423,6 +423,10 @@ function gamifiedquiz_generate_questions_request($topic, $level, $n_questions, $
         'language' => $language,
         'backend' => $backend,
     );
+
+    if (!empty($learning_outcomes)) {
+        $data['learning_outcomes'] = $learning_outcomes;
+    }
 
     if (!empty($predefined_data)) {
         $data['context'] = $predefined_data;
@@ -498,7 +502,7 @@ function gamifiedquiz_generate_questions_request($topic, $level, $n_questions, $
  * @param string $llmmodel Optional local LLM model name (for backend = local)
  * @return array|false Generated questions or false on error
  */
-function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '') {
+function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '', $learning_outcomes = '') {
     $batchsize = gamifiedquiz_local_generation_batch_size();
     if ($backend === 'local' && $n_questions > $batchsize) {
         $all = array();
@@ -506,7 +510,7 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
         while ($remaining > 0) {
             $batch = min($batchsize, $remaining);
             $chunk = gamifiedquiz_generate_questions_request(
-                $topic, $level, $batch, $language, $backend, $predefined_data, $llmmodel, $userapikey
+                $topic, $level, $batch, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes
             );
             if (isset($chunk['error'])) {
                 if (!empty($all)) {
@@ -521,7 +525,7 @@ function gamifiedquiz_generate_questions($topic, $level = 'medium', $n_questions
     }
 
     return gamifiedquiz_generate_questions_request(
-        $topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey
+        $topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes
     );
 }
 
@@ -819,7 +823,7 @@ function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
  * @return array Job info with request_uuid or error
  */
 function gamifiedquiz_enqueue_generation_job($gamifiedquiz, $userid, $cmid, $topic, $level, $count, $language,
-        $backend, $lessoncontext, $llmmodel, $userapikey, $categoryname, $batchid) {
+        $backend, $lessoncontext, $llmmodel, $userapikey, $categoryname, $batchid, $learning_outcomes = '') {
     global $DB;
 
     $apiurl = get_config('mod_gamifiedquiz', 'llmapi_url');
@@ -868,7 +872,8 @@ function gamifiedquiz_enqueue_generation_job($gamifiedquiz, $userid, $cmid, $top
         $backend,
         $lessoncontext,
         $llmmodel,
-        $userapikey
+        $userapikey,
+        $learning_outcomes
     );
     if (isset($dispatch['error'])) {
         $fail = new stdClass();
@@ -904,10 +909,11 @@ function gamifiedquiz_enqueue_generation_job($gamifiedquiz, $userid, $cmid, $top
  * @param string $lessoncontext Optional lesson text
  * @param string $llmmodel Local model name
  * @param string $userapikey Cloud API key
+ * @param string $learning_outcomes Optional learning outcomes
  * @return array status or error
  */
 function gamifiedquiz_dispatch_llm_async_job($logid, $requestuuid, $apiurl, $topic, $level, $count, $language,
-        $backend, $lessoncontext, $llmmodel, $userapikey) {
+        $backend, $lessoncontext, $llmmodel, $userapikey, $learning_outcomes = '') {
     global $DB;
 
     $token = gamifiedquiz_worker_token();
@@ -925,6 +931,9 @@ function gamifiedquiz_dispatch_llm_async_job($logid, $requestuuid, $apiurl, $top
         'webhook_url' => gamifiedquiz_generation_webhook_url(),
         'webhook_token' => $token,
     );
+    if (!empty($learning_outcomes)) {
+        $payload['learning_outcomes'] = $learning_outcomes;
+    }
     if (!empty($lessoncontext)) {
         $payload['context'] = $lessoncontext;
     }
@@ -1914,4 +1923,140 @@ function mod_gamifiedquiz_output_fragment_question_bank($args): string {
     // Output using core question bank renderer
     $renderer = $PAGE->get_renderer('core_question', 'bank');
     return $renderer->render($questionbank);
+}
+
+/**
+ * Retrieve text content of a Moodle course module (page, lesson, book) for RAG.
+ *
+ * @param int $cmid Course module ID
+ * @return string Plain text content of the module
+ */
+function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id = 0) {
+    global $DB;
+    
+    try {
+        $cm = get_coursemodule_from_id('', $cmid, 0, false, IGNORE_MISSING);
+        if (!$cm) {
+            return '';
+        }
+        
+        $content = '';
+        
+        if ($cm->modname === 'page') {
+            $page = $DB->get_record('page', array('id' => $cm->instance));
+            if ($page) {
+                $content = $page->content;
+            }
+        } else if ($cm->modname === 'lesson') {
+            if ($topic_id > 0) {
+                $page = $DB->get_record('lesson_pages', array('id' => $topic_id));
+                if ($page) {
+                    $content = $page->contents;
+                }
+            } else {
+                $pages = $DB->get_records('lesson_pages', array('lessonid' => $cm->instance));
+                if ($pages) {
+                    foreach ($pages as $p) {
+                        $content .= $p->contents . "\n\n";
+                    }
+                }
+            }
+        } else if ($cm->modname === 'book') {
+            if ($subitem_id > 0) {
+                $chapter = $DB->get_record('book_chapters', array('id' => $subitem_id));
+                if ($chapter) {
+                    $content = $chapter->content;
+                }
+            } else if ($topic_id > 0) {
+                $chapter = $DB->get_record('book_chapters', array('id' => $topic_id));
+                if ($chapter) {
+                    $content = $chapter->content . "\n\n";
+                    // Also gather subchapters of this chapter
+                    $chapters = $DB->get_records('book_chapters', array('bookid' => $cm->instance), 'pagenum ASC');
+                    $collect = false;
+                    foreach ($chapters as $ch) {
+                        if ($ch->id == $topic_id) {
+                            $collect = true;
+                            continue;
+                        }
+                        if ($collect) {
+                            if (!$ch->subchapter) {
+                                break;
+                            }
+                            $content .= $ch->content . "\n\n";
+                        }
+                    }
+                }
+            } else {
+                $chapters = $DB->get_records('book_chapters', array('bookid' => $cm->instance));
+                if ($chapters) {
+                    foreach ($chapters as $ch) {
+                        $content .= $ch->content . "\n\n";
+                    }
+                }
+            }
+        } else if ($cm->modname === 'resource') {
+            $context = context_module::instance($cm->id);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder', false);
+            if ($files) {
+                foreach ($files as $file) {
+                    if (!$file->is_directory() && ($file->get_mimetype() === 'text/plain' || $file->get_mimetype() === 'text/html')) {
+                        $content .= $file->get_content() . "\n\n";
+                    }
+                }
+            }
+        }
+        
+        if (!empty($content)) {
+            return html_to_text($content, 0, false);
+        }
+    } catch (Exception $e) {
+        error_log("Gamified Quiz RAG: Failed to retrieve content for cmid {$cmid}: " . $e->getMessage());
+    }
+    
+    return '';
+}
+
+/**
+ * Find the course module ID of the page/lesson/book activity preceding this quiz in the course.
+ *
+ * @param int $current_cmid The course module ID of the gamified quiz
+ * @return int|null Preceding module ID or null if none
+ */
+function gamifiedquiz_get_preceding_activity_cmid($current_cmid) {
+    global $DB;
+    
+    $current_cm = get_coursemodule_from_id('gamifiedquiz', $current_cmid, 0, false, IGNORE_MISSING);
+    if (!$current_cm) {
+        return null;
+    }
+    
+    $modinfo = get_fast_modinfo($current_cm->course);
+    $sectionmodules = $modinfo->sections;
+    
+    $all_cmids = [];
+    foreach ($sectionmodules as $section) {
+        foreach ($section as $cmid) {
+            $all_cmids[] = $cmid;
+        }
+    }
+    
+    $idx = array_search($current_cmid, $all_cmids);
+    if ($idx === false || $idx === 0) {
+        return null;
+    }
+    
+    for ($i = $idx - 1; $i >= 0; $i--) {
+        $prev_cmid = $all_cmids[$i];
+        if (!isset($modinfo->cms[$prev_cmid])) {
+            continue;
+        }
+        $prev_cm = $modinfo->cms[$prev_cmid];
+        if (in_array($prev_cm->modname, ['page', 'lesson', 'book', 'resource'])) {
+            return $prev_cmid;
+        }
+    }
+    
+    return null;
 }

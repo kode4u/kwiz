@@ -98,6 +98,54 @@ if ($background_style) {
     $background_style = 'background-image: ' . $background_style . '; background-size: cover; background-position: center;';
 }
 
+// Find RAG sources and Labels in the current course
+$modinfo = get_fast_modinfo($course->id);
+$rag_sources = [];
+$course_labels = [];
+foreach ($modinfo->cms as $cm_item) {
+    if ($cm_item->uservisible) {
+        if (in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+            $rag_sources[] = array(
+                'id' => $cm_item->id,
+                'name' => $cm_item->name,
+                'type' => $cm_item->modname
+            );
+        } else if ($cm_item->modname === 'label') {
+            $label_rec = $DB->get_record('label', array('id' => $cm_item->instance));
+            if ($label_rec && !empty($label_rec->intro)) {
+                $clean_text = html_to_text($label_rec->intro, 0, false);
+                $clean_text = trim(preg_replace('/\s+/', ' ', $clean_text));
+                if (!empty($clean_text)) {
+                    $display_name = strlen($clean_text) > 60 ? substr($clean_text, 0, 60) . '...' : $clean_text;
+                    $course_labels[] = array(
+                        'id' => $cm_item->id,
+                        'name' => $display_name . ' (Label)',
+                        'content' => $clean_text
+                    );
+                }
+            }
+        }
+    }
+}
+
+// Fetch grade outcomes
+$course_outcomes = [];
+require_once($CFG->libdir . '/gradelib.php');
+if (class_exists('grade_outcome')) {
+    $outcomes = grade_outcome::fetch_all_available($course->id);
+    if (!empty($outcomes)) {
+        foreach ($outcomes as $outcome) {
+            $course_outcomes[] = array(
+                'id' => $outcome->id,
+                'name' => $outcome->fullname . ' (Outcome)',
+                'content' => $outcome->fullname
+            );
+        }
+    }
+}
+
+$course_outcomes_options = array_merge($course_labels, $course_outcomes);
+
 // Set config before loading JS - use inline script to ensure it's available
 echo '<script>
 window.GAMIFIED_QUIZ_CONFIG = {
@@ -111,6 +159,7 @@ window.GAMIFIED_QUIZ_CONFIG = {
     quizId: ' . $gamifiedquiz->id . ',
     cmId: ' . $cm->id . ',
     topic: ' . json_encode($gamifiedquiz->topic) . ',
+    learningOutcomes: ' . json_encode(isset($gamifiedquiz->learning_outcomes) ? $gamifiedquiz->learning_outcomes : '') . ',
     difficulty: ' . json_encode($gamifiedquiz->difficulty) . ',
     language: ' . json_encode($gamifiedquiz->language) . ',
     quizName: ' . json_encode($gamifiedquiz->name) . ',
@@ -123,7 +172,9 @@ window.GAMIFIED_QUIZ_CONFIG = {
     categoriesData: ' . json_encode(isset($gamifiedquiz->categories_data) ? $gamifiedquiz->categories_data : '') . ',
     timeLimitPerQuestion: ' . (isset($gamifiedquiz->time_limit_per_question) ? intval($gamifiedquiz->time_limit_per_question) : 60) . ',
     leaderboardTopN: ' . (isset($gamifiedquiz->leaderboard_top_n) ? intval($gamifiedquiz->leaderboard_top_n) : 3) . ',
-    questionBackgroundStyle: ' . json_encode($background_style) . '
+    questionBackgroundStyle: ' . json_encode($background_style) . ',
+    ragSources: ' . json_encode($rag_sources) . ',
+    courseOutcomesOptions: ' . json_encode($course_outcomes_options) . '
 };
 </script>';
 
@@ -212,8 +263,27 @@ if ($is_teacher) {
     echo '</div>';
 
     echo '<div id="lesson-content-section" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #ddd;">';
-    echo '<label for="generate-lesson-content" style="display: block; margin-bottom: 5px; font-weight: bold;">' . get_string('lesson_content', 'mod_gamifiedquiz') . ' <span style="font-weight: normal; color: #666;">(' . get_string('optional', 'core') . ')</span></label>';
-    echo '<textarea id="generate-lesson-content" name="lesson" rows="8" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;" placeholder="' . s(get_string('lesson_content_placeholder', 'mod_gamifiedquiz')) . '"></textarea>';
+    echo '<label for="generate-rag-source" style="display: block; margin-bottom: 5px; font-weight: bold;">RAG Context (Course Materials):</label>';
+    echo '<select id="generate-rag-source" name="rag_source" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 15px;">';
+    echo '<option value="">-- Do not use RAG (generate from topic/outcomes only) --</option>';
+    echo '<option value="auto">Auto-detect (Current/Preceding Activity)</option>';
+    foreach ($rag_sources as $src) {
+        $type_label = ucfirst($src['type']);
+        echo '<option value="cmid_' . $src['id'] . '">' . s($src['name']) . ' (' . $type_label . ')</option>';
+    }
+    echo '</select>';
+    echo '<div id="rag-nested-selection-container" style="display: none; margin-bottom: 15px; padding: 10px; background: #e9ecef; border-radius: 6px; border: 1px solid #ced4da; flex-direction: row; gap: 10px;">';
+    echo '  <div style="flex: 1;">';
+    echo '    <label for="rag-topic-select" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Topic / Page:</label>';
+    echo '    <select id="rag-topic-select" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;"><option value="">-- All Topics --</option></select>';
+    echo '  </div>';
+    echo '  <div id="rag-subitem-wrapper" style="flex: 1; display: none;">';
+    echo '    <label for="rag-subitem-select" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Subitem / Subchapter:</label>';
+    echo '    <select id="rag-subitem-select" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;"><option value="">-- All Subitems --</option></select>';
+    echo '  </div>';
+    echo '</div>';
+    echo '<label for="generate-lesson-content" style="display: block; margin-bottom: 5px; font-weight: bold;">Or paste custom lesson content: <span style="font-weight: normal; color: #666;">(' . get_string('optional', 'core') . ')</span></label>';
+    echo '<textarea id="generate-lesson-content" name="lesson" rows="6" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;" placeholder="' . s(get_string('lesson_content_placeholder', 'mod_gamifiedquiz')) . '"></textarea>';
     echo '<p style="margin: 8px 0 0; font-size: 13px; color: #666;">' . get_string('lesson_content_help', 'mod_gamifiedquiz') . '</p>';
     echo '</div>';
     

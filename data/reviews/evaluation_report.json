@@ -1,0 +1,81 @@
+{
+  "evaluation_date": "2026-05-29",
+  "ground_truth": "Expert 1 (rating_sheet_expert1.csv)",
+  "study_n": 95,
+  "target_n": 125,
+  "expert_quality": {
+    "prompt_adherence_pct": 100.0,
+    "accuracy_pct": 96.84,
+    "acceptable_count": 92,
+    "semantic_correctness_pct": 98.95,
+    "answer_key_correctness_pct": 97.89,
+    "question_clarity_pct": 100.0
+  },
+  "by_domain": {
+    "C++ Programming": {
+      "n": 15,
+      "accuracy_pct": 86.7,
+      "prompt_adherence_pct": 100.0
+    },
+    "Data Structures": {
+      "n": 25,
+      "accuracy_pct": 100.0,
+      "prompt_adherence_pct": 100.0
+    },
+    "Database Systems": {
+      "n": 15,
+      "accuracy_pct": 100.0,
+      "prompt_adherence_pct": 100.0
+    },
+    "Java Programming": {
+      "n": 20,
+      "accuracy_pct": 100.0,
+      "prompt_adherence_pct": 100.0
+    },
+    "Python Programming": {
+      "n": 20,
+      "accuracy_pct": 95.0,
+      "prompt_adherence_pct": 100.0
+    }
+  },
+  "failed_items": [
+    {
+      "item_id": "Q001",
+      "domain": "C++ Programming",
+      "subtopic": "Variables & Data Types",
+      "notes": "Relevant, semantically correct, clear question, and acceptable."
+    },
+    {
+      "item_id": "Q003",
+      "domain": "C++ Programming",
+      "subtopic": "Variables & Data Types",
+      "notes": "Answer key issue: both \"const int x = 5;\" and \"int const x = 5;\" are valid C++ syntax, so the item is ambiguous."
+    },
+    {
+      "item_id": "Q029",
+      "domain": "Python Programming",
+      "subtopic": "Lists & Dictionaries",
+      "notes": "list.pop() and list.pop(-1) get the same result"
+    }
+  ],
+  "llm_deployment": {
+    "framework": "Ollama",
+    "gpu": "NVIDIA GeForce RTX 3090 24576 MiB",
+    "os": "Windows-10-10.0.26200-SP0"
+  },
+  "llm_latency": {
+    "run_id_prefix": "67852aeb",
+    "n_jobs": 23,
+    "mean_s": 2.4,
+    "median_s": 2.28,
+    "p95_s": 3.16,
+    "note": "Run 2026-05-29 12:28 UTC, 115 questions generated, 10 short of 125"
+  },
+  "websocket": {},
+  "poster_bullets": [
+    "Ollama + local LLM on NVIDIA GeForce RTX 3090 24576 MiB",
+    "95 prompts (5 CS domains); mean 2.4 s/Q (p95 3.16 s)",
+    "Prompt adherence 100.0% | Expert accuracy 96.84% (92/95)",
+    "WebSocket: [run concurrent test]"
+  ]
+}
