@@ -36,8 +36,7 @@ graph TD
         Cache -->|Pass slide vectors| Cos
     end
 
-    Plugin -->|2. Ingest Slides| Doc
-    Plugin -->|3. Query Topic| EmbedQuery
+    Plugin -->|2. Send Slides & Query| AIEngine
 
     %% Output Flow
     MCQ -->|4. SQL DB Import| Bank[(Moodle Question Bank)]
