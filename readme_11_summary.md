@@ -22,7 +22,9 @@ graph TD
         direction TB
         subgraph Row1 [Phase 1: Ingestion & Vector Caching]
             direction LR
-            Doc[Slides: PDF/Text] --> Prep[Pre-processing] --> Split[Line Splitter] --> Hash[SHA-256 Cache]
+            Doc[Slides: PDF/Text] --> Prep[Pre-processing] --> Split[Line Splitter] --> CacheCheck{Cache Hit?}
+            CacheCheck -->|No| Embed["Embedding Model <br/> (nomic-embed-text)"] --> Cache[(Local Vector Cache)]
+            CacheCheck -->|Yes: 0ms| Cache
         end
 
         subgraph Row2 [Phase 2: RAG Search & LLM Generation]
@@ -31,7 +33,7 @@ graph TD
             Cos --> Fetch[Fetch Chunks] --> Prompt[Prompt Template] --> LLM[Local qwen2.5-coder] --> MCQ[Generated MCQs]
         end
 
-        Hash -->|Pass slide vectors| Cos
+        Cache -->|Pass slide vectors| Cos
     end
 
     Plugin -->|2. Ingest Slides| Doc
