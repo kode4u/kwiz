@@ -4,38 +4,56 @@ This document contains landscape-optimized presentation slide modules customized
 
 ---
 
-## 🎴 Slide 1: L3M-RAG Pipeline (Main Contributions Flow)
-A landscape system flow highlighting the three main engineering contributions of the project:
+## 🎴 Slide 1: System Conceptual Architecture
+A landscape system architecture diagram demonstrating the integration of the gamified Moodle plugin and the local RAG-LLM question generation engine:
 
 ```mermaid
-graph LR
-    classDef contrib fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;
-    classDef step fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+graph TD
+    classDef actor fill:#e0f7fa,stroke:#00acc1,stroke-width:2px;
+    classDef plugin fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+    classDef engine fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+    classDef output fill:#eceff1,stroke:#607d8b,stroke-width:2px;
 
-    subgraph Col1 [1. Pre-processing & Vector Cache]
-        direction TB
-        Doc[Lecture Slides <br/> PDF or Text] --> Prep[Pre-processing & Sanitization]
-        Prep --> Split[Line-Preserving Splitter]
-        Split --> Hash[SHA-256 Vector Cache]
+    %% Entry Actor
+    Inst[Instructor] -->|1. Request MCQ Gen| Plugin[Gamified Moodle Quiz Plugin]
+
+    %% Internal AI Engine Call
+    subgraph AIEngine [Local AI Ingestion & Generation Engine]
+        direction LR
+        subgraph Col1 [1. Pre-processing & Vector Cache]
+            direction TB
+            Doc[Lecture Slides <br/> PDF or Text] --> Prep[Pre-processing & Sanitization]
+            Prep --> Split[Line-Preserving Splitter]
+            Split --> Hash[SHA-256 Vector Cache]
+        end
+
+        subgraph Col2 [2. RAG Pipeline]
+            direction TB
+            EmbedQuery[Embed Query Topic] --> Cos["Cosine Similarity Match <br/> <img src='/Users/engtitya/Desktop/kwiz/sim_formula.png' width='180' />"]
+            Cos --> Fetch[Fetch Text Chunks from Cache DB]
+        end
+
+        subgraph Col3 [3. LLM & Prompt Engineering]
+            direction TB
+            Prompt[Prompt Template Formatting] --> LLM[Local qwen2.5-coder Gen]
+            LLM --> MCQ[Generated MCQ Questions]
+        end
+
+        Hash -->|Pass vectors| Cos
+        Fetch -->|Pass text chunks| Prompt
     end
 
-    subgraph Col2 [2. RAG Pipeline]
-        direction TB
-        EmbedQuery[Embed Query Topic] --> Cos["Cosine Similarity Match <br/> <img src='/Users/engtitya/Desktop/kwiz/sim_formula.png' width='180' />"]
-        Cos --> Fetch[Fetch Text Chunks from Cache DB]
-    end
+    Plugin -->|2. Ingest Slides & Query| Doc
+    Plugin -->|3. Trigger RAG Query| EmbedQuery
 
-    subgraph Col3 [3. LLM & Prompt Engineering]
-        direction TB
-        Prompt[Prompt Template Formatting] --> LLM[Local qwen2.5-coder Gen]
-        LLM --> DB[(Generated MCQ Questions)]
-    end
+    %% Output Flow
+    MCQ -->|4. SQL DB Import| Bank[(Moodle Question Bank)]
+    Bank -->|5. Deliver Quiz| StudentQuiz[Gamified Quiz Activity]
 
-    Hash -->|Pass vectors| Cos
-    Fetch -->|Pass text chunks| Prompt
-
-    class Prep,Split,Hash,Prompt contrib;
-    class Doc,EmbedQuery,Cos,Fetch,LLM,DB step;
+    class Inst actor;
+    class Plugin,StudentQuiz plugin;
+    class Col1,Col2,Col3 engine;
+    class Bank output;
 ```
 
 **Key Execution Details:**
