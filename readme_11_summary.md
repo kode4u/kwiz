@@ -98,3 +98,8 @@ We measure and compare each configuration across:
 *   **Java Programming:** **100.0%** acceptability (accurate OOP representation)
 *   **Python Programming:** **95.0%** acceptability (clean indentation structure)
 *   **C++ Programming:** **86.7%** acceptability (minor code snippet syntax variations)
+
+**3. Acceptability Breakdown by MCQ Type (Cognitive & Coding Levels):**
+*   **Programming Theory & Concepts:** **100.0%** (Definitions, logic, OOP concepts)
+*   **Syntax & Code Reading:** **96.0%** (Finding syntax errors, block structure checks)
+*   **Code Execution & Tracing:** **92.0%** (Calculating the final output of execution loops)
