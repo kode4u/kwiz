@@ -19,32 +19,23 @@ graph TD
 
     %% Internal AI Engine Call
     subgraph AIEngine [Local AI Ingestion & Generation Engine]
-        direction LR
-        subgraph Col1 [1. Pre-processing & Vector Cache]
-            direction TB
-            Doc[Lecture Slides <br/> PDF or Text] --> Prep[Pre-processing & Sanitization]
-            Prep --> Split[Line-Preserving Splitter]
-            Split --> Hash[SHA-256 Vector Cache]
+        direction TB
+        subgraph Row1 [Phase 1: Ingestion & Vector Caching]
+            direction LR
+            Doc[Slides: PDF/Text] --> Prep[Sanitization] --> Split[Line Splitter] --> Hash[SHA-256 Cache]
         end
 
-        subgraph Col2 [2. RAG Pipeline]
-            direction TB
-            EmbedQuery[Embed Query Topic] --> Cos["Cosine Similarity Match <br/> <img src='/Users/engtitya/Desktop/kwiz/sim_formula.png' width='180' />"]
-            Cos --> Fetch[Fetch Text Chunks from Cache DB]
+        subgraph Row2 [Phase 2: RAG Search & LLM Generation]
+            direction LR
+            EmbedQuery[Embed Query] --> Cos["Cosine Similarity <br/> <img src='/Users/engtitya/Desktop/kwiz/sim_formula.png' width='130' />"]
+            Cos --> Fetch[Fetch Chunks] --> Prompt[Prompt Template] --> LLM[Local qwen2.5-coder] --> MCQ[Generated MCQs]
         end
 
-        subgraph Col3 [3. LLM & Prompt Engineering]
-            direction TB
-            Prompt[Prompt Template Formatting] --> LLM[Local qwen2.5-coder Gen]
-            LLM --> MCQ[Generated MCQ Questions]
-        end
-
-        Hash -->|Pass vectors| Cos
-        Fetch -->|Pass text chunks| Prompt
+        Hash -->|Pass slide vectors| Cos
     end
 
-    Plugin -->|2. Ingest Slides & Query| Doc
-    Plugin -->|3. Trigger RAG Query| EmbedQuery
+    Plugin -->|2. Ingest Slides| Doc
+    Plugin -->|3. Query Topic| EmbedQuery
 
     %% Output Flow
     MCQ -->|4. SQL DB Import| Bank[(Moodle Question Bank)]
@@ -52,7 +43,7 @@ graph TD
 
     class Inst actor;
     class Plugin,StudentQuiz plugin;
-    class Col1,Col2,Col3 engine;
+    class Row1,Row2 engine;
     class Bank output;
 ```
 
