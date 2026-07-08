@@ -22,7 +22,7 @@ graph TD
         direction TB
         subgraph Row1 [Phase 1: Ingestion & Vector Caching]
             direction LR
-            Doc[Slides: PDF/Text] --> Prep[Sanitization] --> Split[Line Splitter] --> Hash[SHA-256 Cache]
+            Doc[Slides: PDF/Text] --> Prep[Pre-processing] --> Split[Line Splitter] --> Hash[SHA-256 Cache]
         end
 
         subgraph Row2 [Phase 2: RAG Search & LLM Generation]
