@@ -30,7 +30,7 @@ graph TD
         subgraph Row2 [Phase 2: RAG Search & LLM Generation]
             direction LR
             EmbedQuery[Embed Query] --> Cos["Cosine Similarity <br/> <img src='/Users/engtitya/Desktop/kwiz/sim_formula.png' width='130' />"]
-            Cos --> Fetch[Fetch Chunks] --> Prompt[Prompt Template] --> LLM[Local qwen2.5-coder] --> MCQ[Generated MCQs]
+            Cos --> Fetch[Retrieve Top-k Relevant Chunks] --> Prompt[Prompt Template] --> LLM[Local qwen2.5-coder] --> MCQ[Generated MCQs]
         end
 
         Cache -->|Store Embeddings| Cos
