@@ -33,7 +33,7 @@ graph TD
             Cos --> Fetch[Fetch Chunks] --> Prompt[Prompt Template] --> LLM[Local qwen2.5-coder] --> MCQ[Generated MCQs]
         end
 
-        Cache -->|Pass slide vectors| Cos
+        Cache -->|Store Embeddings| Cos
     end
 
     Plugin -->|2. Send Slides & Query| AIEngine
