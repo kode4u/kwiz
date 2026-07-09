@@ -23,7 +23,7 @@ graph TD
         subgraph Row1 [Phase 1: Ingestion & Vector Caching]
             direction LR
             Doc[Slides: PDF/Text] --> Prep[Pre-processing] --> Split[Line Splitter] --> CacheCheck{Cache Hit?}
-            CacheCheck -->|No| Embed["Embedding Model <br/> (nomic-embed-text)"] --> Cache[(Local Vector Cache)]
+            CacheCheck -->|No| Embed["Embedding Model <br/> (nomic-embed-text)"] --> Cache[(Embedding Cache <br/> SHA-256 Indexed)]
             CacheCheck -->|Yes: 0ms| Cache
         end
 
