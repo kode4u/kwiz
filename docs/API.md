@@ -6,7 +6,7 @@ Base URL: `http://localhost:5001` (development) or `https://your-domain.com/api`
 
 ### POST /generate
 
-Generate multiple-choice questions.
+Generate multiple-choice questions. If the provided `context` parameter contains more than 1,500 characters, the RAG search pipeline is triggered (using `nomic-embed-text` embeddings, SHA-256 caching, and cosine similarity vector ranking) to extract the best matching context chunks for the prompt.
 
 **Request:**
 ```json
@@ -16,17 +16,17 @@ Generate multiple-choice questions.
   "n_questions": 5,
   "language": "en",
   "bloom_level": "application",
-  "context": "High school biology course"
+  "context": "High school biology course or full slide contents..."
 }
 ```
 
 **Parameters:**
-- `topic` (string, required): Topic for question generation
-- `level` (string, optional): Difficulty level - `easy`, `medium`, `hard` (default: `medium`)
-- `n_questions` (integer, optional): Number of questions (1-10, default: 1)
+- `topic` (string, required): Topic for question generation (also acts as the vector search RAG query)
+- `level` (string, optional): Difficulty level - `easy`, `medium`, `hard` (default: `medium`; note that Moodle UI now defaults this to `'medium'`)
+- `n_questions` (integer, optional): Number of questions (1-20, default: 5)
 - `language` (string, optional): Language code - `en`, `km` (default: `en`)
 - `bloom_level` (string, optional): Bloom's taxonomy level
-- `context` (string, optional): Additional context for generation
+- `context` (string, optional): Slide/lecture contents. If length > 1,500 characters, it triggers semantic chunking and RAG retrieval. If <= 1,500 characters, it is sent raw to the LLM.
 
 **Response:**
 ```json

@@ -67,21 +67,22 @@ The AI-Enhanced Gamified Moodle Quiz system consists of three main components wo
 ### 3. LLM API Service (Python)
 
 **Responsibilities:**
-- Question generation from topics
-- Structured MCQ creation
-- Multi-language support
-- Difficulty level adjustment
+- Question generation from topics and retrieved context
+- Local RAG semantic text chunking and vector similarity indexing (`nomic-embed-text`)
+- Local SHA-256 vector caching (`embeddings_cache.json`) to skip repeat calculations
+- Multi-language support (English and Khmer)
 - Bloom's taxonomy classification
+- Note: User interface difficulty settings were streamlined out to reduce cognitive overhead, defaulting all generations to medium complexity.
 
 **Technology:**
 - Python 3.10+
-- Flask or FastAPI
-- LLM integration (OpenAI, local LLM, etc.)
-- JSON structured output
+- Flask API server
+- Local LLM engine (Ollama `qwen2.5-coder:7b` + `nomic-embed-text`)
+- Structured JSON schema validation
 
 **Endpoints:**
-- `POST /generate` - Generate questions
-- `GET /health` - Health check
+- `POST /generate` - Generate questions (supports raw prompt topic or RAG context strings)
+- `GET /health` - Health check (reports LLM server connectivity and active backend)
 - `POST /validate` - Validate question quality
 
 ## Data Flow
@@ -139,10 +140,11 @@ The AI-Enhanced Gamified Moodle Quiz system consists of three main components wo
 
 ### Moodle Tables (via Plugin)
 
-- `mdl_gamifiedquiz` - Quiz sessions
-- `mdl_gamifiedquiz_questions` - Generated questions
-- `mdl_gamifiedquiz_responses` - Student answers
-- `mdl_gamifiedquiz_sessions` - Active sessions
+- `mdl_gamifiedquiz` - Quiz activity configuration instances
+- `mdl_gamifiedquiz_questions` - AI-generated multiple-choice questions
+- `mdl_gamifiedquiz_responses` - Student responses and response times
+- `mdl_gamifiedquiz_sessions` - Live multiplayer game rooms
+- `mdl_gamifiedquiz_generation_logs` - Research analytics (timing, tokens, and success rates)
 
 ### Redis Keys
 

@@ -38,7 +38,8 @@ This project implements an AI-enhanced gamified quiz system integrated with Mood
 - **Key Features**:
   - Structured MCQ generation
   - Multi-language support
-  - Difficulty adjustment
+  - Curriculum-aligned RAG vector search (`nomic-embed-text`)
+  - Local SHA-256 embedding caching (`embeddings_cache.json`)
   - Bloom's taxonomy classification
 
 ## Architecture
@@ -100,13 +101,13 @@ This project implements an AI-enhanced gamified quiz system integrated with Mood
 ## Deliverables
 
 - [x] Project structure and documentation
-- [ ] Requirements specification
-- [ ] Alpha plugin release
-- [ ] WebSocket server
-- [ ] LLM adapter service
-- [ ] Test reports (load & usability)
-- [ ] Pilot dataset (anonymized)
-- [ ] Conference paper draft
+- [x] Requirements specification
+- [x] Alpha plugin release
+- [x] WebSocket server
+- [x] LLM adapter service
+- [x] Test reports (load & usability)
+- [x] Pilot dataset (anonymized)
+- [x] Conference paper draft
 - [ ] Workshop materials
 
 ## Research Objectives

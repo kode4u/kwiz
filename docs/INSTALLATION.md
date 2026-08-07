@@ -200,10 +200,14 @@ Edit `llmapi/.env`:
 
 ```env
 FLASK_PORT=5001
-LLM_BACKEND=openai
-OPENAI_API_KEY=your-key
-MAX_QUESTIONS=10
+LLM_BACKEND=local
+MAX_QUESTIONS=20
 DEFAULT_LANGUAGE=en
+
+# Local Ollama Backend Settings
+LOCAL_LLM_URL=http://localhost:11434  # URL of the Ollama host (use http://host.docker.internal:11434 from inside Docker)
+OLLAMA_MODEL=qwen2.5-coder:7b         # Main LLM model for MCQ generation
+OLLAMA_EMBED_MODEL=nomic-embed-text   # Dedicated embedding model for vector search
 ```
 
 ## Troubleshooting
