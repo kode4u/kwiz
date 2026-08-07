@@ -642,7 +642,15 @@ function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $cat
     foreach ($questions as $question) {
         $questiontext = $question['question'] ?? $question['question_text'] ?? '';
         $choices = $question['choices'] ?? array();
-        if (empty($questiontext) || empty($choices)) {
+
+        if (is_string($choices)) {
+            $decoded = json_decode($choices, true);
+            if (is_array($decoded)) {
+                $choices = $decoded;
+            }
+        }
+
+        if (empty($questiontext) || empty($choices) || !is_array($choices)) {
             continue;
         }
 
@@ -659,15 +667,23 @@ function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $cat
             }
         }
 
+        $choicesjson = @json_encode($choices, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($choicesjson === false) {
+            $choicesjson = json_encode($choices);
+        }
+
         $record = new stdClass();
         $record->gamifiedquizid = $gamifiedquizid;
         $record->session_id = $sessionid;
         $record->question_text = $questiontext;
-        $record->choices = json_encode($choices);
-        $record->correct_index = $correctindex;
+        $record->choices = $choicesjson ?: '[]';
+        $record->correct_index = (int)$correctindex;
         $record->difficulty = $difficulty;
         $record->category_name = core_text::substr((string)$categoryname, 0, 255);
         $record->topic = core_text::substr((string)($topic ?: ($question['topic'] ?? '')), 0, 255);
+        if (!empty($question['bloom_level'])) {
+            $record->bloom_level = core_text::substr((string)$question['bloom_level'], 0, 50);
+        }
         $record->timecreated = time();
         $DB->insert_record('gamifiedquiz_questions', $record);
         $saved++;
@@ -754,10 +770,14 @@ function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
             $correctindex = 0;
         }
 
+        $choicesjson = @json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($choicesjson === false) {
+            $choicesjson = json_encode($normalized);
+        }
         $record = new stdClass();
         $record->gamifiedquizid = $gamifiedquizid;
         $record->question_text = $questiontext;
-        $record->choices = json_encode($normalized);
+        $record->choices = $choicesjson ?: '[]';
         $record->correct_index = $correctindex;
         $record->difficulty = $question['difficulty'] ?? 'medium';
         if (!empty($question['category_name'])) {

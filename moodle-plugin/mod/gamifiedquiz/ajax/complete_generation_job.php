@@ -5,8 +5,15 @@ define('AJAX_SCRIPT', true);
 define('NO_MOODLE_COOKIES', true);
 define('NO_DEBUG_DISPLAY', true);
 
-// Called from WebSocket worker at http://moodle — align host with $CFG->wwwroot to avoid 303 redirect.
+// Called from worker at http://moodle — align host with $CFG->wwwroot to avoid redirecterrordetected.
+$configfile = __DIR__ . '/../../../config.php';
 $wwwroot = getenv('MOODLE_HOST');
+if (file_exists($configfile)) {
+    $content = file_get_contents($configfile);
+    if (preg_match('/\$CFG->wwwroot\s*=\s*[\'"]([^\'"]+)[\'"]/', $content, $matches)) {
+        $wwwroot = $matches[1];
+    }
+}
 if (empty($wwwroot)) {
     $wwwroot = 'http://localhost:8080';
 }
@@ -121,14 +128,23 @@ $categoryname = $log->category_name ?? '';
 $topic = $log->topic ?? '';
 $difficulty = $log->difficulty ?: $gamifiedquiz->difficulty;
 
-$saved = gamifiedquiz_save_generated_questions(
-    $gamifiedquiz->id,
-    $questions,
-    $categoryname,
-    $sessionid,
-    $difficulty,
-    $topic
-);
+try {
+    $saved = gamifiedquiz_save_generated_questions(
+        $gamifiedquiz->id,
+        $questions,
+        $categoryname,
+        $sessionid,
+        $difficulty,
+        $topic
+    );
+} catch (Exception $e) {
+    $update->status = 'error';
+    $update->error_message = core_text::substr('Failed to save questions: ' . $e->getMessage(), 0, 1333);
+    $DB->update_record('gamifiedquiz_generation_logs', $update);
+    http_response_code(500);
+    echo json_encode(array('success' => false, 'error' => $update->error_message));
+    exit;
+}
 
 $update->session_id = $sessionid;
 $update->generated_count = count($questions);
