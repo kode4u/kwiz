@@ -180,6 +180,9 @@ try {
             if ($source_cmid > 0) {
                 $rag_text = gamifiedquiz_get_module_text_content($source_cmid, $rag_topic_id, $rag_subitem_id);
             }
+        } else if (strpos($rag_source, 'section_') === 0) {
+            $section_num = (int) substr($rag_source, 8);
+            $rag_text = gamifiedquiz_get_section_text_content($course->id, $section_num);
         }
         if (!empty($rag_text)) {
             $predefined_data = $rag_text;

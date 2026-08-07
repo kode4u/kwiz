@@ -128,6 +128,34 @@ foreach ($modinfo->cms as $cm_item) {
     }
 }
 
+// Find RAG sections/chapters
+$rag_sections = [];
+foreach ($modinfo->sections as $sectionnum => $cmids) {
+    $section_has_rag = false;
+    foreach ($cmids as $sec_cmid) {
+        if (isset($modinfo->cms[$sec_cmid])) {
+            $cm_item = $modinfo->cms[$sec_cmid];
+            if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+                $section_has_rag = true;
+                break;
+            }
+        }
+    }
+    if ($section_has_rag) {
+        $sectioninfo = $modinfo->get_section_info($sectionnum);
+        $name = '';
+        if ($sectioninfo && !empty($sectioninfo->name)) {
+            $name = $sectioninfo->name;
+        } else {
+            $name = 'Section ' . $sectionnum;
+        }
+        $rag_sections[] = array(
+            'number' => $sectionnum,
+            'name' => $name
+        );
+    }
+}
+
 // Fetch grade outcomes
 $course_outcomes = [];
 require_once($CFG->libdir . '/gradelib.php');
@@ -267,9 +295,22 @@ if ($is_teacher) {
     echo '<select id="generate-rag-source" name="rag_source" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 15px;">';
     echo '<option value="">-- Do not use RAG (generate from topic/outcomes only) --</option>';
     echo '<option value="auto">Auto-detect (Current/Preceding Activity)</option>';
-    foreach ($rag_sources as $src) {
-        $type_label = ucfirst($src['type']);
-        echo '<option value="cmid_' . $src['id'] . '">' . s($src['name']) . ' (' . $type_label . ')</option>';
+    
+    if (!empty($rag_sections)) {
+        echo '<optgroup label="Chapters / Sections (Aggregated)">';
+        foreach ($rag_sections as $sec) {
+            echo '<option value="section_' . $sec['number'] . '">Full Chapter: ' . s($sec['name']) . '</option>';
+        }
+        echo '</optgroup>';
+    }
+    
+    if (!empty($rag_sources)) {
+        echo '<optgroup label="Individual Activities / Files">';
+        foreach ($rag_sources as $src) {
+            $type_label = ucfirst($src['type']);
+            echo '<option value="cmid_' . $src['id'] . '">' . s($src['name']) . ' (' . $type_label . ')</option>';
+        }
+        echo '</optgroup>';
     }
     echo '</select>';
     echo '<div id="rag-nested-selection-container" style="display: none; margin-bottom: 15px; padding: 10px; background: #e9ecef; border-radius: 6px; border: 1px solid #ced4da; flex-direction: row; gap: 10px;">';

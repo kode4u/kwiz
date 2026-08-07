@@ -109,6 +109,10 @@ function gamifiedquiz_add_instance($gamifiedquiz, $mform = null) {
     }
     unset($gamifiedquiz->background_image_url);
 
+    if (!isset($gamifiedquiz->difficulty) || empty($gamifiedquiz->difficulty)) {
+        $gamifiedquiz->difficulty = 'medium';
+    }
+
     $gamifiedquiz->timecreated = time();
     $gamifiedquiz->timemodified = $gamifiedquiz->timecreated;
 
@@ -2017,6 +2021,35 @@ function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id 
     
     return '';
 }
+
+/**
+ * Get aggregated text content of all RAG-compatible modules in a section.
+ *
+ * @param int $courseid The course ID
+ * @param int $sectionnum The section number
+ * @return string Aggregated text content
+ */
+function gamifiedquiz_get_section_text_content($courseid, $sectionnum) {
+    $modinfo = get_fast_modinfo($courseid);
+    if (!isset($modinfo->sections[$sectionnum])) {
+        return '';
+    }
+    
+    $aggregated_content = '';
+    foreach ($modinfo->sections[$sectionnum] as $cmid) {
+        $cm_item = $modinfo->cms[$cmid];
+        if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+            $content = gamifiedquiz_get_module_text_content($cmid);
+            if (!empty($content)) {
+                $aggregated_content .= "=== Activity: " . $cm_item->name . " ===\n";
+                $aggregated_content .= $content . "\n\n";
+            }
+        }
+    }
+    return $aggregated_content;
+}
+
+
 
 /**
  * Find the course module ID of the page/lesson/book activity preceding this quiz in the course.

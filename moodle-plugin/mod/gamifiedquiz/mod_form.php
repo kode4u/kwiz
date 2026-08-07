@@ -31,68 +31,6 @@ class mod_gamifiedquiz_mod_form extends moodleform_mod {
         $mform->addRule('topic', null, 'required', null, 'client');
         $mform->addHelpButton('topic', 'topic', 'mod_gamifiedquiz');
 
-        // Learning Outcomes
-        $mform->addElement('textarea', 'learning_outcomes', get_string('learning_outcomes', 'mod_gamifiedquiz'), array('rows' => 4, 'cols' => 60));
-        $mform->setType('learning_outcomes', PARAM_TEXT);
-        $mform->addHelpButton('learning_outcomes', 'learning_outcomes', 'mod_gamifiedquiz');
-
-        // Preset outcomes from course labels and outcomes
-        $course = $this->_course;
-        $presets = array('' => get_string('choose_preset_outcome', 'mod_gamifiedquiz'));
-        
-        // 1. Fetch labels
-        $modinfo = get_fast_modinfo($course->id);
-        foreach ($modinfo->cms as $cm_item) {
-            if ($cm_item->uservisible && $cm_item->modname === 'label') {
-                $label_rec = $DB->get_record('label', array('id' => $cm_item->instance));
-                if ($label_rec && !empty($label_rec->intro)) {
-                    $clean_text = html_to_text($label_rec->intro, 0, false);
-                    $clean_text = trim(preg_replace('/\s+/', ' ', $clean_text));
-                    if (!empty($clean_text)) {
-                        $display_name = strlen($clean_text) > 60 ? substr($clean_text, 0, 60) . '...' : $clean_text;
-                        $presets[$clean_text] = $display_name . ' (Label)';
-                    }
-                }
-            }
-        }
-        
-        // 2. Fetch grade outcomes
-        require_once($CFG->libdir . '/gradelib.php');
-        if (class_exists('grade_outcome')) {
-            $outcomes = grade_outcome::fetch_all_available($course->id);
-            if (!empty($outcomes)) {
-                foreach ($outcomes as $outcome) {
-                    $presets[$outcome->fullname] = $outcome->fullname . ' (Outcome)';
-                }
-            }
-        }
-        
-        if (count($presets) > 1) {
-            $mform->addElement('select', 'learning_outcomes_preset', get_string('learning_outcomes_preset', 'mod_gamifiedquiz'), $presets);
-            $mform->addElement('html', '
-                <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    var presetSelect = document.getElementById("id_learning_outcomes_preset");
-                    var outcomesInput = document.getElementById("id_learning_outcomes");
-                    if (presetSelect && outcomesInput) {
-                        presetSelect.addEventListener("change", function() {
-                            if (presetSelect.value) {
-                                outcomesInput.value = presetSelect.value;
-                            }
-                        });
-                    }
-                });
-                </script>
-            ');
-        }
-
-        // Difficulty
-        $mform->addElement('select', 'difficulty', get_string('difficulty', 'mod_gamifiedquiz'), array(
-            'easy' => get_string('difficulty_easy', 'mod_gamifiedquiz'),
-            'medium' => get_string('difficulty_medium', 'mod_gamifiedquiz'),
-            'hard' => get_string('difficulty_hard', 'mod_gamifiedquiz')
-        ));
-        $mform->setDefault('difficulty', 'medium');
 
         // Language
         $mform->addElement('select', 'language', get_string('language', 'mod_gamifiedquiz'), array(

@@ -1142,7 +1142,7 @@
             }
 
             categoryDiv.innerHTML = `
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center;">
+                <div style="display: grid; grid-template-columns: 3fr 3fr 2fr auto; gap: 10px; align-items: center;">
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Category Name:</label>
                         <input type="text" class="category-name-input" placeholder="e.g., Variables" 
@@ -1154,15 +1154,6 @@
                         <input type="text" class="category-topic-input" placeholder="Topic" 
                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
                                value="${escapeAttr(topicValue)}">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty:</label>
-                        <select class="category-difficulty-input" 
-                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="easy" ${difficultyValue === 'easy' ? 'selected' : ''}>Easy</option>
-                            <option value="medium" ${difficultyValue === 'medium' ? 'selected' : ''}>Medium</option>
-                            <option value="hard" ${difficultyValue === 'hard' ? 'selected' : ''}>Hard</option>
-                        </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Count:</label>
@@ -1180,20 +1171,6 @@
                                 style="margin-top: 25px;">Remove</button>
                     </div>
                 </div>
-                <div style="margin-top: 10px; display: grid; grid-template-columns: 2fr 1fr; gap: 10px; align-items: flex-end;">
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Learning Outcomes (Optional):</label>
-                        <input type="text" class="category-outcomes-input" placeholder="e.g., Explain polymorphism, solve inheritance problems" 
-                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" 
-                               value="${escapeAttr(outcomesValue)}">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Or load from preset:</label>
-                        <select class="category-outcomes-select" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            ${presetOptionsHtml}
-                        </select>
-                    </div>
-                </div>
             `;
             
             categoryList.appendChild(categoryDiv);
@@ -1203,17 +1180,6 @@
             removeBtn.addEventListener('click', () => {
                 categoryDiv.remove();
             });
-
-            // Preset dropdown change listener
-            const outcomesSelect = categoryDiv.querySelector('.category-outcomes-select');
-            const outcomesInput = categoryDiv.querySelector('.category-outcomes-input');
-            if (outcomesSelect && outcomesInput) {
-                outcomesSelect.addEventListener('change', () => {
-                    if (outcomesSelect.value) {
-                        outcomesInput.value = outcomesSelect.value;
-                    }
-                });
-            }
         }
         
         async function generateAllCategories(config) {
@@ -1227,8 +1193,8 @@
             categoryRows.forEach(row => {
                 const name = row.querySelector('.category-name-input')?.value.trim() || 'Default';
                 const topic = row.querySelector('.category-topic-input')?.value.trim() || config.topic || '';
-                const outcomes = row.querySelector('.category-outcomes-input')?.value.trim() || '';
-                const difficulty = row.querySelector('.category-difficulty-input')?.value || config.difficulty || 'medium';
+                const outcomes = '';
+                const difficulty = 'medium';
                 const count = parseInt(row.querySelector('.category-count-input')?.value || '5');
                 
                 if (topic) {
