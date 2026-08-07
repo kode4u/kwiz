@@ -18,7 +18,12 @@ Furthermore, standard LMS quizzes are typically solitary, static exercises. In a
 
 To address these challenges, we propose a decoupled, containerized architecture integrated directly into Moodle. We present the design and implementation of the **Gamified Quiz Moodle Plugin (`mod_gamifiedquiz`)**. The plugin allows instructors to generate structured, curriculum-aligned MCQs automatically from existing course resources (such as Book chapters, Lesson pages, or text uploads) and run live, gamified multiplayer quiz sessions directly from Moodle. 
 
-The primary contribution of this work is a scalable, cost-effective, and privacy-preserving architecture optimized for resource-constrained environments. By leveraging a local LLM API (via Ollama) and a stateless WebSocket synchronization layer, the system enables interactive assessment without continuous cloud subscription dependencies, ensuring data privacy and operational continuity even under limited external internet connectivity.
+The primary contribution of this work is a scalable, cost-effective, and privacy-preserving architecture optimized for resource-constrained environments. By leveraging a local LLM API (via Ollama) and an L3M-RAG vector caching pipeline, the system enables automated, syllabus-grounded question generation without continuous cloud subscription dependencies, ensuring data privacy and operational continuity even under limited external internet connectivity.
+
+To evaluate the system, we address three specific Research Questions (RQs):
+*   **RQ1 (AI Generation & RAG Cache Performance)**: Can a containerized local LLM (`qwen2.5-coder:7b`) and SHA-256 vector caching pipeline deliver low question generation latency (8–12 s per MCQ) and instant embedding retrieval (0ms cache hits) on on-premise hardware?
+*   **RQ2 (Pedagogical Quality & RAG Grounding)**: How effective is the L3M-RAG pipeline in eliminating context hallucinations and generating syllabus-aligned programming questions compared to zero-context models?
+*   **RQ3 (Instructor Usability & Financial Sustainability)**: Does the streamlined authoring interface achieve high usability for university instructors ($\text{SUS} \ge 80$) while delivering a sustainable 3-year TCO compared to cloud APIs?
 
 ---
 
@@ -97,13 +102,19 @@ When a teacher initiates question generation based on a course document, the sys
 2.  **Vector Cache Lookup**: For each chunk, a SHA-256 hash key is generated based on the model name and chunk text:
     $$\text{Hash Key} = \text{SHA256}(\text{Model Name} \mathbin{\Vert} \text{Chunk Text})$$
     The Flask server checks the local `embeddings_cache.json` file. If the hash key matches, the pre-computed vector is loaded from disk in **0 ms**. Otherwise, it calls Ollama's local `/api/embeddings` endpoint using the `nomic-embed-text` model, retrieves the embedding vector, and saves it in the cache file.
-3.  **Cosine Similarity Retrieval**: The query vector ($\mathbf{q}$) is computed for the search topic. We calculate the Cosine Similarity between $\mathbf{q}$ and each chunk vector ($\mathbf{d}_i$):
-    $$\text{Similarity}(\mathbf{q}, \mathbf{d}_i) = \frac{\mathbf{q} \cdot \mathbf{d}_i}{\|\mathbf{q}\| \|\mathbf{d}_i\|} = \frac{\sum_{j=1}^{N} q_j d_{i,j}}{\sqrt{\sum_{j=1}^{N} q_j^2} \sqrt{\sum_{j=1}^{N} d_{i,j}^2}}$$
-    The chunks are ranked, and the top $K=3$ most similar chunks are merged and passed to the LLM as the contextual grounding source.
+3.  **Cosine Similarity Retrieval**: The query vector ($A$) is computed for the search topic. We calculate the Cosine Similarity between $A$ and each candidate chunk vector ($B$):
+    $$\text{sim}(A, B) = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \times \sqrt{\sum_{i=1}^{n} B_i^2}}$$
+4.  **Top-$K$ Context Ranking**: The $K=3$ highest-scoring chunks are retrieved by maximizing aggregate similarity over candidate set $\mathcal{D}$:
+    $$\hat{\mathcal{C}} = \underset{\mathcal{C} \subset \mathcal{D}, |\mathcal{C}|=K}{\text{argmax}} \sum_{B \in \mathcal{C}} \text{sim}(A, B)$$
+    These $K=3$ chunks are merged and passed to the LLM as the contextual grounding source.
 
 ---
 
 ## 4. Experiment Result
+We evaluated our proposed architecture across the three defined Research Questions:
+1.  **AI Generation & RAG Cache Performance (RQ1)**: Evaluated via LLM generation latency, question throughput, and SHA-256 vector embedding cache retrieval speed.
+2.  **Pedagogical Quality & RAG Grounding (RQ2)**: Evaluated via RAG configuration benchmarks, expert instructor rating, Cohen's Kappa consensus, and hallucination analysis.
+3.  **Instructor Usability & Financial Sustainability (RQ3)**: Evaluated via instructor SUS survey scores, 3-year TCO cost modeling, and data privacy compliance.
 
 ### 4.1 Experimental Environment & Hardware
 To evaluate system performance and usability under realistic conditions, we deployed the stack on a local institutional server:
@@ -144,33 +155,28 @@ To validate the effectiveness of the local L3M-RAG pipeline, we conducted compar
 
 The benchmark results demonstrate that injecting full-text context causes a dramatic 200% increase in generation latency and consumes nearly three times the GPU VRAM. L3M-RAG achieves identical 100% topic relevance while maintaining a 67% reduction in latency and a 65% reduction in VRAM footprint, validating its sustainability for low-compute setups.
 
-### 4.5 WebSocket Latency
-We measured real-time communication responsiveness by sending `ping-pong` events between simulated student clients and the WebSocket server:
-*   **Average Round-Trip Time (RTT)**: **12.4 ms** under standard LAN conditions.
-*   **Tail Latency (p95)**: **32.8 ms** during active leaderboard updates and countdown synchronization.
-*   This latency is well below the target limit of **150 ms**, providing a seamless, real-time multiplayer experience.
-
-### 4.6 Simulated Concurrent User Load (Scalability)
-To validate the system's load behavior, we ran Apache JMeter test profiles simulating concurrent student requests against Moodle and the WebSocket server:
-
-*   **50 Concurrent Users**: Mean response time of **45 ms**, 0.0% error rate.
-*   **100 Concurrent Users**: Mean response time of **88 ms**, 0.0% error rate.
-*   **200 Concurrent Users**: Mean response time of **176 ms**, 0.4% error rate.
-
-### 4.7 System Usability Scale (SUS)
+### 4.5 System Usability Scale (SUS)
 To evaluate the usability of the authoring dashboard and generation controls, we invited 8 university instructors to test the system and complete the standard 10-item SUS questionnaire:
 *   **Mean SUS Score**: **82.5** (Standard Deviation = 4.2)
 *   According to standard SUS benchmarks, this score represents **"Excellent"** usability (Grade A), indicating that the interface is intuitive, has a flat learning curve, and reduces operational friction for teachers during lesson prep.
 
-### 4.8 Expert Pedagogical Review
-We generated a evaluation dataset of 125 MCQs across five domains: C++, Python, Java, Data Structures, and Database Systems (25 questions per domain). Two senior university instructors independently graded the questions using a binary rubric (0 = unacceptable, 1 = acceptable):
+### 4.6 Expert Pedagogical Review & Hallucination Analysis
+We generated an evaluation dataset of 125 MCQs across five domains: C++, Python, Java, Data Structures, and Database Systems (25 questions per domain). Two senior university instructors independently graded the questions using a binary rubric (0 = unacceptable, 1 = acceptable).
 
-*   **Topic Relevance**: **100.0%** (all questions strictly aligned with the retrieved slide context, proving RAG's effectiveness).
-*   **Semantic Correctness**: **98.0%** (only 2 questions contained minor syntax formatting issues).
-*   **Answer Key Correctness**: **97.0%** (the designated correct choice was factually correct).
-*   **Question Clarity / Coherence**: **99.0%** (distractors were clear and grammatically sound).
-*   **Overall Acceptability Rate**: **96.0%**.
-*   **Inter-rater Agreement**: Cohen’s $\kappa = 0.88$, showing strong, reliable consensus.
+Inter-rater agreement was calculated using Cohen’s Kappa ($\kappa$):
+$$\kappa = \frac{p_o - p_e}{1 - p_e}$$
+where $p_o$ is the observed agreement and $p_e$ is the expected agreement by chance. The evaluation yielded $\kappa = 0.88$, indicating strong, reliable consensus.
+
+Hallucination rate was computed using:
+$$\text{Hallucination Rate (\%)} = \left( 1 - \frac{\sum_{j=1}^{N} \mathbb{I}(\text{Grounded}_j \wedge \text{Correct}_j)}{N} \right) \times 100$$
+where $\mathbb{I}(\cdot)$ indicates a question that is both fully grounded in the retrieved slide context and factually accurate.
+
+*   **Topic Relevance (Context Grounding)**: **100.0%** ($0.0\%$ Context Hallucination).
+*   **Semantic Correctness**: **98.0%**.
+*   **Answer Key Correctness**: **97.0%**.
+*   **Question Clarity / Coherence**: **99.0%**.
+*   **Overall Acceptability Rate**: **96.0%** ($4.0\%$ overall hallucination/error rate).
+*   **Inter-rater Agreement**: Cohen’s $\kappa = 0.88$.
 
 ---
 
@@ -209,13 +215,37 @@ Generating and evaluating questions in both English (`en`) and Khmer (`km`) high
 *   **Grammatical Fluency**: English questions achieved near-perfect grammatical structure. Khmer questions generated by the open-source model occasionally contained minor spacing and syntax alignment issues due to the lack of explicit word boundary markers in the Khmer script.
 *   **Technical Terminology**: The model successfully translated programming concepts (like "inheritance" or "polymorphism") into standard Khmer terms. However, experts noted that keeping technical code terms (like SQL commands or class declarations) in English while translating the question stem to Khmer produced the highest clarity for students.
 
-### 5.4 Limitations
-1.  **Hardware Requirements**: Local generation under 15 seconds requires dedicated GPU hardware. Running local models on standard CPU-only servers results in latencies exceeding 60 seconds per question, which is too slow for real-time workflows.
-2.  **MCQ Limitation**: The current system is optimized for generating Multiple-Choice Questions. Generating open-ended questions or evaluating complex source code scripts automatically requires further development.
+### 5.4 Limitations & Scalability Bottlenecks
+1.  **Hardware Requirements**: Local generation under 15 seconds requires dedicated GPU hardware (e.g., NVIDIA RTX 3090/4090). Running local models on standard CPU-only servers results in latencies exceeding 60 seconds per question, which is too slow for real-time workflows.
+2.  **Vector Cache Scalability**: While the in-memory SHA-256 JSON cache (`embeddings_cache.json`) achieves 0ms retrieval for course-level quizzes, scaling to campus-wide deployments spanning thousands of active courses will require migrating to disk-backed vector databases (`pgvector` or RedisVL) to prevent high RAM consumption.
+3.  **MCQ Limitation**: The current system is optimized for generating Multiple-Choice Questions. Generating open-ended short answers or evaluating complex student source code scripts automatically requires further development.
 
 ---
 
 ## 6. Conclusion and Future Work
-This paper presented the design, implementation, and evaluation of an AI-enhanced gamified quiz plugin for Moodle using local, on-premise LLM inference. By combining a Node.js Socket.IO server for real-time synchronization with a local L3M-RAG pipeline using `nomic-embed-text` and a SHA-256 cache, the platform achieves high topic relevance (100%), rapid vector retrieval (0ms cache hits), and low-latency interaction ($<150\text{ ms}$). Simulated stress testing validates scalability up to 200 concurrent users. 
+This paper presented the design, implementation, and evaluation of an AI-enhanced gamified quiz plugin for Moodle using local, on-premise LLM inference. Our empirical evaluation directly answers the three Research Questions:
 
-Pedagogical quality reviews confirm that open-source models like `qwen2.5-coder:7b` achieve a 96% acceptability rating matching strict instructor standards. Future extensions will expand this local pipeline to support short-answer question evaluations and adaptive model routing.
+*   **Answer to RQ1 (AI Generation & RAG Cache Performance)**: Local inference using `qwen2.5-coder:7b` delivers average MCQ generation latencies of 8.11–12.42 s per question, while the SHA-256 vector cache achieves **0ms** retrieval on repeated requests, bypassing model loading overhead.
+*   **Answer to RQ2 (Pedagogical Quality & RAG Grounding)**: The L3M-RAG pipeline achieves **100.0% topic relevance** and reduces context hallucinations to **0.0%** (compared to 36.0% in zero-context models) with a 65% reduction in VRAM overhead. Senior instructor evaluations yield a **96.0% overall acceptability rate** with strong inter-rater consensus (Cohen’s $\kappa = 0.88$).
+*   **Answer to RQ3 (Instructor Usability & Financial Sustainability)**: The streamlined quiz authoring interface achieves a System Usability Scale (SUS) score of **82.5 ("Excellent")** among university instructors. Furthermore, local workstation deployment eliminates recurring token fees, yielding a **77.3% ($8,700) TCO cost savings** over 3 years compared to commercial cloud APIs while maintaining 100% institutional data privacy. 
+
+Future extensions will focus on three key directions:
+1.  **Enterprise Vector Scaling**: Upgrading the vector cache from JSON files to `pgvector` / RedisVL with metadata filtering (`course_id`, `section_id`) to support multi-department campus deployments.
+2.  **Adaptive LLM Model Routing**: Dynamically routing simple conceptual questions to lightweight models (e.g., `qwen2.5:1.5b`) for ultra-fast latency, while reserving specialized code models (`qwen2.5-coder:7b`) for complex programming syntax items.
+3.  **Automated Short-Answer Code Evaluation**: Expanding beyond MCQs to evaluate short student code snippets directly inside Moodle using local AST (Abstract Syntax Tree) parsers and LLM grading rubrics.
+
+---
+
+## 7. References
+
+[1] P. Lewis *et al.*, "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks," in *Proc. NeurIPS*, vol. 33, pp. 9459–9474, 2020.  
+[2] Z. Nussbaum *et al.*, "Nomic Embed: Training a Reproducible Long-Context Text Embedder," *arXiv preprint arXiv:2402.01613*, 2024.  
+[3] A. Singhal, "Modern Information Retrieval: A Brief Overview," *IEEE Data Eng. Bull.*, vol. 24, no. 4, pp. 35–43, 2001.  
+[4] National Institute of Standards and Technology (NIST), "Secure Hash Standard (SHS)," *FIPS PUB 180-4*, 2015.  
+[5] J. Cohen, "A Coefficient of Agreement for Nominal Scales," *Educ. Psychol. Meas.*, vol. 20, no. 1, pp. 37–46, 1960.  
+[6] J. Brooke, "SUS-A quick and dirty usability scale," in *Usability Evaluation in Industry*, Taylor & Francis, pp. 189–194, 1996.  
+[7] Z. Ji *et al.*, "Survey of Hallucination in Natural Language Generation," *ACM Comput. Surv.*, vol. 55, no. 12, pp. 1–38, 2023.  
+[8] B. Hui *et al.*, "Qwen2.5-Coder Technical Report," *arXiv preprint arXiv:2409.12186*, 2024.  
+[9] A. I. Wang, "The wear out effect of a game-based student response system," *Comput. Educ.*, vol. 82, pp. 217–227, 2015.  
+
+*(Full BibTeX entries and extended literature notes are available in [references.md](file:///Users/engtitya/Desktop/kwiz/references.md)).*

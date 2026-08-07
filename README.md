@@ -14,45 +14,34 @@ jica/
 └── evaluate/               # Research evaluation (metrics, SUS, JMeter, classroom)
 ```
 
-## 📄 Research & publication
+## 📄 Research Paper & Publication
 
-This project supports empirical evaluation for **academic papers**:
+This repository contains the full draft and reproducible evaluation code for our research paper:
 
-- **Research overview (abstract, methods, claims):** [docs/RESEARCH_README.md](docs/RESEARCH_README.md)
-- **Reproducible evaluation suite:** [evaluate/README.md](evaluate/README.md) — LLM latency, WebSocket latency, SUS, JMeter load tests, classroom deployment protocols
+*   **Conference Paper Draft**: [paper.md](paper.md) — *Design and Evaluation of an AI-Enhanced Gamified Quiz Plugin for Moodle: Integrating Local LLM-Based Question Generation*
+*   **Academic References & BibTeX**: [references.md](references.md) — Citations for RAG, Cosine Similarity, SHA-256 caching, Cohen's Kappa, and SUS metrics.
+*   **System Documentation**: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — System features and architecture.
 
-## 🚀 Quick Start
-
-See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
-
-**Windows Users**: See [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for Windows-specific setup instructions.
-
-### Prerequisites 
-
-- Docker & Docker Compose
-- Git
-- OpenAI API key (optional, for question generation)
-
-### Running the System
+## 🚀 Quick Start (Docker)
 
 1. **Clone and setup:**
    ```bash
    git clone <repository-url>
-   cd jica
+   cd kwiz
    cp docker/env.template docker/.env
-   # Edit docker/.env with your settings (especially OPENAI_API_KEY)
+   # Edit docker/.env with your settings
    ```
 
 2. **Start all services:**
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 3. **Access services:**
-   - Moodle: http://localhost:8080
-   - WebSocket Server: ws://localhost:3001
-   - LLM API: http://localhost:5000
-   - Redis: localhost:6379
+   - Moodle: `http://localhost:8080`
+   - WebSocket Server: `ws://localhost:3001`
+   - LLM API: `http://localhost:5001`
+   - Redis: `localhost:6379`
 
 4. **View logs:**
    ```bash
