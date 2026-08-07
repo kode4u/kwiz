@@ -262,7 +262,7 @@ def retrieve_relevant_context(query: str, document_text: str, backend: str, api_
                 resp.raise_for_status()
                 embedding = resp.json()['embedding']
         except Exception as embed_err:
-            logger.warning(f"Failed to generate embedding for RAG text: {embed_err}")
+            logger.warning(f"Failed to generate embedding for RAG text using model '{model_name}': {embed_err}")
             return []
 
         if embedding:
