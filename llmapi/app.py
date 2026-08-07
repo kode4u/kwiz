@@ -51,6 +51,11 @@ load_dotenv()
 load_embedding_cache()
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
+try:
+    app.json.ensure_ascii = False
+except AttributeError:
+    pass
 CORS(app)
 
 # Configuration

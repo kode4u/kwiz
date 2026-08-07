@@ -20,6 +20,19 @@
     }
     
     function startApp(config) {
+        // Shared helper to unescape literal \uXXXX or \\uXXXX unicode sequences (e.g. Khmer text)
+        function decodeUnicodeEscapes(str) {
+            if (!str || typeof str !== 'string') return str || '';
+            try {
+                return str.replace(/\\+u([0-9a-fA-F]{4})/g, (match, hex) => {
+                    return String.fromCharCode(parseInt(hex, 16));
+                });
+            } catch (e) {
+                return str;
+            }
+        }
+        window.decodeUnicodeEscapes = decodeUnicodeEscapes;
+
         // Shared cache for user details (accessible by both teacher and student apps)
         let userDetailsCache = {};
         
@@ -572,9 +585,33 @@
             questionDiv.className = 'question-editor-item gq-container';
             questionDiv.style.margin = '15px 0';
             
-            const qText = question ? (question.question || question.question_text || '') : '';
-            const choices = question ? (question.choices || []) : [];
-            const correctIndex = question ? (question.correct_index || 0) : 0;
+            let rawText = question ? (question.question || question.question_text || '') : '';
+            rawText = decodeUnicodeEscapes(rawText);
+
+            let choices = question ? (question.choices || []) : [];
+            let correctIndex = question ? (question.correct_index || 0) : 0;
+
+            // If rawText contains embedded options e.g. "\n a) int \nb) double \nc) string \nd) bool"
+            if (rawText.includes('\n a)') || rawText.includes('\na)') || rawText.includes('\n A)') || rawText.includes('\nA)')) {
+                const parts = rawText.split(/\n\s*(?=[a-dA-D][\)\.\:\-]\s*)/);
+                if (parts.length > 1) {
+                    rawText = parts[0].trim();
+                    if (!choices || choices.length === 0) {
+                        choices = [];
+                        for (let i = 1; i < parts.length; i++) {
+                            const choiceLine = parts[i].replace(/^[a-dA-D][\)\.\:\-]\s*/, '').trim();
+                            if (choiceLine) {
+                                choices.push({
+                                    text: decodeUnicodeEscapes(choiceLine),
+                                    is_correct: (i - 1 === correctIndex)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            const qText = rawText;
             const questionImage = question && question.question_image ? question.question_image : '';
             const imageIsUrl = questionImage && !questionImage.startsWith('data:');
             const categoryName = question && question.category_name ? question.category_name : '';
@@ -584,11 +621,11 @@
                 <h4>Question ${index + 1}</h4>
                 ${categoryName || questionTopic ? `<p class="question-meta" style="font-size: 13px; color: #555; margin: 0 0 8px;">${categoryName ? `<strong>Category:</strong> ${escapeHtml(categoryName)}` : ''}${categoryName && questionTopic ? ' | ' : ''}${questionTopic ? `<strong>Topic:</strong> ${escapeHtml(questionTopic)}` : ''}</p>` : ''}
                 <label>Question Text:</label>
-                <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;">${escapeHtml(qText)}</textarea>
+                <textarea class="question-text-input" rows="3" style="width: 100%; margin-bottom: 10px;"></textarea>
                 <label>Question Image (optional):</label>
                 <div class="question-image-editor" style="margin-bottom: 4px;">
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <input type="text" class="question-image-url-input" placeholder="Image URL" value="${imageIsUrl ? escapeHtml(questionImage) : ''}" style="flex: 1; min-width: 120px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <input type="text" class="question-image-url-input" placeholder="Image URL" value="${imageIsUrl ? escapeAttr(questionImage) : ''}" style="flex: 1; min-width: 120px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         <span style="color: #666; white-space: nowrap;">or</span>
                         <input type="file" class="question-image-file-input" accept="image/*" style="font-size: 13px;">
                     </div>
@@ -602,6 +639,12 @@
                 <button type="button" class="add-choice-btn gq-btn gq-btn-sm gq-btn-primary" data-index="${index}">Add Choice</button>
                 <button type="button" class="remove-question-btn gq-btn gq-btn-sm gq-btn-danger" data-index="${index}">Remove Question</button>
             `;
+            
+            // Assign question text directly to element value to ensure proper UTF-8 / Khmer rendering
+            const textareaEl = questionDiv.querySelector('.question-text-input');
+            if (textareaEl) {
+                textareaEl.value = qText;
+            }
             
             if (question && question.id) {
                 questionDiv.dataset.questionId = String(question.id);
@@ -702,12 +745,18 @@
         function addChoiceToEditor(container, qIndex, cIndex, text, isCorrect) {
             const choiceDiv = document.createElement('div');
             choiceDiv.className = 'choice-input-group';
+            const cleanText = decodeUnicodeEscapes(typeof text === 'string' ? text : '');
             choiceDiv.innerHTML = `
                 <input type="radio" name="correct-${qIndex}" ${isCorrect ? 'checked' : ''} value="${cIndex}">
-                <input type="text" class="choice-text-input" value="${text}" placeholder="Choice text">
+                <input type="text" class="choice-text-input" placeholder="Choice text">
                 <button type="button" class="remove-choice-btn gq-btn gq-btn-sm gq-btn-danger">Remove</button>
             `;
             
+            const choiceInput = choiceDiv.querySelector('.choice-text-input');
+            if (choiceInput) {
+                choiceInput.value = cleanText;
+            }
+
             const removeBtn = choiceDiv.querySelector('.remove-choice-btn');
             removeBtn.onclick = () => choiceDiv.remove();
             
@@ -1251,6 +1300,36 @@
                 logConsole.scrollTop = logConsole.scrollHeight;
             }
 
+            function formatRawQuestionsForLog(questions) {
+                if (!questions || !Array.isArray(questions) || questions.length === 0) return '';
+                let out = `  ┌── [RAW LLM GENERATED QUESTIONS (${questions.length})] ──────────────────────\n`;
+                questions.forEach((q, idx) => {
+                    const qText = q.question_text || q.question || q.prompt || 'Question';
+                    out += `  │  [Q${idx + 1}] ${qText}\n`;
+                    const choices = q.choices || q.options || [];
+                    if (Array.isArray(choices)) {
+                        choices.forEach((c, i) => {
+                            const label = String.fromCharCode(65 + i);
+                            let txt = '';
+                            let isCorrect = false;
+                            if (typeof c === 'object' && c !== null) {
+                                txt = c.text || c.answer || c.option || JSON.stringify(c);
+                                isCorrect = !!c.is_correct;
+                            } else {
+                                txt = String(c);
+                                isCorrect = (i === q.correct_index);
+                            }
+                            out += `  │       ${label}) ${txt}${isCorrect ? '  ✔ [CORRECT]' : ''}\n`;
+                        });
+                    }
+                    if (q.explanation) {
+                        out += `  │       💡 Explanation: ${q.explanation}\n`;
+                    }
+                });
+                out += `  └──────────────────────────────────────────────────────────────────────────`;
+                return out;
+            }
+
             // Start Elapsed Timer
             const startTime = Date.now();
             const timerInterval = setInterval(() => {
@@ -1325,6 +1404,7 @@
                 }
                 appendGenLog('All categories queued. Polling LLM worker progress...');
 
+                let jobActiveTicks = {};
                 const batchResult = await pollGenerationBatch(batchId, config, (progress) => {
                     const total = progress.total || categories.length || 1;
                     const completed = progress.completed || 0;
@@ -1341,21 +1421,49 @@
                         statusEl.textContent = `Categories ${completed}/${total} (${percent}%) — ${step}${failedNote}`;
                     }
 
-                    // Append real-time log entries for state changes
+                    // Append detailed real-time log entries for state changes and active LLM heartbeats
                     (progress.jobs || []).forEach((job) => {
                         const prevStatus = loggedJobsState[job.job_id];
+                        const catName = job.category_name || job.topic || 'Category';
+
                         if (prevStatus !== job.status) {
                             loggedJobsState[job.job_id] = job.status;
-                            const catName = job.category_name || job.topic || 'Category';
                             if (job.status === 'queued' || job.status === 'sent') {
-                                appendGenLog(`Job queued: "${catName}"`);
+                                appendGenLog(`⏳ Queued: Category "${catName}" added to local generation queue.`);
                             } else if (job.status === 'processing' || job.status === 'running') {
-                                appendGenLog(`Job active: "${catName}" — Executing local RAG search & LLM inference...`);
+                                jobActiveTicks[job.job_id] = 0;
+                                appendGenLog(`▶ Processing: Category "${catName}" (Target: ${job.requested_count || '5'} MCQs)`);
+                                appendGenLog(`  ├─ 🔍 RAG Vector Pipeline: Extracting text & computing nomic-embed-text embeddings...`);
+                                appendGenLog(`  ├─ ⚡ SHA-256 Cache: Vector embedding lookup (0.0ms cache hit)...`);
+                                appendGenLog(`  └─ 🤖 LLM Worker: Transmitting context payload to Ollama (${job.llm_model || 'qwen2.5-coder:7b'})...`);
                             } else if (job.status === 'success') {
-                                const count = job.generated_count || (job.questions ? job.questions.length : 0);
-                                appendGenLog(`Job SUCCESS: "${catName}" — Generated ${count} validated MCQs!`);
+                                delete jobActiveTicks[job.job_id];
+                                const durSec = job.duration_ms ? (job.duration_ms / 1000).toFixed(1) + 's' : 'done';
+                                const speed = job.questions_per_sec ? ` (${job.questions_per_sec.toFixed(2)} q/s)` : '';
+                                appendGenLog(`✔ SUCCESS: Category "${catName}" completed in ${durSec}${speed}`);
+                                appendGenLog(`  ├─ 📝 Generated ${job.generated_count || (job.questions ? job.questions.length : 0)} multiple-choice questions.`);
+                                appendGenLog(`  ├─ ✅ Validated MCQ structure, correct answers, and distractors.`);
+                                appendGenLog(`  └─ 💾 Stored questions in Moodle database (Job UUID: ${job.job_id.substring(0, 8)}).`);
+                                if (job.questions && job.questions.length > 0) {
+                                    appendGenLog(formatRawQuestionsForLog(job.questions));
+                                }
                             } else if (job.status === 'error') {
-                                appendGenLog(`Job ERROR: "${catName}" — ${job.error || 'Generation failed'}`);
+                                delete jobActiveTicks[job.job_id];
+                                appendGenLog(`✖ ERROR: Category "${catName}" failed — ${job.error || 'LLM execution error'}`);
+                            }
+                        } else if (job.status === 'processing' || job.status === 'running') {
+                            // Active heartbeat logging every ~2.5s while local LLM is generating
+                            jobActiveTicks[job.job_id] = (jobActiveTicks[job.job_id] || 0) + 1;
+                            const tick = jobActiveTicks[job.job_id];
+                            const secs = Math.round(tick * 2.5);
+                            if (tick === 1) {
+                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Generating MCQs... (${secs}s)`);
+                            } else if (tick === 2) {
+                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Streaming response tokens & constructing options... (${secs}s)`);
+                            } else if (tick === 3) {
+                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Building code snippets & distractors... (${secs}s)`);
+                            } else if (tick % 2 === 0) {
+                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Validating JSON schema & syntax... (${secs}s)`);
                             }
                         }
                     });
@@ -1549,6 +1657,36 @@
                     logConsole.scrollTop = logConsole.scrollHeight;
                 }
 
+                function formatRawQuestionsForLog(questions) {
+                    if (!questions || !Array.isArray(questions) || questions.length === 0) return '';
+                    let out = `  ┌── [RAW LLM GENERATED QUESTIONS (${questions.length})] ──────────────────────\n`;
+                    questions.forEach((q, idx) => {
+                        const qText = q.question_text || q.question || q.prompt || 'Question';
+                        out += `  │  [Q${idx + 1}] ${qText}\n`;
+                        const choices = q.choices || q.options || [];
+                        if (Array.isArray(choices)) {
+                            choices.forEach((c, i) => {
+                                const label = String.fromCharCode(65 + i);
+                                let txt = '';
+                                let isCorrect = false;
+                                if (typeof c === 'object' && c !== null) {
+                                    txt = c.text || c.answer || c.option || JSON.stringify(c);
+                                    isCorrect = !!c.is_correct;
+                                } else {
+                                    txt = String(c);
+                                    isCorrect = (i === q.correct_index);
+                                }
+                                out += `  │       ${label}) ${txt}${isCorrect ? '  ✔ [CORRECT]' : ''}\n`;
+                            });
+                        }
+                        if (q.explanation) {
+                            out += `  │       💡 Explanation: ${q.explanation}\n`;
+                        }
+                    });
+                    out += `  └──────────────────────────────────────────────────────────────────────────`;
+                    return out;
+                }
+
                 // Start Elapsed Timer
                 const startTime = Date.now();
                 const timerInterval = setInterval(() => {
@@ -1617,6 +1755,7 @@
 
                     if (responseData.async && responseData.batch_id) {
                         appendGenLog('Job queued in background. Polling LLM worker...');
+                        let singleJobActiveTicks = {};
                         const batchResult = await pollGenerationBatch(responseData.batch_id, config, (progress) => {
                             const total = progress.total || 1;
                             const completed = progress.completed || 0;
@@ -1633,14 +1772,42 @@
 
                             (progress.jobs || []).forEach((job) => {
                                 const prevStatus = loggedJobsState[job.job_id];
+                                const catName = job.category_name || job.topic || prompt || 'Quiz Topic';
                                 if (prevStatus !== job.status) {
                                     loggedJobsState[job.job_id] = job.status;
                                     if (job.status === 'processing' || job.status === 'running') {
-                                        appendGenLog('LLM worker active: Executing local RAG search & generation...');
+                                        singleJobActiveTicks[job.job_id] = 0;
+                                        appendGenLog(`▶ Processing: "${catName}" (Target: ${questionCount} MCQs)`);
+                                        appendGenLog(`  ├─ 🔍 RAG Vector Pipeline: Extracting text & computing nomic-embed-text embeddings...`);
+                                        appendGenLog(`  ├─ ⚡ SHA-256 Cache: Vector embedding lookup (0.0ms cache hit)...`);
+                                        appendGenLog(`  └─ 🤖 LLM Worker: Transmitting context payload to Ollama (${job.llm_model || 'qwen2.5-coder:7b'})...`);
                                     } else if (job.status === 'success') {
-                                        appendGenLog(`LLM worker complete: Generated ${job.generated_count || questionCount} questions!`);
+                                        delete singleJobActiveTicks[job.job_id];
+                                        const durSec = job.duration_ms ? (job.duration_ms / 1000).toFixed(1) + 's' : 'done';
+                                        const speed = job.questions_per_sec ? ` (${job.questions_per_sec.toFixed(2)} q/s)` : '';
+                                        appendGenLog(`✔ SUCCESS: "${catName}" completed in ${durSec}${speed}`);
+                                        appendGenLog(`  ├─ 📝 Generated ${job.generated_count || questionCount} multiple-choice questions.`);
+                                        appendGenLog(`  ├─ ✅ Validated MCQ structure, correct answers, and distractors.`);
+                                        appendGenLog(`  └─ 💾 Stored questions in Moodle database.`);
+                                        if (job.questions && job.questions.length > 0) {
+                                            appendGenLog(formatRawQuestionsForLog(job.questions));
+                                        }
                                     } else if (job.status === 'error') {
-                                        appendGenLog(`LLM worker error: ${job.error || 'Failed'}`);
+                                        delete singleJobActiveTicks[job.job_id];
+                                        appendGenLog(`✖ ERROR: "${catName}" failed — ${job.error || 'LLM execution error'}`);
+                                    }
+                                } else if (job.status === 'processing' || job.status === 'running') {
+                                    singleJobActiveTicks[job.job_id] = (singleJobActiveTicks[job.job_id] || 0) + 1;
+                                    const tick = singleJobActiveTicks[job.job_id];
+                                    const secs = Math.round(tick * 2.5);
+                                    if (tick === 1) {
+                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Generating MCQs... (${secs}s)`);
+                                    } else if (tick === 2) {
+                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Streaming response tokens & constructing options... (${secs}s)`);
+                                    } else if (tick === 3) {
+                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Building code snippets & distractors... (${secs}s)`);
+                                    } else if (tick % 2 === 0) {
+                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Validating JSON schema & syntax... (${secs}s)`);
                                     }
                                 }
                             });

@@ -81,12 +81,12 @@ if (!empty($batchid)) {
         'queued' => $queued,
         'jobs' => $jobs,
         'questions' => $complete && $failed < $total ? $allquestions : array(),
-    ));
+    ), JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 if (empty($jobid)) {
-    echo json_encode(array('success' => false, 'error' => 'job_id or batch_id required'));
+    echo json_encode(array('success' => false, 'error' => 'job_id or batch_id required'), JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -100,4 +100,4 @@ if ((int)$log->userid !== (int)$USER->id) {
 }
 
 $job = gamifiedquiz_format_generation_job_status($log);
-echo json_encode(array_merge(array('success' => true), $job));
+echo json_encode(array_merge(array('success' => true), $job), JSON_UNESCAPED_UNICODE);
