@@ -402,14 +402,39 @@ if ($is_teacher) {
     echo '</div>';
     echo '</div>';
     
-    // Loading Dialog Modal
-    echo '<div id="loading-modal" class="question-editor-modal" style="display:none;">';
-    echo '<div class="question-editor-content gq-container" style="max-width: 400px; text-align: center;">';
-    echo '<div style="margin: 20px 0;">';
-    echo '<div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div>';
+    // Enhanced Loading Dialog Modal
+    echo '<div id="loading-modal" class="question-editor-modal" style="display:none; align-items: center; justify-content: center;">';
+    echo '<div class="question-editor-content gq-container" style="max-width: 580px; width: 90%; text-align: left; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); position: relative;">';
+    echo '<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">';
+    echo '<div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; flex-shrink: 0;"></div>';
+    echo '<div style="flex-grow: 1;">';
+    echo '<h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #1e293b;">Generating Questions...</h3>';
+    echo '<span id="gen-timer-text" style="font-size: 0.85rem; color: #64748b;">Elapsed: 00:00</span>';
     echo '</div>';
-    echo '<h3 style="margin: 20px 0;">Generating Questions...</h3>';
-    echo '<p style="color: #666;">Please wait while we generate your questions.</p>';
+    echo '</div>';
+    
+    // Progress Bar
+    echo '<div style="margin-bottom: 12px;">';
+    echo '<div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #334155;">';
+    echo '<span id="loading-status">Initializing LLM generation...</span>';
+    echo '<span id="gen-progress-percent">0%</span>';
+    echo '</div>';
+    echo '<div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden;">';
+    echo '<div id="gen-progress-bar-inner" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); transition: width 0.4s ease; border-radius: 5px;"></div>';
+    echo '</div>';
+    echo '</div>';
+
+    // Toggle Log Console Button
+    echo '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">';
+    echo '<button id="toggle-gen-logs-btn" type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 0.8rem; padding: 4px 10px; border-radius: 6px; cursor: pointer;">Show LLM Logs 📜</button>';
+    echo '<span style="font-size: 0.75rem; color: #94a3b8;">Local GPU / RAG Worker Active</span>';
+    echo '</div>';
+
+    // Log Console Container
+    echo '<div id="gen-log-console-wrap" style="display: none; margin-top: 12px;">';
+    echo '<div id="gen-log-console" style="height: 150px; overflow-y: auto; background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.78rem; padding: 10px 12px; border-radius: 6px; border: 1px solid #334155; white-space: pre-wrap; line-height: 1.4;"></div>';
+    echo '</div>';
+
     echo '</div>';
     echo '</div>';
     

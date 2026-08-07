@@ -1211,30 +1211,77 @@
             const ragSource = document.getElementById('generate-rag-source')?.value || '';
             await saveGenerationPrefs(config, categories, sharedLessonText);
             
-            // Show loading
+            // Show loading & Initialize enhanced Progress UI
             const loadingModal = document.getElementById('loading-modal');
             const generateModal = document.getElementById('generate-questions-modal');
-            if (loadingModal) loadingModal.style.display = 'flex';
             if (generateModal) generateModal.style.display = 'none';
+
+            // Progress & Log UI Elements
+            const statusEl = document.getElementById('loading-status');
+            const percentEl = document.getElementById('gen-progress-percent');
+            const progressBarInner = document.getElementById('gen-progress-bar-inner');
+            const timerEl = document.getElementById('gen-timer-text');
+            const toggleLogBtn = document.getElementById('toggle-gen-logs-btn');
+            const logWrap = document.getElementById('gen-log-console-wrap');
+            const logConsole = document.getElementById('gen-log-console');
+
+            if (loadingModal) loadingModal.style.display = 'flex';
+            if (statusEl) statusEl.textContent = 'Initializing generation batch...';
+            if (percentEl) percentEl.textContent = '0%';
+            if (progressBarInner) progressBarInner.style.width = '0%';
+            if (logConsole) logConsole.textContent = '';
+            if (logWrap) logWrap.style.display = 'none';
+
+            if (toggleLogBtn && logWrap) {
+                toggleLogBtn.onclick = function() {
+                    if (logWrap.style.display === 'none' || !logWrap.style.display) {
+                        logWrap.style.display = 'block';
+                        toggleLogBtn.textContent = 'Hide LLM Logs 📜';
+                    } else {
+                        logWrap.style.display = 'none';
+                        toggleLogBtn.textContent = 'Show LLM Logs 📜';
+                    }
+                };
+            }
+
+            function appendGenLog(msg) {
+                if (!logConsole) return;
+                const timeStr = new Date().toLocaleTimeString();
+                logConsole.textContent += `[${timeStr}] ${msg}\n`;
+                logConsole.scrollTop = logConsole.scrollHeight;
+            }
+
+            // Start Elapsed Timer
+            const startTime = Date.now();
+            const timerInterval = setInterval(() => {
+                const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+                const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+                const secs = String(elapsedSec % 60).padStart(2, '0');
+                if (timerEl) timerEl.textContent = `Elapsed: ${mins}:${secs}`;
+            }, 1000);
+
+            appendGenLog(`Batch starting for ${categories.length} category(ies)...`);
             
             // Generate questions for each category
             const allQuestions = [];
             const wwwroot = config.wwwroot || '';
             const sesskey = config.sesskey || '';
 
-            const loadingStatus = loadingModal ? loadingModal.querySelector('p') : null;
             const batchId = (typeof crypto !== 'undefined' && crypto.randomUUID)
                 ? crypto.randomUUID()
                 : `batch_${Date.now()}`;
             activeGenerationBatchId = batchId;
 
+            let loggedJobsState = {};
+
             try {
                 let categoryIndex = 0;
                 for (const category of categories) {
                     categoryIndex++;
-                    if (loadingStatus) {
-                        loadingStatus.textContent = `Queuing category ${categoryIndex} of ${categories.length}: ${category.name}…`;
-                    }
+                    const msg = `Queuing category ${categoryIndex}/${categories.length}: "${category.name}" (Topic: ${category.topic || 'Default'})...`;
+                    if (statusEl) statusEl.textContent = msg;
+                    appendGenLog(msg);
+
                     const formData = new URLSearchParams();
                     formData.append('quizid', config.quizId);
                     formData.append('cmid', config.cmId);
@@ -1273,19 +1320,48 @@
                     }
                 }
 
-                if (loadingStatus) {
-                    loadingStatus.textContent = 'Generating questions in the background… This may take several minutes.';
+                if (statusEl) {
+                    statusEl.textContent = 'Generating questions via local LLM / RAG worker...';
                 }
+                appendGenLog('All categories queued. Polling LLM worker progress...');
 
                 const batchResult = await pollGenerationBatch(batchId, config, (progress) => {
-                    if (loadingStatus) {
-                        const failedNote = progress.failed > 0 ? ` (${progress.failed} failed)` : '';
-                        const activeJob = (progress.jobs || []).find((j) => !j.complete);
-                        const step = activeJob?.status_label || activeJob?.status || 'working';
-                        loadingStatus.textContent =
-                            `Categories ${progress.completed}/${progress.total} — ${step}${failedNote}`;
+                    const total = progress.total || categories.length || 1;
+                    const completed = progress.completed || 0;
+                    const percent = Math.min(100, Math.round((completed / total) * 100));
+
+                    if (percentEl) percentEl.textContent = `${percent}%`;
+                    if (progressBarInner) progressBarInner.style.width = `${percent}%`;
+
+                    const failedNote = progress.failed > 0 ? ` (${progress.failed} failed)` : '';
+                    const activeJob = (progress.jobs || []).find((j) => !j.complete);
+                    const step = activeJob ? `Processing "${activeJob.category_name || activeJob.topic}": ${activeJob.status_label || activeJob.status}` : (progress.complete ? 'Completed!' : 'Finishing tasks...');
+
+                    if (statusEl) {
+                        statusEl.textContent = `Categories ${completed}/${total} (${percent}%) — ${step}${failedNote}`;
                     }
+
+                    // Append real-time log entries for state changes
+                    (progress.jobs || []).forEach((job) => {
+                        const prevStatus = loggedJobsState[job.job_id];
+                        if (prevStatus !== job.status) {
+                            loggedJobsState[job.job_id] = job.status;
+                            const catName = job.category_name || job.topic || 'Category';
+                            if (job.status === 'queued' || job.status === 'sent') {
+                                appendGenLog(`Job queued: "${catName}"`);
+                            } else if (job.status === 'processing' || job.status === 'running') {
+                                appendGenLog(`Job active: "${catName}" — Executing local RAG search & LLM inference...`);
+                            } else if (job.status === 'success') {
+                                const count = job.generated_count || (job.questions ? job.questions.length : 0);
+                                appendGenLog(`Job SUCCESS: "${catName}" — Generated ${count} validated MCQs!`);
+                            } else if (job.status === 'error') {
+                                appendGenLog(`Job ERROR: "${catName}" — ${job.error || 'Generation failed'}`);
+                            }
+                        }
+                    });
                 });
+
+                clearInterval(timerInterval);
 
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
@@ -1305,9 +1381,11 @@
                     alert(`Generated ${batchResult.questions.length} questions, but ${failedJobs.length} category(ies) failed.`);
                 }
             } catch (error) {
+                clearInterval(timerInterval);
                 console.error('Error generating questions:', error);
                 alert('Error generating questions: ' + error.message);
             } finally {
+                clearInterval(timerInterval);
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
                 }
@@ -1434,13 +1512,53 @@
                     return;
                 }
                 
+                // Progress & Log UI Elements
+                const statusEl = document.getElementById('loading-status');
+                const percentEl = document.getElementById('gen-progress-percent');
+                const progressBarInner = document.getElementById('gen-progress-bar-inner');
+                const timerEl = document.getElementById('gen-timer-text');
+                const toggleLogBtn = document.getElementById('toggle-gen-logs-btn');
+                const logWrap = document.getElementById('gen-log-console-wrap');
+                const logConsole = document.getElementById('gen-log-console');
+
                 // Hide generate dialog and show loading dialog
-                if (generateModal) {
-                    generateModal.style.display = 'none';
+                if (generateModal) generateModal.style.display = 'none';
+                if (loadingModal) loadingModal.style.display = 'flex';
+                if (statusEl) statusEl.textContent = 'Initializing generation task...';
+                if (percentEl) percentEl.textContent = '0%';
+                if (progressBarInner) progressBarInner.style.width = '0%';
+                if (logConsole) logConsole.textContent = '';
+                if (logWrap) logWrap.style.display = 'none';
+
+                if (toggleLogBtn && logWrap) {
+                    toggleLogBtn.onclick = function() {
+                        if (logWrap.style.display === 'none' || !logWrap.style.display) {
+                            logWrap.style.display = 'block';
+                            toggleLogBtn.textContent = 'Hide LLM Logs 📜';
+                        } else {
+                            logWrap.style.display = 'none';
+                            toggleLogBtn.textContent = 'Show LLM Logs 📜';
+                        }
+                    };
                 }
-                if (loadingModal) {
-                    loadingModal.style.display = 'flex';
+
+                function appendGenLog(msg) {
+                    if (!logConsole) return;
+                    const timeStr = new Date().toLocaleTimeString();
+                    logConsole.textContent += `[${timeStr}] ${msg}\n`;
+                    logConsole.scrollTop = logConsole.scrollHeight;
                 }
+
+                // Start Elapsed Timer
+                const startTime = Date.now();
+                const timerInterval = setInterval(() => {
+                    const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+                    const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+                    const secs = String(elapsedSec % 60).padStart(2, '0');
+                    if (timerEl) timerEl.textContent = `Elapsed: ${mins}:${secs}`;
+                }, 1000);
+
+                appendGenLog(`Task started: Prompt="${prompt}", Count=${questionCount}`);
                 
                 console.log('Starting question generation with:', { prompt, predefinedData, difficulty, questionCount });
                 
@@ -1495,20 +1613,44 @@
                     responseData = JSON.parse(responseText);
                     console.log('Generate questions parsed response:', responseData);
 
+                    let loggedJobsState = {};
+
                     if (responseData.async && responseData.batch_id) {
-                        const loadingStatus = loadingModal ? loadingModal.querySelector('p') : null;
-                        if (loadingStatus) {
-                            loadingStatus.textContent = 'Generating questions in the background…';
-                        }
+                        appendGenLog('Job queued in background. Polling LLM worker...');
                         const batchResult = await pollGenerationBatch(responseData.batch_id, config, (progress) => {
-                            if (loadingStatus && progress.total <= 1) {
-                                loadingStatus.textContent = 'Generating questions…';
+                            const total = progress.total || 1;
+                            const completed = progress.completed || 0;
+                            const percent = Math.min(100, Math.round((completed / total) * 100));
+
+                            if (percentEl) percentEl.textContent = `${percent}%`;
+                            if (progressBarInner) progressBarInner.style.width = `${percent}%`;
+
+                            const activeJob = (progress.jobs || []).find((j) => !j.complete);
+                            const step = activeJob ? activeJob.status_label || activeJob.status : 'Completed!';
+                            if (statusEl) {
+                                statusEl.textContent = `Generating questions... (${percent}%) — ${step}`;
                             }
+
+                            (progress.jobs || []).forEach((job) => {
+                                const prevStatus = loggedJobsState[job.job_id];
+                                if (prevStatus !== job.status) {
+                                    loggedJobsState[job.job_id] = job.status;
+                                    if (job.status === 'processing' || job.status === 'running') {
+                                        appendGenLog('LLM worker active: Executing local RAG search & generation...');
+                                    } else if (job.status === 'success') {
+                                        appendGenLog(`LLM worker complete: Generated ${job.generated_count || questionCount} questions!`);
+                                    } else if (job.status === 'error') {
+                                        appendGenLog(`LLM worker error: ${job.error || 'Failed'}`);
+                                    }
+                                }
+                            });
                         });
                         responseData.questions = batchResult.questions || [];
                         responseData.success = responseData.questions.length > 0;
                     }
                     
+                    clearInterval(timerInterval);
+
                     if (loadingModal) {
                         loadingModal.style.display = 'none';
                     }
@@ -1523,12 +1665,12 @@
                         window.currentQuestions = questions;
                         if (startBtn) startBtn.disabled = false;
                         currentQuestionIndex = 0;
-                        const statusEl = document.getElementById('session-status');
-                        if (statusEl) {
-                            statusEl.style.display = 'block';
-                            statusEl.textContent = 'Questions generated successfully! (' + (responseData.count || questions.length) + ' questions) Ready to start session.';
-                            statusEl.style.background = '#d4edda';
-                            statusEl.style.borderColor = '#28a745';
+                        const sessionStatusEl = document.getElementById('session-status');
+                        if (sessionStatusEl) {
+                            sessionStatusEl.style.display = 'block';
+                            sessionStatusEl.textContent = 'Questions generated successfully! (' + (responseData.count || questions.length) + ' questions) Ready to start session.';
+                            sessionStatusEl.style.background = '#d4edda';
+                            sessionStatusEl.style.borderColor = '#28a745';
                         }
                     } else {
                         const errorMsg = responseData.error || 'Failed to generate questions. Please check LLM API configuration.';
@@ -1539,8 +1681,8 @@
                         }
                     }
                 } catch (error) {
+                    clearInterval(timerInterval);
                     console.error('Error generating questions:', error);
-                    // Hide loading dialog
                     if (loadingModal) {
                         loadingModal.style.display = 'none';
                     }

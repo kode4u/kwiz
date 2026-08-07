@@ -1,6 +1,6 @@
-# LBE JICA — AI-Enhanced Gamified Moodle Quiz
+# KwizRAG — AI-Enhanced Gamified Moodle Quiz System
 
-A comprehensive system that integrates AI-powered question generation with real-time gamified quizzes in Moodle.
+**KwizRAG** is a local RAG-powered, gamified assessment system integrated with Moodle (`mod_gamifiedquiz`). It combines on-premise AI question generation (`qwen2.5-coder:7b` + `nomic-embed-text` vector caching) with real-time multiplayer gamification (Socket.IO + Redis).
 
 ## 🏗️ Project Structure
 
