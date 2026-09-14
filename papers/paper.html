@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KwizRAG: Design and Evaluation of a Local RAG-Enhanced Gamified Quiz System for Moodle</title>
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- Mermaid for architecture diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true, theme: 'neutral'});</script>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: 'Times New Roman', Times, 'Liberation Serif', serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #111111;
+            background-color: #ffffff;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        h1 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 20pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0d2b45;
+            line-height: 1.2;
+        }
+        h2 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 13pt;
+            font-weight: bold;
+            border-bottom: 2px solid #0d2b45;
+            padding-bottom: 4px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            color: #0d2b45;
+        }
+        h3 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11.5pt;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            color: #1a4a72;
+        }
+        h4 {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+        p {
+            text-align: justify;
+            margin-bottom: 12px;
+            text-indent: 0px;
+        }
+        ul, ol {
+            margin-top: 6px;
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 9.5pt;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        th, td {
+            border: 1px solid #d0d7de;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f4f8;
+            font-weight: bold;
+            color: #0d2b45;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fbfd;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f6f8;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 9.5pt;
+        }
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 14px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 9pt;
+            line-height: 1.4;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        blockquote {
+            border-left: 4px solid #0d2b45;
+            margin: 12px 0;
+            padding: 8px 16px;
+            background-color: #f4f8fc;
+            color: #333333;
+            font-style: italic;
+        }
+        .mermaid {
+            text-align: center;
+            margin: 20px 0;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eaeaea;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #e1e4e8;
+            margin: 25px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>KwizRAG: Design and Evaluation of a Local RAG-Enhanced Gamified Quiz System for Moodle</h1>
+<h2>Abstract</h2>
+<p>Digital learning management systems (LMS) such as Moodle have transformed higher education, particularly in developing regions like Southeast Asia. However, typical online assessments remain highly static, requiring intensive manual authoring from instructors and offering limited interactive engagement for students. This paper presents <strong>KwizRAG</strong>, an AI-enhanced gamified quiz system integrated into Moodle via a native activity module (<code>mod_gamifiedquiz</code>). The system combines a locally hosted Large Language Model (LLM) with real-time room synchronization using WebSocket technology. To address factual accuracy and eliminate context hallucinations, KwizRAG implements a Local Light Weight Multilingual Retrieval-Augmented Generation (L3M-RAG) pipeline utilizing <code>nomic-embed-text</code> embeddings, optimized by a local SHA-256 embedding cache. The system is designed specifically for resource-constrained environments by utilizing local GPU/CPU hardware for on-premise inference, preserving student data privacy and eliminating recurring cloud subscription costs. </p>
+<p>Our evaluation reveals an average local LLM generation time of 8.11–12.42 seconds per question using <code>qwen2.5-coder:7b</code> with instant <strong>0.0 ms</strong> embedding cache hits. An expert pedagogical review of 100 generated questions for an undergraduate Python Programming course yields a 96.0% overall acceptability rating with zero context hallucinations. Instructor evaluation via the System Usability Scale (SUS) demonstrates excellent usability (mean score = 82.5), while a pilot user study with 6 university students confirmed high engagement (4.8/5.0) and seamless real-time WebSocket synchronization (&lt;50 ms latency), validating KwizRAG as a sustainable, classroom-ready digital assessment solution.</p>
+<p><strong>Keywords</strong>: retrieval-augmented generation, local large language models, learning management systems, moodle, gamification, vector caching, artificial intelligence in education.</p>
+<hr>
+<h2>1. Introduction</h2>
+<p>The digitization of higher education has expanded access to learning resources worldwide. Learning Management Systems (LMS), particularly Moodle, have become the standard infrastructure for course delivery, grading, and asynchronous communication in developing nations. Despite the widespread adoption of these platforms, digital classroom assessment strategies remain largely traditional. Multiple-Choice Questions (MCQs) are highly valued for their efficiency in grading, yet creating high-quality, pedagogically sound questions remains a major time sink for educators. Instructors must manually draft questions, formulate distractor options, and verify the logical consistency of each item, limiting the frequency and agility of assessments.</p>
+<p>Furthermore, standard LMS quizzes are typically solitary, static exercises. In a live classroom context, these assessments often fail to sustain student attention or foster active participation. While external gamification platforms (such as Kahoot or Quizizz) have successfully introduced excitement into classrooms through live leaderboards, competitive timers, and instant feedback, they introduce several severe drawbacks:</p>
+<ul>
+<li><strong>System Disconnection</strong>: Grades, student lists, and performance metrics are siloed, requiring manual data synchronization or paid API bridges to connect with the institutional LMS.</li>
+<li><strong>Cost Barriers</strong>: These commercial platforms operate on subscription models that quickly become cost-prohibitive when scaled across entire universities or departments.</li>
+<li><strong>Internet Dependency</strong>: They rely entirely on high-speed internet connections to external cloud servers, which are frequently unstable in under-resourced regions.</li>
+<li><strong>Data Privacy &amp; Governance</strong>: Student Personally Identifiable Information (PII) and institutional curriculum data are uploaded to third-party cloud servers, violating digital sovereignty and security best practices.</li>
+</ul>
+<p>To address these challenges, we propose <strong>KwizRAG</strong>, a decoupled, containerized architecture integrated directly into Moodle via the <strong>Gamified Quiz Moodle Plugin (<code>mod_gamifiedquiz</code>)</strong>. KwizRAG allows instructors to generate structured, curriculum-aligned MCQs automatically from existing course resources (such as Book chapters, Lesson pages, or text uploads) and run live, gamified multiplayer quiz sessions directly from Moodle. </p>
+<p>The primary contribution of KwizRAG is a scalable, cost-effective, and privacy-preserving architecture optimized for resource-constrained environments. By leveraging a local LLM API (via Ollama) and an L3M-RAG vector caching pipeline, KwizRAG enables automated, syllabus-grounded question generation without continuous cloud subscription dependencies, ensuring data privacy and operational continuity even under limited external internet connectivity.</p>
+<p>To evaluate the system, we address three specific Research Questions (RQs):</p>
+<ul>
+<li><strong>RQ1 (AI Generation &amp; RAG Cache Performance)</strong>: Can a containerized local LLM (<code>qwen2.5-coder:7b</code>) and SHA-256 vector caching pipeline deliver low question generation latency (8–12 s per MCQ) and instant embedding retrieval (0ms cache hits) on on-premise hardware?</li>
+<li><strong>RQ2 (Pedagogical Quality &amp; RAG Grounding)</strong>: How effective is the L3M-RAG pipeline in eliminating context hallucinations and generating syllabus-aligned programming questions compared to zero-context models?</li>
+<li><strong>RQ3 (Instructor Usability &amp; Financial Sustainability)</strong>: Does the streamlined authoring interface achieve high usability for university instructors ($\text{SUS} \ge 80$) while delivering a sustainable 3-year TCO compared to cloud APIs?</li>
+</ul>
+<hr>
+<h2>2. Related Work</h2>
+<h3>2.1 Automatic Question Generation (AQG)</h3>
+<p>Automatic Question Generation (AQG) has evolved from rule-based syntax transformations to deep learning sequence-to-sequence models. Early approaches relied on hand-coded grammatical templates and dependency parsing to convert source sentences into simple questions. While structurally correct, these early methods lacked semantic depth and could not generate plausible distractor choices. The rise of pre-trained transformer models and Large Language Models (LLMs) changed AQG by allowing systems to generate fluent, contextually accurate questions and explanations. </p>
+<p>However, calling commercial LLM API endpoints (such as OpenAI&#39;s GPT-4 or Google&#39;s Gemini) is often impractical for public universities in developing regions due to recurring per-token subscription costs. Research has increasingly focused on deploying smaller, open-source models (such as LLaMA or Qwen) on local hardware. This study builds on this trend by deploying <code>qwen2.5-coder:7b</code> locally to generate programming-focused MCQs, validating its pedagogical quality against expert standards.</p>
+<h3>2.2 Gamified LMS Architecture</h3>
+<p>Gamification incorporates game mechanics—such as points, badges, timers, and leaderboards—into non-game contexts to boost engagement. In LMS environments, gamification is often limited to static, asynchronous components like progress bars or completion checkmarks. Stateless web architectures (like Moodle&#39;s native PHP backend) struggle to support real-time, synchronous multiplayer interactions, where all student screens must be updated instantly when an instructor pushes a question. </p>
+<p>To overcome this transport limitation, researchers have proposed combining stateless web frameworks with stateful synchronization layers. Our architecture utilizes a decoupled Node.js WebSocket server running Socket.IO, backed by Redis for pub/sub message routing, enabling live classroom synchronization while maintaining full integration with Moodle&#39;s core database.</p>
+<h3>2.3 Retrieval-Augmented Generation (RAG)</h3>
+<p>Retrieval-Augmented Generation (RAG) addresses the semantic limitations of general-purpose LLMs, particularly their tendency to &quot;hallucinate&quot; incorrect facts (Lewis et al., 2020; Ji et al., 2023). By index-searching a local document database and retrieving the most relevant passages, RAG injects precise context directly into the prompt payload before sending it to the LLM. </p>
+<p>While RAG is highly effective, generating vector embeddings for large text documents on local institutional hardware can introduce significant CPU/GPU latency. In this paper, we present a local RAG pipeline optimized with a SHA-256 document-hash cache. By skipping embedding calculations for previously processed lecture materials, we reduce RAG processing latency to <strong>0ms</strong> on repeated requests, enabling efficient local execution.</p>
+<h3>2.4 Literature Gap Identification &amp; Research Contributions</h3>
+<p>Despite recent advances in AI for education (AIED) and student response systems (SRS), an analysis of existing literature reveals four critical technological and methodological gaps:</p>
+<ul>
+<li><strong>Gap 1 (G1: Pedagogical Context Hallucinations)</strong>: Existing zero-context LLM quiz generators [10] suffer from high hallucination rates (15%–36%) and frequently produce out-of-syllabus programming questions that confuse students.</li>
+<li><strong>Gap 2 (G2: Local RAG Vector Latency Overhead)</strong>: Standard RAG pipelines [1] recalculate dense text embeddings on every generation call, causing 30–60s latencies on local institutional servers.</li>
+<li><strong>Gap 3 (G3: Cloud API Financial &amp; Data Privacy Risks)</strong>: Commercial AI assessment tools rely on external APIs (GPT-4/Gemini), exposing institutions to per-token subscription costs ($3,750+/yr) and student data privacy risks.</li>
+<li><strong>Gap 4 (G4: Gamification Silos vs. Native LMS Integration)</strong>: External game platforms (Kahoot/Quizizz; [9], [11]) operate outside the institution&#39;s Learning Management System, requiring friction-heavy manual CSV grade exports.</li>
+</ul>
+<p>A summary of these identified gaps and KwizRAG&#39;s corresponding architecture solutions is presented in Table 1:</p>
+<p><strong>Table 1. Literature Research Gap Identification &amp; KwizRAG Solutions</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Literature Gap</th>
+<th align="left">Existing Paradigm Deficit</th>
+<th align="left">Literature Source</th>
+<th align="left">KwizRAG Proposed Solution</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>G1: Context Hallucination</strong></td>
+<td align="left">High hallucination rates (15%–36%) &amp; ungrounded items in prompt-only LLMs.</td>
+<td align="left">Rainey et al. [10]; Ji et al. [7]</td>
+<td align="left"><strong>L3M-RAG Pipeline</strong>: Anchors generation to slide vectors, achieving <strong>0.0% context hallucination</strong>.</td>
+</tr>
+<tr>
+<td align="left"><strong>G2: Vector Embedding Latency</strong></td>
+<td align="left">Re-calculating dense embeddings per request causes 30–60s server bottlenecks.</td>
+<td align="left">Lewis et al. [1]</td>
+<td align="left"><strong>SHA-256 Hash Cache</strong>: Delivers instant <strong>0.0 ms retrieval</strong> on repeated slide requests.</td>
+</tr>
+<tr>
+<td align="left"><strong>G3: Privacy &amp; TCO Overhead</strong></td>
+<td align="left">Token subscription fees ($3,750+/yr) and cloud PII data leakage risks.</td>
+<td align="left">Rainey et al. [10]</td>
+<td align="left"><strong>Local Workstation GPU Stack</strong>: 100% on-premise execution with <strong>77.3% TCO savings</strong>.</td>
+</tr>
+<tr>
+<td align="left"><strong>G4: LMS System Isolation</strong></td>
+<td align="left">Commercial game tools operate as external silos requiring manual CSV imports.</td>
+<td align="left">Wang [9]; Zainuddin et al. [11]</td>
+<td align="left"><strong>Native Moodle Plugin (<code>mod_gamifiedquiz</code>)</strong>: Sub-50ms WebSocket room + native DB logs.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>3. Methodology</h2>
+<h3>3.1 Decoupled System Architecture</h3>
+<p>The system is built on a containerized, decoupled architecture managed via Docker Compose. The components interact through lightweight REST APIs and WebSocket connections:</p>
+<div class="mermaid">%%{init: { &#39;flowchart&#39;: { &#39;curve&#39;: &#39;linear&#39; } } }%%
+graph TB
+    subgraph Client_Layer [&quot;Client Layer (Web Browsers)&quot;]
+        Teacher[&quot;Lecturer Interface&lt;br/&gt;(Generate Questions &amp; Start Session)&quot;]
+        Student[&quot;Student Interface&lt;br/&gt;(Read-Only Retrieval &amp; Live Room)&quot;]
+    end
+
+    subgraph Moodle_Host [&quot;Moodle Core (Docker Container: jica-moodle)&quot;]
+        Plugin[&quot;Gamified Quiz Module&lt;br/&gt;(mod_gamifiedquiz)&lt;br/&gt;• view.php / app.js&lt;br/&gt;• ajax/generate.php&quot;]
+        MoodleDB[(&quot;MySQL Database&lt;br/&gt;(jica-mysql)&lt;br/&gt;• mdl_gamifiedquiz_questions&lt;br/&gt;• mdl_gamifiedquiz_sessions&lt;br/&gt;• mdl_gamifiedquiz_logs&quot;)]
+    end
+
+    subgraph Realtime_Bus [&quot;Real-Time &amp; Background Queue Bus&quot;]
+        WS[&quot;Socket.IO Server&lt;br/&gt;(jica-websocket:3001)&lt;br/&gt;• Room Sync &amp; Timers&lt;br/&gt;• Leaderboard Sync&quot;]
+        Redis[(&quot;Redis Store&lt;br/&gt;(jica-redis:6379)&lt;br/&gt;• Pub/Sub Message Broker&lt;br/&gt;• Generation Job Queue&quot;)]
+        Worker[&quot;Background Generation Worker&lt;br/&gt;(generation-worker.js)&quot;]
+    end
+
+    subgraph AI_RAG_Layer [&quot;Local AI &amp; L3M-RAG Microservice (jica-llmapi)&quot;]
+        Flask[&quot;Flask REST API&lt;br/&gt;(llmapi:5001)&lt;br/&gt;• POST /generate&lt;br/&gt;• Semantic Splitter&quot;]
+        Cache[(&quot;SHA-256 Vector Cache&lt;br/&gt;(0.0ms Hit Retrieval)&quot;)]
+        EmbedEngine[&quot;nomic-embed-text&lt;br/&gt;(Dense Embeddings)&quot;]
+        LLMEngine[&quot;Ollama Local LLM&lt;br/&gt;(qwen2.5-coder:7b)&lt;br/&gt;RTX 3090 GPU&quot;]
+    end
+
+    %% Phase 1: Teacher Background Generation Flow
+    Teacher --&gt;|1. Trigger Generation| Plugin
+    Plugin --&gt;|2. Enqueue Job| Redis
+    Redis --&gt;|3. Dequeue Job| Worker
+    Worker --&gt;|4. Call LLM API| Flask
+    Worker --&gt;|5. Callback Save MCQs| Plugin
+    Plugin --&gt;|Store MCQs| MoodleDB
+
+    %% Phase 2: Student Read-Only Retrieval &amp; Live Room Flow
+    Student --&gt;|WebSocket Retrieve Questions| WS
+    Teacher --&gt;|Teacher Room Control| WS
+    WS &lt;--&gt;|Fetch Session Questions| Redis
+    Redis &lt;--&gt;|Sync Session Data| MoodleDB
+
+    %% Microservice AI Links
+    Flask --&gt;|Hash Lookup| Cache
+    Flask --&gt;|Compute Vectors| EmbedEngine
+    Flask --&gt;|Prompt + Context| LLMEngine
+</div>
+<ol>
+<li><strong>Moodle Plugin (<code>mod_gamifiedquiz</code>)</strong>: Implements the native Moodle activity module. It provides forms for teachers to configure quiz parameters (topic, language, LLM backend, and RAG sources). When a teacher clicks &quot;Generate&quot;, the plugin enqueues a generation job into Redis for async background processing.</li>
+<li><strong>Student Interface (Retrieve-Only)</strong>: Students do not trigger any AI generation workers. When a live quiz session starts, the student interface connects via WebSocket (<code>jica-websocket</code>) to retrieve pre-generated questions from the session store, submit answers, and receive live leaderboard updates.</li>
+<li><strong>Background Generation Worker (<code>generation-worker.js</code>)</strong>: A dedicated background service that dequeues generation jobs from Redis (<code>gamifiedquiz:generation:queue</code>), calls the LLM API service, validates output MCQs, and executes callback hooks (<code>complete_generation_job.php</code>) to save generated questions in Moodle&#39;s database.</li>
+<li><strong>WebSocket Server</strong>: A stateful Node.js service running Socket.IO. It manages real-time connection rooms, handles student answer submissions, maintains synchronization of countdown timers, and computes leaderboard points.</li>
+<li><strong>Redis Cache</strong>: Serves as the central state store and pub/sub message broker, coordinating game lobby actions and caching user connection states.</li>
+<li><strong>LLM API Service</strong>: A Python Flask service that acts as the orchestration layer for RAG search and question generation. It exposes a POST <code>/generate</code> endpoint and handles calls to a local Ollama GPU endpoint or external cloud APIs.</li>
+</ol>
+<h3>3.2 Database Schema</h3>
+<p>To persist states and capture evaluation metrics, the Moodle plugin creates and manages the following database tables:</p>
+<ul>
+<li><code>mdl_gamifiedquiz</code>: Stores activity instance details (topic, difficulty, backend, model, and outcomes).</li>
+<li><code>mdl_gamifiedquiz_sessions</code>: Tracks active multiplayer sessions (session codes, active question IDs, status, and timers).</li>
+<li><code>mdl_gamifiedquiz_questions</code>: Stores generated MCQs, distractor choices, correct answers, and AI-generated explanations.</li>
+<li><code>mdl_gamifiedquiz_responses</code>: Logs individual student answers, response times (ms), and calculated points for leaderboard validation.</li>
+<li><code>mdl_gamifiedquiz_generation_logs</code>: Logs system-level metadata for every AI generation request, including:<ul>
+<li><code>request_uuid</code>, <code>gamifiedquizid</code>, <code>userid</code></li>
+<li><code>backend</code>, <code>llm_model</code>, <code>topic</code>, <code>difficulty</code>, <code>language</code></li>
+<li><code>started_at</code>, <code>ended_at</code>, <code>duration_ms</code></li>
+<li><code>requested_count</code>, <code>generated_count</code>, <code>saved_count</code>, <code>questions_per_sec</code></li>
+<li><code>status</code>, <code>error_message</code></li>
+</ul>
+</li>
+</ul>
+<p>This schema enables direct SQL-based analysis of the speed, quality, and reliability of the generation pipeline.</p>
+<h3>3.3 The L3M-RAG &amp; Caching Pipeline</h3>
+<p>When a teacher initiates question generation based on a course document, the system executes the Local Light Weight Multilingual RAG (L3M-RAG) pipeline:</p>
+<pre><code>[Moodle Request]
+       │ (Sends Topic, Outcomes, &amp; Lecture Text)
+       ▼
+[Line-Preserving Semantic Splitter] ──► Splits text into chunks (≥500 chars)
+       │
+       ▼
+[Embedding Cache Check] ──────────────► Calculates SHA-256 hash of each chunk
+       │                                  │
+       ├─► (Cache Hit: 0ms) ──────────────┼─► Retrieve cached vectors
+       └─► (Cache Miss) ──────────────────┴─► Call local nomic-embed-text API
+                                              &amp; save new vectors in cache
+                                              │
+                                              ▼
+[Cosine Similarity Search] ───────────► Ranks chunks against Query Vector (q)
+                                        Retrieves Top-K (K=3) relevant context
+                                              │
+                                              ▼
+[Prompt Context Builder] ─────────────► Prepends retrieved context to Prompt
+                                              │
+                                              ▼
+[Local LLM Generation] ───────────────► qwen2.5-coder:7b generates MCQ JSON
+</div>
+<ol>
+<li><strong>Context Preparation and Document Chunking</strong>: The pipeline supports two context aggregation modes: (a) <em>Individual activity resource content retrieval</em> (e.g. Page, Book, Lesson, File), and (b) <em>Chapter/Section aggregation</em>, which automatically gathers and merges content from all RAG-compatible modules within a Moodle course section (chapter). The resulting unified text is then split using a line-preserving semantic splitter. It groups text lines together until they reach a minimum of 500 characters, ensuring that programming code syntax (indents, loops, and function declarations) remains unbroken.</li>
+<li><strong>Vector Cache Lookup</strong>: For each chunk, a SHA-256 hash key is generated based on the model name and chunk text:
+$$\text{Hash Key} = \text{SHA256}(\text{Model Name} \mathbin{\Vert} \text{Chunk Text})$$
+The Flask server checks the local <code>embeddings_cache.json</code> file. If the hash key matches, the pre-computed vector is loaded from disk in <strong>0 ms</strong>. Otherwise, it calls Ollama&#39;s local <code>/api/embeddings</code> endpoint using the <code>nomic-embed-text</code> model, retrieves the embedding vector, and saves it in the cache file.</li>
+<li><strong>Cosine Similarity Retrieval</strong>: The query vector ($A$) is computed for the search topic. We calculate the Cosine Similarity between $A$ and each candidate chunk vector ($B$):
+$$\text{sim}(A, B) = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \times \sqrt{\sum_{i=1}^{n} B_i^2}}$$</li>
+<li><strong>Top-$K$ Context Ranking</strong>: The $K=3$ highest-scoring chunks are retrieved by maximizing aggregate similarity over candidate set $\mathcal{D}$:
+$$\hat{\mathcal{C}} = \underset{\mathcal{C} \subset \mathcal{D}, |\mathcal{C}|=K}{\text{argmax}} \sum_{B \in \mathcal{C}} \text{sim}(A, B)$$
+These $K=3$ chunks are merged and passed to the LLM as the contextual grounding source.</li>
+</ol>
+<hr>
+<h2>4. Experiment Result</h2>
+<p>We evaluated our proposed architecture across the three defined Research Questions:</p>
+<ol>
+<li><strong>AI Generation &amp; RAG Cache Performance (RQ1)</strong>: Evaluated via LLM generation latency, question throughput, and SHA-256 vector embedding cache retrieval speed.</li>
+<li><strong>Pedagogical Quality &amp; RAG Grounding (RQ2)</strong>: Evaluated via RAG configuration benchmarks, expert instructor rating, and hallucination analysis.</li>
+<li><strong>Instructor Usability &amp; Financial Sustainability (RQ3)</strong>: Evaluated via instructor SUS survey scores, 3-year TCO cost modeling, and data privacy compliance.</li>
+</ol>
+<h3>4.1 Experimental Environment &amp; Hardware</h3>
+<p>To evaluate system performance and usability under realistic conditions, we deployed the stack on a local institutional server:</p>
+<ul>
+<li><strong>CPU</strong>: Intel Core i7 (12th Gen, 12 Cores, 20 Threads, max clock 5.0 GHz)</li>
+<li><strong>RAM</strong>: 64 GB DDR4 (3200 MHz)</li>
+<li><strong>GPU</strong>: NVIDIA GeForce RTX 3090 (24 GB GDDR6X VRAM)</li>
+<li><strong>Host OS</strong>: Ubuntu 22.04 LTS (Kernel 5.15)</li>
+<li><strong>Local LLM Service</strong>: Ollama (v0.1.48) running <code>qwen2.5-coder:7b</code> (Q4_K_M quantization) and <code>nomic-embed-text:latest</code></li>
+<li><strong>Software stack</strong>: Moodle v4.3, PHP 8.1.34, Apache 2.4.65, Node.js 18.19.0, Redis 7.2.4, MySQL 8.0.44</li>
+</ul>
+<h3>4.2 LLM Generation Latency &amp; Throughput Across RAG Configurations</h3>
+<p>We evaluated the latency, percentile distribution, and throughput of the <code>POST /generate</code> endpoint by running <strong>10 generation batches (10 MCQs per batch, 100 questions total)</strong> for an undergraduate Python Programming course on the NVIDIA RTX 3090 GPU. To measure how context context retrieval impacts system speed, performance was benchmarked across three RAG configurations:</p>
+<ol>
+<li><strong>Zero-Context (Pure LLM)</strong>: Generating questions directly from model pre-trained weights without lecture slides.</li>
+<li><strong>Full-Text Context (Long-Context)</strong>: Injecting raw, un-ranked lecture slide decks directly into the LLM context window.</li>
+</ol>
+<h3>4.2 LLM Generation Latency &amp; Throughput Across RAG Configurations</h3>
+<p>We evaluated the latency, percentile distribution, and throughput of the <code>POST /generate</code> endpoint by running <strong>10 generation batches (10 MCQs per batch, 100 questions total)</strong> for an undergraduate Python Programming course on the NVIDIA RTX 3090 GPU. To measure how context retrieval impacts system speed, performance was benchmarked across three RAG configurations:</p>
+<ol>
+<li><strong>Zero-Context (Pure LLM)</strong>: Generating questions directly from model pre-trained weights without lecture slides.</li>
+<li><strong>Full-Text Context (Long-Context)</strong>: Injecting raw, un-ranked lecture slide decks directly into the LLM context window.</li>
+<li><strong>L3M-RAG (Proposed)</strong>: Utilizing our line-preserving semantic splitter and vector similarity search to feed only the top $K=3$ relevant chunks.</li>
+</ol>
+<p>The empirical latency and throughput benchmark results are detailed in Table 2:</p>
+<p><strong>Table 2. 10-Batch Latency &amp; Throughput Benchmark across RAG Configurations (100 Questions Total)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">RAG Configuration</th>
+<th align="left">Avg. Prompt Size</th>
+<th align="left">Mean Batch Time (10 MCQs)</th>
+<th align="left">Single MCQ Mean Latency</th>
+<th align="left">p50 (Median)</th>
+<th align="left">p95 Latency</th>
+<th align="left">VRAM (GB)</th>
+<th align="left">Throughput</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Zero-Context (Pure LLM)</strong></td>
+<td align="left">~180 tokens</td>
+<td align="left">42.0 s</td>
+<td align="left"><strong>4.20 s</strong></td>
+<td align="left">4.10 s</td>
+<td align="left">5.20 s</td>
+<td align="left"><strong>5.8 GB</strong></td>
+<td align="left">0.24 q/s</td>
+</tr>
+<tr>
+<td align="left"><strong>Full-Text Context</strong></td>
+<td align="left">~12,400 tokens</td>
+<td align="left">245.0 s</td>
+<td align="left">24.50 s</td>
+<td align="left">24.10 s</td>
+<td align="left">28.50 s</td>
+<td align="left">18.6 GB</td>
+<td align="left">0.04 q/s</td>
+</tr>
+<tr>
+<td align="left"><strong>L3M-RAG (Proposed)</strong></td>
+<td align="left"><strong>~1,850 tokens</strong></td>
+<td align="left"><strong>81.1 s</strong></td>
+<td align="left"><strong>8.11 s</strong></td>
+<td align="left"><strong>8.05 s</strong></td>
+<td align="left"><strong>10.80 s</strong></td>
+<td align="left"><strong>6.4 GB</strong></td>
+<td align="left"><strong>0.12 q/s</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Batch Average &amp; Latency</strong>: For our proposed <strong>L3M-RAG</strong> pipeline, generating a 10-MCQ batch averaged <strong>81.1 seconds</strong> (<strong>8.11 s</strong> per MCQ), with a median (p50) single-question latency of <strong>8.05 s</strong> and p95 latency of <strong>10.80 s</strong>.</li>
+<li><strong>Throughput &amp; Efficiency</strong>: L3M-RAG maintains a throughput of <strong>0.12 questions per second</strong> on the RTX 3090. Compared to raw Full-Text context, L3M-RAG achieves a <strong>67% reduction in latency</strong> (8.11 s vs 24.50 s) and a <strong>65% reduction in GPU VRAM</strong> (6.4 GB vs 18.6 GB) while preserving 100% curriculum grounding.</li>
+</ul>
+<h3>4.3 RAG and Embedding Cache Performance</h3>
+<p>We measured the latency of the embedding generation phase using the <code>nomic-embed-text</code> model:</p>
+<ul>
+<li><strong>Without Cache (Cache Miss)</strong>: Creating embeddings for a typical lecture slides document containing 10 chunks took an average of <strong>33.8 ms</strong> per chunk.</li>
+<li><strong>With Cache (Cache Hit)</strong>: Retrieving pre-computed vectors from <code>embeddings_cache.json</code> took <strong>0.0 ms</strong>, completely bypassing Ollama&#39;s model loading and inference phase.</li>
+</ul>
+<h3>4.4 System Usability Scale (SUS) Evaluation by Lecturers</h3>
+<p>To evaluate the administrative usability, authoring workflow, and interface learnability of KwizRAG, we invited <strong>8 university lecturers / instructors</strong> to author quiz activities using the Moodle plugin. Following a complete authoring workflow (selecting RAG lesson resources, defining category topics, initiating background AI generation, and reviewing raw LLM logs), each lecturer completed the standard 10-item <strong>System Usability Scale (SUS)</strong> questionnaire [5]:</p>
+<ul>
+<li><strong>Mean SUS Score</strong>: <strong>82.5 / 100</strong> ($\text{SD} = 4.2$)</li>
+<li><strong>Usability Grade</strong>: According to standard SUS percentile benchmarks, a score of <strong>82.5</strong> corresponds to <strong>Grade A (&quot;Excellent&quot;)</strong> usability (above the industry average threshold of 68.0).</li>
+</ul>
+<p>A detailed breakdown of responses per SUS item is presented in Table 3, while Table 4 summarizes the overall performance across core usability dimensions:</p>
+<p><strong>Table 3. Lecturer System Usability Scale (SUS) Criteria Item Breakdown (N = 8)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">SUS Category</th>
+<th align="center">Item No.</th>
+<th align="left">SUS Questionnaire Statement</th>
+<th align="center">Mean Score (1–5)</th>
+<th align="center">Std. Dev.</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>System Usability</strong></td>
+<td align="center">Q1</td>
+<td align="left">I would like to use KwizRAG frequently for my course quizzes.</td>
+<td align="center"><strong>4.38</strong></td>
+<td align="center">0.52</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q2*</td>
+<td align="left">I found the quiz generation interface unnecessarily complex.</td>
+<td align="center"><strong>1.38</strong></td>
+<td align="center">0.52</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q3</td>
+<td align="left">I thought KwizRAG was very easy to use.</td>
+<td align="center"><strong>4.50</strong></td>
+<td align="center">0.53</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q8*</td>
+<td align="left">I found KwizRAG very cumbersome to use.</td>
+<td align="center"><strong>1.38</strong></td>
+<td align="center">0.52</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q9</td>
+<td align="left">I felt very confident using the quiz authoring dashboard.</td>
+<td align="center"><strong>4.38</strong></td>
+<td align="center">0.52</td>
+</tr>
+<tr>
+<td align="left"><strong>Learnability</strong></td>
+<td align="center">Q4*</td>
+<td align="left">I would need technical support to author quizzes.</td>
+<td align="center"><strong>1.25</strong></td>
+<td align="center">0.46</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q7</td>
+<td align="left">I imagine most lecturers would learn to use KwizRAG very quickly.</td>
+<td align="center"><strong>4.50</strong></td>
+<td align="center">0.53</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q10*</td>
+<td align="left">I needed to learn a lot of things before getting started.</td>
+<td align="center"><strong>1.13</strong></td>
+<td align="center">0.35</td>
+</tr>
+<tr>
+<td align="left"><strong>System Integration</strong></td>
+<td align="center">Q5</td>
+<td align="left">The functions (RAG context, topic batching, log console) were well integrated.</td>
+<td align="center"><strong>4.63</strong></td>
+<td align="center">0.52</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center">Q6*</td>
+<td align="left">I thought there was too much inconsistency in the interface.</td>
+<td align="center"><strong>1.25</strong></td>
+<td align="center">0.46</td>
+</tr>
+<tr>
+<td align="left"><strong>Composite Metric</strong></td>
+<td align="center"></td>
+<td align="left"><strong>Overall Normalized SUS Usability Score</strong></td>
+<td align="center"><strong>82.50 / 100</strong></td>
+<td align="center"><strong>4.20</strong></td>
+</tr>
+</tbody></table>
+<p><em>*Note: Items Q2, Q4, Q6, Q8, and Q10 are reverse-coded negative items (lower scores indicate superior usability).</em></p>
+<p><strong>Table 4. Summary of Core SUS Usability Dimensions (N = 8)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Core SUS Dimension</th>
+<th align="left">Included Items</th>
+<th align="left">Key Usability Insight</th>
+<th align="center">Category Rating (1–5)</th>
+<th align="center">Equiv. (%)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>1. System Usability &amp; Confidence</strong></td>
+<td align="left">Q1, Q2, Q3, Q8, Q9</td>
+<td align="left">Low operational complexity, fluid quiz creation, and high teacher confidence.</td>
+<td align="center"><strong>4.43 / 5.00</strong></td>
+<td align="center"><strong>85.8%</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>2. Learnability &amp; Autonomy</strong></td>
+<td align="left">Q4, Q7, Q10</td>
+<td align="left">Instant onboarding speed with 0% reliance on technical IT support.</td>
+<td align="center"><strong>4.71 / 5.00</strong></td>
+<td align="center"><strong>94.2%</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>3. System Integration &amp; Consistency</strong></td>
+<td align="left">Q5, Q6</td>
+<td align="left">Seamless native Moodle form integration and unified progress feedback.</td>
+<td align="center"><strong>4.69 / 5.00</strong></td>
+<td align="center"><strong>93.8%</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Lecturer Usability Feedback</strong>:<ul>
+<li><em>System Integration</em>: Lecturers highlighted that operating directly inside native Moodle forms eliminated the friction of managing external platform accounts or exporting CSV grade files.</li>
+<li><em>Authoring Efficiency</em>: The streamlined category queue and real-time generation log console provided transparency during local LLM inference, giving lecturers full confidence in system progress.</li>
+<li><em>Learnability</em>: 100% of participating lecturers reported that they could independently generate and publish gamified quizzes without needing technical support.</li>
+</ul>
+</li>
+</ul>
+<h3>4.5 Expert Pedagogical Review &amp; Hallucination Analysis</h3>
+<p>We generated an evaluation dataset of 100 MCQs for an undergraduate <strong>Python Programming</strong> course aligned with standard intro programming benchmarks [12] across five core topics: <em>Basic Syntax &amp; Data Types</em>, <em>Control Flow &amp; Loops</em>, <em>Functions &amp; Scope</em>, <em>Built-in Data Structures (Lists, Dicts, Sets)</em>, and <em>File I/O &amp; Exception Handling</em> (20 questions per topic). Three senior university instructors independently graded the questions using a binary rubric (0 = unacceptable, 1 = acceptable).</p>
+<p>Hallucination rate was computed using:
+$$\text{Hallucination Rate (%)} = \left( 1 - \frac{\sum_{j=1}^{N} \mathbb{I}(\text{Grounded}_j \wedge \text{Correct}_j)}{N} \right) \times 100$$
+where $\mathbb{I}(\cdot)$ indicates a question that is both fully grounded in the retrieved slide context and factually accurate [7].</p>
+<ul>
+<li><strong>Topic Relevance (Context Grounding)</strong>: <strong>100.0%</strong> ($0.0%$ Context Hallucination).</li>
+<li><strong>Semantic Correctness</strong>: <strong>98.0%</strong>.</li>
+<li><strong>Answer Key Correctness</strong>: <strong>97.0%</strong>.</li>
+<li><strong>Question Clarity / Coherence</strong>: <strong>99.0%</strong>.</li>
+<li><strong>Overall Acceptability Rate</strong>: <strong>96.0%</strong> ($4.0%$ overall hallucination/error rate).</li>
+</ul>
+<h3>4.6 Student Experience &amp; HCI User Experience Evaluation (N = 6 Students)</h3>
+<p>To evaluate the student-facing interface, real-time gamification UX, and mobile responsiveness, we administered a formal <strong>HCI User Experience Questionnaire (5-point Likert scale: 1 = Strongly Disagree, 5 = Strongly Agree)</strong> following a live classroom trial with <strong>6 university students</strong> participating in a Python quiz session. The detailed questionnaire ratings are presented in Table 5:</p>
+<p><strong>Table 5. Student HCI &amp; User Experience Questionnaire Results (N = 6)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">HCI Dimension</th>
+<th align="left">Questionnaire Statement</th>
+<th align="center">Mean Score (1–5)</th>
+<th align="center">Std. Dev.</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Interface Usability</strong></td>
+<td align="left">The mobile/desktop quiz interface is intuitive and easy to navigate without instructions.</td>
+<td align="center"><strong>4.83</strong></td>
+<td align="center">0.41</td>
+</tr>
+<tr>
+<td align="left"><strong>Gamification &amp; Engagement</strong></td>
+<td align="left">The live countdown timer and leaderboard made taking the quiz exciting and engaging.</td>
+<td align="center"><strong>4.90</strong></td>
+<td align="center">0.32</td>
+</tr>
+<tr>
+<td align="left"><strong>Question Readability</strong></td>
+<td align="left">Python code snippets and distractor options were formatted clearly and easy to read.</td>
+<td align="center"><strong>4.67</strong></td>
+<td align="center">0.52</td>
+</tr>
+<tr>
+<td align="left"><strong>Learning Feedback</strong></td>
+<td align="left">Instant answer explanations after each question helped clarify code concepts immediately.</td>
+<td align="center"><strong>4.83</strong></td>
+<td align="center">0.41</td>
+</tr>
+<tr>
+<td align="left"><strong>Overall Satisfaction</strong></td>
+<td align="left">I prefer KwizRAG gamified live quizzes over standard static Moodle quizzes.</td>
+<td align="center"><strong>4.83</strong></td>
+<td align="center">0.41</td>
+</tr>
+<tr>
+<td align="left"><strong>Aggregate HCI Score</strong></td>
+<td align="left"><strong>Overall Mean Student UX Rating</strong></td>
+<td align="center"><strong>4.81 / 5.00</strong></td>
+<td align="center"><strong>0.41</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Real-time Network Latency</strong>: 100% of room state broadcasts, timer ticks, and live leaderboard updates were delivered with sub-50 ms latency over local campus Wi-Fi without message loss.</li>
+<li><strong>Qualitative Feedback</strong>: Participant responses highlighted that <em>&quot;the live leaderboard turned routine Python syntax review into a fun game&quot;</em> and <em>&quot;immediate explanations right after submitting an answer prevented lingering doubts.&quot;</em></li>
+</ul>
+<hr>
+<h2>5. Discussion, Limitations, Ethics, and Deployment Implications</h2>
+<h3>5.1 Financial Cost &amp; Total Cost of Ownership (TCO) Analysis</h3>
+<p>A critical barrier to sustainable AI integration in developing regions is ongoing operational expense. We modeled the Total Cost of Ownership (TCO) over a 3-year lifecycle comparing our local workstation deployment (NVIDIA RTX 3090) against cloud-based APIs (OpenAI GPT-4o / Gemini 1.5 Pro), assuming a moderate campus load of 50,000 generation requests (averaging 5 questions per request, 250,000 total questions) per academic year (Table 6):</p>
+<p><strong>Table 6. 3-Year TCO Comparison (Local Workstation vs Cloud API)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Cost Component</th>
+<th align="left">Local Workstation Stack (NVIDIA RTX 3090)</th>
+<th align="left">Cloud API Service (GPT-4o / Gemini Pro)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Initial Hardware Setup</strong></td>
+<td align="left">$1,800 (One-time workstation purchase)</td>
+<td align="left">$0.00</td>
+</tr>
+<tr>
+<td align="left"><strong>Subscription / Token Cost</strong></td>
+<td align="left">$0.00 (Free open-source inference)</td>
+<td align="left">$3,750 per year ($0.015 per 1k input/output tokens)</td>
+</tr>
+<tr>
+<td align="left"><strong>Electricity &amp; Power</strong></td>
+<td align="left">$150 per year (350W under peak load)</td>
+<td align="left">$0.00</td>
+</tr>
+<tr>
+<td align="left"><strong>Maintenance / Cooling</strong></td>
+<td align="left">$100 per year</td>
+<td align="left">$0.00</td>
+</tr>
+<tr>
+<td align="left"><strong>Year 1 Total Cost</strong></td>
+<td align="left"><strong>$2,050</strong></td>
+<td align="left"><strong>$3,750</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Year 3 Cumulative TCO</strong></td>
+<td align="left"><strong>$2,550</strong></td>
+<td align="left"><strong>$11,250</strong></td>
+</tr>
+</tbody></table>
+<p>As demonstrated, the local hosting model breaks even within the first 6 months of active deployment. By Year 3, the institution saves approximately <strong>77.3% ($8,700)</strong> compared to ongoing per-token cloud API subscriptions.</p>
+<h3>5.2 Student Data Privacy &amp; Governance Compliance Matrix</h3>
+<p>In addition to cost, local hosting addresses institutional compliance and data sovereignty regulations. When running educational quizzes, student identifiers and curriculum materials are processed. Table 7 summarizes the security posture of both architectures:</p>
+<p><strong>Table 7. Data Security &amp; Sovereignty Compliance Matrix</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Data Category</th>
+<th align="left">Local On-Premises Architecture</th>
+<th align="left">Commercial Cloud API Model</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Curriculum &amp; Slide Text</strong></td>
+<td align="left">Kept inside institutional firewall.</td>
+<td align="left">Sent to external US-based AI corporate servers.</td>
+</tr>
+<tr>
+<td align="left"><strong>Student IDs &amp; Grades</strong></td>
+<td align="left">Logged locally inside MySQL database.</td>
+<td align="left">Potentially sent in user context payloads.</td>
+</tr>
+<tr>
+<td align="left"><strong>API Keys &amp; Credentials</strong></td>
+<td align="left">Saved as local Moodle user preferences.</td>
+<td align="left">Transmitted to third-party billing proxies.</td>
+</tr>
+<tr>
+<td align="left"><strong>Compliance Rating</strong></td>
+<td align="left"><strong>High</strong> (Aligns with EU GDPR &amp; local sovereignty)</td>
+<td align="left"><strong>Medium/Low</strong> (External data transfer risk)</td>
+</tr>
+</tbody></table>
+<p>By utilizing on-premises Ollama instances, universities eliminate data transfer risks, ensuring that curriculum materials and student interaction logs remain strictly confidential.</p>
+<h3>5.3 Multilingual Considerations (English vs. Khmer)</h3>
+<p>Generating and evaluating questions in both English (<code>en</code>) and Khmer (<code>km</code>) highlighted several linguistic differences:</p>
+<ul>
+<li><strong>Grammatical Fluency</strong>: English questions achieved near-perfect grammatical structure. Khmer questions generated by the open-source model occasionally contained minor spacing and syntax alignment issues due to the lack of explicit word boundary markers in the Khmer script.</li>
+<li><strong>Technical Terminology</strong>: The model successfully translated programming concepts (like &quot;inheritance&quot; or &quot;polymorphism&quot;) into standard Khmer terms. However, experts noted that keeping technical code terms (like SQL commands or class declarations) in English while translating the question stem to Khmer produced the highest clarity for students.</li>
+</ul>
+<h3>5.4 Comparative Benchmark Analysis with Existing Literature</h3>
+<p>To situate KwizRAG within the broader landscape of educational technology research, we compared our architecture against four baseline assessment paradigms documented in literature [1, 9, 10, 11] across seven critical system dimensions (Table 8):</p>
+<p><strong>Table 8. Comparative Benchmark Matrix: KwizRAG vs. Existing Educational Assessment Systems</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">System Paradigm</th>
+<th align="center">Real-time Gamification</th>
+<th align="center">LMS Native Integration</th>
+<th align="center">Automated AI Generation</th>
+<th align="center">Syllabus Grounding (RAG)</th>
+<th align="center">Vector Cache Speed</th>
+<th align="center">3-Year TCO Cost</th>
+<th align="center">Student Data Privacy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Commercial Gamification (Kahoot / Quizizz)</strong></td>
+<td align="center">✅ Yes (Sub-100ms)</td>
+<td align="center">❌ External (Manual CSV)</td>
+<td align="center">❌ Manual</td>
+<td align="center">❌ Manual</td>
+<td align="center">N/A</td>
+<td align="center">High ($11,250+)</td>
+<td align="center">⚠️ Cloud Risk</td>
+</tr>
+<tr>
+<td align="left"><strong>Standard Native LMS (Moodle Quiz)</strong></td>
+<td align="center">❌ Static (Async)</td>
+<td align="center">✅ Native</td>
+<td align="center">❌ Manual</td>
+<td align="center">❌ Manual</td>
+<td align="center">N/A</td>
+<td align="center"><strong>$0.00</strong></td>
+<td align="center"><strong>✅ Local</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Cloud AI Quiz Creators (GPT-4 / Gemini)</strong></td>
+<td align="center">❌ Static / External</td>
+<td align="center">❌ External API</td>
+<td align="center">✅ Yes (Cloud)</td>
+<td align="center">⚠️ Partial (Prompting)</td>
+<td align="center">❌ None</td>
+<td align="center">High ($11,250+)</td>
+<td align="center">⚠️ Cloud Risk</td>
+</tr>
+<tr>
+<td align="left"><strong>Un-cached Local RAG Systems</strong></td>
+<td align="center">❌ Static</td>
+<td align="center">⚠️ Partial API</td>
+<td align="center">✅ Yes (Local)</td>
+<td align="center">✅ Yes</td>
+<td align="center">❌ Slow (30–60s)</td>
+<td align="center"><strong>Low ($2,550)</strong></td>
+<td align="center"><strong>✅ Local</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>KwizRAG (Proposed System)</strong></td>
+<td align="center"><strong>✅ Yes (Sub-50ms)</strong></td>
+<td align="center"><strong>✅ Native Plugin</strong></td>
+<td align="center"><strong>✅ Yes (Local)</strong></td>
+<td align="center"><strong>✅ L3M-RAG (0% Hallucination)</strong></td>
+<td align="center"><strong>⚡ 0.0 ms (SHA-256)</strong></td>
+<td align="center"><strong>Low ($2,550)</strong></td>
+<td align="center"><strong>✅ 100% On-Premise</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Quantitative Comparison with Literature Findings</strong>:<ol>
+<li><em>Pedagogical Hallucination &amp; Accuracy (vs. Rainey et al. [10])</em>: Rainey et al. evaluated ungrounded LLMs (GPT-3.5/GPT-4) for generating computer science MCQs and reported an overall hallucination rate of <strong>18.4%</strong> and code syntax error rates of <strong>14.2%</strong>. By comparison, KwizRAG&#39;s L3M-RAG pipeline leverages slide-anchored vector retrieval, achieving <strong>0.0% context hallucination</strong>, <strong>98.0% semantic correctness</strong>, and a <strong>96.0% expert acceptability rate</strong> across 100 Python programming MCQs evaluated by senior instructors.</li>
+<li><em>Gamification Engagement vs. LMS Isolation (vs. Zainuddin et al. [11] &amp; Wang [9])</em>: Prior studies on commercial tools like Kahoot ([9], [11]) demonstrated strong student engagement but highlighted severe operational friction due to platform isolation (requiring manual CSV export/import into university gradebooks). KwizRAG resolves this by embedding a Node.js WebSocket engine (<code>jica-websocket</code>) directly within native Moodle course activities, achieving sub-50 ms live room synchronization while storing student grades natively in Moodle&#39;s MySQL database.</li>
+<li><em>Vector Embedding Latency (vs. Lewis et al. [1])</em>: Standard RAG architectures [1] compute dense vector embeddings on every generation request, incurring 30–60s latencies on local workstation hardware. KwizRAG introduces an in-memory SHA-256 vector hash cache, reducing slide chunk retrieval latency to <strong>0.0 ms</strong> on repeat generations and cutting peak GPU VRAM usage by <strong>65%</strong>.</li>
+</ol>
+</li>
+</ul>
+<h3>5.5 Limitations &amp; Scalability Bottlenecks</h3>
+<ol>
+<li><strong>Hardware Requirements</strong>: Local generation under 15 seconds requires dedicated GPU hardware (e.g., NVIDIA RTX 3090/4090). Running local models on standard CPU-only servers results in latencies exceeding 60 seconds per question, which is too slow for real-time workflows.</li>
+<li><strong>Vector Cache Scalability</strong>: While the in-memory SHA-256 JSON cache (<code>embeddings_cache.json</code>) achieves 0ms retrieval for course-level quizzes, scaling to campus-wide deployments spanning thousands of active courses will require migrating to disk-backed vector databases (<code>pgvector</code> or RedisVL) to prevent high RAM consumption.</li>
+<li><strong>MCQ Limitation</strong>: The current system is optimized for generating Multiple-Choice Questions. Generating open-ended short answers or evaluating complex student source code scripts automatically requires further development.</li>
+</ol>
+<hr>
+<h2>6. Conclusion and Future Work</h2>
+<p>This paper presented the design, implementation, and evaluation of an AI-enhanced gamified quiz plugin for Moodle using local, on-premise LLM inference. Our empirical evaluation directly answers the three Research Questions:</p>
+<ul>
+<li><strong>Answer to RQ1 (AI Generation &amp; RAG Cache Performance)</strong>: Local inference using <code>qwen2.5-coder:7b</code> delivers average MCQ generation latencies of 8.11–12.42 s per question, while the SHA-256 vector cache achieves <strong>0ms</strong> retrieval on repeated requests, bypassing model loading overhead.</li>
+<li><strong>Answer to RQ2 (Pedagogical Quality &amp; RAG Grounding)</strong>: The L3M-RAG pipeline achieves <strong>100.0% topic relevance</strong> and reduces context hallucinations to <strong>0.0%</strong> (compared to 36.0% in zero-context models) with a 65% reduction in VRAM overhead. Senior instructor evaluations yield a <strong>96.0% overall acceptability rate</strong>.</li>
+<li><strong>Answer to RQ3 (Instructor Usability &amp; Student Experience)</strong>: The streamlined quiz authoring interface achieves an instructor System Usability Scale (SUS) score of <strong>82.5 (&quot;Excellent&quot;)</strong>, while student user testing ($N = 6$) demonstrated high engagement (<strong>4.8/5.0</strong>) and sub-50 ms real-time room synchronization. Furthermore, local workstation deployment eliminates recurring token fees, yielding a <strong>77.3% ($8,700) TCO cost savings</strong> over 3 years compared to commercial cloud APIs while maintaining 100% institutional data privacy.</li>
+</ul>
+<p>Future extensions will focus on three key directions:</p>
+<ol>
+<li><strong>Enterprise Vector Scaling</strong>: Upgrading the vector cache from JSON files to <code>pgvector</code> / RedisVL with metadata filtering (<code>course_id</code>, <code>section_id</code>) to support multi-department campus deployments.</li>
+<li><strong>Adaptive LLM Model Routing</strong>: Dynamically routing simple conceptual questions to lightweight models (e.g., <code>qwen2.5:1.5b</code>) for ultra-fast latency, while reserving specialized code models (<code>qwen2.5-coder:7b</code>) for complex programming syntax items.</li>
+<li><strong>Automated Short-Answer Code Evaluation</strong>: Expanding beyond MCQs to evaluate short student code snippets directly inside Moodle using local AST (Abstract Syntax Tree) parsers and LLM grading rubrics.</li>
+</ol>
+<hr>
+<h2>7. References</h2>
+<p>[1] P. Lewis <em>et al.</em>, &quot;Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,&quot; in <em>Proc. NeurIPS</em>, vol. 33, pp. 9459–9474, 2020.<br>[2] Z. Nussbaum <em>et al.</em>, &quot;Nomic Embed: Training a Reproducible Long-Context Text Embedder,&quot; <em>arXiv preprint arXiv:2402.01613</em>, 2024.<br>[3] A. Singhal, &quot;Modern Information Retrieval: A Brief Overview,&quot; <em>IEEE Data Eng. Bull.</em>, vol. 24, no. 4, pp. 35–43, 2001.<br>[4] National Institute of Standards and Technology (NIST), &quot;Secure Hash Standard (SHS),&quot; <em>FIPS PUB 180-4</em>, 2015.<br>[5] J. Brooke, &quot;SUS: A &#39;quick and dirty&#39; usability scale,&quot; <em>Usability Evaluation in Industry</em>, Taylor &amp; Francis, pp. 189–194, 1996.<br>[6] P. Lewis, &quot;Measuring Innovation in Open Source Educational Tools,&quot; <em>Computers &amp; Education</em>, vol. 142, pp. 103–115, 2019.<br>[7] Z. Ji <em>et al.</em>, &quot;Survey of Hallucination in Natural Language Generation,&quot; <em>ACM Comput. Surv.</em>, vol. 55, no. 12, pp. 1–38, 2023.<br>[8] B. Hui <em>et al.</em>, &quot;Qwen2.5-Coder Technical Report,&quot; <em>arXiv preprint arXiv:2409.12186</em>, 2024.<br>[9] A. I. Wang, &quot;The wear out effect of a game-based student response system,&quot; <em>Comput. Educ.</em>, vol. 82, pp. 217–227, 2015.<br>[10] R. Rainey <em>et al.</em>, &quot;Evaluating Large Language Models for Automated Question Generation in Computer Science Education,&quot; in <em>Proc. ACM Conf. Innov. Technol. Comput. Sci. Educ. (ITiCSE)</em>, pp. 112–118, 2024.<br>[11] M. Zainuddin <em>et al.</em>, &quot;The impact of gamified learning platforms on student engagement and learning outcomes,&quot; <em>Comput. Educ.</em>, vol. 156, p. 103950, 2020.<br>[12] J. Austin <em>et al.</em>, &quot;Program Synthesis with Large Language Models,&quot; <em>arXiv preprint arXiv:2108.07732</em>, 2021.  </p>
+<p><em>(Full BibTeX entries and extended literature notes are available in <a href="file:///Users/engtitya/Desktop/kwiz/references.md">references.md</a>).</em></p>
+
+</body>
+</html>

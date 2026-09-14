@@ -19,7 +19,7 @@ jica/
 This repository contains the full draft and reproducible evaluation code for our research paper:
 
 *   **Conference Paper Draft**: [paper.md](paper.md) — *Design and Evaluation of an AI-Enhanced Gamified Quiz Plugin for Moodle: Integrating Local LLM-Based Question Generation*
-*   **Academic References & BibTeX**: [references.md](references.md) — Citations for RAG, Cosine Similarity, SHA-256 caching, Cohen's Kappa, and SUS metrics.
+*   **Academic References & BibTeX**: [references.md](references.md) — Citations for RAG, Cosine Similarity, SHA-256 caching, and SUS metrics.
 *   **System Documentation**: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — System features and architecture.
 
 ## 🚀 Quick Start (Docker)

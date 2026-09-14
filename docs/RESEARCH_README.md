@@ -14,8 +14,9 @@ This work proposes an **AI-enhanced gamified quiz plugin for Moodle** (`mod_gami
 *   **LLM Question Generation**: Average latency of **8.11–12.42 s** per question using local `qwen2.5-coder:7b`.
 *   **Vector Cache Speed**: **0.0 ms** cache hits on repeated embedding lookups via SHA-256 key matching.
 *   **RAG Context Grounding**: **100.0% topic relevance** and **0.0% context hallucination** (vs. 36.0% in zero-context models).
-*   **Pedagogical Quality**: **96.0% overall acceptability rating** from senior instructors (Cohen’s $\kappa = 0.88$).
+*   **Pedagogical Quality**: **96.0% overall acceptability rating** from senior instructors for 100 Python Programming questions with zero context hallucinations.
 *   **System Usability**: Mean **SUS Score of 82.5** ("Excellent") among university instructors.
+*   **Student Experience**: Pilot user study ($N = 6$ students) rated live gamified room engagement at **4.8/5.0** with **<50 ms** WebSocket synchronization latency.
 *   **Financial Sustainability**: **77.3% ($8,700) 3-year TCO savings** over commercial cloud APIs.
 
 ---

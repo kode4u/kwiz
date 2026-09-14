@@ -38,7 +38,7 @@ Set real specs (Docker on Mac often mis-detects GPU):
 
 ```bash
 export EVAL_GPU="NVIDIA RTX 3090 (24 GB VRAM)"
-export EVAL_CPU="AMD Ryzen 9 5950X"
+export EVAL_CPU="Intel Core i7"
 export EVAL_RAM_GB="64"
 export EVAL_OS="Ubuntu 22.04"
 export OLLAMA_MODEL="qwen3:8b"
