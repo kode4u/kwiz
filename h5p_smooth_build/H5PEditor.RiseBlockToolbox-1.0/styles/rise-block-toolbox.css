@@ -787,14 +787,22 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
-.rise-canvas-drop-zone:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+.rise-canvas-drop-zone * {
+  pointer-events: none;
 }
 
+body.is-rise-dragging .rise-canvas-drop-zone {
+  border-color: #3b82f6 !important;
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  min-height: 54px !important;
+  border-width: 2.5px !important;
+}
+
+.rise-canvas-drop-zone:hover,
 .rise-canvas-drop-zone.is-hovered,
 .rise-canvas-drop-zone.rise-drop-target-active {
   border-color: #2563eb !important;

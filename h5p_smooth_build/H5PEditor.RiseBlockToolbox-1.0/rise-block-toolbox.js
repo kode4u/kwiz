@@ -249,7 +249,9 @@
      * Initialize Studio
      */
     self.init = function (widgetInstance) {
-      self.widget = widgetInstance;
+      if (widgetInstance) {
+        self.widget = widgetInstance;
+      }
       self.renderStudio();
       self.setupDragAndDrop();
     };
@@ -346,19 +348,25 @@
           $card.on("click", function (e) {
             e.preventDefault();
             $previewTooltip.hide();
-            self.insertBlock(item.content);
+            self.insertBlock(item.content, "end");
           });
 
           // Drag Start
           $card.on("dragstart", function (e) {
             $previewTooltip.hide();
             $(this).addClass("is-dragging");
+            $("body").addClass("is-rise-dragging");
             window.riseCurrentDraggedBlock = item;
-            var dt = e.originalEvent.dataTransfer;
-            dt.effectAllowed = "copy";
-            dt.setData("text/plain", JSON.stringify(item));
+            if (e.originalEvent && e.originalEvent.dataTransfer) {
+              e.originalEvent.dataTransfer.effectAllowed = "copy";
+              try {
+                e.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(item));
+                e.originalEvent.dataTransfer.setData("application/json", JSON.stringify(item));
+              } catch (err) {}
+            }
           }).on("dragend", function () {
             $(this).removeClass("is-dragging");
+            $("body").removeClass("is-rise-dragging");
             $(".rise-drop-target-active, .is-hovered").removeClass("rise-drop-target-active is-hovered");
           });
 
@@ -425,27 +433,44 @@
       if (self.widget && self.widget.parent && self.widget.parent.parent && self.widget.parent.parent.params) {
         return self.widget.parent.parent.params;
       }
-      if (window.H5PEditor && window.H5PEditor.instances && window.H5PEditor.instances.length > 0) {
+      if (window.H5PEditor && window.H5PEditor.instances && window.H5PEditor.instances.length > 0 && window.H5PEditor.instances[0].params) {
         return window.H5PEditor.instances[0].params;
       }
-      return {
-        courseMeta: {
-          title: "មេរៀនទី១ ការណែនាំអំពីភាសាJava",
-          coverImageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1600&q=80",
-          description: "<p>នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:</p><ul><li>ភាសាកូដ Java</li><li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>ដំណើរការ នៃការសរសេរកូដ Java</li><li>លក្ខណៈរបស់ភាសា Java</li></ul>"
-        },
-        sections: [
-          {
-            sectionTitle: "ចាប់ផ្តើម",
-            lessons: [
-              {
-                title: "មេរៀនទី១: ការណែនាំ",
-                content: { params: [] }
-              }
-            ]
-          }
-        ]
-      };
+      if (!window.riseFallbackParams) {
+        window.riseFallbackParams = {
+          courseMeta: {
+            title: "មេរៀនទី១ ការណែនាំអំពីភាសាJava",
+            coverImageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1600&q=80",
+            description: "<p>នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:</p><ul><li>ភាសាកូដ Java</li><li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>ដំណើរការ នៃការសរសេរកូដ Java</li><li>លក្ខណៈរបស់ភាសា Java</li></ul>"
+          },
+          sections: [
+            {
+              sectionTitle: "ចាប់ផ្តើម",
+              lessons: [
+                {
+                  title: "មេរៀនទី១: ការណែនាំ",
+                  content: {
+                    library: "H5P.Column 1.22",
+                    params: {
+                      content: [
+                        {
+                          content: {
+                            library: "H5P.AdvancedText 1.1",
+                            params: {
+                              text: '<div class="rise-header-block"><div class="rise-category-tag">Overview</div><h2 class="rise-main-title">ចំណងជើងមេរៀន (Lesson Title)</h2><p class="rise-main-desc">ការពិពណ៌នាសង្ខេបអំពីខ្លឹមសារមេរៀន...</p></div>'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        };
+      }
+      return window.riseFallbackParams;
     };
 
     /**
@@ -618,8 +643,16 @@
       var sIdx = parseInt(parts[0], 10) || 0;
       var lIdx = parseInt(parts[1], 10) || 0;
 
-      var sec = (params.sections && params.sections[sIdx]) || {};
-      var lesson = (sec.lessons && sec.lessons[lIdx]) || { title: "New Lesson", content: { params: [] } };
+      if (!params.sections) params.sections = [];
+      if (!params.sections[sIdx]) {
+        params.sections[sIdx] = { sectionTitle: "មាតិកាមេរៀន", lessons: [] };
+      }
+      var sec = params.sections[sIdx];
+      if (!sec.lessons) sec.lessons = [];
+      if (!sec.lessons[lIdx]) {
+        sec.lessons[lIdx] = { title: "មេរៀនទី " + (lIdx + 1), content: "" };
+      }
+      var lesson = sec.lessons[lIdx];
 
       var prevTab = "cover";
       var prevLabel = "← Cover & Outline";
@@ -642,7 +675,7 @@
         '</div>' +
         '<div class="rise-canvas-drop-zone top-zone" data-drop-index="0">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-          '<span>Drop Component Here (or Click on Left Toolbox)</span>' +
+          '<span>Drop Component Here at Top</span>' +
         '</div>' +
         '<div class="rise-canvas-blocks-list"></div>' +
         '<div class="rise-canvas-drop-zone bottom-zone" data-drop-index="end">' +
@@ -682,27 +715,71 @@
 
       if (rawContent && rawContent.trim()) {
         self.renderRenderedBlocks($blocksList, rawContent, lesson);
+      } else {
+        $blocksList.html('<div style="color: #94a3b8; text-align: center; padding: 24px 0; font-size: 0.85rem;">No blocks added yet. Click or drag any component from the left toolbox!</div>');
       }
 
       $canvas.append($lessonView);
     };
 
     /**
-     * Parse Lesson Content HTML
+     * Parse Lesson Content HTML reliably from all H5P representations
      */
     self.getLessonContentHtml = function (lesson) {
-      if (!lesson.content) return "";
+      if (!lesson) return "";
       if (typeof lesson.content === "string") return lesson.content;
-      if (lesson.content.params && Array.isArray(lesson.content.params)) {
-        var htmlArr = [];
-        lesson.content.params.forEach(function (p) {
-          if (p.content && p.content.params && p.content.params.text) {
-            htmlArr.push(p.content.params.text);
-          }
-        });
-        return htmlArr.join("\n");
+      if (lesson.content && typeof lesson.content === "object") {
+        if (lesson.content.params && lesson.content.params.content && Array.isArray(lesson.content.params.content)) {
+          var htmlArr = [];
+          lesson.content.params.content.forEach(function (item) {
+            if (item.content && item.content.params && item.content.params.text) {
+              htmlArr.push(item.content.params.text);
+            } else if (item.params && item.params.text) {
+              htmlArr.push(item.params.text);
+            }
+          });
+          if (htmlArr.length > 0) return htmlArr.join("\n");
+        }
+        if (lesson.content.params && Array.isArray(lesson.content.params)) {
+          var htmlArr2 = [];
+          lesson.content.params.forEach(function (p) {
+            if (p.content && p.content.params && p.content.params.text) {
+              htmlArr2.push(p.content.params.text);
+            } else if (p.params && p.params.text) {
+              htmlArr2.push(p.params.text);
+            }
+          });
+          if (htmlArr2.length > 0) return htmlArr2.join("\n");
+        }
+        if (lesson.content.text) return lesson.content.text;
       }
       return "";
+    };
+
+    /**
+     * Store HTML back to lesson parameters in valid H5P Column schema
+     */
+    self.setLessonContentHtml = function (lesson, fullHtml) {
+      if (!lesson) return;
+      var subId = (lesson.content && lesson.content.subContentId) || ("rise-col-" + Math.random().toString(36).substr(2, 9));
+      lesson.content = {
+        library: "H5P.Column 1.22",
+        params: {
+          content: [
+            {
+              content: {
+                library: "H5P.AdvancedText 1.1",
+                params: {
+                  text: fullHtml
+                },
+                subContentId: "rise-txt-" + Math.random().toString(36).substr(2, 9)
+              },
+              useSeparator: "auto"
+            }
+          ]
+        },
+        subContentId: subId
+      };
     };
 
     /**
@@ -717,6 +794,7 @@
         return;
       }
 
+      $container.empty();
       children.each(function (idx) {
         var blockOuterHtml = this.outerHTML;
         var $blockWrap = $('<div class="rise-canvas-block-wrapper" data-block-index="' + idx + '">' +
@@ -793,21 +871,7 @@
       });
       var fullHtml = htmlParts.join("\n");
 
-      if (typeof lesson.content === "string") {
-        lesson.content = fullHtml;
-      } else if (lesson.content && lesson.content.params) {
-        lesson.content = {
-          library: "H5P.Column 1.22",
-          params: [
-            {
-              content: {
-                library: "H5P.AdvancedText 1.1",
-                params: { text: fullHtml }
-              }
-            }
-          ]
-        };
-      }
+      self.setLessonContentHtml(lesson, fullHtml);
 
       try {
         if (window.CKEDITOR && window.CKEDITOR.instances) {
@@ -834,11 +898,13 @@
       if (!sec.lessons) sec.lessons = [];
 
       var newNum = sec.lessons.length + 1;
-      sec.lessons.push({
+      var newLesson = {
         title: "មេរៀនទី" + newNum + ": ចំណងជើងមេរៀនថ្មី",
         iconType: "overview",
-        content: '<div class="rise-header-block"><div class="rise-category-tag">Lesson ' + newNum + '</div><h2 class="rise-main-title">មេរៀនទី' + newNum + '</h2><p class="rise-main-desc">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ...</p></div>'
-      });
+        content: ""
+      };
+      self.setLessonContentHtml(newLesson, '<div class="rise-header-block"><div class="rise-category-tag">Lesson ' + newNum + '</div><h2 class="rise-main-title">មេរៀនទី' + newNum + '</h2><p class="rise-main-desc">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ...</p></div>');
+      sec.lessons.push(newLesson);
 
       self.activeTab = "0_" + (sec.lessons.length - 1);
       self.updateStudio();
@@ -863,8 +929,13 @@
       var sIdx = parseInt(parts[0], 10) || 0;
       var lIdx = parseInt(parts[1], 10) || 0;
 
-      var sec = (params.sections && params.sections[sIdx]) || {};
-      var lesson = (sec.lessons && sec.lessons[lIdx]) || {};
+      if (!params.sections) params.sections = [];
+      if (!params.sections[sIdx]) params.sections[sIdx] = { sectionTitle: "Section", lessons: [] };
+      if (!params.sections[sIdx].lessons) params.sections[sIdx].lessons = [];
+      if (!params.sections[sIdx].lessons[lIdx]) {
+        params.sections[sIdx].lessons[lIdx] = { title: "Lesson", content: "" };
+      }
+      var lesson = params.sections[sIdx].lessons[lIdx];
 
       var currentHtml = self.getLessonContentHtml(lesson);
       var newHtml = "";
@@ -873,8 +944,10 @@
         var $temp = $("<div>" + currentHtml + "</div>");
         var children = $temp.children();
         var insertIdx = parseInt(targetIndex, 10);
-        if (insertIdx >= 0 && insertIdx < children.length) {
-          $(children[insertIdx]).before(blockHtml);
+        if (insertIdx === 0) {
+          newHtml = currentHtml ? (blockHtml + "\n" + currentHtml) : blockHtml;
+        } else if (insertIdx > 0 && insertIdx <= children.length) {
+          $(children[insertIdx - 1]).after(blockHtml);
           newHtml = $temp.html();
         } else {
           newHtml = currentHtml ? (currentHtml + "\n" + blockHtml) : blockHtml;
@@ -883,42 +956,68 @@
         newHtml = currentHtml ? (currentHtml + "\n" + blockHtml) : blockHtml;
       }
 
-      lesson.content = newHtml;
+      self.setLessonContentHtml(lesson, newHtml);
       self.renderActiveTabContent();
       self.showToast("Block added! Click to edit text.");
     };
 
     /**
-     * Setup Drag & Drop across Workspace
+     * Setup Drag & Drop across Workspace with full delegation & bounds safety
      */
     self.setupDragAndDrop = function () {
-      $(document).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function (e) {
-        e.preventDefault();
-        e.originalEvent.dataTransfer.dropEffect = "copy";
-        if ($(this).hasClass("rise-canvas-drop-zone") || $(this).hasClass("rise-canvas-block-wrapper")) {
-          $(this).addClass("rise-drop-target-active is-hovered");
-        }
-      });
+      $(document).off(".riseStudioDnD");
 
-      $(document).on("dragleave", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function () {
-        $(this).removeClass("rise-drop-target-active is-hovered");
-      });
-
-      $(document).on("drop", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function (e) {
-        e.preventDefault();
-        $(".rise-drop-target-active, .is-hovered").removeClass("rise-drop-target-active is-hovered");
-
-        var item = window.riseCurrentDraggedBlock;
-        if (!item) {
-          var rawData = e.originalEvent.dataTransfer.getData("text/plain");
-          if (rawData) {
-            try { item = JSON.parse(rawData); } catch (err) {}
+      $(document).on("dragover.riseStudioDnD dragenter.riseStudioDnD", function (e) {
+        var $target = $(e.target);
+        if ($target.closest(".rise-visual-workspace").length) {
+          e.preventDefault();
+          if (e.originalEvent && e.originalEvent.dataTransfer) {
+            e.originalEvent.dataTransfer.dropEffect = "copy";
+          }
+          var $dropZone = $target.closest(".rise-canvas-drop-zone, .rise-canvas-block-wrapper");
+          if ($dropZone.length) {
+            $(".rise-canvas-drop-zone, .rise-canvas-block-wrapper").not($dropZone).removeClass("rise-drop-target-active is-hovered");
+            $dropZone.addClass("rise-drop-target-active is-hovered");
           }
         }
+      });
 
-        if (item && item.content) {
-          var dropIdx = $(this).data("drop-index");
-          self.insertBlock(item.content, dropIdx);
+      $(document).on("dragleave.riseStudioDnD", function (e) {
+        var $target = $(e.target);
+        if ($target.hasClass("rise-canvas-drop-zone") || $target.hasClass("rise-canvas-block-wrapper")) {
+          $target.removeClass("rise-drop-target-active is-hovered");
+        }
+      });
+
+      $(document).on("drop.riseStudioDnD", function (e) {
+        var $target = $(e.target);
+        if ($target.closest(".rise-visual-workspace").length) {
+          e.preventDefault();
+          e.stopPropagation();
+          $("body").removeClass("is-rise-dragging");
+          $(".rise-drop-target-active, .is-hovered, .is-dragging").removeClass("rise-drop-target-active is-hovered is-dragging");
+
+          var item = window.riseCurrentDraggedBlock;
+          if (!item && e.originalEvent && e.originalEvent.dataTransfer) {
+            var raw = e.originalEvent.dataTransfer.getData("application/json") || e.originalEvent.dataTransfer.getData("text/plain");
+            if (raw) {
+              try { item = JSON.parse(raw); } catch (err) {}
+            }
+          }
+
+          if (item && item.content) {
+            var $zone = $target.closest(".rise-canvas-drop-zone");
+            var $block = $target.closest(".rise-canvas-block-wrapper");
+            var dropIdx = "end";
+
+            if ($zone.length && $zone.attr("data-drop-index") !== undefined) {
+              dropIdx = $zone.attr("data-drop-index");
+            } else if ($block.length && $block.attr("data-block-index") !== undefined) {
+              dropIdx = parseInt($block.attr("data-block-index"), 10) + 1;
+            }
+
+            self.insertBlock(item.content, dropIdx);
+          }
         }
       });
     };
@@ -977,8 +1076,8 @@
 
   RiseBlockToolboxWidget.initStudio = function (widgetInstance) {
     fixCoreTranslations();
-    var toolbox = new RiseBlockToolbox();
-    toolbox.init(widgetInstance);
+    window.riseStudioInstance = window.riseStudioInstance || new RiseBlockToolbox();
+    window.riseStudioInstance.init(widgetInstance);
   };
 
   H5PEditor.widgets.riseBlockToolbox = H5PEditor.RiseBlockToolbox = RiseBlockToolboxWidget;
