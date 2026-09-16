@@ -1,0 +1,51 @@
+[
+  {
+    "name": "text",
+    "type": "text",
+    "widget": "html",
+    "label": "Text",
+    "importance": "high",
+    "enterMode": "p",
+    "tags": [
+      "strong",
+      "em",
+      "del",
+      "u",
+      "a",
+      "ul",
+      "ol",
+      "li",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "hr",
+      "pre",
+      "code",
+      "p",
+      "div",
+      "span",
+      "table",
+      "thead",
+      "tbody",
+      "tr",
+      "th",
+      "td",
+      "img",
+      "iframe",
+      "blockquote",
+      "svg",
+      "path",
+      "line",
+      "polyline",
+      "rect",
+      "circle"
+    ],
+    "font": {
+      "size": true,
+      "color": true,
+      "background": true
+    }
+  }
+]

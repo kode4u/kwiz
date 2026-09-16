@@ -1,0 +1,130 @@
+{
+  "title": "\u1798\u17c1\u179a\u17c0\u1793\u1791\u17b8\u17e1 \u1780\u17b6\u179a\u178e\u17c2\u1793\u17b6\u17c6\u17a2\u17c6\u1796\u17b8\u1797\u17b6\u179f\u17b6Java - Articulate Rise Course",
+  "mainLibrary": "H5P.RiseCourse",
+  "language": "en",
+  "embedTypes": [
+    "iframe"
+  ],
+  "preloadedDependencies": [
+    {
+      "machineName": "H5P.RiseCourse",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5P.Column",
+      "majorVersion": 1,
+      "minorVersion": 22
+    },
+    {
+      "machineName": "H5P.AdvancedText",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.Image",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.ImageSlider",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.ImageSlide",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.Video",
+      "majorVersion": 1,
+      "minorVersion": 6
+    },
+    {
+      "machineName": "H5P.Audio",
+      "majorVersion": 1,
+      "minorVersion": 5
+    },
+    {
+      "machineName": "H5P.Accordion",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5P.MultiChoice",
+      "majorVersion": 1,
+      "minorVersion": 16
+    },
+    {
+      "machineName": "H5P.SingleChoiceSet",
+      "majorVersion": 1,
+      "minorVersion": 11
+    },
+    {
+      "machineName": "H5P.TrueFalse",
+      "majorVersion": 1,
+      "minorVersion": 8
+    },
+    {
+      "machineName": "H5P.Blanks",
+      "majorVersion": 1,
+      "minorVersion": 14
+    },
+    {
+      "machineName": "H5P.DragText",
+      "majorVersion": 1,
+      "minorVersion": 10
+    },
+    {
+      "machineName": "H5P.Dialogcards",
+      "majorVersion": 1,
+      "minorVersion": 9
+    },
+    {
+      "machineName": "H5P.Summary",
+      "majorVersion": 1,
+      "minorVersion": 10
+    },
+    {
+      "machineName": "H5P.Table",
+      "majorVersion": 1,
+      "minorVersion": 2
+    },
+    {
+      "machineName": "H5P.Link",
+      "majorVersion": 1,
+      "minorVersion": 3
+    },
+    {
+      "machineName": "H5P.IFrameEmbed",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5P.JoubelUI",
+      "majorVersion": 1,
+      "minorVersion": 3
+    },
+    {
+      "machineName": "H5P.Question",
+      "majorVersion": 1,
+      "minorVersion": 5
+    },
+    {
+      "machineName": "H5P.Transition",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "FontAwesome",
+      "majorVersion": 4,
+      "minorVersion": 5
+    },
+    {
+      "machineName": "jQuery.ui",
+      "majorVersion": 1,
+      "minorVersion": 10
+    }
+  ]
+}

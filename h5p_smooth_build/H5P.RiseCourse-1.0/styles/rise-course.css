@@ -1,0 +1,1737 @@
+/* ==========================================================================
+   Articulate Rise Full Course Design System (Sidebar + Header + Next Navigation)
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap");
+
+:root {
+  --rise-font: "Plus Jakarta Sans", "Kantumruy Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --rise-primary: #1e3a8a;
+  --rise-primary-hover: #1e40af;
+  --rise-primary-subtle: #f0f7ff;
+  --rise-primary-border: #bfdbfe;
+  
+  --rise-success: #059669;
+  --rise-success-bg: #f0fdf4;
+  --rise-success-border: #bbf7d0;
+  
+  --rise-sidebar-width: 310px;
+  --rise-header-height: 72px;
+  --rise-border: #e2e8f0;
+  --rise-bg-body: #f8fafc;
+  --rise-bg-surface: #ffffff;
+  --rise-text-heading: #0f172a;
+  --rise-text-body: #334155;
+  --rise-text-muted: #64748b;
+  --rise-transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.h5p-rise-course-root,
+.rise-course-wrapper {
+  font-family: var(--rise-font) !important;
+  color: var(--rise-text-body) !important;
+  background-color: var(--rise-bg-surface) !important;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   1. Cover Page View
+   -------------------------------------------------------------------------- */
+.rise-cover-page {
+  width: 100%;
+  background: var(--rise-bg-surface);
+}
+
+.rise-cover-hero {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rise-cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%);
+}
+
+.rise-cover-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rise-cover-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.rise-author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.rise-author-name {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rise-cover-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0 0 30px 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 640px) {
+  .rise-cover-title {
+    font-size: 1.85rem;
+  }
+}
+
+.rise-start-course-btn {
+  background: #ffffff;
+  color: var(--rise-text-heading);
+  border: none;
+  border-radius: 30px;
+  padding: 14px 38px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: var(--rise-transition);
+}
+
+.rise-start-course-btn:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.rise-cover-description-container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 48px 24px 60px 24px;
+}
+
+.rise-cover-description-body {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--rise-text-body);
+}
+
+.rise-cover-description-body ul {
+  padding-left: 20px;
+  margin: 16px 0;
+}
+
+.rise-cover-description-body li {
+  margin-bottom: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Multi-Lesson Layout (Sidebar + Main Viewport)
+   -------------------------------------------------------------------------- */
+.rise-course-view {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  background: var(--rise-bg-surface);
+}
+
+/* Left Sidebar */
+.rise-sidebar {
+  width: var(--rise-sidebar-width);
+  min-width: var(--rise-sidebar-width);
+  background: #ffffff;
+  border-right: 1px solid var(--rise-border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+}
+
+.rise-course-view.sidebar-collapsed .rise-sidebar {
+  margin-left: calc(-1 * var(--rise-sidebar-width));
+}
+
+.rise-sidebar-header {
+  border-bottom: 1px solid var(--rise-border);
+}
+
+.rise-sidebar-thumb {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+
+.rise-sidebar-thumb:before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.85) 100%);
+}
+
+.rise-sidebar-header-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rise-sidebar-title {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 10px 0;
+}
+
+.rise-sidebar-progress {
+  width: 100%;
+}
+
+.rise-sidebar-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.rise-sidebar-progress-bar {
+  height: 100%;
+  background: #38bdf8;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.rise-sidebar-progress-text {
+  font-size: 0.725rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+}
+
+/* Sidebar Nav Sections */
+.rise-sidebar-nav {
+  padding: 18px 0;
+  flex: 1;
+}
+
+.rise-sidebar-section-group {
+  margin-bottom: 18px;
+}
+
+.rise-sidebar-section-title {
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--rise-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rise-section-chevron {
+  font-size: 0.85rem;
+  color: var(--rise-text-subtle);
+}
+
+.rise-sidebar-lesson-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rise-sidebar-lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.rise-sidebar-lesson-item:hover {
+  background: var(--rise-bg-body);
+}
+
+.rise-sidebar-lesson-item.active {
+  background: var(--rise-primary-subtle);
+  border-left-color: var(--rise-primary);
+}
+
+.rise-sidebar-lesson-item.active .rise-sidebar-lesson-text {
+  color: var(--rise-primary);
+  font-weight: 700;
+}
+
+.rise-sidebar-lesson-icon {
+  color: var(--rise-text-muted);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.rise-sidebar-lesson-item.active .rise-sidebar-lesson-icon {
+  color: var(--rise-primary);
+}
+
+.rise-sidebar-lesson-text {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--rise-text-heading);
+  line-height: 1.35;
+}
+
+/* Completion Status Ring */
+.rise-sidebar-status-ring {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: var(--rise-transition);
+}
+
+.rise-sidebar-lesson-item.completed .rise-sidebar-status-ring {
+  border-color: var(--rise-success);
+  background: var(--rise-success);
+}
+
+.rise-sidebar-lesson-item.completed .rise-sidebar-status-ring:before {
+  content: "\2713";
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* --------------------------------------------------------------------------
+   3. Main Content Area & Sticky Top Header
+   -------------------------------------------------------------------------- */
+.rise-main-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--rise-bg-surface);
+}
+
+/* Sticky Top Header */
+.rise-top-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rise-border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rise-hamburger-btn {
+  background: transparent;
+  border: 1px solid var(--rise-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--rise-text-heading);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--rise-transition);
+}
+
+.rise-hamburger-btn:hover {
+  background: var(--rise-bg-body);
+  border-color: var(--rise-primary-border);
+  color: var(--rise-primary);
+}
+
+.rise-top-header-info {
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.rise-lesson-counter {
+  font-size: 0.775rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rise-text-muted);
+  margin-bottom: 2px;
+}
+
+.rise-top-lesson-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--rise-text-heading);
+  margin: 0 0 4px 0;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.rise-top-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Sidebar Close Button */
+.rise-sidebar-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 34px;
+  height: 34px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.rise-sidebar-close-btn:hover {
+  background: rgba(15, 23, 42, 0.9);
+  transform: scale(1.08);
+}
+
+.rise-author-avatar-sm {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.675rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rise-author-name-sm {
+  font-size: 0.775rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--rise-text-muted);
+  text-transform: uppercase;
+}
+
+.rise-exit-course-btn {
+  background: transparent;
+  border: 1px solid var(--rise-border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rise-text-heading);
+  cursor: pointer;
+  transition: var(--rise-transition);
+}
+
+.rise-exit-course-btn:hover {
+  background: var(--rise-bg-body);
+  border-color: var(--rise-border-strong);
+}
+
+/* Lesson Viewport & Page Transitions */
+@keyframes risePageSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-lesson-viewport {
+  flex: 1;
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px 20px 24px;
+  box-sizing: border-box;
+}
+
+.rise-lesson-content-block {
+  width: 100%;
+}
+
+.rise-lesson-content-block.rise-slide-up-active {
+  animation: risePageSlideUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Bottom Action Bar (Next Button) */
+.rise-bottom-action-bar {
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto 60px auto;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.rise-next-lesson-btn {
+  background: var(--rise-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 14px 44px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+  transition: var(--rise-transition);
+}
+
+.rise-next-lesson-btn:hover {
+  background: var(--rise-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(30, 58, 138, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   4. Mobile Responsiveness & Off-Canvas Drawer
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .rise-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    margin-left: 0 !important;
+    z-index: 100;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .rise-course-view:not(.sidebar-collapsed) .rise-sidebar {
+    transform: translateX(0);
+  }
+
+  .rise-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    z-index: 90;
+  }
+
+  .rise-sidebar-backdrop.show {
+    display: block;
+  }
+
+  .rise-top-header {
+    padding: 10px 14px;
+  }
+
+  .rise-top-lesson-title {
+    font-size: 1.1rem;
+  }
+
+  .rise-exit-course-btn {
+    padding: 6px 10px;
+    font-size: 0.725rem;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   QUIZ COLOR-ONLY FEEDBACK & RISE QUIZ UI (Matching Screenshot)
+   -------------------------------------------------------------------------- */
+.rise-quiz-header {
+  margin-bottom: 8px;
+}
+
+.rise-quiz-category {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+
+.rise-quiz-counter {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.h5p-multichoice .h5p-question-title,
+.h5p-multichoice .h5p-question-introduction,
+.h5p-multichoice .h5p-question-content {
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  line-height: 1.5 !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  padding-bottom: 18px !important;
+  margin-bottom: 24px !important;
+}
+
+/* 1. Hide redundant text feedback & score bar */
+.h5p-joubelui-score-bar,
+.h5p-question-scorebar,
+.h5p-score-bar,
+.joubel-score-bar,
+.h5p-score-bar-container,
+.h5p-scorebar-container,
+.h5p-scorebar-visuals,
+.h5p-multichoice-scorebar,
+.h5p-theme .h5p-question-scorebar,
+.h5p-multichoice .h5p-question-scorebar,
+.h5p-multichoice .h5p-feedback-dialog,
+.h5p-multichoice .h5p-feedback-text,
+.h5p-multichoice .feedback-text,
+.h5p-multichoice .h5p-feedback-inner,
+.h5p-question-feedback,
+.h5p-question-feedback-content,
+.h5p-theme .h5p-question-feedback {
+  display: none !important;
+}
+
+/* 2. Color-only card styling for Correct and Incorrect */
+.h5p-multichoice .h5p-answer.h5p-correct .h5p-alternative-container,
+.h5p-multichoice .h5p-correct .h5p-alternative-container {
+  background-color: #f0fdf4 !important;
+  border: 1.5px solid #86efac !important;
+  color: #166534 !important;
+}
+
+.h5p-multichoice .h5p-answer.h5p-wrong .h5p-alternative-container,
+.h5p-multichoice .h5p-wrong .h5p-alternative-container {
+  background-color: #fef2f2 !important;
+  border: 1.5px solid #fca5a5 !important;
+  color: #991b1b !important;
+}
+
+/* 3. Card inner layout: Radio on left, text in middle, icon on far right */
+.h5p-multichoice .h5p-alternative-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  position: relative !important;
+  padding: 18px 22px !important;
+  border-radius: 6px !important;
+  margin-bottom: 14px !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.h5p-multichoice .h5p-alternative-container:hover {
+  background-color: #f8fafc !important;
+}
+
+.h5p-multichoice .h5p-alternative-container.rise-quiz-selected,
+.h5p-multichoice .h5p-selected .h5p-alternative-container,
+.h5p-multichoice .h5p-answer[aria-checked="true"] .h5p-alternative-container {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+.h5p-multichoice .h5p-alternative-inner {
+  flex: 1 !important;
+  margin: 0 14px 0 0 !important;
+  text-align: left !important;
+  font-size: 1.1rem !important;
+  color: #0f172a !important;
+  font-weight: 500 !important;
+}
+
+.h5p-multichoice .h5p-answer-icon {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  flex-shrink: 0 !important;
+  order: 10 !important;
+}
+
+/* 4. Action Buttons (Uniform Sizing, Equal Height, Modern Look) */
+.h5p-question-buttons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 28px 0 10px 0 !important;
+  flex-wrap: wrap !important;
+}
+
+.h5p-joubelui-button,
+.h5p-question-buttons button,
+.h5p-question-show-solution,
+.h5p-question-try-again,
+.h5p-question-check-answer {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 24px !important;
+  border-radius: 8px !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.h5p-joubelui-button:before,
+.h5p-question-buttons button:before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin-right: 8px !important;
+  vertical-align: -2px !important;
+  background-color: currentColor !important;
+}
+
+.h5p-question-show-solution,
+.h5p-joubelui-button.h5p-question-show-solution {
+  background: #f8fafc !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #1e3a8a !important;
+}
+
+.h5p-question-show-solution:hover,
+.h5p-joubelui-button.h5p-question-show-solution:hover {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+.h5p-question-show-solution:before,
+.h5p-theme .h5p-question-show-solution:before,
+button.h5p-question-show-solution:before,
+.h5p-joubelui-button.h5p-question-show-solution:before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") no-repeat center !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") no-repeat center !important;
+  -webkit-mask-size: contain !important;
+  mask-size: contain !important;
+}
+
+.h5p-question-try-again,
+.h5p-joubelui-button.h5p-question-try-again {
+  background: #f8fafc !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.h5p-question-try-again:hover,
+.h5p-joubelui-button.h5p-question-try-again:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+}
+
+.h5p-question-try-again:before,
+.h5p-theme .h5p-question-try-again:before,
+button.h5p-question-try-again:before,
+.h5p-joubelui-button.h5p-question-try-again:before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M23 4v6h-6'/%3E%3Cpath d='M20.49 15a9 9 0 1 1-2.12-9.36L23 10'/%3E%3C/svg%3E") no-repeat center !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M23 4v6h-6'/%3E%3Cpath d='M20.49 15a9 9 0 1 1-2.12-9.36L23 10'/%3E%3C/svg%3E") no-repeat center !important;
+  -webkit-mask-size: contain !important;
+  mask-size: contain !important;
+}
+
+.h5p-question-check-answer,
+.h5p-joubelui-button.h5p-question-check-answer {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  border: 1.5px solid #1e3a8a !important;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25) !important;
+}
+
+.h5p-question-check-answer:hover,
+.h5p-joubelui-button.h5p-question-check-answer:hover {
+  background: #1e40af !important;
+  border-color: #1e40af !important;
+  transform: translateY(-1px) !important;
+}
+
+.h5p-question-check-answer:before,
+.h5p-theme .h5p-question-check-answer:before,
+button.h5p-question-check-answer:before,
+.h5p-joubelui-button.h5p-question-check-answer:before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center !important;
+  -webkit-mask-size: contain !important;
+  mask-size: contain !important;
+}
+
+/* --------------------------------------------------------------------------
+   Embedded Moodle Quiz Container
+   -------------------------------------------------------------------------- */
+.rise-moodle-quiz-frame {
+  width: 100% !important;
+  border: none !important;
+  min-height: 420px;
+  background: transparent;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   5. Articulate Rise Numbered Lists, Bullet Lists & Step Animations
+   -------------------------------------------------------------------------- */
+@keyframes riseItemFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Rise Lists & Badges (Ordered & Unordered) */
+.h5p-rise-course-root .rise-lesson-content-block ol,
+.h5p-rise-course-root .h5p-advanced-text ol,
+.h5p-rise-course-root ol,
+.rise-numbered-list,
+.rise-steps-list-clean {
+  list-style: none !important;
+  counter-reset: rise-ol-counter;
+  padding: 0 !important;
+  margin: 20px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.h5p-rise-course-root .rise-lesson-content-block ol > li,
+.h5p-rise-course-root .h5p-advanced-text ol > li,
+.h5p-rise-course-root ol > li,
+.rise-numbered-list > li,
+.rise-steps-list-clean .rise-clean-step-item {
+  counter-increment: rise-ol-counter;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  font-size: 1.05rem !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  line-height: 1.6 !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 14px 20px !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: riseItemFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.h5p-rise-course-root .rise-lesson-content-block ol > li:hover,
+.h5p-rise-course-root .h5p-advanced-text ol > li:hover,
+.h5p-rise-course-root ol > li:hover,
+.rise-numbered-list > li:hover,
+.rise-steps-list-clean .rise-clean-step-item:hover {
+  transform: translateX(6px) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.12) !important;
+}
+
+/* Numbered Badge */
+.rise-number-badge,
+.rise-clean-badge {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28) !important;
+}
+
+.h5p-rise-course-root ol:not(.rise-has-dom-badges) > li::before,
+.rise-numbered-list:not(.rise-has-dom-badges) > li::before {
+  content: counter(rise-ol-counter);
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28);
+}
+
+/* Bullet Lists (Default for all <ul> in Rise Course, excluding UI elements) */
+.h5p-rise-course-root .rise-lesson-content-block ul,
+.h5p-rise-course-root .h5p-advanced-text ul,
+.h5p-rise-course-root ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress),
+.rise-bullet-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 20px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.h5p-rise-course-root .rise-lesson-content-block ul > li,
+.h5p-rise-course-root .h5p-advanced-text ul > li,
+.h5p-rise-course-root ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li,
+.rise-bullet-list > li {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  background: #f8fafc !important;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 12px !important;
+  padding: 12px 18px !important;
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+  transition: all 0.25s ease !important;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: riseItemFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.h5p-rise-course-root .rise-lesson-content-block ul > li:hover,
+.h5p-rise-course-root .h5p-advanced-text ul > li:hover,
+.h5p-rise-course-root ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li:hover,
+.rise-bullet-list > li:hover {
+  transform: translateX(6px) !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Bullet Badge */
+.rise-bullet-badge {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 50% !important;
+  background: #eff6ff !important;
+  border: 1.5px solid #bfdbfe !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.rise-bullet-dot {
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 10px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.5) !important;
+  display: block !important;
+}
+
+.h5p-rise-course-root ul:not(.rise-has-dom-badges):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li::before,
+.rise-bullet-list:not(.rise-has-dom-badges) > li::before {
+  content: "" !important;
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.22) !important;
+  display: block !important;
+}
+
+.rise-item-text {
+  flex: 1 1 auto !important;
+  color: #1e293b !important;
+}
+
+.rise-item-text p {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+}
+
+/* Checkmark List Variant */
+ul.rise-check-list > li::before {
+  content: "" !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  border-radius: 50% !important;
+  background: #10b981 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center !important;
+  background-size: 14px 14px !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Process / Timeline Connected List */
+.rise-process-list {
+  position: relative !important;
+  padding-left: 10px !important;
+}
+
+.rise-process-list::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 27px !important;
+  top: 24px !important;
+  bottom: 24px !important;
+  width: 2px !important;
+  background: linear-gradient(180deg, #3b82f6 0%, #94a3b8 100%) !important;
+  z-index: 0 !important;
+}
+
+.rise-process-list > li {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Staggered Cascade Animation Delays (1 to 20 items) */
+.h5p-rise-course-root ol > li:nth-child(1), .h5p-rise-course-root ul > li:nth-child(1), .rise-clean-step-item:nth-child(1) { animation-delay: 0.10s !important; }
+.h5p-rise-course-root ol > li:nth-child(2), .h5p-rise-course-root ul > li:nth-child(2), .rise-clean-step-item:nth-child(2) { animation-delay: 0.20s !important; }
+.h5p-rise-course-root ol > li:nth-child(3), .h5p-rise-course-root ul > li:nth-child(3), .rise-clean-step-item:nth-child(3) { animation-delay: 0.30s !important; }
+.h5p-rise-course-root ol > li:nth-child(4), .h5p-rise-course-root ul > li:nth-child(4), .rise-clean-step-item:nth-child(4) { animation-delay: 0.40s !important; }
+.h5p-rise-course-root ol > li:nth-child(5), .h5p-rise-course-root ul > li:nth-child(5), .rise-clean-step-item:nth-child(5) { animation-delay: 0.50s !important; }
+.h5p-rise-course-root ol > li:nth-child(6), .h5p-rise-course-root ul > li:nth-child(6), .rise-clean-step-item:nth-child(6) { animation-delay: 0.60s !important; }
+.h5p-rise-course-root ol > li:nth-child(7), .h5p-rise-course-root ul > li:nth-child(7), .rise-clean-step-item:nth-child(7) { animation-delay: 0.70s !important; }
+.h5p-rise-course-root ol > li:nth-child(8), .h5p-rise-course-root ul > li:nth-child(8), .rise-clean-step-item:nth-child(8) { animation-delay: 0.80s !important; }
+.h5p-rise-course-root ol > li:nth-child(9), .h5p-rise-course-root ul > li:nth-child(9), .rise-clean-step-item:nth-child(9) { animation-delay: 0.90s !important; }
+.h5p-rise-course-root ol > li:nth-child(10), .h5p-rise-course-root ul > li:nth-child(10), .rise-clean-step-item:nth-child(10) { animation-delay: 1.00s !important; }
+.h5p-rise-course-root ol > li:nth-child(11), .h5p-rise-course-root ul > li:nth-child(11), .rise-clean-step-item:nth-child(11) { animation-delay: 1.10s !important; }
+.h5p-rise-course-root ol > li:nth-child(12), .h5p-rise-course-root ul > li:nth-child(12), .rise-clean-step-item:nth-child(12) { animation-delay: 1.20s !important; }
+.h5p-rise-course-root ol > li:nth-child(13), .h5p-rise-course-root ul > li:nth-child(13), .rise-clean-step-item:nth-child(13) { animation-delay: 1.30s !important; }
+.h5p-rise-course-root ol > li:nth-child(14), .h5p-rise-course-root ul > li:nth-child(14), .rise-clean-step-item:nth-child(14) { animation-delay: 1.40s !important; }
+.h5p-rise-course-root ol > li:nth-child(15), .h5p-rise-course-root ul > li:nth-child(15), .rise-clean-step-item:nth-child(15) { animation-delay: 1.50s !important; }
+.h5p-rise-course-root ol > li:nth-child(16), .h5p-rise-course-root ul > li:nth-child(16), .rise-clean-step-item:nth-child(16) { animation-delay: 1.60s !important; }
+.h5p-rise-course-root ol > li:nth-child(17), .h5p-rise-course-root ul > li:nth-child(17), .rise-clean-step-item:nth-child(17) { animation-delay: 1.70s !important; }
+.h5p-rise-course-root ol > li:nth-child(18), .h5p-rise-course-root ul > li:nth-child(18), .rise-clean-step-item:nth-child(18) { animation-delay: 1.80s !important; }
+.h5p-rise-course-root ol > li:nth-child(19), .h5p-rise-course-root ul > li:nth-child(19), .rise-clean-step-item:nth-child(19) { animation-delay: 1.90s !important; }
+.h5p-rise-course-root ol > li:nth-child(20), .h5p-rise-course-root ul > li:nth-child(20), .rise-clean-step-item:nth-child(20) { animation-delay: 2.00s !important; }
+
+/* --------------------------------------------------------------------------
+   6. Sidebar Progress Rings (Matching Screenshot 2)
+   -------------------------------------------------------------------------- */
+.rise-sidebar-status-ring {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent;
+  position: relative;
+}
+
+/* In-Progress (Active Lesson): Blue circle with top gap */
+.rise-sidebar-lesson-item.active .rise-sidebar-status-ring {
+  border: 2.5px solid #1e3a8a;
+  border-top-color: transparent !important;
+  transform: rotate(45deg);
+  background: transparent !important;
+}
+
+/* Completed Lesson: Solid Blue with Checkmark */
+.rise-sidebar-lesson-item.completed .rise-sidebar-status-ring {
+  border-color: #1e3a8a !important;
+  background: #1e3a8a !important;
+  transform: rotate(0deg) !important;
+}
+
+.rise-sidebar-lesson-item.completed .rise-sidebar-status-ring:before {
+  content: "\2713";
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   7. Terminology Cards & Structured Cards Format
+   -------------------------------------------------------------------------- */
+.rise-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.rise-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: riseFadeInUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.rise-step-item:nth-child(1) { animation-delay: 0.15s; }
+.rise-step-item:nth-child(2) { animation-delay: 0.35s; }
+.rise-step-item:nth-child(3) { animation-delay: 0.55s; }
+.rise-step-item:nth-child(4) { animation-delay: 0.75s; }
+.rise-step-item:nth-child(5) { animation-delay: 0.95s; }
+.rise-step-item:nth-child(6) { animation-delay: 1.15s; }
+
+.rise-step-item:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.rise-step-badge {
+  background: #eff6ff;
+  color: #1e3a8a;
+  border: 1.5px solid #bfdbfe;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  padding: 8px 16px;
+  border-radius: 8px;
+  min-width: 58px;
+  text-align: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(30, 58, 138, 0.1);
+}
+
+.rise-step-content {
+  flex: 1;
+}
+
+.rise-step-content h4 {
+  margin: 0 0 6px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.rise-step-content p {
+  margin: 0;
+  font-size: 1.025rem;
+  color: #475569;
+  line-height: 1.65;
+}
+
+/* --------------------------------------------------------------------------
+   8. Callouts & Information Banners
+   -------------------------------------------------------------------------- */
+.rise-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 10px;
+  margin: 24px 0;
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  color: #1e293b;
+  font-size: 1.025rem;
+  line-height: 1.65;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: riseFadeInUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.4s;
+}
+
+.rise-callout-info {
+  background: #eff6ff;
+  border-left-color: #2563eb;
+  color: #1e3a8a;
+}
+
+.rise-callout-tip {
+  background: #f0fdf4;
+  border-left-color: #16a34a;
+  color: #14532d;
+}
+
+.rise-callout-warning {
+  background: #fffbeb;
+  border-left-color: #d97706;
+  color: #78350f;
+}
+
+/* --------------------------------------------------------------------------
+   9. Code Syntax Highlighter & Dark IDE Window
+   -------------------------------------------------------------------------- */
+.rise-code-window {
+  margin: 28px 0;
+  border-radius: 12px;
+  background: #0f172a !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3), 0 8px 10px -6px rgba(15, 23, 42, 0.2) !important;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: riseFadeInUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.35s;
+}
+
+.rise-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: #1e293b !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.rise-code-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rise-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+.rise-code-title {
+  display: flex;
+  align-items: center;
+}
+
+.rise-lang-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.rise-copy-code-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.rise-copy-code-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.rise-copy-code-btn.copied {
+  background: #059669;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+.rise-code-content,
+.rise-code-window pre,
+.rise-lesson-viewport pre,
+pre.rise-code-content {
+  margin: 0 !important;
+  padding: 22px 24px !important;
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.7 !important;
+  overflow-x: auto;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+}
+
+.rise-code-content code,
+.rise-code-window pre code,
+.rise-lesson-viewport pre code {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: inherit !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Syntax Token Colors */
+.hl-keyword {
+  color: #c084fc; /* purple/magenta */
+  font-weight: 600;
+}
+
+.hl-type, .hl-class {
+  color: #38bdf8; /* cyan */
+  font-weight: 600;
+}
+
+.hl-string {
+  color: #86efac; /* green */
+}
+
+.hl-method, .hl-function {
+  color: #facc15; /* gold */
+}
+
+.hl-number, .hl-literal {
+  color: #fb923c; /* orange */
+}
+
+.hl-comment {
+  color: #94a3b8; /* slate */
+  font-style: italic;
+}
+
+.hl-annotation {
+  color: #f472b6; /* pink */
+  font-weight: 600;
+}
+
+.hl-operator {
+  color: #cbd5e1; /* light grey */
+}
+
+/* --------------------------------------------------------------------------
+   10. Articulate Rise 3D Flip Cards / Flashcards
+   -------------------------------------------------------------------------- */
+.rise-flashcard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  margin: 28px 0;
+  perspective: 1200px;
+}
+
+.rise-flip-card {
+  background-color: transparent;
+  min-height: 250px;
+  cursor: pointer;
+  perspective: 1200px;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+
+.rise-flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  text-align: center;
+  transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.rise-flip-card.is-flipped .rise-flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.rise-flip-card-front,
+.rise-flip-card-back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.rise-flip-card-front {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  color: #0f172a;
+}
+
+.rise-flip-card:hover .rise-flip-card-front {
+  border-color: #3b82f6;
+  box-shadow: 0 12px 28px rgba(59, 130, 246, 0.15);
+  transform: translateY(-3px);
+}
+
+.rise-flip-word {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.02em;
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.rise-flip-card-back {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #ffffff;
+  transform: rotateY(180deg);
+  border: 2px solid #1e3a8a;
+  box-shadow: 0 10px 25px rgba(30, 58, 138, 0.25);
+}
+
+.rise-flip-definition {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.75;
+  text-align: center;
+  margin: 0;
+  padding: 0 8px;
+}
+
+/* --------------------------------------------------------------------------
+   11. H5P.Dialogcards Rise Enhancements
+   -------------------------------------------------------------------------- */
+.h5p-dialogcards {
+  background: transparent !important;
+  border: none !important;
+}
+
+.h5p-dialogcards .h5p-dialogcards-cardholder {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08) !important;
+  transition: transform 0.4s ease, border-color 0.2s ease !important;
+}
+
+.h5p-dialogcards .h5p-dialogcards-cardholder:hover {
+  border-color: #3b82f6 !important;
+}
+
+.h5p-dialogcards-card-text-area {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  text-align: center !important;
+  line-height: 1.6 !important;
+}
+
+.h5p-dialogcards .h5p-dialogcards-card-footer button,
+.h5p-dialogcards .h5p-theme-button {
+  border-radius: 8px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 24px !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+}
+
+/* --------------------------------------------------------------------------
+   12. Image Gallery & Multi-Style Presentation Options
+   -------------------------------------------------------------------------- */
+/* 2-Column Image Grid */
+.rise-image-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin: 28px 0;
+}
+
+/* 3-Column Image Grid */
+.rise-image-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 28px 0;
+}
+
+@media (max-width: 680px) {
+  .rise-image-grid-2,
+  .rise-image-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rise-image-card {
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.rise-image-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.rise-image-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.rise-image-card-caption {
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.5;
+  background: #ffffff;
+}
+
+/* Full Width Hero Image */
+.rise-image-hero {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 28px 0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+}
+
+.rise-image-hero img {
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: cover;
+  display: block;
+}
+
+.rise-image-hero-caption {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  color: #64748b;
+  text-align: center;
+  font-style: italic;
+}
+
+/* H5P.ImageSlider / Carousel Overrides */
+.h5p-image-slider {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  margin: 28px 0 !important;
+}
+
+.h5p-image-slider .h5p-image-slider-button {
+  width: 44px !important;
+  height: 44px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border-radius: 50% !important;
+  margin: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.h5p-image-slider .h5p-image-slider-button:hover {
+  background: rgba(15, 23, 42, 0.9) !important;
+  transform: translateY(-50%) scale(1.1) !important;
+}
+
+/* --------------------------------------------------------------------------
+   13. H5P.TrueFalse Modern Rise Styling & Tofu Fix
+   -------------------------------------------------------------------------- */
+.h5p-true-false {
+  margin: 24px 0 !important;
+  background: transparent !important;
+}
+
+.h5p-true-false-answers {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  margin-top: 18px !important;
+}
+
+.h5p-true-false-answer {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px 24px !important;
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+
+.h5p-true-false-answer:hover {
+  border-color: #3b82f6 !important;
+  background: #f8fafc !important;
+  transform: translateY(-2px) !important;
+}
+
+.h5p-true-false-answer[aria-checked="true"],
+.h5p-true-false-answer.rise-quiz-selected {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #1e3a8a !important;
+  box-shadow: 0 0 0 1px #2563eb !important;
+}
+
+/* Eliminate font tofu boxes in True/False */
+.h5p-true-false-answer:before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 50% !important;
+  margin-right: 12px !important;
+  background: #ffffff !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.h5p-true-false-answer[aria-checked="true"]:before,
+.h5p-true-false-answer.rise-quiz-selected:before {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  box-shadow: inset 0 0 0 4px #ffffff !important;
+}
+
+.h5p-true-false-answer:after {
+  display: none !important;
+}
+
+

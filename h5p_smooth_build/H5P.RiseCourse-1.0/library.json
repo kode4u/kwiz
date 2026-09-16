@@ -1,0 +1,172 @@
+{
+  "title": "Articulate Rise Course",
+  "description": "Multi-lesson course module with left sidebar navigation, top header, progress tracking, and next button flow.",
+  "majorVersion": 1,
+  "minorVersion": 0,
+  "patchVersion": 26,
+  "runnable": 1,
+  "author": "Antigravity",
+  "license": "MIT",
+  "machineName": "H5P.RiseCourse",
+  "embedTypes": [
+    "iframe"
+  ],
+  "coreApi": {
+    "majorVersion": 1,
+    "minorVersion": 26
+  },
+  "preloadedJs": [
+    {
+      "path": "scripts/rise-course.js"
+    }
+  ],
+  "preloadedCss": [
+    {
+      "path": "styles/rise-course.css"
+    }
+  ],
+  "preloadedDependencies": [
+    {
+      "machineName": "H5P.Column",
+      "majorVersion": 1,
+      "minorVersion": 22
+    },
+    {
+      "machineName": "H5P.AdvancedText",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.Image",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.ImageSlider",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5P.Video",
+      "majorVersion": 1,
+      "minorVersion": 6
+    },
+    {
+      "machineName": "H5P.Audio",
+      "majorVersion": 1,
+      "minorVersion": 5
+    },
+    {
+      "machineName": "H5P.Accordion",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5P.MultiChoice",
+      "majorVersion": 1,
+      "minorVersion": 16
+    },
+    {
+      "machineName": "H5P.SingleChoiceSet",
+      "majorVersion": 1,
+      "minorVersion": 11
+    },
+    {
+      "machineName": "H5P.TrueFalse",
+      "majorVersion": 1,
+      "minorVersion": 8
+    },
+    {
+      "machineName": "H5P.Blanks",
+      "majorVersion": 1,
+      "minorVersion": 14
+    },
+    {
+      "machineName": "H5P.DragText",
+      "majorVersion": 1,
+      "minorVersion": 10
+    },
+    {
+      "machineName": "H5P.Dialogcards",
+      "majorVersion": 1,
+      "minorVersion": 9
+    },
+    {
+      "machineName": "H5P.Summary",
+      "majorVersion": 1,
+      "minorVersion": 10
+    },
+    {
+      "machineName": "H5P.JoubelUI",
+      "majorVersion": 1,
+      "minorVersion": 3
+    },
+    {
+      "machineName": "H5P.Question",
+      "majorVersion": 1,
+      "minorVersion": 5
+    },
+    {
+      "machineName": "H5P.Transition",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "FontAwesome",
+      "majorVersion": 4,
+      "minorVersion": 5
+    },
+    {
+      "machineName": "jQuery.ui",
+      "majorVersion": 1,
+      "minorVersion": 10
+    }
+  ],
+  "editorDependencies": [
+    {
+      "machineName": "H5PEditor.VerticalTabs",
+      "majorVersion": 1,
+      "minorVersion": 3
+    },
+    {
+      "machineName": "H5PEditor.ShowWhen",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5PEditor.RadioGroup",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5PEditor.RangeList",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5PEditor.TableList",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5PEditor.UrlField",
+      "majorVersion": 1,
+      "minorVersion": 2
+    },
+    {
+      "machineName": "H5PEditor.ColorSelector",
+      "majorVersion": 1,
+      "minorVersion": 3
+    },
+    {
+      "machineName": "H5PEditor.SummaryTextualEditor",
+      "majorVersion": 1,
+      "minorVersion": 1
+    },
+    {
+      "machineName": "H5PEditor.SingleChoiceSetTextualEditor",
+      "majorVersion": 1,
+      "minorVersion": 0
+    }
+  ]
+}

@@ -1,0 +1,388 @@
+{
+  "courseMeta": {
+    "title": "\u1798\u17c1\u179a\u17c0\u1793\u1791\u17b8\u17e1 \u1780\u17b6\u179a\u178e\u17c2\u1793\u17b6\u17c6\u17a2\u17c6\u1796\u17b8\u1797\u17b6\u179f\u17b6Java",
+    "coverImageUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1600&q=80",
+    "description": "<div><p>\u1793\u17c5\u1780\u17d2\u1793\u17bb\u1784\u1798\u17c1\u179a\u17c0\u1793\u1793\u17c1\u17c7 \u1799\u17be\u1784\u1793\u17b9\u1784\u179f\u17b7\u1780\u17d2\u179f\u17b6\u17a2\u17c6\u1796\u17b8\u1785\u17c6\u178e\u17bb\u1785\u179f\u17c6\u1781\u17b6\u1793\u17cb\u17d7\u1798\u17bd\u1799\u1785\u17c6\u1793\u17bd\u1793\u178a\u17bc\u1785\u1787\u17b6\u17d6</p><ul><li>\u1797\u17b6\u179f\u17b6\u1780\u17bc\u178a Java</li><li>\u1796\u17b6\u1780\u17d2\u1799\u1794\u1785\u17d2\u1785\u17c1\u1780\u1791\u17c1\u179f Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a \u1793\u17c3\u1780\u17b6\u179a\u179f\u179a\u179f\u17c1\u179a\u1780\u17bc\u178a Java</li><li>\u179b\u1780\u17d2\u1781\u178e\u17c8\u179a\u1794\u179f\u17cb\u1797\u17b6\u179f\u17b6 Java</li></ul></div>",
+    "showCover": true,
+    "startButtonText": "START COURSE",
+    "exitButtonText": "EXIT COURSE"
+  },
+  "sections": [
+    {
+      "sectionTitle": "\u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798",
+      "lessons": [
+        {
+          "title": "\u1791\u17b7\u178a\u17d2\u178b\u1797\u17b6\u1796\u1791\u17bc\u1791\u17c5\u1793\u17c3\u1798\u17c1\u179a\u17c0\u1793",
+          "iconType": "overview",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "\n<div class=\"rise-content-section\" style=\"padding-top: 10px;\">\n    <h1 class=\"rise-main-title\" style=\"font-size: 2.2rem; margin-bottom: 16px; font-weight: 800; color: #0f172a;\">ទិដ្ឋភាពទូទៅនៃមេរៀន</h1>\n    <p style=\"font-size: 1.15rem; color: #334155; margin-bottom: 28px; line-height: 1.7;\">នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា៖</p>\n    <ol class=\"rise-numbered-list\">\n        <li>ភាសាកូដ Java</li>\n        <li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li>\n        <li>ដំណើរការ នៃការសរសេរកូដ Java</li>\n        <li>លក្ខណៈរបស់ភាសា Java</li>\n        <li>ចេះសរសេរកូដបង្ហាញអក្សរលើអេក្រង់</li>\n    </ol>\n</div>\n"
+                    },
+                    "subContentId": "1e726a8e2c28bd90"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "232163edb8714ac7"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        },
+        {
+          "title": "\u179b\u1791\u17d2\u1792\u1795\u179b\u179a\u17c6\u1796\u17b9\u1784\u1791\u17bb\u1780\u1793\u17c3\u1798\u17c1\u179a\u17c0\u1793",
+          "iconType": "document",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-header-block\"><div class=\"rise-category-tag\">Learning Goals</div><h2 class=\"rise-main-title\">\u179b\u1791\u17d2\u1792\u1795\u179b\u179a\u17c6\u1796\u17b9\u1784\u1791\u17bb\u1780\u1793\u17c3\u1798\u17c1\u179a\u17c0\u1793</h2><p class=\"rise-main-desc\">\u1780\u17d2\u179a\u17c4\u1799\u1794\u1789\u17d2\u1785\u1794\u17cb\u1798\u17c1\u179a\u17c0\u1793\u1793\u17c1\u17c7 \u179f\u17b7\u1780\u17d2\u1781\u17b6\u1780\u17b6\u1798\u1793\u17b9\u1784\u1791\u1791\u17bd\u179b\u1794\u17b6\u1793\u1785\u17c6\u178e\u17c1\u17c7\u178a\u17b9\u1784 \u1793\u17b7\u1784\u1787\u17c6\u1793\u17b6\u1789\u178a\u17bc\u1785\u1781\u17b6\u1784\u1780\u17d2\u179a\u17c4\u1798\u17d6</p></div>"
+                    },
+                    "subContentId": "cd80895ad27f08a7"
+                  },
+                  "useSeparator": "disabled"
+                },
+                {
+                  "content": {
+                    "library": "H5P.Accordion 1.0",
+                    "params": {
+                      "panels": [
+                        {
+                          "title": "\u1785\u17c6\u178e\u17c1\u17c7\u178a\u17b9\u1784 (Knowledge)",
+                          "content": {
+                            "library": "H5P.AdvancedText 1.1",
+                            "params": {
+                              "text": "<p>\u1799\u179b\u17cb\u178a\u17b9\u1784\u17a2\u17c6\u1796\u17b8\u1782\u17c4\u179b\u1780\u17b6\u179a\u178e\u17cd\u1782\u17d2\u179a\u17b9\u17c7\u1793\u17c3 Object-Oriented Programming (OOP) \u1793\u17b7\u1784\u179f\u17d2\u1790\u17b6\u1794\u178f\u17d2\u1799\u1780\u1798\u17d2\u1798 Java Virtual Machine (JVM)\u17d4</p>"
+                            }
+                          }
+                        },
+                        {
+                          "title": "\u1787\u17c6\u1793\u17b6\u1789\u17a2\u1793\u17bb\u179c\u178f\u17d2\u178f (Practical Skills)",
+                          "content": {
+                            "library": "H5P.AdvancedText 1.1",
+                            "params": {
+                              "text": "<p>\u1785\u17c1\u17c7\u178a\u17c6\u17a1\u17be\u1784 JDK, \u1780\u17c6\u178e\u178f\u17cb Environment Variables \u1793\u17b7\u1784\u179f\u179a\u179f\u17c1\u179a\u1780\u1798\u17d2\u1798\u179c\u17b7\u1792\u17b8 Console Application \u178a\u17c6\u1794\u17bc\u1784\u1794\u1784\u17d2\u17a2\u179f\u17cb\u17d4</p>"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "subContentId": "5cfb4ee7b989f78e"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "1568c358bdcac535"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        },
+        {
+          "title": "\u1796\u17b6\u1780\u17d2\u1799\u1782\u1793\u17d2\u179b\u17b9\u17c7 (Flip Cards)",
+          "iconType": "document",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-header-block\"><div class=\"rise-category-tag\">Flashcards & Terminology</div><h2 class=\"rise-main-title\">\u1796\u17b6\u1780\u17d2\u1799\u1782\u1793\u17d2\u179b\u17b9\u17c7\u179f\u17c6\u1781\u17b6\u1793\u17cb\u17d7 (\u1785\u17bb\u1785\u178a\u17be\u1798\u17d2\u1794\u17b8\u178f\u17d2\u179a\u17a1\u1794\u17cb Flip Card)</h2><p class=\"rise-main-desc\">\u1785\u17bb\u1785\u179b\u17be\u1780\u17b6\u178f\u1793\u17b8\u1798\u17bd\u1799\u17d7\u178a\u17be\u1798\u17d2\u1794\u17b8\u178f\u17d2\u179a\u17a1\u1794\u17cb\u1798\u17be\u179b\u1793\u17b7\u1799\u1798\u1793\u17d0\u1799 \u1793\u17b7\u1784\u1796\u17d0\u178f\u17cc\u1798\u17b6\u1793\u179b\u1798\u17d2\u17a2\u17b7\u178f\u17d6</p></div>"
+                    },
+                    "subContentId": "07648fc782693b20"
+                  },
+                  "useSeparator": "disabled"
+                },
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-flashcard-grid\"><div class=\"rise-flip-card\"><div class=\"rise-flip-card-inner\"><div class=\"rise-flip-card-front\"><div class=\"rise-flip-word\">JDK</div></div><div class=\"rise-flip-card-back\"><div class=\"rise-flip-definition\"><strong>JDK (Java Development Kit)</strong><br>កញ្ចប់ឧបករណ៍ពេញលេញសម្រាប់អ្នកអភិវឌ្ឍន៍សរសេរ និង compile កូដ Java (.java ទៅជា .class) រួមមាន javac, debugger និង JRE។</div></div></div></div><div class=\"rise-flip-card\"><div class=\"rise-flip-card-inner\"><div class=\"rise-flip-card-front\"><div class=\"rise-flip-word\">JRE</div></div><div class=\"rise-flip-card-back\"><div class=\"rise-flip-definition\"><strong>JRE (Java Runtime Environment)</strong><br>បរិស្ថានសម្រាប់ដំណើរការកម្មវិធី Java សម្រាប់ End-user ដែលរួមបញ្ចូល JVM និង Class Libraries ទាំងអស់។</div></div></div></div><div class=\"rise-flip-card\"><div class=\"rise-flip-card-inner\"><div class=\"rise-flip-card-front\"><div class=\"rise-flip-word\">JVM</div></div><div class=\"rise-flip-card-back\"><div class=\"rise-flip-definition\"><strong>JVM (Java Virtual Machine)</strong><br>ម៉ាស៊ីននិម្មិតដែលដំណើរការ Java Bytecode នៅលើគ្រប់ OS (Write Once, Run Anywhere)។</div></div></div></div><div class=\"rise-flip-card\"><div class=\"rise-flip-card-inner\"><div class=\"rise-flip-card-front\"><div class=\"rise-flip-word\">OOP</div></div><div class=\"rise-flip-card-back\"><div class=\"rise-flip-definition\"><strong>OOP (Object-Oriented Programming)</strong><br>វិធីសាស្ត្រនៃការសរសេរកម្មវិធីដោយផ្អែកលើ Objects និង Classes ដូចជា Encapsulation, Inheritance, Polymorphism, Abstraction។</div></div></div></div></div><div class=\"rise-callout rise-callout-info\"><div><strong>ចំណាំសំខាន់:</strong> អ្នកអភិវឌ្ឍន៍ (Developer) ត្រូវការ <strong>JDK</strong> ដើម្បីសរសេរ និង compile កូដ ចំណែកអ្នកប្រើប្រាស់ទូទៅ (End-user) ត្រូវការត្រឹមតែ <strong>JRE</strong> ដើម្បីដំណើរការកម្មវិធី Java ប៉ុណ្ណោះ។</div></div>"
+                    },
+                    "subContentId": "4cbdc07512a2c18c"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "edf0a343c4be6e77"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        },
+        {
+          "title": "\u179c\u17b8\u178a\u17c1\u17a2\u17bc & \u179a\u17bc\u1794\u1797\u17b6\u1796 Gallery",
+          "iconType": "video",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-video-card\"><div class=\"rise-video-header\"><div class=\"rise-section-label\">Video Lecture</div><h3 class=\"rise-section-heading\">\u1780\u17b6\u179a\u178e\u17c2\u1793\u17b6\u17c6\u1797\u17b6\u179f\u17b6 Java \u1793\u17b7\u1784\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a Installation</h3></div><div class=\"rise-video-wrapper\"><iframe src=\"https://www.youtube.com/embed/eIrMbAQSU34\" allowfullscreen></iframe></div><div class=\"rise-video-caption\">\u179c\u17b8\u178a\u17c1\u17a2\u17bc\u1794\u1784\u17d2\u179a\u17c0\u1793\u179b\u1798\u17d2\u17a2\u17b7\u178f\u17a2\u17c6\u1796\u17b8 Java Ecosystem \u1793\u17b7\u1784\u1780\u17b6\u179a\u179f\u179a\u179f\u17c1\u179a\u1780\u17bc\u178a\u1787\u17c6\u17a0\u17b6\u1793\u178a\u17c6\u1794\u17bc\u1784\u17d4</div></div>\n<div class=\"rise-header-block\" style=\"margin-top: 36px;\"><div class=\"rise-category-tag\">Interactive Slider</div><h2 class=\"rise-main-title\">\u178f\u17bd\u1799\u17c9\u17b6\u1784 Image Slider (Pro Look &amp; Animated)</h2><p class=\"rise-main-desc\">\u179a\u17c4\u179f\u17d2\u179b\u17b6\u1799\u178a\u17be\u1798\u17d2\u1794\u17b8\u1798\u17be\u179b\u179a\u17bc\u1794\u1797\u17b6\u1796\u178a\u17c4\u1799\u179f\u17d2\u179c\u17d0\u1799\u1794\u17d2\u1799\u179c\u178f\u17d2\u178f\u17b7 \u1787\u17b6\u1798\u17bd\u1799 Glassmorphic Navigation Buttons \u1793\u17b7\u1784 Pill Dock\u17d6</p></div>\n<div class=\"rise-image-grid-2\"><div class=\"rise-image-card\"><img src=\"https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80\" alt=\"Code Editor\"><div class=\"rise-image-card-caption\"><strong>1. Code Editor & IDE Setup</strong><br>IntelliJ IDEA / VS Code \u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1780\u17b6\u179a\u17a2\u1797\u17b7\u179c\u178c\u17d2\u178d\u1793\u17cd\u1780\u17bc\u178a Java</div></div><div class=\"rise-image-card\"><img src=\"https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80\" alt=\"Java Architecture\"><div class=\"rise-image-card-caption\"><strong>2. Java Architecture & JVM</strong><br>\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u179a\u1794\u179f\u17cb Java Virtual Machine \u1793\u17c5\u179b\u17be Cross-Platform</div></div></div>\n<div class=\"rise-image-hero\"><img src=\"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1400&q=80\" alt=\"Hero Banner\"><div class=\"rise-image-hero-caption\">\u179a\u17bc\u1794\u1797\u17b6\u1796 Hero Wide Banner \u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1794\u1784\u17d2\u17a0\u17b6\u1789\u179a\u1785\u1793\u17b6\u179f\u1798\u17d2\u1796\u17d0\u1793\u17d2\u1792\u1798\u17c1\u179a\u17c0\u1793 \u17ac Diagram \u1792\u17c6\u17d7</div></div>"
+                    },
+                    "subContentId": "1d188173a3d6bfc6"
+                  },
+                  "useSeparator": "disabled"
+                },
+                {
+                  "content": {
+                    "library": "H5P.ImageSlider 1.1",
+                    "params": {
+                      "sliderStyle": "rise-cinema",
+                      "aspectRatioMode": "custom",
+                      "aspectRatio": {
+                        "aspectWidth": 16,
+                        "aspectHeight": 9
+                      },
+                      "imageSlides": [
+                        {
+                          "imageSlide": {
+                            "library": "H5P.ImageSlide 1.1",
+                            "params": {
+                              "image": {
+                                "library": "H5P.Image 1.1",
+                                "params": {
+                                  "contentName": "Slide 1",
+                                  "file": {
+                                    "path": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+                                    "mime": "image/jpeg",
+                                    "width": 1200,
+                                    "height": 800
+                                  },
+                                  "alt": "Modern Java IDE",
+                                  "title": "Modern Java IDE"
+                                },
+                                "subContentId": "img-slide-1"
+                              }
+                            },
+                            "subContentId": "slide-wrap-1"
+                          }
+                        },
+                        {
+                          "imageSlide": {
+                            "library": "H5P.ImageSlide 1.1",
+                            "params": {
+                              "image": {
+                                "library": "H5P.Image 1.1",
+                                "params": {
+                                  "contentName": "Slide 2",
+                                  "file": {
+                                    "path": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80",
+                                    "mime": "image/jpeg",
+                                    "width": 1200,
+                                    "height": 800
+                                  },
+                                  "alt": "Java Code on Laptop",
+                                  "title": "Java Code on Laptop"
+                                },
+                                "subContentId": "img-slide-2"
+                              }
+                            },
+                            "subContentId": "slide-wrap-2"
+                          }
+                        },
+                        {
+                          "imageSlide": {
+                            "library": "H5P.ImageSlide 1.1",
+                            "params": {
+                              "image": {
+                                "library": "H5P.Image 1.1",
+                                "params": {
+                                  "contentName": "Slide 3",
+                                  "file": {
+                                    "path": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80",
+                                    "mime": "image/jpeg",
+                                    "width": 1200,
+                                    "height": 800
+                                  },
+                                  "alt": "Full Stack Development",
+                                  "title": "Full Stack Development"
+                                },
+                                "subContentId": "img-slide-3"
+                              }
+                            },
+                            "subContentId": "slide-wrap-3"
+                          }
+                        }
+                      ]
+                    },
+                    "subContentId": "slider-block-01"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "a1ec78df07ee4872"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        },
+        {
+          "title": "\u179f\u17c6\u178e\u17bd\u179a\u1786\u17d2\u179b\u17be\u1799 (Pre-Test)",
+          "iconType": "quiz",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.MultiChoice 1.16",
+                    "params": {
+                      "question": "<p>JRE \u1798\u1780\u1796\u17b8\u1796\u17b6\u1780\u17d2\u1799 ___.</p>",
+                      "answers": [
+                        {
+                          "correct": false,
+                          "tipsAndFeedback": {
+                            "tip": "",
+                            "chosenFeedback": "<div>\u1798\u17b7\u1793\u178f\u17d2\u179a\u17b9\u1798\u178f\u17d2\u179a\u17bc\u179c\u1791\u17c1!</div>"
+                          },
+                          "text": "<div>JDK Runtime Environment</div>"
+                        },
+                        {
+                          "correct": false,
+                          "tipsAndFeedback": {
+                            "tip": "",
+                            "chosenFeedback": "<div>\u1798\u17b7\u1793\u178f\u17d2\u179a\u17b9\u1798\u178f\u17d2\u179a\u17bc\u179c\u1791\u17c1!</div>"
+                          },
+                          "text": "<div>None of these</div>"
+                        },
+                        {
+                          "correct": true,
+                          "tipsAndFeedback": {
+                            "tip": "",
+                            "chosenFeedback": "<div>\u178f\u17d2\u179a\u17b9\u1798\u178f\u17d2\u179a\u17bc\u179c! JRE \u178f\u17c6\u178e\u17b6\u1784\u17b1\u17d2\u1799 Java Runtime Environment\u17d4</div>"
+                          },
+                          "text": "<div>Java Runtime Environment</div>"
+                        },
+                        {
+                          "correct": false,
+                          "tipsAndFeedback": {
+                            "tip": "",
+                            "chosenFeedback": "<div>\u1798\u17b7\u1793\u178f\u17d2\u179a\u17b9\u1798\u178f\u17d2\u179a\u17bc\u179c\u1791\u17c1!</div>"
+                          },
+                          "text": "<div>Java Run Ecosystem</div>"
+                        }
+                      ],
+                      "behaviour": {
+                        "enableRetry": true,
+                        "enableSolutionsButton": true,
+                        "singlePoint": true,
+                        "randomAnswers": false,
+                        "showSolutionsRequiresInput": true,
+                        "type": "auto"
+                      },
+                      "UI": {
+                        "checkAnswerButton": "Check",
+                        "tryAgainButton": "Retry",
+                        "showSolutionButton": "Show Solution"
+                      }
+                    },
+                    "subContentId": "724db567665b5ab6"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "b2e530db999f315a"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "\u1781\u17d2\u179b\u17b9\u1798\u179f\u17b6\u179a\u1798\u17c1\u179a\u17c0\u1793",
+      "lessons": [
+        {
+          "title": "\u17e1. \u17a2\u17d2\u179c\u17b8\u1791\u17c5\u1787\u17b6Programming Language?",
+          "iconType": "document",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-header-block\"><div class=\"rise-category-tag\">Chapter 1</div><h2 class=\"rise-main-title\">\u17e1. \u17a2\u17d2\u179c\u17b8\u1791\u17c5\u1787\u17b6 Programming Language?</h2><p class=\"rise-main-desc\">\u1797\u17b6\u179f\u17b6\u179f\u179a\u179f\u17c1\u179a\u1780\u1798\u17d2\u1798\u179c\u17b7\u1792\u17b8 (Programming Language) \u1782\u17ba\u1787\u17b6\u1797\u17b6\u179f\u17b6\u178a\u17c2\u179b\u1798\u1793\u17bb\u179f\u17d2\u179f\u1794\u17d2\u179a\u17be\u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1794\u1789\u17d2\u1787\u17b6\u1780\u17bb\u17c6\u1796\u17d2\u1799\u17bc\u1791\u17d0\u179a\u17b1\u17d2\u1799\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1780\u17b6\u179a\u1784\u17b6\u179a\u1795\u17d2\u179f\u17c1\u1784\u17d7\u178f\u17b6\u1798\u179b\u17c6\u178a\u17b6\u1794\u17cb\u179b\u17c6\u178a\u17c4\u1799\u17d4</p></div>"
+                    },
+                    "subContentId": "01d308efa8b23b2b"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "fff391b98b52ac9e"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        },
+        {
+          "title": "\u17e2. \u17a2\u17d2\u179c\u17b8\u1791\u17c5\u1787\u17b6Java",
+          "iconType": "document",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-header-block\"><div class=\"rise-category-tag\">Chapter 2</div><h2 class=\"rise-main-title\">\u17e2. \u17a2\u17d2\u179c\u17b8\u1791\u17c5\u1787\u17b6 Java?</h2><p class=\"rise-main-desc\">Java \u1782\u17ba\u1787\u17b6\u1797\u17b6\u179f\u17b6\u179f\u179a\u179f\u17c1\u179a\u1780\u1798\u17d2\u1798\u179c\u17b7\u1792\u17b8\u1780\u1798\u17d2\u179a\u17b7\u178f\u1781\u17d2\u1796\u179f\u17cb (High-level Programming Language) \u1794\u1784\u17d2\u1780\u17be\u178f\u17a1\u17be\u1784\u178a\u17c4\u1799 James Gosling \u1793\u17c5\u1780\u17d2\u179a\u17bb\u1798\u17a0\u17ca\u17bb\u1793 Sun Microsystems \u1780\u17d2\u1793\u17bb\u1784\u1786\u17d2\u1793\u17b6\u17c6 1995 \u1780\u17d2\u179a\u17c4\u1798\u1796\u17b6\u1780\u17d2\u1799\u179f\u17d2\u179b\u17c4\u1780 <strong>Write Once, Run Anywhere (WORA)</strong>\u17d4</p></div><div class=\"rise-callout rise-callout-tip\"><div><strong>\u1782\u17c6\u179a\u17bc\u1780\u17bc\u178a\u178a\u17c6\u1794\u17bc\u1784 (First Java Program):</strong> \u1781\u17b6\u1784\u1780\u17d2\u179a\u17c4\u1798\u1793\u17c1\u17c7\u1787\u17b6\u1791\u1798\u17d2\u179a\u1784\u17cb\u1780\u17bc\u178a\u1798\u17bc\u179b\u178f\u17d2\u178b\u17b6\u1793\u1793\u17c3\u1797\u17b6\u179f\u17b6 Java \u178a\u17be\u1798\u17a1\u17be\u1794\u1784\u17d2\u17a0\u17b6\u1789\u1796\u17b6\u1780\u17d2\u1799\u179f\u17d2\u179c\u17b6\u1782\u1798\u1793\u17cd\u17d6</div></div><pre><code class=\"language-java\">// \u1780\u1798\u17d2\u1798\u179c\u17b7\u1792\u17b8\u1794\u1784\u17d2\u17a0\u17b6\u1789\u1796\u17b6\u1780\u17d2\u1799\u179f\u17d2\u179c\u17b6\u1782\u1798\u1793\u17cd\u178a\u17c6\u1794\u17bc\u1784\u1780\u17d2\u1793\u17bb\u1784 Java\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"\u179f\u17bc\u179f\u17d2\u178f\u17b8\u1796\u17b7\u1797\u1796\u179b\u17c4\u1780! Hello, Java in Cambodia!\");\n    }\n}</code></pre>"
+                    },
+                    "subContentId": "49028ce1a0af86f3"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "89b9af7e3d6ca666"
+          },
+          "nextButtonText": "\u1794\u1793\u17d2\u1791\u17b6\u1794\u17cb"
+        },
+        {
+          "title": "\u17e3. \u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7\u179a\u1794\u179f\u17cbJava",
+          "iconType": "document",
+          "content": {
+            "library": "H5P.Column 1.22",
+            "params": {
+              "content": [
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-header-block\"><div class=\"rise-category-tag\">Chapter 3</div><h2 class=\"rise-main-title\">\u17e3. \u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7\u179a\u1794\u179f\u17cb Java</h2><p class=\"rise-main-desc\">\u178a\u17be\u1798\u17a1\u17be\u1799 Java \u1798\u17b6\u1793\u1788\u17d2\u1798\u17c4\u17c7\u1790\u17b6 <em>Oak</em> \u1794\u1784\u17d2\u1780\u17be\u178f\u17a1\u17be\u1784\u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb set-top boxes \u1793\u17b7\u1784 smart appliances \u1780\u17d2\u179a\u17c4\u1799\u1798\u1780\u178f\u17d2\u179a\u17bc\u179c\u1794\u17b6\u1793\u1794\u17d2\u178f\u17bc\u179a\u1788\u17d2\u1798\u17c4\u17c7\u1791\u17c5\u1787\u17b6 <strong>Java</strong> \u1793\u17b7\u1784\u1780\u17d2\u179b\u17b6\u1799\u1787\u17b6\u1797\u17b6\u179f\u17b6\u1780\u17c6\u1796\u17bc\u179b\u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb Enterprise, Android, \u1793\u17b7\u1784 Cloud Systems\u17d4</p></div>"
+                    },
+                    "subContentId": "79c745e3370e0c49"
+                  },
+                  "useSeparator": "disabled"
+                },
+                {
+                  "content": {
+                    "library": "H5P.AdvancedText 1.1",
+                    "params": {
+                      "text": "<div class=\"rise-summary-block\"><div class=\"rise-section-label\" style=\"color: var(--rise-success);\">Course Complete</div><h3 class=\"rise-summary-title\">\u179f\u17bc\u1798\u17a2\u1794\u17a2\u179a\u179f\u17b6\u1791\u179a!</h3><p class=\"rise-summary-desc\">\u17a2\u17d2\u1793\u1780\u1794\u17b6\u1793\u1794\u1789\u17d2\u1785\u1794\u17cb\u1780\u17b6\u179a\u179f\u17b7\u1780\u17d2\u179f\u17b6\u1798\u17c1\u179a\u17c0\u1793\u1791\u17b8\u17e1 \u1780\u17b6\u179a\u178e\u17c2\u1793\u17b6\u17c6\u17a2\u17c6\u1796\u17b8\u1797\u17b6\u179f\u17b6 Java \u1791\u17b6\u17c6\u1784\u179f\u17d2\u179a\u17bb\u1784\u17d4</p></div>"
+                    },
+                    "subContentId": "72f641cb7a79f0ce"
+                  },
+                  "useSeparator": "disabled"
+                }
+              ]
+            },
+            "subContentId": "fe0c3d3acf24564d"
+          },
+          "nextButtonText": "\u1794\u1789\u17d2\u1785\u1794\u17cb\u1798\u17c1\u179a\u17c0\u1793 (Complete Course)"
+        }
+      ]
+    }
+  ]
+}

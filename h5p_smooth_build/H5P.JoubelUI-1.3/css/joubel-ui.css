@@ -1,0 +1,180 @@
+@CHARSET "UTF-8";
+
+/* Styling of button */
+.h5peditor .ui-dialog .h5p-joubelui-button,
+.h5peditor .h5p-joubelui-button,
+.h5p-joubelui-button {
+  font-size: 1em;
+  line-height: 1.2;
+  margin: 0 0.5em 1em;
+  padding: 0.5em 1.25em;
+  border-radius: 2em;
+
+  background: #1a73d9;
+  color: #ffffff;
+
+  cursor: pointer;
+  border: none;
+  box-shadow: none;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+
+  display: inline-block;
+  text-align: center;
+  text-shadow: none;
+  text-decoration: none;
+  vertical-align: baseline;
+}
+.h5p-joubelui-button:first-child {
+  margin: 0 0.5em 1em 0;
+}
+
+.h5p-joubelui-button:last-child {
+  margin: 0 0 1em 0.5em;
+}
+
+.h5p-joubelui-button:first-child:last-child {
+  margin: 0 0 1em;
+}
+
+/* Truncated buttons */
+.h5p-joubelui-button.truncated {
+  width: 2.235em;
+  height: 2.235em;
+  border-radius: 50%;
+  padding: 0;
+  text-align: center;
+}
+
+.h5p-joubelui-button.truncated:before {
+  padding: 0;
+}
+
+.h5p-joubelui-button:hover,
+.h5p-joubelui-button:focus {
+  background: #1356a3;
+  color: var(--h5p-theme-contrast-cta);
+  text-decoration: none;
+  -webkit-transition: initial;
+  -moz-transition: initial;
+  -o-transition: initial;
+  transition: initial;
+}
+.h5p-joubelui-button:active {
+  position: relative;
+  background: #104888;
+
+  -webkit-box-shadow: inset 0 4px 0 #0e407a;
+  -moz-box-shadow: inset 0 4px 0 #0e407a;
+  box-shadow: inset 0 4px 0 #0e407a;
+}
+
+.h5p-joubelui-button:active .h5p-joubelui-button-text {
+  position: relative;
+  top: 2px;
+}
+
+.h5p-joubelui-button:before {
+  font-family: 'H5PFontAwesome4';
+  padding-right: 0.5em;
+}
+
+.h5p-question-try-again:before {
+  content: "\F01E";
+}
+
+.h5p-question-show-solution:before {
+  content: "\F06E";
+}
+.h5p-theme .h5p-question-show-solution:before {
+  content: "\e90a";
+}
+
+.h5p-question-check-answer:before {
+  content: "\F058";
+}
+
+/* Remove outline for all elements having tabIndex="-1"*/
+.h5p-content [tabIndex="-1"] {
+  outline: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   QUIZ COLOR-ONLY FEEDBACK & BUTTON ICON FIXES
+   -------------------------------------------------------------------------- */
+
+/* 1. Hide redundant text feedback below choices */
+.h5p-multichoice .h5p-feedback-dialog,
+.h5p-multichoice .h5p-feedback-text,
+.h5p-multichoice .feedback-text,
+.h5p-multichoice .h5p-feedback-inner,
+.h5p-question-feedback,
+.h5p-question-feedback-content,
+.h5p-theme .h5p-question-feedback {
+  display: none !important;
+}
+
+/* 2. Color-only card styling for Correct and Incorrect */
+.h5p-multichoice .h5p-answer.h5p-correct .h5p-alternative-container,
+.h5p-multichoice .h5p-correct .h5p-alternative-container {
+  background-color: #f0fdf4 !important;
+  border: 1.5px solid #86efac !important;
+  color: #166534 !important;
+}
+
+.h5p-multichoice .h5p-answer.h5p-wrong .h5p-alternative-container,
+.h5p-multichoice .h5p-wrong .h5p-alternative-container {
+  background-color: #fef2f2 !important;
+  border: 1.5px solid #fca5a5 !important;
+  color: #991b1b !important;
+}
+
+/* 3. Card inner layout: Radio on left, text in middle, icon on far right */
+.h5p-multichoice .h5p-alternative-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  position: relative !important;
+  padding: 14px 18px !important;
+  border-radius: 6px !important;
+}
+
+.h5p-multichoice .h5p-alternative-inner {
+  flex: 1 !important;
+  margin: 0 14px 0 0 !important;
+  text-align: left !important;
+}
+
+.h5p-multichoice .h5p-answer-icon {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  flex-shrink: 0 !important;
+  order: 10 !important;
+}
+
+/* 4. Button Icons (Zero Tofu Font Dependencies) */
+.h5p-joubelui-button:before,
+.h5p-question-buttons button:before {
+  font-family: "FontAwesome", sans-serif !important;
+  margin-right: 8px !important;
+  display: inline-block !important;
+}
+
+.h5p-question-show-solution:before,
+.h5p-theme .h5p-question-show-solution:before {
+  content: "\f06e" !important; /* FontAwesome eye */
+  font-family: "FontAwesome" !important;
+}
+
+.h5p-question-try-again:before,
+.h5p-theme .h5p-question-try-again:before {
+  content: "\f01e" !important; /* FontAwesome retry */
+  font-family: "FontAwesome" !important;
+}
+
+.h5p-question-check-answer:before,
+.h5p-theme .h5p-question-check-answer:before {
+  content: "\f058" !important; /* FontAwesome check-circle */
+  font-family: "FontAwesome" !important;
+}

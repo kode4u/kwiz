@@ -1,0 +1,373 @@
+/* --------------------------------------------------------------------------
+   Articulate Rise Image Slider & Gallery System
+   -------------------------------------------------------------------------- */
+
+.h5p-image-slider {
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  background: #0f172a !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  margin: 24px 0 !important;
+  position: relative !important;
+}
+
+.h5p-image-slider-slides-holder {
+  position: relative !important;
+  height: 480px !important;
+  min-height: 360px !important;
+  max-height: 560px !important;
+  margin-bottom: 0 !important;
+  background: #0f172a !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.h5p-image-slider-slides {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+}
+
+.h5p-image-slider-slides:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+/* Slide Holder & Images */
+.h5p-image-slide-holder {
+  float: left;
+  margin-left: -100%;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #0f172a !important;
+}
+
+.h5p-image-slide-holder .h5p-image-slide {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #0f172a !important;
+}
+
+.h5p-image-slide-holder .h5p-image-slide-image-holder {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+.h5p-image-slide-holder img,
+.h5p-image-slide-holder .h5p-image {
+  max-height: 100% !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+}
+
+/* Slide Transitions */
+.h5p-image-slide-holder:first-child {
+  display: flex !important;
+  margin-left: 0;
+}
+
+.h5p-image-slide-holder.h5p-image-slider-current {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, left 0.4s ease !important;
+  left: 0 !important;
+  display: flex !important;
+  z-index: 2 !important;
+  opacity: 1 !important;
+}
+
+.h5p-image-slider-future {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, left 0.4s ease !important;
+  left: 100.1% !important;
+  opacity: 0 !important;
+}
+
+.h5p-image-slider-past {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, left 0.4s ease !important;
+  left: -100.1% !important;
+  opacity: 0 !important;
+}
+
+.h5p-image-slider-removing {
+  display: flex !important;
+}
+
+.h5p-image-slider-dragging {
+  transition: none !important;
+  left: 0 !important;
+}
+
+.h5p-image-slider-no-transition {
+  transition: none !important;
+}
+
+/* Glassmorphic Navigation Buttons (Pure SVG Arrows) */
+.h5p-image-slider-button {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 50% !important;
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.h5p-image-slider-left-button {
+  left: 18px !important;
+  right: auto !important;
+}
+
+.h5p-image-slider-right-button {
+  right: 18px !important;
+  left: auto !important;
+}
+
+.h5p-image-slider-button:hover {
+  background: rgba(15, 23, 42, 0.95) !important;
+  transform: translateY(-50%) scale(1.1) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5) !important;
+}
+
+.h5p-image-slider-button:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.h5p-image-slider-button-text {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  text-shadow: none !important;
+}
+
+.h5p-image-slider-left-button .h5p-image-slider-button-text:before {
+  content: "" !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: block !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center !important;
+  background-size: contain !important;
+}
+
+.h5p-image-slider-right-button .h5p-image-slider-button-text:before {
+  content: "" !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: block !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center !important;
+  background-size: contain !important;
+}
+
+.h5p-image-slider-button-background {
+  display: none !important;
+}
+
+/* Glassmorphic Progress Dock (Pill Indicators) */
+.h5p-image-slider-progress {
+  position: absolute !important;
+  bottom: 16px !important;
+  top: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  z-index: 8 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.h5p-image-slider-progress-element {
+  position: relative !important;
+  list-style: none !important;
+  display: inline-block !important;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  background: rgba(255, 255, 255, 0.35) !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  font-size: 0 !important;
+}
+
+.h5p-image-slider-progress-element:before {
+  display: none !important;
+  content: "" !important;
+}
+
+.h5p-image-slider-current-progress-element {
+  width: 24px !important;
+  background: #3b82f6 !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.7) !important;
+}
+
+.h5p-image-slider-current-progress-element:before {
+  display: none !important;
+  content: "" !important;
+}
+
+.h5p-image-slider-progress-button {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+.h5p-image-slider-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Slider Style Variants
+   -------------------------------------------------------------------------- */
+
+/* 1. Cinematic Glass Dock (Default: .slider-style-rise-cinema) */
+.h5p-image-slider.slider-style-rise-cinema {
+  background: #090e1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35) !important;
+}
+
+.h5p-image-slider.slider-style-rise-cinema .h5p-image-slider-slides-holder,
+.h5p-image-slider.slider-style-rise-cinema .h5p-image-slide-holder,
+.h5p-image-slider.slider-style-rise-cinema .h5p-image-slide {
+  background: #090e1a !important;
+}
+
+/* 2. Clean Minimalist Card (.slider-style-rise-card) */
+.h5p-image-slider.slider-style-rise-card {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06) !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-slides-holder,
+.h5p-image-slider.slider-style-rise-card .h5p-image-slide-holder,
+.h5p-image-slider.slider-style-rise-card .h5p-image-slide {
+  background: #f8fafc !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slide-holder img {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-button {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12) !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-button:hover {
+  background: #ffffff !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18) !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-left-button .h5p-image-slider-button-text:before {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center !important;
+  background-size: contain !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-right-button .h5p-image-slider-button-text:before {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center !important;
+  background-size: contain !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-progress {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08) !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-progress-element {
+  background: #cbd5e1 !important;
+}
+
+.h5p-image-slider.slider-style-rise-card .h5p-image-slider-current-progress-element {
+  background: #2563eb !important;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.4) !important;
+}
+
+/* 3. Full-Bleed Modern Showcase (.slider-style-rise-fullwidth) */
+.h5p-image-slider.slider-style-rise-fullwidth {
+  border-radius: 20px !important;
+  background: #020617 !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+.h5p-image-slider.slider-style-rise-fullwidth .h5p-image-slider-slides-holder {
+  height: 520px !important;
+  background: #020617 !important;
+}
+
+.h5p-image-slider.slider-style-rise-fullwidth .h5p-image-slide-holder,
+.h5p-image-slider.slider-style-rise-fullwidth .h5p-image-slide {
+  background: #020617 !important;
+}
+
+.h5p-image-slider.slider-style-rise-fullwidth .h5p-image-slider-button {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.h5p-image-slider.slider-style-rise-fullwidth .h5p-image-slider-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-color: #ffffff !important;
+}

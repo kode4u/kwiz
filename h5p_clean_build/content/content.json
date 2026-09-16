@@ -1,0 +1,129 @@
+{
+  "content": [
+    {
+      "content": {
+        "library": "H5P.AdvancedText 1.1",
+        "params": {
+          "text": "\n<div class=\"rise-hero-card\">\n    <div class=\"rise-hero-badge\">\u2728 Interactive Lesson \u2022 Articulate Rise Feel</div>\n    <h1 class=\"rise-hero-title\">Mastering Smooth Animations in Modern E-Learning</h1>\n    <p class=\"rise-hero-subtitle\">Learn how micro-interactions, scroll-triggered reveals, and fluid cubic-bezier curves create an intuitive and engaging learner experience.</p>\n    <div class=\"rise-hero-meta\">\n        <span>\u23f1\ufe0f 5 min interactive lesson</span>\n        <span>\u2022</span>\n        <span>\ud83d\udcf1 Responsive &amp; Touch-Optimized</span>\n    </div>\n</div>\n"
+        },
+        "subContentId": "21ce8fa6-6396-45e4-b6e5-ca10d61e5475"
+      },
+      "useSeparator": "disabled"
+    },
+    {
+      "content": {
+        "library": "H5P.AdvancedText 1.1",
+        "params": {
+          "text": "\n<div class=\"rise-card\">\n    <div class=\"rise-card-header\">\n        <div class=\"rise-card-icon\">\ud83c\udfa8</div>\n        <h2 class=\"rise-card-title\">Why Smooth Motion Matters</h2>\n    </div>\n    <p class=\"rise-lead-text\">\n        In modern instructional design (like Articulate Rise), animations are not decorative gimmicks\u2014they serve as cognitive anchors. Subtle motion guides the learner's eye, provides immediate feedback to actions, and reduces cognitive load by maintaining spatial context.\n    </p>\n    <div class=\"rise-highlight-box\">\n        <strong>\ud83d\udca1 Key Takeaway:</strong> High-performance e-learning interfaces use physics-based deceleration curves like <code>cubic-bezier(0.16, 1, 0.3, 1)</code> rather than linear transitions to create natural, responsive motion.\n    </div>\n</div>\n"
+        },
+        "subContentId": "2f2c2580-ac6e-494c-8c16-3d1ed4b6726d"
+      },
+      "useSeparator": "disabled"
+    },
+    {
+      "content": {
+        "library": "H5P.Accordion 1.0",
+        "params": {
+          "hTag": "h3",
+          "panels": [
+            {
+              "title": "1. Scroll-Triggered Staggered Entrances",
+              "content": {
+                "library": "H5P.AdvancedText 1.1",
+                "params": {
+                  "text": "<p>As the learner scrolls, items smoothly fade and glide up into position using <code>IntersectionObserver</code>. This keeps learners focused on one bite-sized chunk at a time without overwhelming them.</p>"
+                },
+                "subContentId": "c35158cb-9484-48e6-9257-1d4618b0ba63"
+              }
+            },
+            {
+              "title": "2. Tactile Button Micro-Interactions",
+              "content": {
+                "library": "H5P.AdvancedText 1.1",
+                "params": {
+                  "text": "<p>Interactive cards and answer choices lift up by <code>2px to 3px</code> on hover with a softened drop-shadow. On click, they slightly compress to give physical tactile confirmation.</p>"
+                },
+                "subContentId": "7b82dee0-80a0-4fa0-9109-48f00584c62a"
+              }
+            },
+            {
+              "title": "3. Fluid Feedback & Solution Reveals",
+              "content": {
+                "library": "H5P.AdvancedText 1.1",
+                "params": {
+                  "text": "<p>Rather than instant binary score popups, feedback banners slide up smoothly with rounded badges and pleasant color transitions that reward learner curiosity.</p>"
+                },
+                "subContentId": "5e76747a-5cb5-4f40-866e-07b662671e75"
+              }
+            }
+          ]
+        },
+        "subContentId": "a4de96a2-b8b2-445c-ae45-217f68213839"
+      },
+      "useSeparator": "disabled"
+    },
+    {
+      "content": {
+        "library": "H5P.MultiChoice 1.16",
+        "params": {
+          "question": "<p><strong>\ud83c\udfaf Quick Knowledge Check</strong></p><p>Which animation timing function produces the natural spring-like deceleration characteristic of modern Rise modules?</p>",
+          "answers": [
+            {
+              "correct": true,
+              "text": "<div><strong>cubic-bezier(0.16, 1, 0.3, 1) (Ease-Out Deceleration)</strong></div>",
+              "feedback": "Correct! Natural physics-based deceleration eases smoothly to a stop, making the interface feel responsive and refined."
+            },
+            {
+              "correct": false,
+              "text": "<div><strong>linear (Constant Velocity)</strong></div>",
+              "feedback": "Not quite. Linear animation has no acceleration or deceleration, feeling robotic and unnatural."
+            },
+            {
+              "correct": false,
+              "text": "<div><strong>steps(4) (Discontinuous jumps)</strong></div>",
+              "feedback": "Incorrect. Step transitions jump abruptly between frames and do not provide smooth fluid motion."
+            }
+          ],
+          "behaviour": {
+            "enableRetry": true,
+            "enableSolutionsButton": true,
+            "singlePoint": true,
+            "randomAnswers": false,
+            "showSolutionsRequiresInput": true,
+            "confirmCheckDialog": false,
+            "confirmRetryDialog": false,
+            "autoCheck": false,
+            "passPercentage": 100,
+            "showScorePoints": true
+          },
+          "overallFeedback": [
+            {
+              "from": 0,
+              "to": 100,
+              "feedback": "Keep exploring smooth interactive designs!"
+            }
+          ],
+          "UI": {
+            "checkAnswerButton": "Check Answer",
+            "showSolutionButton": "Show Solution",
+            "tryAgainButton": "Retry",
+            "tipsLabel": "Show Tip",
+            "scoreBarLabel": "You achieved :num out of :total points"
+          }
+        },
+        "subContentId": "8fce74dc-2db3-4975-9ab4-c6da41537b48"
+      },
+      "useSeparator": "disabled"
+    },
+    {
+      "content": {
+        "library": "H5P.AdvancedText 1.1",
+        "params": {
+          "text": "\n<div class=\"rise-summary-card\">\n    <div class=\"rise-summary-title\">\ud83c\udf89 Lesson Completed!</div>\n    <p style=\"margin: 0 0 12px 0; color: #15803d; line-height: 1.6;\">\n        You now have a fully functional H5P module featuring Articulate Rise-style typography, cards, accordions, interactive buttons, and scroll animations ready for Moodle LMS.\n    </p>\n    <div style=\"font-size: 0.85rem; color: #166534;\">\n        \u2713 Moodle 3.x, 4.x &amp; 5.x Compatible &nbsp;\u2022&nbsp; \u2713 Native H5P Activity &amp; Content Bank Ready\n    </div>\n</div>\n"
+        },
+        "subContentId": "01faf8d9-66e5-4769-83ed-18398c3b688e"
+      },
+      "useSeparator": "disabled"
+    }
+  ]
+}
