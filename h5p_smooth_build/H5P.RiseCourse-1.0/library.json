@@ -3,7 +3,7 @@
   "description": "Multi-lesson course module with left sidebar navigation, top header, progress tracking, and next button flow.",
   "majorVersion": 1,
   "minorVersion": 0,
-  "patchVersion": 26,
+  "patchVersion": 27,
   "runnable": 1,
   "author": "Antigravity",
   "license": "MIT",
@@ -165,6 +165,11 @@
     },
     {
       "machineName": "H5PEditor.SingleChoiceSetTextualEditor",
+      "majorVersion": 1,
+      "minorVersion": 0
+    },
+    {
+      "machineName": "H5PEditor.RiseBlockToolbox",
       "majorVersion": 1,
       "minorVersion": 0
     }
