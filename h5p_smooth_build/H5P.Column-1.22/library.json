@@ -7,7 +7,7 @@
   "author": "Joubel",
   "majorVersion": 1,
   "minorVersion": 22,
-  "patchVersion": 159,
+  "patchVersion": 160,
   "runnable": 1,
   "fullscreen": 0,
   "embedTypes": [
@@ -28,6 +28,13 @@
     },
     {
       "path": "styles/rise-theme.css"
+    }
+  ],
+  "editorDependencies": [
+    {
+      "machineName": "H5PEditor.RiseBlockToolbox",
+      "majorVersion": 1,
+      "minorVersion": 0
     }
   ]
 }

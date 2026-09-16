@@ -420,12 +420,59 @@
     };
   }
 
-  // Auto-initialize when H5PEditor is ready
-  $(document).ready(function () {
-    setTimeout(function () {
-      var toolbox = new RiseBlockToolbox();
-      toolbox.init();
-    }, 600);
-  });
+  // Register H5PEditor widget
+  var $ = window.H5PEditor && window.H5PEditor.$ ? window.H5PEditor.$ : (window.H5P && window.H5P.jQuery ? window.H5P.jQuery : (window.jQuery || window.$));
 
-})(H5P.jQuery);
+  function RiseBlockToolboxWidget(parent, field, params, setValue) {
+    this.parent = parent;
+    this.field = field;
+    this.params = params;
+    this.setValue = setValue;
+  }
+
+  RiseBlockToolboxWidget.prototype.appendTo = function ($wrapper) {
+    var self = this;
+    self.$item = $(self.createFieldMarkup());
+    $wrapper.append(self.$item);
+    RiseBlockToolboxWidget.initDock();
+  };
+
+  RiseBlockToolboxWidget.prototype.createFieldMarkup = function () {
+    return '<div class="rise-toolbox-widget-status" style="padding: 10px 14px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; color: #166534; font-size: 13px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">' +
+      '<span>✨ <strong>Articulate Rise Block Toolbox Active</strong> (Click or drag blocks from the left drawer)</span>' +
+      '</div>';
+  };
+
+  RiseBlockToolboxWidget.prototype.validate = function () {
+    return true;
+  };
+
+  RiseBlockToolboxWidget.prototype.remove = function () {};
+
+  RiseBlockToolboxWidget.initDock = function () {
+    var $jq = window.H5PEditor && window.H5PEditor.$ ? window.H5PEditor.$ : (window.H5P && window.H5P.jQuery ? window.H5P.jQuery : (window.jQuery || window.$));
+    if (!$jq) return;
+    if ($jq(".rise-toolbox-dock").length > 0) return;
+    var toolbox = new RiseBlockToolbox();
+    toolbox.init();
+  };
+
+  H5PEditor.widgets.riseBlockToolbox = H5PEditor.RiseBlockToolbox = RiseBlockToolboxWidget;
+
+  // Auto-initialize when DOM / H5PEditor is ready with multiple staggered intervals
+  if (typeof $ !== "undefined" && $) {
+    $(function () {
+      RiseBlockToolboxWidget.initDock();
+      setTimeout(RiseBlockToolboxWidget.initDock, 300);
+      setTimeout(RiseBlockToolboxWidget.initDock, 800);
+      setTimeout(RiseBlockToolboxWidget.initDock, 1500);
+      setTimeout(RiseBlockToolboxWidget.initDock, 3000);
+    });
+  } else {
+    setTimeout(function () {
+      RiseBlockToolboxWidget.initDock();
+    }, 500);
+  }
+
+})(window.H5PEditor && window.H5PEditor.$ ? window.H5PEditor.$ : (window.H5P && window.H5P.jQuery ? window.H5P.jQuery : (window.jQuery || window.$)));
+

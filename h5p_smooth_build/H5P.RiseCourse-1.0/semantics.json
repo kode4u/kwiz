@@ -5,6 +5,14 @@
     "label": "Course Information & Cover",
     "fields": [
       {
+        "name": "riseToolboxHelper",
+        "type": "text",
+        "widget": "riseBlockToolbox",
+        "label": "Articulate Rise Block Toolbox",
+        "optional": true,
+        "common": true
+      },
+      {
         "name": "title",
         "type": "text",
         "label": "Course Title",
