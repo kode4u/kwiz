@@ -53,6 +53,7 @@
 
     self.activeTab = "cover"; // 'cover' or '0_0'
     self.isFullscreen = false;
+    self.isOutlineOpen = true;
 
     self.blocks = [
       // 1. Text & Headings
@@ -269,23 +270,38 @@
 
       var $editorRoot = $('<div class="rise-visual-editor-root">' +
         '<div class="rise-visual-top-bar">' +
-          '<div class="rise-visual-nav-pills">' +
-            '<button type="button" class="rise-visual-pill-btn is-active" data-tab="cover">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
-              '<span>Cover & Outline</span>' +
+          '<div class="rise-top-left-group">' +
+            '<button type="button" class="rise-visual-toggle-outline-btn is-active" title="Toggle Course Outline Sidebar">' +
+              '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>' +
+              '<span>Outline</span>' +
             '</button>' +
-            '<div class="rise-visual-lesson-pills" style="display: flex; gap: 8px;"></div>' +
+            '<div class="rise-visual-current-badge">' +
+              '<span class="rise-current-badge-label">Active:</span>' +
+              '<span class="rise-current-badge-title">Cover & Outline</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rise-top-right-group">' +
             '<button type="button" class="rise-visual-add-lesson-btn" title="Add a new lesson to course">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
               '<span>+ Add Lesson</span>' +
             '</button>' +
+            '<button type="button" class="rise-visual-fullscreen-btn" title="Toggle Fullscreen Studio">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>' +
+              '<span>Fullscreen</span>' +
+            '</button>' +
           '</div>' +
-          '<button type="button" class="rise-visual-fullscreen-btn" title="Toggle Fullscreen Studio">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>' +
-            '<span>Fullscreen</span>' +
-          '</button>' +
         '</div>' +
         '<div class="rise-visual-workspace">' +
+          '<aside class="rise-visual-outline-sidebar">' +
+            '<div class="rise-outline-header">' +
+              '<div class="rise-outline-title">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+                '<span>Course Outline</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="rise-outline-tree"></div>' +
+          '</aside>' +
+          '<div class="rise-visual-canvas-area"></div>' +
           '<aside class="rise-visual-sidebar-toolbox">' +
             '<div class="rise-toolbox-header">' +
               '<div class="rise-toolbox-title-row">' +
@@ -302,13 +318,12 @@
             '</div>' +
             '<div class="rise-toolbox-body"></div>' +
           '</aside>' +
-          '<div class="rise-visual-canvas-area"></div>' +
         '</div>' +
       '</div>');
 
       $mount.before($editorRoot);
 
-      // Render Left Toolbox components
+      // Render Right Toolbox components
       var $toolboxBody = $editorRoot.find(".rise-toolbox-body");
       var $previewTooltip = $('<div class="rise-live-preview-tooltip" style="display: none;"></div>');
       $("body").append($previewTooltip);
@@ -391,6 +406,13 @@
         });
       });
 
+      // Outline Sidebar Toggle
+      $editorRoot.find(".rise-visual-toggle-outline-btn").on("click", function () {
+        self.isOutlineOpen = !self.isOutlineOpen;
+        $editorRoot.toggleClass("outline-collapsed", !self.isOutlineOpen);
+        $(this).toggleClass("is-active", self.isOutlineOpen);
+      });
+
       // Fullscreen Toggle
       $editorRoot.find(".rise-visual-fullscreen-btn").on("click", function () {
         self.isFullscreen = !self.isFullscreen;
@@ -402,8 +424,8 @@
         }
       });
 
-      // Navigation tab switching
-      $editorRoot.on("click", ".rise-visual-pill-btn", function () {
+      // Navigation outline item switching
+      $editorRoot.on("click", ".rise-outline-item", function () {
         var tab = $(this).data("tab");
         self.switchTab(tab);
       });
@@ -421,9 +443,27 @@
      */
     self.switchTab = function (tabId) {
       self.activeTab = tabId;
-      $(".rise-visual-pill-btn").removeClass("is-active");
-      $('.rise-visual-pill-btn[data-tab="' + tabId + '"]').addClass("is-active");
+      $(".rise-outline-item").removeClass("is-active");
+      $('.rise-outline-item[data-tab="' + tabId + '"]').addClass("is-active");
+      self.updateTopBadge();
       self.renderActiveTabContent();
+    };
+
+    /**
+     * Update active badge in top bar
+     */
+    self.updateTopBadge = function () {
+      var params = self.getParams();
+      var label = "Cover & Outline";
+      if (self.activeTab !== "cover") {
+        var parts = self.activeTab.split("_");
+        var sIdx = parseInt(parts[0], 10) || 0;
+        var lIdx = parseInt(parts[1], 10) || 0;
+        var sec = (params.sections && params.sections[sIdx]) || {};
+        var les = (sec.lessons && sec.lessons[lIdx]) || {};
+        label = les.title || ("Lesson " + (lIdx + 1));
+      }
+      $(".rise-current-badge-title").text(label);
     };
 
     /**
@@ -474,32 +514,50 @@
     };
 
     /**
-     * Update Studio Navigation Tabs
+     * Update Studio Navigation Outline Tree
      */
     self.updateStudio = function () {
       var params = self.getParams();
-      var $pillsContainer = $(".rise-visual-lesson-pills");
-      $pillsContainer.empty();
+      var $tree = $(".rise-outline-tree");
+      $tree.empty();
 
+      // 1. Cover Item
+      var isCoverAct = self.activeTab === "cover" ? "is-active" : "";
+      var $coverItem = $('<div class="rise-outline-item is-cover ' + isCoverAct + '" data-tab="cover">' +
+        '<div class="rise-outline-item-icon">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+        '</div>' +
+        '<span class="rise-outline-item-title">Cover & Outline</span>' +
+      '</div>');
+      $tree.append($coverItem);
+
+      // 2. Sections and Lessons
       var lessonCount = 0;
       if (params.sections && params.sections.length > 0) {
         params.sections.forEach(function (sec, sIdx) {
+          var secTitle = sec.sectionTitle || ("Section " + (sIdx + 1));
+          var $secLabel = $('<div class="rise-outline-section-label">' + secTitle + '</div>');
+          $tree.append($secLabel);
+
           if (sec.lessons && sec.lessons.length > 0) {
             sec.lessons.forEach(function (les, lIdx) {
               var tabId = sIdx + "_" + lIdx;
               var isAct = self.activeTab === tabId ? "is-active" : "";
               var title = les.title || ("Lesson " + (lessonCount + 1));
-              var $pill = $('<button type="button" class="rise-visual-pill-btn ' + isAct + '" data-tab="' + tabId + '">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
-                '<span>' + title + '</span>' +
-              '</button>');
-              $pillsContainer.append($pill);
+              var $lessonItem = $('<div class="rise-outline-item is-lesson ' + isAct + '" data-tab="' + tabId + '">' +
+                '<div class="rise-outline-item-icon">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+                '</div>' +
+                '<span class="rise-outline-item-title">' + title + '</span>' +
+              '</div>');
+              $tree.append($lessonItem);
               lessonCount++;
             });
           }
         });
       }
 
+      self.updateTopBadge();
       self.renderActiveTabContent();
     };
 
