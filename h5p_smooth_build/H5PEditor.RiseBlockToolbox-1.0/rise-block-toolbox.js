@@ -1606,7 +1606,7 @@
       $(".rise-image-modal-backdrop").remove();
 
       var $modal = $('<div class="rise-image-modal-backdrop">' +
-        '<div class="rise-image-modal-dialog" style="max-width: 640px;">' +
+        '<div class="rise-image-modal-dialog">' +
           '<div class="rise-image-modal-header">' +
             '<div class="rise-image-modal-title">' +
               '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
@@ -1614,28 +1614,35 @@
             '</div>' +
             '<button type="button" class="rise-image-modal-close" title="Close">✕</button>' +
           '</div>' +
+          '<div class="rise-image-modal-tabs">' +
+            '<button type="button" class="rise-image-tab-btn is-active" data-tab="upload">📁 Upload from Computer</button>' +
+            '<button type="button" class="rise-image-tab-btn" data-tab="url">🔗 Web Image URL</button>' +
+          '</div>' +
           '<div class="rise-image-modal-body">' +
-            '<div class="rise-image-upload-dropzone">' +
-              '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
-              '<div style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">Upload images from computer (Multiple allowed)</div>' +
-              '<div style="font-size: 0.78rem; color: #64748b;">Select or drag & drop multiple image files</div>' +
-              '<input type="file" class="rise-image-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" multiple style="display: none;">' +
-              '<button type="button" class="rise-image-browse-btn">' +
-                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
-                '<span>Choose Image Files</span>' +
-              '</button>' +
-              '<div class="rise-image-upload-status" style="font-size: 0.75rem; font-weight: 700; color: #16a34a; display: none;"></div>' +
+            '<div class="rise-image-tab-content is-upload">' +
+              '<div class="rise-image-upload-dropzone">' +
+                '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+                '<div style="font-weight: 700; font-size: 0.85rem; color: #0f172a;">Drag & drop images here or choose files</div>' +
+                '<input type="file" class="rise-image-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" multiple style="display: none;">' +
+                '<button type="button" class="rise-image-browse-btn">' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
+                  '<span>Choose Files</span>' +
+                '</button>' +
+                '<div class="rise-image-upload-status" style="font-size: 0.75rem; font-weight: 700; color: #16a34a; display: none;"></div>' +
+              '</div>' +
             '</div>' +
-            '<div class="rise-image-modal-field">' +
-              '<label>Or Add Web Image URL</label>' +
-              '<div style="display: flex; gap: 8px;">' +
-                '<input type="text" class="rise-image-url-input" placeholder="https://images.unsplash.com/..." style="flex: 1;">' +
-                '<button type="button" class="rise-image-add-url-btn" style="background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; border-radius: 6px; padding: 0 12px; font-weight: 700; cursor: pointer;">+ Add</button>' +
+            '<div class="rise-image-tab-content is-url" style="display: none;">' +
+              '<div class="rise-image-modal-field">' +
+                '<label>Web Image URL</label>' +
+                '<div style="display: flex; gap: 8px;">' +
+                  '<input type="text" class="rise-image-url-input" placeholder="https://images.unsplash.com/..." style="flex: 1;">' +
+                  '<button type="button" class="rise-image-add-url-btn" style="background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; border-radius: 6px; padding: 0 14px; font-weight: 700; cursor: pointer;">+ Add</button>' +
+                '</div>' +
               '</div>' +
             '</div>' +
             '<div class="rise-image-modal-field">' +
               '<div style="display: flex; justify-content: space-between; align-items: center;">' +
-                '<label>Images & Slides List (' + imagesList.length + ')</label>' +
+                '<label class="rise-image-count-label">Images & Slides (' + imagesList.length + ')</label>' +
                 '<div style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem;">' +
                   '<span>Layout:</span>' +
                   '<select class="rise-image-layout-select" style="font-size: 0.78rem; border-radius: 4px; border: 1px solid #cbd5e1; padding: 2px 6px;">' +
@@ -1664,11 +1671,20 @@
       var $tray = $modal.find(".rise-multi-images-tray");
       var $layoutSelect = $modal.find(".rise-image-layout-select");
 
+      // Tab switcher
+      $modal.find(".rise-image-tab-btn").on("click", function () {
+        var tab = $(this).data("tab");
+        $modal.find(".rise-image-tab-btn").removeClass("is-active");
+        $(this).addClass("is-active");
+        $modal.find(".rise-image-tab-content").hide();
+        $modal.find(".rise-image-tab-content.is-" + tab).show();
+      });
+
       function renderTray() {
         $tray.empty();
-        $modal.find(".rise-image-modal-field label").first().text('Images & Slides List (' + imagesList.length + ')');
+        $modal.find(".rise-image-count-label").text('Images & Slides (' + imagesList.length + ')');
         if (imagesList.length === 0) {
-          $tray.html('<div style="color: #94a3b8; text-align: center; padding: 18px; font-size: 0.8rem;">No images uploaded yet. Upload or paste URL above.</div>');
+          $tray.html('<div style="color: #94a3b8; text-align: center; padding: 12px; font-size: 0.8rem;">No images uploaded yet. Upload or paste URL above.</div>');
           return;
         }
 
