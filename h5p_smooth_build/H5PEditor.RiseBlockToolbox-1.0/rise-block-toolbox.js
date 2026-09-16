@@ -1,6 +1,6 @@
 /**
- * Articulate Rise Live Visual Editor & Left Component Toolbox for H5P
- * Pure SVG UI, WYSIWYG live course authoring matching student preview.
+ * Articulate Rise Live Visual Studio & Embedded Component Toolbox for H5P
+ * Pure SVG UI, integrated side-by-side WYSIWYG authoring studio.
  */
 (function ($) {
   "use strict";
@@ -46,19 +46,19 @@
   fixCoreTranslations();
 
   /**
-   * Main Toolbox & Live Canvas Controller
+   * Main Studio Controller
    */
   function RiseBlockToolbox() {
     var self = this;
 
-    self.activeTab = "cover"; // 'cover' or lesson index (e.g. 0, 1)
+    self.activeTab = "cover"; // 'cover' or 'sIdx_lIdx' (e.g. '0_0')
     self.activeViewMode = "visual"; // 'visual' or 'form'
 
     self.blocks = [
       // 1. Text & Headings
       {
         category: "Text & Headers",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>',
+        catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>',
         items: [
           {
             id: "heading_hero",
@@ -76,7 +76,7 @@
             desc: "Clean styled body text",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>',
             previewHtml: '<p style="margin: 0; font-size: 11px; color: #334155; line-height: 1.4;">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ។ អ្នកអាចសរសេរអក្សរដិត <em>ទ្រេត</em> ឬបន្ថែមតំណភ្ជាប់បានយ៉ាងងាយស្រួល។</p>',
-            content: '<p style="font-size: 1.1rem; line-height: 1.75; color: #334155; margin: 16px 0;">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ។ អ្នកអាចសរសេរអក្សរដិត <em>ទ្រេត</em> ឬបន្ថែមតំណភ្ជាប់ (links) បានយ៉ាងងាយស្រួល។</p>'
+            content: '<p style="font-size: 1.05rem; line-height: 1.75; color: #334155; margin: 14px 0;">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ។ អ្នកអាចសរសេរអក្សរដិត <em>ទ្រេត</em> ឬបន្ថែមតំណភ្ជាប់ (links) បានយ៉ាងងាយស្រួល។</p>'
           },
           {
             id: "quote_testimonial",
@@ -92,11 +92,11 @@
       // 2. Statements & Callouts
       {
         category: "Callouts & Stats",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
         items: [
           {
             id: "callout_note",
-            name: "Note Callout (Blue)",
+            name: "Note (Blue)",
             badge: "Note",
             desc: "Key takeaway info box",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
@@ -105,7 +105,7 @@
           },
           {
             id: "callout_warning",
-            name: "Warning Callout (Amber)",
+            name: "Warning (Amber)",
             badge: "Warning",
             desc: "Caution and alert card",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
@@ -114,7 +114,7 @@
           },
           {
             id: "callout_success",
-            name: "Success / Tip (Green)",
+            name: "Success (Green)",
             badge: "Tip",
             desc: "Best practice pro tip",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
@@ -123,23 +123,23 @@
           },
           {
             id: "stat_big_number",
-            name: "Big Stat / Metric",
+            name: "Big Stat Metric",
             badge: "Stats",
             desc: "3-Column metric showcase",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
             previewHtml: '<div style="display: flex; gap: 4px; text-align: center;"><div style="background: #f1f5f9; padding: 4px; border-radius: 4px; flex: 1;"><div style="font-weight: 800; color: #2563eb; font-size: 12px;">100%</div><div style="font-size: 8px;">JVM</div></div><div style="background: #f1f5f9; padding: 4px; border-radius: 4px; flex: 1;"><div style="font-weight: 800; color: #2563eb; font-size: 12px;">3B+</div><div style="font-size: 8px;">Devices</div></div></div>',
-            content: '<div class="rise-stat-grid"><div class="rise-stat-card"><div class="rise-stat-number">100%</div><div class="rise-stat-label">Cross-Platform (JVM)</div></div><div class="rise-stat-card"><div class="rise-stat-number">3B+</div><div class="rise-stat-label">Devices Running Java</div></div><div class="rise-stat-card"><div class="rise-stat-number">#1</div><div class="rise-stat-label">Enterprise Backend Choice</div></div></div>'
+            content: '<div class="rise-stat-grid"><div class="rise-stat-card"><div class="rise-stat-number">100%</div><div class="rise-stat-label">Cross-Platform (JVM)</div></div><div class="rise-stat-card"><div class="rise-stat-number">3B+</div><div class="rise-stat-label">Devices Running Java</div></div><div class="rise-stat-card"><div class="rise-stat-number">#1</div><div class="rise-stat-label">Enterprise Choice</div></div></div>'
           }
         ]
       },
       // 3. Lists & Steps
       {
         category: "Lists & Steps",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>',
+        catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>',
         items: [
           {
             id: "bullet_list_glowing",
-            name: "Glowing Bullet List",
+            name: "Glowing Bullets",
             badge: "List",
             desc: "Card list with glowing blue dots",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="4" cy="18" r="2"/></svg>',
@@ -154,31 +154,22 @@
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
             previewHtml: '<div style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; gap: 6px; align-items: center;"><span style="color: #16a34a; font-weight: bold;">✓</span><span>បានអានពាក្យបច្ចេកទេស JDK</span></div><div style="display: flex; gap: 6px; align-items: center;"><span style="color: #16a34a; font-weight: bold;">✓</span><span>បានដំឡើង IntelliJ IDEA</span></div></div>',
             content: '<ul class="rise-check-list"><li>បានអាន និងយល់ច្បាស់អំពីពាក្យបច្ចេកទេស JDK, JRE, JVM</li><li>បានដំឡើងកម្មវិធី IntelliJ IDEA ឬ VS Code រួចរាល់</li><li>បានសរសេរកូដ Java ដំបូង និង Compile ជោគជ័យ</li></ul>'
-          },
-          {
-            id: "timeline_stepper",
-            name: "Timeline / Stepper",
-            badge: "Timeline",
-            desc: "Connected milestone line",
-            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-            previewHtml: '<div style="border-left: 2px solid #2563eb; padding-left: 8px; font-size: 10px;"><div style="color: #2563eb; font-weight: bold;">ដំណាក់កាលទី១: Setup</div><div style="color: #64748b;">ដំឡើងបរិស្ថានកូដ</div></div>',
-            content: '<div class="rise-timeline"><div class="rise-timeline-item"><div class="rise-timeline-dot"></div><div class="rise-timeline-title">ដំណាក់កាលទី១: Setup Environment</div><div class="rise-timeline-desc">ដំឡើង JDK និងផ្ទៀងផ្ទាត់ Path ដើម្បីឱ្យប្រព័ន្ធស្គាល់ javac និង java command។</div></div><div class="rise-timeline-item"><div class="rise-timeline-dot"></div><div class="rise-timeline-title">ដំណាក់កាលទី២: សរសេរ និង Compile កូដ</div><div class="rise-timeline-desc">បង្កើត Class Main.java និងធ្វើការ Compile ទៅជា .class bytecode តាមរយៈ javac។</div></div><div class="rise-timeline-item"><div class="rise-timeline-dot"></div><div class="rise-timeline-title">ដំណាក់កាលទី៣: ដំណើរការលើ JVM</div><div class="rise-timeline-desc">ដំណើរការកម្មវិធីដោយប្រើ java Main និងពិនិត្យលទ្ធផលក្នុង Console។</div></div></div>'
           }
         ]
       },
       // 4. Media & Galleries
       {
         category: "Media & Galleries",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+        catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
         items: [
           {
             id: "image_slider_preview",
-            name: "Image Slider",
-            badge: "Slider",
+            name: "Image Showcase",
+            badge: "Photo",
             desc: "Clean full-bleed showcase",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
             previewHtml: '<div style="border-radius: 6px; overflow: hidden; position: relative;"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 60px; object-fit: cover;"><div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; font-size: 9px;">Image Showcase Slider</div></div>',
-            content: '<div class="rise-image-hero"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slider Image"><div class="rise-image-hero-caption"><strong>Image Showcase & Slider</strong> — បង្ហាញស្លាយរូបភាព និង Diagram ស្ថាបត្យកម្មប្រព័ន្ធ</div></div>'
+            content: '<div class="rise-image-hero"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slider Image"><div class="rise-image-hero-caption"><strong>Image Showcase</strong> — បង្ហាញស្លាយរូបភាព និង Diagram ស្ថាបត្យកម្មប្រព័ន្ធ</div></div>'
           },
           {
             id: "grid_gallery_2",
@@ -212,7 +203,7 @@
       // 5. Interactive & Quizzes
       {
         category: "Interactive & Quizzes",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+        catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
         items: [
           {
             id: "flip_flashcards",
@@ -236,14 +227,14 @@
             id: "code_window",
             name: "Code Window",
             badge: "Code",
-            desc: "Dark macOS IDE terminal snippet",
+            desc: "Dark IDE terminal snippet",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
             previewHtml: '<div style="background: #0f172a; color: #38bdf8; border-radius: 4px; padding: 6px; font-family: monospace; font-size: 9px;">public class Main {<br>&nbsp;&nbsp;System.out.println("Hello");<br>}</div>',
             content: '<div class="rise-code-block"><div class="rise-code-header"><div class="rise-code-dots"><div class="rise-code-dot red"></div><div class="rise-code-dot amber"></div><div class="rise-code-dot green"></div></div><div class="rise-code-lang">Java</div></div><pre class="rise-code-body"><code>public class Main {\n    public static void main(String[] args) {\n        System.out.println("ស្វាគមន៍មកកាន់ការសិក្សាភាសា Java!");\n    }\n}</code></pre></div>'
           },
           {
             id: "quiz_check_card",
-            name: "Knowledge Check Quiz",
+            name: "Knowledge Quiz",
             badge: "Quiz",
             desc: "Multiple choice check question",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
@@ -255,142 +246,22 @@
     ];
 
     /**
-     * Initialize Toolbox & Visual Canvas
+     * Initialize Studio
      */
     self.init = function (widgetInstance) {
       self.widget = widgetInstance;
-      self.renderDock();
-      self.renderVisualCanvas();
+      self.renderStudio();
       self.setupDragAndDrop();
     };
 
     /**
-     * Render Left Sidebar Toolbox Dock
+     * Render the Complete Studio (Top Bar + Left Embedded Toolbox + Right Live Canvas)
      */
-    self.renderDock = function () {
-      var targetDoc = document;
-      try {
-        if (window.parent && window.parent.document && window.parent.document.body) {
-          targetDoc = window.parent.document;
-        }
-      } catch (e) {}
-
-      var $target = $(targetDoc.body || document.body);
-      if ($target.find(".rise-toolbox-dock").length > 0) return;
-
-      var $dock = $('<aside class="rise-toolbox-dock">' +
-        '<button type="button" class="rise-toolbox-toggle-btn" title="Toggle Rise Block Library">' +
-          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>' +
-          '<span>BLOCKS</span>' +
-        '</button>' +
-        '<div class="rise-toolbox-header">' +
-          '<div class="rise-toolbox-title-row">' +
-            '<div class="rise-toolbox-title">' +
-              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>' +
-              'Rise Blocks' +
-            '</div>' +
-            '<span class="rise-toolbox-badge">Drag & Drop</span>' +
-          '</div>' +
-          '<div class="rise-toolbox-search-wrapper">' +
-            '<svg class="rise-toolbox-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
-            '<input type="text" class="rise-toolbox-search-input" placeholder="Search components...">' +
-          '</div>' +
-        '</div>' +
-        '<div class="rise-toolbox-body"></div>' +
-      '</aside>');
-
-      var $body = $dock.find(".rise-toolbox-body");
-      var $previewTooltip = $('<div class="rise-live-preview-tooltip" style="display: none;"></div>');
-      $target.append($previewTooltip);
-
-      self.blocks.forEach(function (cat) {
-        var $cat = $('<div class="rise-toolbox-category">' +
-          '<div class="rise-toolbox-category-title">' + (cat.catSvg || '') + ' ' + cat.category + '</div>' +
-          '<div class="rise-toolbox-grid"></div>' +
-        '</div>');
-
-        var $grid = $cat.find(".rise-toolbox-grid");
-
-        cat.items.forEach(function (item) {
-          var $card = $('<div class="rise-toolbox-block-card" draggable="true" data-block-id="' + item.id + '">' +
-            '<div class="rise-toolbox-block-icon">' + item.iconSvg + '</div>' +
-            '<div class="rise-toolbox-block-name">' + item.name + '</div>' +
-            '<div class="rise-toolbox-block-tag">' + (item.badge || "BLOCK") + '</div>' +
-          '</div>');
-
-          // Hover Live Preview Tooltip
-          $card.on("mouseenter", function () {
-            var offset = $card.offset();
-            var topPos = Math.max(10, Math.min(offset.top - 20, $(window).height() - 240));
-            $previewTooltip.html(
-              '<div class="rise-tooltip-header">' +
-                '<span class="rise-tooltip-title">' + item.name + '</span>' +
-                '<span class="rise-tooltip-badge">' + (item.badge || "PREVIEW") + '</span>' +
-              '</div>' +
-              '<div class="rise-tooltip-preview-frame">' + item.previewHtml + '</div>' +
-              '<div class="rise-tooltip-hint">Click or Drag to insert instantly</div>'
-            ).css({ top: topPos + "px" }).stop(true, true).fadeIn(150);
-          }).on("mouseleave", function () {
-            $previewTooltip.stop(true, true).fadeOut(100);
-          });
-
-          // Click to insert directly into active lesson or active CKEditor
-          $card.on("click", function (e) {
-            e.preventDefault();
-            $previewTooltip.hide();
-            self.insertBlock(item.content);
-          });
-
-          // Drag Start
-          $card.on("dragstart", function (e) {
-            $previewTooltip.hide();
-            $(this).addClass("is-dragging");
-            var dt = e.originalEvent.dataTransfer;
-            dt.effectAllowed = "copy";
-            dt.setData("text/plain", JSON.stringify(item));
-          }).on("dragend", function () {
-            $(this).removeClass("is-dragging");
-            $(".rise-drop-target-active, .is-hovered").removeClass("rise-drop-target-active is-hovered");
-          });
-
-          $grid.append($card);
-        });
-
-        $body.append($cat);
-      });
-
-      // Toggle drawer action
-      $dock.find(".rise-toolbox-toggle-btn").on("click", function () {
-        $dock.toggleClass("is-collapsed");
-        $previewTooltip.hide();
-      });
-
-      // Search filter
-      $dock.find(".rise-toolbox-search-input").on("input", function () {
-        var query = $(this).val().toLowerCase().trim();
-        $dock.find(".rise-toolbox-block-card").each(function () {
-          var $c = $(this);
-          var name = $c.find(".rise-toolbox-block-name").text().toLowerCase();
-          var tag = $c.find(".rise-toolbox-block-tag").text().toLowerCase();
-          if (name.indexOf(query) !== -1 || tag.indexOf(query) !== -1 || query === "") {
-            $c.show();
-          } else {
-            $c.hide();
-          }
-        });
-      });
-
-      $target.append($dock);
-    };
-
-    /**
-     * Render the Live Visual Editor Canvas directly in H5PEditor
-     */
-    self.renderVisualCanvas = function () {
+    self.renderStudio = function () {
       var $mount = $(".field-name-courseMeta, .h5peditor").first();
       if (!$mount.length) return;
       if ($(".rise-visual-editor-root").length > 0) {
-        self.updateVisualCanvas();
+        self.updateStudio();
         return;
       }
 
@@ -417,12 +288,106 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        '<div class="rise-visual-viewport"></div>' +
+        '<div class="rise-visual-workspace">' +
+          '<aside class="rise-visual-sidebar-toolbox">' +
+            '<div class="rise-toolbox-header">' +
+              '<div class="rise-toolbox-title-row">' +
+                '<div class="rise-toolbox-title">' +
+                  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>' +
+                  'Components' +
+                '</div>' +
+                '<span class="rise-toolbox-badge">Drag & Drop</span>' +
+              '</div>' +
+              '<div class="rise-toolbox-search-wrapper">' +
+                '<svg class="rise-toolbox-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+                '<input type="text" class="rise-toolbox-search-input" placeholder="Search blocks...">' +
+              '</div>' +
+            '</div>' +
+            '<div class="rise-toolbox-body"></div>' +
+          '</aside>' +
+          '<div class="rise-visual-canvas-area"></div>' +
+        '</div>' +
       '</div>');
 
       $mount.before($editorRoot);
 
-      // Event handlers for mode toggling
+      // Render Left Toolbox components
+      var $toolboxBody = $editorRoot.find(".rise-toolbox-body");
+      var $previewTooltip = $('<div class="rise-live-preview-tooltip" style="display: none;"></div>');
+      $("body").append($previewTooltip);
+
+      self.blocks.forEach(function (cat) {
+        var $cat = $('<div class="rise-toolbox-category">' +
+          '<div class="rise-toolbox-category-title">' + (cat.catSvg || '') + ' ' + cat.category + '</div>' +
+          '<div class="rise-toolbox-grid"></div>' +
+        '</div>');
+
+        var $grid = $cat.find(".rise-toolbox-grid");
+
+        cat.items.forEach(function (item) {
+          var $card = $('<div class="rise-toolbox-block-card" draggable="true" data-block-id="' + item.id + '">' +
+            '<div class="rise-toolbox-block-icon">' + item.iconSvg + '</div>' +
+            '<div class="rise-toolbox-block-name">' + item.name + '</div>' +
+            '<div class="rise-toolbox-block-tag">' + (item.badge || "BLOCK") + '</div>' +
+          '</div>');
+
+          // Hover Tooltip
+          $card.on("mouseenter", function () {
+            var offset = $card.offset();
+            var topPos = Math.max(10, Math.min(offset.top - 20, $(window).height() - 240));
+            $previewTooltip.html(
+              '<div class="rise-tooltip-header">' +
+                '<span class="rise-tooltip-title">' + item.name + '</span>' +
+                '<span class="rise-tooltip-badge">' + (item.badge || "PREVIEW") + '</span>' +
+              '</div>' +
+              '<div class="rise-tooltip-preview-frame">' + item.previewHtml + '</div>' +
+              '<div class="rise-tooltip-hint">Click or Drag to insert into lesson</div>'
+            ).css({ top: topPos + "px" }).stop(true, true).fadeIn(150);
+          }).on("mouseleave", function () {
+            $previewTooltip.stop(true, true).fadeOut(100);
+          });
+
+          // Click to insert
+          $card.on("click", function (e) {
+            e.preventDefault();
+            $previewTooltip.hide();
+            self.insertBlock(item.content);
+          });
+
+          // Drag Start
+          $card.on("dragstart", function (e) {
+            $previewTooltip.hide();
+            $(this).addClass("is-dragging");
+            var dt = e.originalEvent.dataTransfer;
+            dt.effectAllowed = "copy";
+            dt.setData("text/plain", JSON.stringify(item));
+          }).on("dragend", function () {
+            $(this).removeClass("is-dragging");
+            $(".rise-drop-target-active, .is-hovered").removeClass("rise-drop-target-active is-hovered");
+          });
+
+          $grid.append($card);
+        });
+
+        $toolboxBody.append($cat);
+      });
+
+      // Search filter
+      $editorRoot.find(".rise-toolbox-search-input").on("input", function () {
+        var query = $(this).val().toLowerCase().trim();
+        $editorRoot.find(".rise-toolbox-block-card").each(function () {
+          var $c = $(this);
+          var name = $c.find(".rise-toolbox-block-name").text().toLowerCase();
+          var tag = $c.find(".rise-toolbox-block-tag").text().toLowerCase();
+          if (name.indexOf(query) !== -1 || tag.indexOf(query) !== -1 || query === "") {
+            $c.show();
+          } else {
+            $c.hide();
+          }
+        });
+      });
+
+      // Mode toggling
       $editorRoot.find(".rise-visual-mode-btn").on("click", function () {
         var mode = $(this).data("mode");
         self.activeViewMode = mode;
@@ -430,15 +395,18 @@
         $(this).addClass("is-active");
 
         if (mode === "visual") {
-          $editorRoot.find(".rise-visual-viewport").show();
+          $editorRoot.find(".rise-visual-workspace").show();
+          $(".h5peditor, .h5peditor-form").addClass("rise-visual-mode-active");
           $(".field-name-courseMeta, .field-name-sections").hide();
         } else {
-          $editorRoot.find(".rise-visual-viewport").hide();
+          $editorRoot.find(".rise-visual-workspace").hide();
+          $(".h5peditor, .h5peditor-form").removeClass("rise-visual-mode-active");
           $(".field-name-courseMeta, .field-name-sections").show();
         }
       });
 
-      // Default: hide messy form fields and show visual editor
+      // Default: active visual mode & hide old fields completely
+      $(".h5peditor, .h5peditor-form").addClass("rise-visual-mode-active");
       $(".field-name-courseMeta, .field-name-sections").hide();
 
       // Navigation tab switching
@@ -455,7 +423,7 @@
         self.addNewLesson();
       });
 
-      self.updateVisualCanvas();
+      self.updateStudio();
     };
 
     /**
@@ -489,9 +457,9 @@
     };
 
     /**
-     * Update Visual Canvas UI & Tabs
+     * Update Studio Tabs & Content
      */
-    self.updateVisualCanvas = function () {
+    self.updateStudio = function () {
       var params = self.getParams();
       var $pillsContainer = $(".rise-visual-lesson-pills");
       $pillsContainer.empty();
@@ -519,30 +487,29 @@
     };
 
     /**
-     * Render the currently selected tab in the visual canvas
+     * Render Active Tab Content in Right Canvas Area
      */
     self.renderActiveTabContent = function () {
       var params = self.getParams();
-      var $viewport = $(".rise-visual-viewport");
-      $viewport.empty();
+      var $canvas = $(".rise-visual-canvas-area");
+      $canvas.empty();
 
       if (self.activeTab === "cover") {
-        self.renderCoverPage($viewport, params);
+        self.renderCoverPage($canvas, params);
       } else {
-        self.renderLessonPage($viewport, params, self.activeTab);
+        self.renderLessonPage($canvas, params, self.activeTab);
       }
     };
 
     /**
-     * 1. Render Cover & Course Outline (Matches user uploaded image!)
+     * 1. Render Cover & Outline View
      */
-    self.renderCoverPage = function ($viewport, params) {
+    self.renderCoverPage = function ($canvas, params) {
       var meta = (params && params.courseMeta) || {};
       var title = meta.title || "មេរៀនទី១ ការណែនាំអំពីភាសាJava";
       var coverImg = meta.coverImageUrl || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1600&q=80";
       var desc = meta.description || "<p>នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:</p><ul><li>ភាសាកូដ Java</li><li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>ដំណើរការ នៃការសរសេរកូដ Java</li><li>លក្ខណៈរបស់ភាសា Java</li></ul>";
 
-      // Parse list items from description if present
       var $temp = $("<div>" + desc + "</div>");
       var introText = $temp.find("p").first().text() || "នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:";
       var items = [];
@@ -580,7 +547,7 @@
       '</div>');
 
       var $list = $cover.find(".rise-canvas-takeaways-list");
-      items.forEach(function (txt, idx) {
+      items.forEach(function (txt) {
         var $card = $('<div class="rise-canvas-takeaway-card">' +
           '<div class="rise-canvas-takeaway-dot"></div>' +
           '<div class="rise-canvas-takeaway-text" contenteditable="true">' + txt + '</div>' +
@@ -589,14 +556,14 @@
         $list.append($card);
       });
 
-      // Event: Title edit
+      // Sync Title
       $cover.find(".rise-canvas-title-editable").on("input blur", function () {
         var newTitle = $(this).text().trim();
         meta.title = newTitle;
         self.syncField("courseMeta/title", newTitle);
       });
 
-      // Event: Cover Image Change
+      // Change Cover Image
       $cover.find(".rise-canvas-change-cover-btn").on("click", function () {
         var url = prompt("Enter cover image URL (e.g. Unsplash URL):", coverImg);
         if (url && url.trim()) {
@@ -606,7 +573,6 @@
         }
       });
 
-      // Event: Intro Text & Takeaway sync
       function saveDescription() {
         var pText = $cover.find(".rise-canvas-outline-intro").text().trim();
         var html = "<p>" + pText + "</p><ul>";
@@ -622,13 +588,11 @@
       $cover.find(".rise-canvas-outline-intro").on("input blur", saveDescription);
       $cover.on("input blur", ".rise-canvas-takeaway-text", saveDescription);
 
-      // Event: Delete takeaway
       $cover.on("click", ".rise-canvas-takeaway-delete", function () {
         $(this).closest(".rise-canvas-takeaway-card").remove();
         saveDescription();
       });
 
-      // Event: Add takeaway
       $cover.find(".rise-canvas-add-takeaway-btn").on("click", function () {
         var $newCard = $('<div class="rise-canvas-takeaway-card">' +
           '<div class="rise-canvas-takeaway-dot"></div>' +
@@ -640,13 +604,13 @@
         saveDescription();
       });
 
-      $viewport.append($cover);
+      $canvas.append($cover);
     };
 
     /**
-     * 2. Render Lesson Content Canvas (with drop zones & WYSIWYG editing)
+     * 2. Render Lesson Content Canvas
      */
-    self.renderLessonPage = function ($viewport, params, tabId) {
+    self.renderLessonPage = function ($canvas, params, tabId) {
       var parts = tabId.split("_");
       var sIdx = parseInt(parts[0], 10) || 0;
       var lIdx = parseInt(parts[1], 10) || 0;
@@ -659,22 +623,21 @@
           '<div style="font-size: 0.75rem; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.05em;">' + (sec.sectionTitle || "SECTION") + '</div>' +
           '<h2 class="rise-canvas-lesson-title-editable" contenteditable="true" title="Click to edit lesson title">' + (lesson.title || "Lesson Title") + '</h2>' +
         '</div>' +
-        '<div class="rise-canvas-drop-zone top-zone" data-pos="0">' +
+        '<div class="rise-canvas-drop-zone top-zone">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-          '<span>Drop Rise Block Here (or Click any Component on Left)</span>' +
+          '<span>Drop Rise Block Here (or Click on Left Toolbox)</span>' +
         '</div>' +
         '<div class="rise-canvas-blocks-list"></div>' +
-        '<div class="rise-canvas-drop-zone bottom-zone" data-pos="end">' +
+        '<div class="rise-canvas-drop-zone bottom-zone">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
           '<span>+ Drop block here to append</span>' +
         '</div>' +
       '</div>');
 
-      // Sync Lesson Title
       $lessonView.find(".rise-canvas-lesson-title-editable").on("input blur", function () {
         var newTitle = $(this).text().trim();
         lesson.title = newTitle;
-        self.updateVisualCanvas();
+        self.updateStudio();
       });
 
       var $blocksList = $lessonView.find(".rise-canvas-blocks-list");
@@ -684,11 +647,11 @@
         self.renderRenderedBlocks($blocksList, rawContent, lesson);
       }
 
-      $viewport.append($lessonView);
+      $canvas.append($lessonView);
     };
 
     /**
-     * Parse HTML string or params into block elements
+     * Parse HTML string or params
      */
     self.getLessonContentHtml = function (lesson) {
       if (!lesson.content) return "";
@@ -706,14 +669,14 @@
     };
 
     /**
-     * Render blocks with action toolbar (Edit, Duplicate, Move Up/Down, Delete)
+     * Render blocks with action toolbar
      */
     self.renderRenderedBlocks = function ($container, htmlContent, lesson) {
       var $temp = $("<div>" + htmlContent + "</div>");
       var children = $temp.children();
 
       if (children.length === 0) {
-        $container.html('<div style="color: #94a3b8; text-align: center; padding: 30px 0; font-size: 0.9rem;">No blocks added yet. Drag or click any component from the left toolbox!</div>');
+        $container.html('<div style="color: #94a3b8; text-align: center; padding: 24px 0; font-size: 0.85rem;">No blocks added yet. Click or drag any component from the left toolbox!</div>');
         return;
       }
 
@@ -728,17 +691,15 @@
             '<button type="button" class="rise-canvas-action-btn is-delete" title="Delete">🗑️</button>' +
           '</div>' +
           '<div class="rise-canvas-block-inner" contenteditable="true">' + blockOuterHtml + '</div>' +
-          '<div class="rise-canvas-drop-zone mid-zone" data-pos="' + (idx + 1) + '">' +
+          '<div class="rise-canvas-drop-zone mid-zone">' +
             '<span>+ Drop block here</span>' +
           '</div>' +
         '</div>');
 
-        // Direct contenteditable editing
         $blockWrap.find(".rise-canvas-block-inner").on("blur", function () {
           self.saveAllBlocksFromCanvas($container, lesson);
         });
 
-        // Action: Edit HTML
         $blockWrap.find(".is-edit").on("click", function (e) {
           e.stopPropagation();
           var currentHtml = $blockWrap.find(".rise-canvas-block-inner").html();
@@ -749,7 +710,6 @@
           }
         });
 
-        // Action: Duplicate
         $blockWrap.find(".is-dup").on("click", function (e) {
           e.stopPropagation();
           var cloneHtml = $blockWrap.find(".rise-canvas-block-inner").html();
@@ -758,7 +718,6 @@
           self.renderActiveTabContent();
         });
 
-        // Action: Move Up
         $blockWrap.find(".is-up").on("click", function (e) {
           e.stopPropagation();
           var $prev = $blockWrap.prev(".rise-canvas-block-wrapper");
@@ -768,7 +727,6 @@
           }
         });
 
-        // Action: Move Down
         $blockWrap.find(".is-down").on("click", function (e) {
           e.stopPropagation();
           var $next = $blockWrap.next(".rise-canvas-block-wrapper");
@@ -778,7 +736,6 @@
           }
         });
 
-        // Action: Delete
         $blockWrap.find(".is-delete").on("click", function (e) {
           e.stopPropagation();
           $blockWrap.remove();
@@ -790,7 +747,7 @@
     };
 
     /**
-     * Save all blocks in the visual canvas back to H5P params & CKEditor
+     * Save all blocks back to H5P params & CKEditor
      */
     self.saveAllBlocksFromCanvas = function ($container, lesson) {
       var htmlParts = [];
@@ -799,7 +756,6 @@
       });
       var fullHtml = htmlParts.join("\n");
 
-      // Update in lesson object
       if (typeof lesson.content === "string") {
         lesson.content = fullHtml;
       } else if (lesson.content && lesson.content.params) {
@@ -816,7 +772,6 @@
         };
       }
 
-      // Sync to CKEditor if available
       try {
         if (window.CKEDITOR && window.CKEDITOR.instances) {
           for (var k in window.CKEDITOR.instances) {
@@ -829,7 +784,7 @@
     };
 
     /**
-     * Add a new lesson to the course
+     * Add new lesson
      */
     self.addNewLesson = function () {
       var params = self.getParams();
@@ -849,16 +804,16 @@
       });
 
       self.activeTab = "0_" + (sec.lessons.length - 1);
-      self.updateVisualCanvas();
+      self.updateStudio();
       self.showToast("New Lesson added!");
     };
 
     /**
-     * Insert Block Content into active lesson or drop position
+     * Insert Block Content
      */
-    self.insertBlock = function (blockHtml, dropPos) {
+    self.insertBlock = function (blockHtml) {
       if (self.activeTab === "cover") {
-        self.showToast("Switch to a Lesson tab to insert blocks.");
+        self.showToast("Please select a Lesson tab to insert blocks.");
         return;
       }
 
@@ -879,48 +834,39 @@
     };
 
     /**
-     * Setup Drag and Drop Zones on the Live Canvas
+     * Drag and Drop Zones
      */
     self.setupDragAndDrop = function () {
-      var eventTargets = [document];
-      try {
-        if (window.parent && window.parent.document && window.parent.document !== document) {
-          eventTargets.push(window.parent.document);
-        }
-      } catch (e) {}
+      $(document).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
+        e.preventDefault();
+        e.originalEvent.dataTransfer.dropEffect = "copy";
+        $(this).addClass("rise-drop-target-active is-hovered");
+      });
 
-      eventTargets.forEach(function (doc) {
-        $(doc).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
-          e.preventDefault();
-          e.originalEvent.dataTransfer.dropEffect = "copy";
-          $(this).addClass("rise-drop-target-active is-hovered");
-        });
+      $(document).on("dragleave", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function () {
+        $(this).removeClass("rise-drop-target-active is-hovered");
+      });
 
-        $(doc).on("dragleave", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function () {
-          $(this).removeClass("rise-drop-target-active is-hovered");
-        });
+      $(document).on("drop", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
+        e.preventDefault();
+        $(this).removeClass("rise-drop-target-active is-hovered");
 
-        $(doc).on("drop", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
-          e.preventDefault();
-          $(this).removeClass("rise-drop-target-active is-hovered");
+        var rawData = e.originalEvent.dataTransfer.getData("text/plain");
+        if (!rawData) return;
 
-          var rawData = e.originalEvent.dataTransfer.getData("text/plain");
-          if (!rawData) return;
-
-          try {
-            var item = JSON.parse(rawData);
-            if (item.content) {
-              self.insertBlock(item.content);
-            }
-          } catch (err) {
-            console.error("Drop error:", err);
+        try {
+          var item = JSON.parse(rawData);
+          if (item.content) {
+            self.insertBlock(item.content);
           }
-        });
+        } catch (err) {
+          console.error("Drop error:", err);
+        }
       });
     };
 
     /**
-     * Sync value to underlying form inputs if present
+     * Sync value to underlying form inputs
      */
     self.syncField = function (path, val) {
       try {
@@ -933,21 +879,14 @@
     };
 
     /**
-     * Display a floating feedback toast
+     * Toast feedback
      */
     self.showToast = function (msg) {
-      var targetDoc = document;
-      try {
-        if (window.parent && window.parent.document && window.parent.document.body) {
-          targetDoc = window.parent.document;
-        }
-      } catch (e) {}
-
       var $toast = $('<div style="position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #38bdf8; border: 1.5px solid #38bdf8; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; z-index: 2147483647; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">' + msg + '</div>');
-      $(targetDoc.body || document.body).append($toast);
+      $("body").append($toast);
       setTimeout(function () {
         $toast.fadeOut(300, function () { $(this).remove(); });
-      }, 2200);
+      }, 2000);
     };
   }
 
@@ -965,7 +904,7 @@
     var self = this;
     self.$item = $(self.createFieldMarkup());
     $wrapper.append(self.$item);
-    RiseBlockToolboxWidget.initDock(self);
+    RiseBlockToolboxWidget.initStudio(self);
   };
 
   RiseBlockToolboxWidget.prototype.createFieldMarkup = function () {
@@ -978,7 +917,7 @@
 
   RiseBlockToolboxWidget.prototype.remove = function () {};
 
-  RiseBlockToolboxWidget.initDock = function (widgetInstance) {
+  RiseBlockToolboxWidget.initStudio = function (widgetInstance) {
     fixCoreTranslations();
     var toolbox = new RiseBlockToolbox();
     toolbox.init(widgetInstance);
@@ -988,14 +927,14 @@
 
   if (typeof $ !== "undefined" && $) {
     $(function () {
-      RiseBlockToolboxWidget.initDock();
-      setTimeout(RiseBlockToolboxWidget.initDock, 400);
-      setTimeout(RiseBlockToolboxWidget.initDock, 1000);
-      setTimeout(RiseBlockToolboxWidget.initDock, 2000);
+      RiseBlockToolboxWidget.initStudio();
+      setTimeout(RiseBlockToolboxWidget.initStudio, 400);
+      setTimeout(RiseBlockToolboxWidget.initStudio, 1000);
+      setTimeout(RiseBlockToolboxWidget.initStudio, 2000);
     });
   } else {
     setTimeout(function () {
-      RiseBlockToolboxWidget.initDock();
+      RiseBlockToolboxWidget.initStudio();
     }, 500);
   }
 
