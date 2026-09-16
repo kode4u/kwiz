@@ -503,6 +503,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
      */
     self.showLesson = function (index) {
       if (index < 0 || index >= self.lessons.length) return;
+      if (self.isTransitioning) return;
 
       self.currentLessonIndex = index;
       var les = self.lessons[index];
@@ -522,44 +523,56 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.$nextBtn.text(les.nextButtonText || "បន្ទាប់");
       }
 
-      // Render Lesson Content
-      self.$lessonContainer.html("");
-      if (!les.instance && les.content) {
-        var $lesWrap = $("<div/>", { class: "rise-lesson-content-block" });
-        les.instance = H5P.newRunnable(les.content, self.contentId, $lesWrap, true);
-        les.$wrapper = $lesWrap;
-      }
-
-      if (les.$wrapper) {
-        les.$wrapper.removeClass("rise-slide-up-active");
-        self.$lessonContainer.append(les.$wrapper);
-        // Force reflow and add animation class
-        if (les.$wrapper[0]) {
-          void les.$wrapper[0].offsetWidth;
-        }
-        les.$wrapper.addClass("rise-slide-up-active");
-
-        var runEnhance = function () {
-          self.enhanceContentBlocks(les.$wrapper);
-          if (self.$container) {
-            self.enhanceContentBlocks(self.$container);
-          }
-        };
-        runEnhance();
-        setTimeout(runEnhance, 50);
-        setTimeout(runEnhance, 150);
-        setTimeout(runEnhance, 300);
-        setTimeout(runEnhance, 600);
-        setTimeout(runEnhance, 1200);
-      }
-
       // Update Sidebar Active state
       self.$sidebar.find(".rise-sidebar-lesson-item").removeClass("active");
       self.$sidebar.find('.rise-sidebar-lesson-item[data-global-index="' + index + '"]').addClass("active");
 
-      // Scroll to top smoothly
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      self.trigger("resize");
+      var renderIncomingLesson = function () {
+        self.$lessonContainer.html("");
+        if (!les.instance && les.content) {
+          var $lesWrap = $("<div/>", { class: "rise-lesson-content-block" });
+          les.instance = H5P.newRunnable(les.content, self.contentId, $lesWrap, true);
+          les.$wrapper = $lesWrap;
+        }
+
+        if (les.$wrapper) {
+          les.$wrapper.removeClass("rise-slide-up-exit").removeClass("rise-slide-up-active");
+          self.$lessonContainer.append(les.$wrapper);
+          // Force reflow and add animation class
+          if (les.$wrapper[0]) {
+            void les.$wrapper[0].offsetWidth;
+          }
+          les.$wrapper.addClass("rise-slide-up-active");
+
+          var runEnhance = function () {
+            self.enhanceContentBlocks(les.$wrapper);
+            if (self.$container) {
+              self.enhanceContentBlocks(self.$container);
+            }
+          };
+          runEnhance();
+          setTimeout(runEnhance, 50);
+          setTimeout(runEnhance, 150);
+          setTimeout(runEnhance, 300);
+          setTimeout(runEnhance, 600);
+          setTimeout(runEnhance, 1200);
+        }
+
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        self.trigger("resize");
+        self.isTransitioning = false;
+      };
+
+      var $currentBlock = self.$lessonContainer.children(".rise-lesson-content-block");
+      if ($currentBlock.length > 0 && $currentBlock.is(":visible")) {
+        self.isTransitioning = true;
+        $currentBlock.removeClass("rise-slide-up-active").addClass("rise-slide-up-exit");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(renderIncomingLesson, 280);
+      } else {
+        renderIncomingLesson();
+      }
     };
 
     /**

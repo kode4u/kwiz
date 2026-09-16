@@ -506,10 +506,21 @@
 }
 
 /* Lesson Viewport & Page Transitions */
-@keyframes risePageSlideUp {
+@keyframes risePageSlideUpExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
+@keyframes risePageSlideUpEnter {
   0% {
     opacity: 0;
-    transform: translateY(48px);
+    transform: translateY(70px);
   }
   100% {
     opacity: 1;
@@ -530,8 +541,13 @@
   width: 100%;
 }
 
+.rise-lesson-content-block.rise-slide-up-exit {
+  animation: risePageSlideUpExit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none !important;
+}
+
 .rise-lesson-content-block.rise-slide-up-active {
-  animation: risePageSlideUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: risePageSlideUpEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   will-change: transform, opacity;
 }
 
