@@ -1089,9 +1089,19 @@
           }
         });
 
+        $blockWrap.find(".is-delete").on("click", function (e) {
+          e.stopPropagation();
+          $blockWrap.remove();
+          self.saveAllBlocksFromCanvas($container, lesson);
+          if ($container.find(".rise-canvas-block-wrapper").length === 0) {
+            $container.html('<div style="color: #94a3b8; text-align: center; padding: 24px 0; font-size: 0.85rem;">No blocks added yet. Click or drag any component from the left toolbox!</div>');
+          }
+        });
+
         // 1. Process Carousel Slideshow Blocks (Multi-Image)
         $blockWrap.find(".rise-carousel-container").each(function () {
           var $car = $(this);
+          var $track = $car.find(".rise-carousel-track");
           var $slides = $car.find(".rise-carousel-slide");
           var $dots = $car.find(".rise-carousel-dot");
           var slideIdx = parseInt($car.attr("data-slide-index"), 10) || 0;
@@ -1102,9 +1112,12 @@
             if (i >= $slides.length) i = 0;
             slideIdx = i;
             $car.attr("data-slide-index", slideIdx);
+            $track.css("transform", "translateX(-" + (slideIdx * 100) + "%)");
             $slides.removeClass("is-active").eq(slideIdx).addClass("is-active");
             $dots.removeClass("is-active").eq(slideIdx).addClass("is-active");
           }
+
+          setSlide(slideIdx);
 
           $car.find(".rise-carousel-btn.prev").off("click").on("click", function (e) {
             e.stopPropagation();
@@ -1263,14 +1276,23 @@
             $editBtn.add($img).on("click", function (e) {
               e.preventDefault();
               e.stopPropagation();
+              var existingCaption = "";
+              var $captionEl = $img.siblings(".rise-image-card-caption, .rise-image-hero-caption, .rise-carousel-slide-caption");
+              if ($captionEl.length) {
+                existingCaption = $captionEl.text().trim();
+              } else {
+                existingCaption = $img.attr("alt") || "";
+              }
+
               self.openImageEditor({
-                title: "Edit & Upload Images",
+                title: "Edit & Upload Image",
                 currentUrl: $img.attr("src"),
-                currentAlt: $img.attr("alt") || "",
+                currentAlt: existingCaption,
                 onApply: function (newUrl, newAlt) {
                   $img.attr("src", newUrl);
-                  if (newAlt) {
-                    $img.attr("alt", newAlt);
+                  $img.attr("alt", newAlt || "");
+                  if ($captionEl.length) {
+                    $captionEl.text(newAlt);
                   }
                   self.saveAllBlocksFromCanvas($container, lesson);
                 }

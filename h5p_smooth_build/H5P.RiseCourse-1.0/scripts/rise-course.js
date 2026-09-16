@@ -676,6 +676,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       // 4. Process Multi-Image Carousel / Slideshow Blocks
       $container.find(".rise-carousel-container").each(function () {
         var $car = $(this);
+        var $track = $car.find(".rise-carousel-track");
         var $slides = $car.find(".rise-carousel-slide");
         var $dots = $car.find(".rise-carousel-dot");
         var slideIdx = parseInt($car.attr("data-slide-index"), 10) || 0;
@@ -686,9 +687,12 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           if (i >= $slides.length) i = 0;
           slideIdx = i;
           $car.attr("data-slide-index", slideIdx);
+          $track.css("transform", "translateX(-" + (slideIdx * 100) + "%)");
           $slides.removeClass("is-active").eq(slideIdx).addClass("is-active");
           $dots.removeClass("is-active").eq(slideIdx).addClass("is-active");
         }
+
+        setSlide(slideIdx);
 
         $car.find(".rise-carousel-btn.prev").off("click").on("click", function (e) {
           e.stopPropagation();

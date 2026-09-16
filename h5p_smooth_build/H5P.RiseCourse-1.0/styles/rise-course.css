@@ -2389,29 +2389,27 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
 }
 
 .rise-carousel-track {
-  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
   width: 100% !important;
   min-height: 380px !important;
-  overflow: hidden !important;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .rise-carousel-slide {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
+  flex: 0 0 100% !important;
   width: 100% !important;
-  height: 100% !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  transition: opacity 0.4s ease, transform 0.4s ease !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-end !important;
 }
 
 .rise-carousel-slide.is-active {
-  opacity: 1 !important;
-  visibility: visible !important;
   position: relative !important;
 }
 
