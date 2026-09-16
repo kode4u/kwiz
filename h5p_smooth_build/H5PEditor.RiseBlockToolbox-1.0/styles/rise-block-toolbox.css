@@ -1548,3 +1548,194 @@ body.is-rise-dragging .rise-canvas-drop-zone {
   background: #1d4ed8;
 }
 
+/* --------------------------------------------------------------------------
+   9. Lesson Drag & Drop Reordering in Outline Drawer
+   -------------------------------------------------------------------------- */
+.rise-outline-drag-handle {
+  cursor: grab;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.rise-outline-drag-handle:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.rise-outline-item.is-reordering {
+  opacity: 0.35;
+  background: #1e293b;
+  border: 1.5px dashed #38bdf8 !important;
+}
+
+.rise-outline-item.drag-over-top {
+  border-top: 2.5px solid #38bdf8 !important;
+  transform: translateY(-2px);
+}
+
+.rise-outline-item.drag-over-bottom {
+  border-bottom: 2.5px solid #38bdf8 !important;
+  transform: translateY(2px);
+}
+
+/* --------------------------------------------------------------------------
+   10. Real Student Preview Button & Interactive Viewport Modal
+   -------------------------------------------------------------------------- */
+.rise-visual-preview-mode-btn {
+  height: 36px !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  font-size: 0.825rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  outline: none !important;
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border: 1px solid #0369a1 !important;
+}
+
+.rise-visual-preview-mode-btn:hover {
+  background: #0369a1 !important;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4) !important;
+}
+
+.rise-real-preview-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 17, 32, 0.94);
+  backdrop-filter: blur(8px);
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: riseFadeIn 0.2s ease;
+  box-sizing: border-box;
+}
+
+.rise-preview-top-toolbar {
+  width: 100%;
+  height: 56px;
+  background: #0b1120;
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-sizing: border-box;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.rise-preview-toolbar-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+}
+
+.rise-preview-device-switcher {
+  display: flex;
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rise-device-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rise-device-btn:hover {
+  color: #ffffff;
+}
+
+.rise-device-btn.is-active {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.rise-preview-close-btn {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.rise-preview-close-btn:hover {
+  background: #dc2626;
+}
+
+.rise-preview-viewport-frame {
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  box-sizing: border-box;
+  transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rise-preview-viewport-frame.device-desktop {
+  max-width: 100%;
+}
+
+.rise-preview-viewport-frame.device-tablet {
+  max-width: 820px;
+}
+
+.rise-preview-viewport-frame.device-mobile {
+  max-width: 410px;
+}
+
+.rise-preview-h5p-mount {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow-y: auto;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+}
+
+

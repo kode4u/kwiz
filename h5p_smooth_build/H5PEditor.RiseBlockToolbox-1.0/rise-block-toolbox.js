@@ -281,6 +281,10 @@
             '</div>' +
           '</div>' +
           '<div class="rise-top-right-group">' +
+            '<button type="button" class="rise-visual-preview-mode-btn" title="Preview Student Experience">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+              '<span>Preview</span>' +
+            '</button>' +
             '<button type="button" class="rise-visual-add-lesson-btn" title="Add a new lesson to course">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
               '<span>+ Add Lesson</span>' +
@@ -411,6 +415,11 @@
         self.isOutlineOpen = !self.isOutlineOpen;
         $editorRoot.toggleClass("outline-collapsed", !self.isOutlineOpen);
         $(this).toggleClass("is-active", self.isOutlineOpen);
+      });
+
+      // Preview Mode Button
+      $editorRoot.find(".rise-visual-preview-mode-btn").on("click", function () {
+        self.openRealPreviewModal();
       });
 
       // Fullscreen Toggle
@@ -544,12 +553,95 @@
               var tabId = sIdx + "_" + lIdx;
               var isAct = self.activeTab === tabId ? "is-active" : "";
               var title = les.title || ("Lesson " + (lessonCount + 1));
-              var $lessonItem = $('<div class="rise-outline-item is-lesson ' + isAct + '" data-tab="' + tabId + '">' +
+              var $lessonItem = $('<div class="rise-outline-item is-lesson ' + isAct + '" data-tab="' + tabId + '" data-section-idx="' + sIdx + '" data-lesson-idx="' + lIdx + '" draggable="true">' +
+                '<div class="rise-outline-drag-handle" title="Drag to reorder lesson">' +
+                  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>' +
+                '</div>' +
                 '<div class="rise-outline-item-icon">' +
                   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
                 '</div>' +
                 '<span class="rise-outline-item-title">' + title + '</span>' +
               '</div>');
+
+              // Drag to reorder lesson items
+              $lessonItem.on("dragstart", function (e) {
+                e.stopPropagation();
+                window.riseDraggedLesson = { sIdx: sIdx, lIdx: lIdx };
+                $(this).addClass("is-reordering");
+                if (e.originalEvent && e.originalEvent.dataTransfer) {
+                  e.originalEvent.dataTransfer.effectAllowed = "move";
+                  try {
+                    e.originalEvent.dataTransfer.setData("text/plain", "reorder-lesson");
+                  } catch (err) {}
+                }
+              });
+
+              $lessonItem.on("dragover", function (e) {
+                if (!window.riseDraggedLesson) return;
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.originalEvent && e.originalEvent.dataTransfer) {
+                  e.originalEvent.dataTransfer.dropEffect = "move";
+                }
+                var rect = this.getBoundingClientRect();
+                var relY = e.originalEvent.clientY - rect.top;
+                var isTop = relY < (rect.height / 2);
+                $(this).toggleClass("drag-over-top", isTop);
+                $(this).toggleClass("drag-over-bottom", !isTop);
+              });
+
+              $lessonItem.on("dragleave", function (e) {
+                $(this).removeClass("drag-over-top drag-over-bottom");
+              });
+
+              $lessonItem.on("drop", function (e) {
+                if (!window.riseDraggedLesson) return;
+                e.preventDefault();
+                e.stopPropagation();
+                var srcInfo = window.riseDraggedLesson;
+                window.riseDraggedLesson = null;
+                $(".rise-outline-item").removeClass("drag-over-top drag-over-bottom is-reordering");
+
+                var targetSIdx = parseInt($(this).attr("data-section-idx"), 10);
+                var targetLIdx = parseInt($(this).attr("data-lesson-idx"), 10);
+
+                var rect = this.getBoundingClientRect();
+                var relY = e.originalEvent.clientY - rect.top;
+                var insertBefore = relY < (rect.height / 2);
+
+                if (srcInfo.sIdx === targetSIdx && srcInfo.lIdx === targetLIdx) {
+                  return;
+                }
+
+                var params = self.getParams();
+                if (!params.sections || !params.sections[srcInfo.sIdx] || !params.sections[targetSIdx]) return;
+
+                var movedLesson = params.sections[srcInfo.sIdx].lessons.splice(srcInfo.lIdx, 1)[0];
+                if (!movedLesson) return;
+
+                var targetLessons = params.sections[targetSIdx].lessons;
+                var insertIdx = targetLIdx;
+                if (srcInfo.sIdx === targetSIdx && srcInfo.lIdx < targetLIdx) {
+                  insertIdx = insertBefore ? (targetLIdx - 1) : targetLIdx;
+                } else {
+                  insertIdx = insertBefore ? targetLIdx : (targetLIdx + 1);
+                }
+
+                if (insertIdx < 0) insertIdx = 0;
+                if (insertIdx > targetLessons.length) insertIdx = targetLessons.length;
+
+                targetLessons.splice(insertIdx, 0, movedLesson);
+
+                self.activeTab = targetSIdx + "_" + insertIdx;
+                self.updateStudio();
+                self.showToast("Lesson reordered!");
+              });
+
+              $lessonItem.on("dragend", function (e) {
+                window.riseDraggedLesson = null;
+                $(".rise-outline-item").removeClass("drag-over-top drag-over-bottom is-reordering");
+              });
+
               $tree.append($lessonItem);
               lessonCount++;
             });
@@ -1304,6 +1396,91 @@
         $modal.fadeOut(150, function () { $(this).remove(); });
         self.showToast("Image updated successfully!");
       });
+    };
+
+    /**
+     * Open Real Student Preview Modal with Device Switcher & H5P.RiseCourse attachment
+     */
+    self.openRealPreviewModal = function () {
+      $(".rise-real-preview-backdrop").remove();
+
+      var $modal = $('<div class="rise-real-preview-backdrop">' +
+        '<div class="rise-preview-top-toolbar">' +
+          '<div class="rise-preview-toolbar-title">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+            '<span>Student Interactive Preview</span>' +
+          '</div>' +
+          '<div class="rise-preview-device-switcher">' +
+            '<button type="button" class="rise-device-btn is-active" data-device="desktop">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>' +
+              '<span>Desktop</span>' +
+            '</button>' +
+            '<button type="button" class="rise-device-btn" data-device="tablet">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>' +
+              '<span>Tablet</span>' +
+            '</button>' +
+            '<button type="button" class="rise-device-btn" data-device="mobile">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>' +
+              '<span>Mobile</span>' +
+            '</button>' +
+          '</div>' +
+          '<button type="button" class="rise-preview-close-btn" title="Exit Preview Mode">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '<span>Close Preview</span>' +
+          '</button>' +
+        '</div>' +
+        '<div class="rise-preview-viewport-frame device-desktop">' +
+          '<div class="rise-preview-h5p-mount"></div>' +
+        '</div>' +
+      '</div>');
+
+      $("body").append($modal);
+
+      var $frame = $modal.find(".rise-preview-viewport-frame");
+      var $mount = $modal.find(".rise-preview-h5p-mount");
+
+      // Device switcher handling
+      $modal.find(".rise-device-btn").on("click", function () {
+        var device = $(this).data("device");
+        $modal.find(".rise-device-btn").removeClass("is-active");
+        $(this).addClass("is-active");
+        $frame.removeClass("device-desktop device-tablet device-mobile").addClass("device-" + device);
+        $(window).trigger("resize");
+      });
+
+      // Close handling
+      function closeModal() {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      }
+
+      $modal.find(".rise-preview-close-btn").on("click", closeModal);
+
+      // Keyboard Esc to exit
+      $(document).on("keydown.risePreviewModal", function (e) {
+        if (e.key === "Escape" || e.keyCode === 27) {
+          closeModal();
+          $(document).off("keydown.risePreviewModal");
+        }
+      });
+
+      // Instantiate H5P.RiseCourse
+      try {
+        var paramsClone = JSON.parse(JSON.stringify(self.getParams()));
+        var contentId = (window.H5PEditor && window.H5PEditor.contentId) || 0;
+
+        if (window.H5P && typeof window.H5P.RiseCourse === "function") {
+          var risePlayer = new window.H5P.RiseCourse(paramsClone, contentId);
+          risePlayer.attach($mount);
+        } else {
+          $mount.html('<div style="padding: 60px 20px; text-align: center; color: #64748b; font-family: sans-serif;">' +
+            '<div style="font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Preview Unavailable</div>' +
+            '<p>H5P.RiseCourse player library is initializing...</p>' +
+          '</div>');
+        }
+      } catch (err) {
+        console.error("Error rendering real preview modal:", err);
+        $mount.html('<div style="padding: 40px; color: #ef4444; font-family: sans-serif;">Error initializing preview: ' + err.message + '</div>');
+      }
     };
 
     /**
