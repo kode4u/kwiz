@@ -2003,4 +2003,271 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
 }
 
+/* ==========================================================================
+   Articulate Rise Expanded Component Suite Styles
+   ========================================================================== */
+
+/* 1. Quote / Testimonial Block */
+.rise-quote-block {
+  background: #f8fafc !important;
+  border-left: 4px solid #2563eb !important;
+  padding: 24px 28px !important;
+  border-radius: 0 14px 14px 0 !important;
+  margin: 28px 0 !important;
+}
+.rise-quote-text {
+  font-size: 1.15rem !important;
+  font-style: italic !important;
+  color: #1e293b !important;
+  line-height: 1.65 !important;
+  margin-bottom: 14px !important;
+}
+.rise-quote-author {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+.rise-quote-avatar {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+.rise-quote-info {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.rise-quote-name {
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  font-size: 0.95rem !important;
+}
+.rise-quote-title {
+  color: #64748b !important;
+  font-size: 0.8rem !important;
+}
+
+/* 2. Callouts (Warning & Success) */
+.rise-callout-warning {
+  background: #fffbeb !important;
+  border-left: 4px solid #f59e0b !important;
+  color: #92400e !important;
+  padding: 16px 20px !important;
+  border-radius: 8px !important;
+  margin: 20px 0 !important;
+}
+.rise-callout-success {
+  background: #f0fdf4 !important;
+  border-left: 4px solid #10b981 !important;
+  color: #065f46 !important;
+  padding: 16px 20px !important;
+  border-radius: 8px !important;
+  margin: 20px 0 !important;
+}
+
+/* 3. Stat / Big Number Grid */
+.rise-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 16px !important;
+  margin: 28px 0 !important;
+}
+.rise-stat-card {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 24px 20px !important;
+  text-align: center !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04) !important;
+}
+.rise-stat-number {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  color: #2563eb !important;
+  margin-bottom: 6px !important;
+  line-height: 1 !important;
+}
+.rise-stat-label {
+  font-size: 0.9rem !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+/* 4. Vertical Timeline */
+.rise-timeline {
+  position: relative !important;
+  margin: 28px 0 28px 18px !important;
+  border-left: 3px solid #cbd5e1 !important;
+  padding-left: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 22px !important;
+}
+.rise-timeline-item {
+  position: relative !important;
+}
+.rise-timeline-dot {
+  position: absolute !important;
+  left: -32px !important;
+  top: 4px !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: #2563eb !important;
+  border: 3px solid #ffffff !important;
+  box-shadow: 0 0 0 2px #2563eb !important;
+}
+.rise-timeline-title {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin-bottom: 4px !important;
+}
+.rise-timeline-desc {
+  font-size: 0.925rem !important;
+  color: #475569 !important;
+  line-height: 1.55 !important;
+}
+
+/* 5. 3-Column Image Grid */
+.rise-image-grid-3 {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 16px !important;
+  margin: 28px 0 !important;
+}
+
+/* 6. Audio Player Card */
+.rise-audio-card {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-radius: 14px !important;
+  padding: 20px 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+  margin: 28px 0 !important;
+}
+.rise-audio-play-btn {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.2rem !important;
+  flex-shrink: 0 !important;
+}
+.rise-audio-info {
+  flex: 1 !important;
+}
+.rise-audio-title {
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 4px !important;
+}
+.rise-audio-duration {
+  font-size: 0.8rem !important;
+  color: #94a3b8 !important;
+}
+
+/* 7. Interactive Tabs */
+.rise-tabs-container {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  margin: 28px 0 !important;
+  background: #ffffff !important;
+}
+.rise-tabs-header {
+  display: flex !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+.rise-tab-btn {
+  padding: 14px 24px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  color: #64748b !important;
+  border: none !important;
+  background: none !important;
+  cursor: pointer !important;
+  border-bottom: 3px solid transparent !important;
+  transition: all 0.2s ease !important;
+}
+.rise-tab-btn.is-active {
+  color: #2563eb !important;
+  border-bottom-color: #2563eb !important;
+  background: #ffffff !important;
+}
+.rise-tab-panel {
+  padding: 24px !important;
+  display: none;
+}
+.rise-tab-panel.is-active {
+  display: block !important;
+}
+
+/* 8. Knowledge Check / Quiz Card */
+.rise-quiz-card {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  padding: 28px !important;
+  margin: 32px 0 !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
+}
+.rise-quiz-badge {
+  display: inline-block !important;
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  padding: 4px 12px !important;
+  border-radius: 14px !important;
+  margin-bottom: 14px !important;
+  text-transform: uppercase !important;
+}
+.rise-quiz-question {
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin-bottom: 18px !important;
+}
+.rise-quiz-option {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 14px 18px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  margin-bottom: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-size: 0.95rem !important;
+  color: #334155 !important;
+}
+.rise-quiz-option:hover {
+  border-color: #3b82f6 !important;
+  background: #f8fafc !important;
+}
+.rise-quiz-check-btn {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  padding: 12px 28px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  cursor: pointer !important;
+  margin-top: 14px !important;
+  transition: all 0.2s ease !important;
+}
+.rise-quiz-check-btn:hover {
+  background: linear-gradient(135deg, #1e40af, #1d4ed8) !important;
+}
+
+
 
