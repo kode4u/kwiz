@@ -225,6 +225,33 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.showLesson(0);
       }
 
+      // Setup MutationObserver to continuously enhance any dynamically rendered elements
+      if (window.MutationObserver && self.$container && self.$container[0]) {
+        var enhanceTimer = null;
+        var observer = new MutationObserver(function (mutations) {
+          var shouldEnhance = false;
+          for (var i = 0; i < mutations.length; i++) {
+            if (mutations[i].addedNodes && mutations[i].addedNodes.length > 0) {
+              for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+                var node = mutations[i].addedNodes[j];
+                if (node.nodeType === 1 && !node.classList.contains("rise-number-badge") && !node.classList.contains("rise-bullet-badge")) {
+                  shouldEnhance = true;
+                  break;
+                }
+              }
+            }
+            if (shouldEnhance) break;
+          }
+          if (shouldEnhance) {
+            clearTimeout(enhanceTimer);
+            enhanceTimer = setTimeout(function () {
+              self.enhanceContentBlocks(self.$container);
+            }, 50);
+          }
+        });
+        observer.observe(self.$container[0], { childList: true, subtree: true });
+      }
+
       // Trigger resize for H5P iframe
       self.trigger("resize");
     };
@@ -460,6 +487,13 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
     self.showCoverPage = function () {
       self.$courseView.hide();
       self.$coverPage.show();
+      var runCoverEnhance = function () {
+        self.enhanceContentBlocks(self.$coverPage);
+      };
+      runCoverEnhance();
+      setTimeout(runCoverEnhance, 50);
+      setTimeout(runCoverEnhance, 150);
+      setTimeout(runCoverEnhance, 300);
       window.scrollTo({ top: 0, behavior: "smooth" });
       self.trigger("resize");
     };
@@ -504,7 +538,19 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           void les.$wrapper[0].offsetWidth;
         }
         les.$wrapper.addClass("rise-slide-up-active");
-        self.enhanceContentBlocks(les.$wrapper);
+
+        var runEnhance = function () {
+          self.enhanceContentBlocks(les.$wrapper);
+          if (self.$container) {
+            self.enhanceContentBlocks(self.$container);
+          }
+        };
+        runEnhance();
+        setTimeout(runEnhance, 50);
+        setTimeout(runEnhance, 150);
+        setTimeout(runEnhance, 300);
+        setTimeout(runEnhance, 600);
+        setTimeout(runEnhance, 1200);
       }
 
       // Update Sidebar Active state
@@ -641,9 +687,13 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       });
 
       // 5. Process Numbered and Bullet Lists Animation & Clean-up
-      $container.find("ol, ul, .rise-steps-list-clean, .rise-numbered-list, .rise-bullet-list").each(function () {
+      var $lists = $container.is("ol, ul, .rise-steps-list-clean, .rise-numbered-list, .rise-bullet-list") ?
+        $container.add($container.find("ol, ul, .rise-steps-list-clean, .rise-numbered-list, .rise-bullet-list")) :
+        $container.find("ol, ul, .rise-steps-list-clean, .rise-numbered-list, .rise-bullet-list");
+
+      $lists.each(function () {
         var $list = $(this);
-        if ($list.closest(".h5p-summary-list, .ui-autocomplete, .rise-course-sections, .rise-lesson-list, .h5p-image-slider-progress").length) return;
+        if ($list.closest(".h5p-summary-list, .ui-autocomplete, .rise-course-sections, .rise-lesson-list, .h5p-image-slider-progress, .rise-code-dots, .h5p-audio-inner").length) return;
         $list.addClass("rise-has-dom-badges");
         var isOrdered = $list.is("ol") || $list.hasClass("rise-numbered-list") || $list.hasClass("rise-steps-list-clean");
         var counter = 1;

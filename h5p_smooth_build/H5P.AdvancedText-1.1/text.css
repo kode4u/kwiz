@@ -1,24 +1,167 @@
-.h5p-advanced-text ul,
-.h5p-advanced-text ol {
-  padding: 0;
-  margin: 1em 0;
-}
-.h5p-advanced-text ul > li,
-.h5p-advanced-text ol > li {
-  margin: 0 0 1em 1.5em;
-  padding: 0;
+@keyframes riseItemFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.h5p-advanced-text ul > li:last-child,
-.h5p-advanced-text ol > li:last-child {
-  margin-bottom: 0;
+.h5p-advanced-text ol,
+.h5p-advanced-text ol.rise-numbered-list,
+.h5p-advanced-text .rise-numbered-list {
+  list-style: none !important;
+  counter-reset: rise-ol-counter !important;
+  padding: 0 !important;
+  margin: 20px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
 }
-.h5p-advanced-text ul > li {
-  list-style-type: circle;
+
+.h5p-advanced-text ol > li,
+.h5p-advanced-text ol.rise-numbered-list > li,
+.h5p-advanced-text .rise-numbered-list > li {
+  counter-increment: rise-ol-counter !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  font-size: 1.05rem !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  line-height: 1.6 !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 14px 20px !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+  animation: riseItemFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
 }
-.h5p-advanced-text ol > li {
-  list-style-type: decimal;
+
+.h5p-advanced-text ol > li:hover {
+  transform: translateX(6px) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.12) !important;
 }
-.h5p-advanced-text.h5p-frame {
-  margin: 1em;
+
+.h5p-advanced-text ol:not(.rise-has-dom-badges) > li::before {
+  content: counter(rise-ol-counter) !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28) !important;
 }
+
+.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 20px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  background: #f8fafc !important;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 12px !important;
+  padding: 12px 18px !important;
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+  transition: all 0.25s ease !important;
+  animation: riseItemFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li:hover {
+  transform: translateX(6px) !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+}
+
+.h5p-advanced-text ul:not(.rise-has-dom-badges):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li::before {
+  content: "" !important;
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.22) !important;
+  display: block !important;
+}
+
+.rise-number-badge {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28) !important;
+}
+
+.rise-bullet-badge {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 50% !important;
+  background: #eff6ff !important;
+  border: 1.5px solid #bfdbfe !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.rise-bullet-dot {
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 10px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.5) !important;
+  display: block !important;
+}
+
+.rise-item-text {
+  flex: 1 1 auto !important;
+  color: #1e293b !important;
+}
+
+.rise-item-text p {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+}
+
