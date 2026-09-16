@@ -164,13 +164,22 @@
         catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
         items: [
           {
+            id: "interactive_carousel",
+            name: "Slideshow Carousel",
+            badge: "Multi-Image",
+            desc: "Multi-image carousel with slide navigation",
+            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+            previewHtml: '<div style="background: #0f172a; border-radius: 6px; overflow: hidden; position: relative;"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 55px; object-fit: cover;"><div style="display: flex; justify-content: center; gap: 3px; padding: 3px; background: #0b1120;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #38bdf8;"></span><span style="width: 5px; height: 5px; border-radius: 50%; background: #475569;"></span></div></div>',
+            content: '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track"><div class="rise-carousel-slide is-active"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slide 1"><div class="rise-carousel-slide-caption"><strong>1. Code Editor & IDE</strong> — បរិស្ថានសម្រាប់សរសេរកូដ Java ប្រកបដោយប្រសិទ្ធភាព</div></div><div class="rise-carousel-slide"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" alt="Slide 2"><div class="rise-carousel-slide-caption"><strong>2. Java Architecture</strong> — ដំណើរការ Java Bytecode នៅលើ JVM</div></div></div><button type="button" class="rise-carousel-btn prev" title="Previous Slide">‹</button><button type="button" class="rise-carousel-btn next" title="Next Slide">›</button><div class="rise-carousel-dots"><span class="rise-carousel-dot is-active" data-idx="0"></span><span class="rise-carousel-dot" data-idx="1"></span></div></div>'
+          },
+          {
             id: "image_slider_preview",
             name: "Image Showcase",
             badge: "Photo",
             desc: "Clean full-bleed showcase",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
             previewHtml: '<div style="border-radius: 6px; overflow: hidden; position: relative;"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 60px; object-fit: cover;"><div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; font-size: 9px;">Image Showcase Slider</div></div>',
-            content: '<div class="rise-image-hero"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slider Image"><div class="rise-image-hero-caption"><strong>Image Showcase</strong> — បង្ហាញស្លាយរូបភាព និង Diagram ស្ថាបត្យកម្មប្រព័ន្ធ</div></div>'
+            content: '<div class="rise-image-hero"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slider Image"><div class="rise-image-hero-caption"><strong>Image Showcase</strong> — បង្ហាញរូបភាព និង Diagram ស្ថាបត្យកម្មប្រព័ន្ធ</div></div>'
           },
           {
             id: "grid_gallery_2",
@@ -180,6 +189,15 @@
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/></svg>',
             previewHtml: '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=200&q=80" style="height: 45px; object-fit: cover; border-radius: 4px;"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=200&q=80" style="height: 45px; object-fit: cover; border-radius: 4px;"></div>',
             content: '<div class="rise-image-grid-2"><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80" alt="Editor"><div class="rise-image-card-caption"><strong>1. Code Editor & IDE</strong><br>បរិស្ថានសម្រាប់សរសេរកូដ</div></div><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" alt="Java"><div class="rise-image-card-caption"><strong>2. Java Architecture</strong><br>ដំណើរការលើ JVM</div></div></div>'
+          },
+          {
+            id: "grid_gallery_3",
+            name: "3-Column Grid",
+            badge: "Gallery",
+            desc: "3-Column multi-image gallery",
+            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="5" height="18" rx="1"/><rect x="9.5" y="3" width="5" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1"/></svg>',
+            previewHtml: '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px;"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=150&q=80" style="height: 40px; object-fit: cover; border-radius: 3px;"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=150&q=80" style="height: 40px; object-fit: cover; border-radius: 3px;"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=150&q=80" style="height: 40px; object-fit: cover; border-radius: 3px;"></div>',
+            content: '<div class="rise-image-grid-3"><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Item 1"><div class="rise-image-card-caption"><strong>JDK</strong> — Development Kit</div></div><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80" alt="Item 2"><div class="rise-image-card-caption"><strong>JRE</strong> — Runtime Environment</div></div><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" alt="Item 3"><div class="rise-image-card-caption"><strong>JVM</strong> — Virtual Machine</div></div></div>'
           },
           {
             id: "video_lecture",
@@ -207,6 +225,24 @@
         catSvg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
         items: [
           {
+            id: "interactive_quiz_card",
+            name: "Interactive Quiz",
+            badge: "Quiz",
+            desc: "Multiple choice check with instant scoring",
+            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+            previewHtml: '<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 10px;"><strong>សំនួរ:</strong> តើ Java Bytecode ដំណើរការលើអ្វី?<div style="margin-top: 4px; color: #2563eb;">○ A. JVM (Java Virtual Machine)</div></div>',
+            content: '<div class="rise-quiz-card" data-correct="0" data-explanation="JVM (Java Virtual Machine) គឺជាម៉ាស៊ីននិម្មិតដែលទទួលបន្ទុកដំណើរការ Bytecode របស់ Java នៅលើគ្រប់ OS។"><div class="rise-quiz-header"><div class="rise-quiz-tag">Knowledge Check</div><div class="rise-quiz-score-badge">1 Point</div></div><div class="rise-quiz-question">សំនួរត្រួតពិនិត្យការយល់ដឹង: តើកម្មវិធី Java Bytecode ដំណើរការនៅលើអ្វី?</div><div class="rise-quiz-options"><div class="rise-quiz-option" data-opt-idx="0"><span>A. JVM (Java Virtual Machine)</span><span class="rise-quiz-option-indicator"></span></div><div class="rise-quiz-option" data-opt-idx="1"><span>B. Operating System Kernel ផ្ទាល់</span><span class="rise-quiz-option-indicator"></span></div><div class="rise-quiz-option" data-opt-idx="2"><span>C. Web Browser JavaScript Engine</span><span class="rise-quiz-option-indicator"></span></div></div><div class="rise-quiz-feedback"></div><div class="rise-quiz-actions" style="display: none;"><button type="button" class="rise-quiz-retry-btn"><span>🔄 Try Again</span></button></div></div>'
+          },
+          {
+            id: "moodle_quiz_activity",
+            name: "Moodle Quiz Block",
+            badge: "Moodle Plugin",
+            desc: "Moodle Question Bank & Quiz activity embed",
+            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 10px;"><div style="color: #f97316; font-weight: bold;">Moodle Quiz</div><div>Official Course Exam</div></div>',
+            content: '<div class="rise-moodle-embed-card" data-quiz-id="1"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-title">ការប្រឡងតេស្តពិន្ទុ (Official Moodle Quiz)</div><div class="rise-moodle-embed-desc">សូមចុចប៊ូតុងខាងក្រោមដើម្បីចូលរួមធ្វើតេស្តប្រឡងពិន្ទុផ្លូវការនៅក្នុងប្រព័ន្ធ Moodle Quiz។</div><a href="/mod/quiz/view.php?id=1" target="_blank" class="rise-moodle-embed-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg><span>Open Moodle Quiz Test</span></a></div>'
+          },
+          {
             id: "flip_flashcards",
             name: "3D Flip Cards",
             badge: "Cards",
@@ -232,15 +268,6 @@
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
             previewHtml: '<div style="background: #0f172a; color: #38bdf8; border-radius: 4px; padding: 6px; font-family: monospace; font-size: 9px;">public class Main {<br>&nbsp;&nbsp;System.out.println("Hello");<br>}</div>',
             content: '<div class="rise-code-block"><div class="rise-code-header"><div class="rise-code-dots"><div class="rise-code-dot red"></div><div class="rise-code-dot amber"></div><div class="rise-code-dot green"></div></div><div class="rise-code-lang">Java</div></div><pre class="rise-code-body"><code>public class Main {\n    public static void main(String[] args) {\n        System.out.println("ស្វាគមន៍មកកាន់ការសិក្សាភាសា Java!");\n    }\n}</code></pre></div>'
-          },
-          {
-            id: "quiz_check_card",
-            name: "Knowledge Quiz",
-            badge: "Quiz",
-            desc: "Multiple choice check question",
-            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-            previewHtml: '<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 10px;"><strong>សំនួរ:</strong> តើ Java Bytecode ដំណើរការលើអ្វី?<div style="margin-top: 4px; color: #2563eb;">○ JVM</div></div>',
-            content: '<div class="rise-quiz-card"><div class="rise-quiz-tag">Knowledge Check</div><div class="rise-quiz-question">សំនួរត្រួតពិនិត្យការយល់ដឹង: តើកម្មវិធី Java Bytecode ដំណើរការនៅលើអ្វី?</div><div class="rise-quiz-options"><div class="rise-quiz-option">○ A. JVM (Java Virtual Machine)</div><div class="rise-quiz-option">○ B. Operating System Kernel ផ្ទាល់</div><div class="rise-quiz-option">○ C. Web Browser JavaScript Engine</div></div></div>'
           }
         ]
       }
@@ -1062,7 +1089,166 @@
           }
         });
 
-        // Attach image editing triggers to every image in this block
+        // 1. Process Carousel Slideshow Blocks (Multi-Image)
+        $blockWrap.find(".rise-carousel-container").each(function () {
+          var $car = $(this);
+          var $slides = $car.find(".rise-carousel-slide");
+          var $dots = $car.find(".rise-carousel-dot");
+          var slideIdx = parseInt($car.attr("data-slide-index"), 10) || 0;
+
+          function setSlide(i) {
+            if ($slides.length === 0) return;
+            if (i < 0) i = $slides.length - 1;
+            if (i >= $slides.length) i = 0;
+            slideIdx = i;
+            $car.attr("data-slide-index", slideIdx);
+            $slides.removeClass("is-active").eq(slideIdx).addClass("is-active");
+            $dots.removeClass("is-active").eq(slideIdx).addClass("is-active");
+          }
+
+          $car.find(".rise-carousel-btn.prev").off("click").on("click", function (e) {
+            e.stopPropagation();
+            setSlide(slideIdx - 1);
+          });
+
+          $car.find(".rise-carousel-btn.next").off("click").on("click", function (e) {
+            e.stopPropagation();
+            setSlide(slideIdx + 1);
+          });
+
+          $dots.off("click").on("click", function (e) {
+            e.stopPropagation();
+            var dIdx = parseInt($(this).attr("data-idx"), 10) || 0;
+            setSlide(dIdx);
+          });
+
+          // Add Manage Slides action button to carousel
+          if (!$car.find(".rise-carousel-manage-btn").length) {
+            var $mBtn = $('<button type="button" class="rise-carousel-manage-btn" style="position: absolute; top: 12px; right: 12px; z-index: 20; background: rgba(15, 23, 42, 0.75); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; backdrop-filter: blur(4px);">' +
+              '<span>🖼️ Manage Slides (Multi-Upload)</span>' +
+            '</button>');
+            $car.append($mBtn);
+
+            $mBtn.on("click", function (e) {
+              e.stopPropagation();
+              var existingImages = [];
+              $slides.each(function () {
+                var $s = $(this);
+                var src = $s.find("img").attr("src");
+                var cap = $s.find(".rise-carousel-slide-caption").text().trim();
+                if (src) existingImages.push({ url: src, caption: cap });
+              });
+
+              self.openImageEditor({
+                title: "Manage Slides & Multi-Image Upload",
+                images: existingImages,
+                layout: "carousel",
+                onApply: function (pUrl, pAlt, imagesList, layout) {
+                  if (layout === "carousel") {
+                    var slidesHtml = "";
+                    var dotsHtml = "";
+                    imagesList.forEach(function (img, i) {
+                      var isAct = i === 0 ? "is-active" : "";
+                      slidesHtml += '<div class="rise-carousel-slide ' + isAct + '"><img src="' + img.url + '" alt="Slide ' + (i + 1) + '"><div class="rise-carousel-slide-caption">' + (img.caption || ('Slide ' + (i + 1))) + '</div></div>';
+                      dotsHtml += '<span class="rise-carousel-dot ' + isAct + '" data-idx="' + i + '"></span>';
+                    });
+                    var newCarouselHtml = '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track">' + slidesHtml + '</div><button type="button" class="rise-carousel-btn prev" title="Previous Slide">‹</button><button type="button" class="rise-carousel-btn next" title="Next Slide">›</button><div class="rise-carousel-dots">' + dotsHtml + '</div></div>';
+                    $blockWrap.find(".rise-canvas-block-inner").html(newCarouselHtml);
+                  } else if (layout === "grid2" || layout === "grid3") {
+                    var gridCls = layout === "grid2" ? "rise-image-grid-2" : "rise-image-grid-3";
+                    var cardsHtml = "";
+                    imagesList.forEach(function (img, i) {
+                      cardsHtml += '<div class="rise-image-card"><img src="' + img.url + '" alt="Item ' + (i + 1) + '"><div class="rise-image-card-caption">' + (img.caption || ('Item ' + (i + 1))) + '</div></div>';
+                    });
+                    $blockWrap.find(".rise-canvas-block-inner").html('<div class="' + gridCls + '">' + cardsHtml + '</div>');
+                  } else {
+                    $blockWrap.find(".rise-canvas-block-inner").html('<div class="rise-image-hero"><img src="' + pUrl + '" alt="' + pAlt + '"><div class="rise-image-hero-caption">' + pAlt + '</div></div>');
+                  }
+                  self.saveAllBlocksFromCanvas($container, lesson);
+                  self.renderActiveTabContent();
+                }
+              });
+            });
+          }
+        });
+
+        // 2. Process Interactive Quiz Cards
+        $blockWrap.find(".rise-quiz-card").each(function () {
+          var $qCard = $(this);
+          var $options = $qCard.find(".rise-quiz-option");
+          var $feedback = $qCard.find(".rise-quiz-feedback");
+          var $actions = $qCard.find(".rise-quiz-actions");
+          var $retryBtn = $qCard.find(".rise-quiz-retry-btn");
+          var correctIdx = parseInt($qCard.attr("data-correct"), 10) || 0;
+          var explanation = $qCard.attr("data-explanation") || "";
+
+          $options.off("click").on("click", function (e) {
+            e.stopPropagation();
+            if ($options.hasClass("is-correct") || $options.hasClass("is-incorrect")) return;
+
+            var chosenIdx = parseInt($(this).attr("data-opt-idx"), 10);
+            if (chosenIdx === correctIdx) {
+              $(this).addClass("is-correct");
+              $qCard.find(".rise-quiz-score-badge").text("1/1 (Correct)").css({ background: "#dcfce7", color: "#166534" });
+              $feedback.html('<strong>✓ Correct!</strong> ' + explanation).removeClass("is-incorrect").addClass("is-correct").slideDown(200);
+            } else {
+              $(this).addClass("is-incorrect");
+              $options.filter('[data-opt-idx="' + correctIdx + '"]').addClass("is-correct");
+              $qCard.find(".rise-quiz-score-badge").text("0/1 (Try Again)").css({ background: "#fee2e2", color: "#991b1b" });
+              $feedback.html('<strong>✕ Incorrect.</strong> ' + explanation).removeClass("is-correct").addClass("is-incorrect").slideDown(200);
+            }
+            $actions.show();
+          });
+
+          $retryBtn.off("click").on("click", function (e) {
+            e.stopPropagation();
+            $options.removeClass("is-correct is-incorrect is-selected");
+            $feedback.slideUp(150);
+            $actions.hide();
+            $qCard.find(".rise-quiz-score-badge").text("1 Point").css({ background: "#f1f5f9", color: "#64748b" });
+          });
+
+          // Add Edit Quiz button
+          if (!$qCard.find(".rise-quiz-edit-btn").length) {
+            var $qEditBtn = $('<button type="button" class="rise-quiz-edit-btn" style="position: absolute; top: 12px; right: 12px; z-index: 10; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; border-radius: 6px; padding: 4px 10px; font-size: 0.725rem; font-weight: 700; cursor: pointer;">' +
+              '<span>✏️ Edit Quiz / Import Moodle</span>' +
+            '</button>');
+            $qCard.prepend($qEditBtn);
+
+            $qEditBtn.on("click", function (e) {
+              e.stopPropagation();
+              var existingOpts = [];
+              $options.each(function () {
+                existingOpts.push($(this).find("span").first().text().trim());
+              });
+
+              self.openQuizEditor({
+                category: $qCard.find(".rise-quiz-tag").text().trim(),
+                question: $qCard.find(".rise-quiz-question").text().trim(),
+                options: existingOpts,
+                correctIndex: correctIdx,
+                explanation: explanation,
+                onApply: function (quizData) {
+                  if (quizData.isActivity) {
+                    var actHtml = '<div class="rise-moodle-embed-card" data-quiz-id="' + quizData.url + '"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-title">' + quizData.title + '</div><div class="rise-moodle-embed-desc">' + quizData.desc + '</div><a href="' + quizData.url + '" target="_blank" class="rise-moodle-embed-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg><span>Open Moodle Quiz Test</span></a></div>';
+                    $blockWrap.find(".rise-canvas-block-inner").html(actHtml);
+                  } else {
+                    var optsHtml = "";
+                    quizData.options.forEach(function (opt, oIdx) {
+                      optsHtml += '<div class="rise-quiz-option" data-opt-idx="' + oIdx + '"><span>' + opt + '</span><span class="rise-quiz-option-indicator"></span></div>';
+                    });
+                    var newQuizHtml = '<div class="rise-quiz-card" data-correct="' + quizData.correctIndex + '" data-explanation="' + quizData.explanation + '"><div class="rise-quiz-header"><div class="rise-quiz-tag">' + quizData.category + '</div><div class="rise-quiz-score-badge">1 Point</div></div><div class="rise-quiz-question">' + quizData.question + '</div><div class="rise-quiz-options">' + optsHtml + '</div><div class="rise-quiz-feedback"></div><div class="rise-quiz-actions" style="display: none;"><button type="button" class="rise-quiz-retry-btn"><span>🔄 Try Again</span></button></div></div>';
+                    $blockWrap.find(".rise-canvas-block-inner").html(newQuizHtml);
+                  }
+                  self.saveAllBlocksFromCanvas($container, lesson);
+                  self.renderActiveTabContent();
+                }
+              });
+            });
+          }
+        });
+
+        // 3. Attach image editing triggers to every image in this block
         $blockWrap.find(".rise-canvas-block-inner img").each(function () {
           var $img = $(this);
           var $imgParent = $img.parent();
@@ -1070,7 +1256,7 @@
             $imgParent.css("position", "relative");
             var $editBtn = $('<button type="button" class="rise-img-edit-trigger" title="Change / Upload Image">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
-              '<span>Change Image</span>' +
+              '<span>Change / Upload</span>' +
             '</button>');
             $imgParent.append($editBtn);
 
@@ -1078,7 +1264,7 @@
               e.preventDefault();
               e.stopPropagation();
               self.openImageEditor({
-                title: "Edit & Upload Image",
+                title: "Edit & Upload Images",
                 currentUrl: $img.attr("src"),
                 currentAlt: $img.attr("alt") || "",
                 onApply: function (newUrl, newAlt) {
@@ -1311,21 +1497,28 @@
     };
 
     /**
-     * Open Image Settings and Upload Modal
+     * Open Image Settings and Multi-Image Upload Modal
      */
     self.openImageEditor = function (opts) {
       opts = opts || {};
       var currentUrl = opts.currentUrl || "";
       var currentAlt = opts.currentAlt || "";
-      var modalTitle = opts.title || "Edit & Upload Image";
+      var modalTitle = opts.title || "Edit & Upload Images";
+      var initialImages = opts.images || [];
+      if (initialImages.length === 0 && currentUrl) {
+        initialImages.push({ url: currentUrl, caption: currentAlt });
+      }
+
+      var imagesList = JSON.parse(JSON.stringify(initialImages));
+      var selectedLayout = opts.layout || (imagesList.length > 1 ? "carousel" : "single");
 
       $(".rise-image-modal-backdrop").remove();
 
       var $modal = $('<div class="rise-image-modal-backdrop">' +
-        '<div class="rise-image-modal-dialog">' +
+        '<div class="rise-image-modal-dialog" style="max-width: 640px;">' +
           '<div class="rise-image-modal-header">' +
             '<div class="rise-image-modal-title">' +
-              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
               '<span>' + modalTitle + '</span>' +
             '</div>' +
             '<button type="button" class="rise-image-modal-close" title="Close">✕</button>' +
@@ -1333,34 +1526,41 @@
           '<div class="rise-image-modal-body">' +
             '<div class="rise-image-upload-dropzone">' +
               '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
-              '<div style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">Upload image from your computer</div>' +
-              '<div style="font-size: 0.78rem; color: #64748b;">Click browse or drag and drop image file here</div>' +
-              '<input type="file" class="rise-image-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" style="display: none;">' +
+              '<div style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">Upload images from computer (Multiple allowed)</div>' +
+              '<div style="font-size: 0.78rem; color: #64748b;">Select or drag & drop multiple image files</div>' +
+              '<input type="file" class="rise-image-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" multiple style="display: none;">' +
               '<button type="button" class="rise-image-browse-btn">' +
                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
-                '<span>Choose File</span>' +
+                '<span>Choose Image Files</span>' +
               '</button>' +
               '<div class="rise-image-upload-status" style="font-size: 0.75rem; font-weight: 700; color: #16a34a; display: none;"></div>' +
             '</div>' +
             '<div class="rise-image-modal-field">' +
-              '<label>Or Paste Web Image URL</label>' +
-              '<input type="text" class="rise-image-url-input" placeholder="https://images.unsplash.com/..." value="' + currentUrl + '">' +
+              '<label>Or Add Web Image URL</label>' +
+              '<div style="display: flex; gap: 8px;">' +
+                '<input type="text" class="rise-image-url-input" placeholder="https://images.unsplash.com/..." style="flex: 1;">' +
+                '<button type="button" class="rise-image-add-url-btn" style="background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; border-radius: 6px; padding: 0 12px; font-weight: 700; cursor: pointer;">+ Add</button>' +
+              '</div>' +
             '</div>' +
             '<div class="rise-image-modal-field">' +
-              '<label>Image Caption / Alt Description</label>' +
-              '<input type="text" class="rise-image-alt-input" placeholder="Enter image description..." value="' + currentAlt + '">' +
-            '</div>' +
-            '<div class="rise-image-modal-preview-box">' +
-              '<div class="rise-image-modal-preview-label">Live Preview</div>' +
-              '<div class="rise-image-modal-preview-img-wrap">' +
-                '<img src="' + currentUrl + '" class="rise-image-modal-preview-img" alt="Preview" ' + (currentUrl ? '' : 'style="display:none;"') + '>' +
-                (!currentUrl ? '<span style="color: #94a3b8; font-size: 0.8rem;">No image selected</span>' : '') +
+              '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                '<label>Images & Slides List (' + imagesList.length + ')</label>' +
+                '<div style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem;">' +
+                  '<span>Layout:</span>' +
+                  '<select class="rise-image-layout-select" style="font-size: 0.78rem; border-radius: 4px; border: 1px solid #cbd5e1; padding: 2px 6px;">' +
+                    '<option value="carousel" ' + (selectedLayout === "carousel" ? "selected" : "") + '>Slideshow Carousel</option>' +
+                    '<option value="grid2" ' + (selectedLayout === "grid2" ? "selected" : "") + '>2-Column Grid</option>' +
+                    '<option value="grid3" ' + (selectedLayout === "grid3" ? "selected" : "") + '>3-Column Grid</option>' +
+                    '<option value="single" ' + (selectedLayout === "single" ? "selected" : "") + '>Single Image</option>' +
+                  '</select>' +
+                '</div>' +
               '</div>' +
+              '<div class="rise-multi-images-tray"></div>' +
             '</div>' +
           '</div>' +
           '<div class="rise-image-modal-footer">' +
             '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
-            '<button type="button" class="rise-image-modal-btn apply">Apply Image</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">Apply Images</button>' +
           '</div>' +
         '</div>' +
       '</div>');
@@ -1369,51 +1569,88 @@
 
       var $fileInput = $modal.find(".rise-image-file-input");
       var $urlInput = $modal.find(".rise-image-url-input");
-      var $altInput = $modal.find(".rise-image-alt-input");
-      var $previewImg = $modal.find(".rise-image-modal-preview-img");
-      var $previewWrap = $modal.find(".rise-image-modal-preview-img-wrap");
       var $status = $modal.find(".rise-image-upload-status");
-      var selectedFileUrl = currentUrl;
+      var $tray = $modal.find(".rise-multi-images-tray");
+      var $layoutSelect = $modal.find(".rise-image-layout-select");
 
-      function updatePreview(url) {
-        selectedFileUrl = url;
-        if (url) {
-          $previewImg.attr("src", url).show();
-          $previewWrap.find("span").hide();
-        } else {
-          $previewImg.hide();
-          if (!$previewWrap.find("span").length) {
-            $previewWrap.append('<span style="color: #94a3b8; font-size: 0.8rem;">No image selected</span>');
-          } else {
-            $previewWrap.find("span").show();
-          }
+      function renderTray() {
+        $tray.empty();
+        $modal.find(".rise-image-modal-field label").first().text('Images & Slides List (' + imagesList.length + ')');
+        if (imagesList.length === 0) {
+          $tray.html('<div style="color: #94a3b8; text-align: center; padding: 18px; font-size: 0.8rem;">No images uploaded yet. Upload or paste URL above.</div>');
+          return;
         }
+
+        imagesList.forEach(function (imgItem, idx) {
+          var $row = $('<div class="rise-multi-image-item" data-idx="' + idx + '">' +
+            '<img src="' + imgItem.url + '" class="rise-multi-image-thumb" alt="Thumb">' +
+            '<div class="rise-multi-image-inputs">' +
+              '<input type="text" class="rise-slide-caption-input" placeholder="Slide caption / title..." value="' + (imgItem.caption || '') + '">' +
+              '<div style="font-size: 0.7rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px;">' + imgItem.url + '</div>' +
+            '</div>' +
+            '<button type="button" class="rise-multi-image-del-btn" title="Remove image">✕</button>' +
+          '</div>');
+
+          $row.find(".rise-slide-caption-input").on("input blur", function () {
+            imagesList[idx].caption = $(this).val().trim();
+          });
+
+          $row.find(".rise-multi-image-del-btn").on("click", function () {
+            imagesList.splice(idx, 1);
+            renderTray();
+          });
+
+          $tray.append($row);
+        });
       }
 
-      $urlInput.on("input", function () {
-        updatePreview($(this).val().trim());
+      renderTray();
+
+      $modal.find(".rise-image-add-url-btn").on("click", function () {
+        var url = $urlInput.val().trim();
+        if (url) {
+          imagesList.push({ url: url, caption: "New Slide " + (imagesList.length + 1) });
+          $urlInput.val("");
+          renderTray();
+        }
       });
 
       $modal.find(".rise-image-browse-btn, .rise-image-upload-dropzone").on("click", function (e) {
-        if (e.target !== $fileInput[0]) {
+        if (e.target !== $fileInput[0] && !$(e.target).hasClass("rise-image-browse-btn")) {
           $fileInput.trigger("click");
         }
       });
 
-      function handleFiles(files) {
+      $modal.find(".rise-image-browse-btn").on("click", function (e) {
+        e.stopPropagation();
+        $fileInput.trigger("click");
+      });
+
+      function handleMultipleFiles(files) {
         if (!files || !files.length) return;
-        var file = files[0];
-        $status.text("Uploading " + file.name + "...").css("color", "#2563eb").show();
-        self.uploadImageFile(file, function (err, serverUrl, dataUrl) {
-          var finalUrl = serverUrl || dataUrl;
-          $urlInput.val(finalUrl);
-          updatePreview(finalUrl);
-          $status.text("Uploaded: " + file.name + " (" + Math.round(file.size / 1024) + " KB)").css("color", "#16a34a").show();
+        var total = files.length;
+        var completed = 0;
+        $status.text("Uploading " + total + " image(s)...").css("color", "#2563eb").show();
+
+        Array.from(files).forEach(function (file, fIdx) {
+          self.uploadImageFile(file, function (err, serverUrl, dataUrl) {
+            completed++;
+            var finalUrl = serverUrl || dataUrl;
+            imagesList.push({
+              url: finalUrl,
+              caption: file.name.replace(/\.[^/.]+$/, "")
+            });
+            $status.text("Uploaded " + completed + " of " + total + " images...").css("color", "#16a34a").show();
+            if (completed === total) {
+              renderTray();
+              setTimeout(function () { $status.fadeOut(); }, 2500);
+            }
+          });
         });
       }
 
       $fileInput.on("change", function () {
-        handleFiles(this.files);
+        handleMultipleFiles(this.files);
       });
 
       var $dropzone = $modal.find(".rise-image-upload-dropzone");
@@ -1428,7 +1665,7 @@
         if (e.type === "drop") {
           var dt = e.originalEvent.dataTransfer;
           if (dt && dt.files && dt.files.length) {
-            handleFiles(dt.files);
+            handleMultipleFiles(dt.files);
           }
         }
       });
@@ -1444,13 +1681,240 @@
       });
 
       $modal.find(".rise-image-modal-btn.apply").on("click", function () {
-        var finalUrl = $urlInput.val().trim() || selectedFileUrl;
-        var finalAlt = $altInput.val().trim();
-        if (opts.onApply && finalUrl) {
-          opts.onApply(finalUrl, finalAlt);
+        if (imagesList.length === 0) {
+          alert("Please upload or add at least one image.");
+          return;
+        }
+
+        var layout = $layoutSelect.val();
+        var primaryUrl = imagesList[0].url;
+        var primaryAlt = imagesList[0].caption || "";
+
+        if (opts.onApply) {
+          opts.onApply(primaryUrl, primaryAlt, imagesList, layout);
         }
         $modal.fadeOut(150, function () { $(this).remove(); });
-        self.showToast("Image updated successfully!");
+        self.showToast("Images applied successfully!");
+      });
+    };
+
+    /**
+     * Open Quiz Editor and Moodle Question Bank Importer Modal
+     */
+    self.openQuizEditor = function (opts) {
+      opts = opts || {};
+      var questionText = opts.question || "សំនួរត្រួតពិនិត្យការយល់ដឹង:";
+      var categoryTag = opts.category || "Knowledge Check";
+      var options = opts.options || [
+        "A. JVM (Java Virtual Machine)",
+        "B. Operating System Kernel ផ្ទាល់",
+        "C. Web Browser JavaScript Engine"
+      ];
+      var correctIndex = opts.correctIndex !== undefined ? opts.correctIndex : 0;
+      var explanation = opts.explanation || "JVM (Java Virtual Machine) គឺជាម៉ាស៊ីននិម្មិតដែលដំណើរការ Java Bytecode នៅលើគ្រប់ OS។";
+
+      $(".rise-quiz-modal-backdrop").remove();
+
+      var $modal = $('<div class="rise-quiz-modal-backdrop">' +
+        '<div class="rise-quiz-modal-dialog">' +
+          '<div class="rise-quiz-modal-header">' +
+            '<div class="rise-quiz-modal-title">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
+              '<span>Quiz & Moodle Question Bank Editor</span>' +
+            '</div>' +
+            '<button type="button" class="rise-image-modal-close" title="Close" style="background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;">✕</button>' +
+          '</div>' +
+          '<div class="rise-quiz-modal-tabs">' +
+            '<button type="button" class="rise-quiz-tab-btn is-active" data-tab="builder">✏️ Question Builder</button>' +
+            '<button type="button" class="rise-quiz-tab-btn" data-tab="moodle">📥 Import from Moodle (Aiken/GIFT)</button>' +
+            '<button type="button" class="rise-quiz-tab-btn" data-tab="activity">🔗 Link Moodle Activity</button>' +
+          '</div>' +
+          '<div class="rise-quiz-modal-body">' +
+            '<div class="rise-quiz-tab-content is-builder">' +
+              '<div class="rise-quiz-field">' +
+                '<label>Quiz Category / Tag</label>' +
+                '<input type="text" class="rise-quiz-cat-input" value="' + categoryTag + '" placeholder="e.g. Knowledge Check, Quiz 1">' +
+              '</div>' +
+              '<div class="rise-quiz-field">' +
+                '<label>Question Text</label>' +
+                '<textarea class="rise-quiz-q-input" rows="3" placeholder="Enter your question here...">' + questionText + '</textarea>' +
+              '</div>' +
+              '<div class="rise-quiz-field">' +
+                '<label>Answer Choices (Select radio button for Correct Answer)</label>' +
+                '<div class="rise-quiz-option-builder-list"></div>' +
+                '<button type="button" class="rise-quiz-add-opt-btn" style="background: #eff6ff; color: #2563eb; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; margin-top: 6px;">+ Add Choice</button>' +
+              '</div>' +
+              '<div class="rise-quiz-field">' +
+                '<label>Explanation / Feedback Message</label>' +
+                '<textarea class="rise-quiz-exp-input" rows="2" placeholder="Explanation shown after answering...">' + explanation + '</textarea>' +
+              '</div>' +
+            '</div>' +
+            '<div class="rise-quiz-tab-content is-moodle" style="display: none;">' +
+              '<div class="rise-quiz-field">' +
+                '<label>Paste Moodle Question Bank Format (Aiken / GIFT Format)</label>' +
+                '<textarea class="rise-moodle-import-input" rows="7" placeholder="What is JVM in Java?\nA. Java Virtual Machine\nB. Java Visual Machine\nC. Just Virtual Memory\nANSWER: A\nEXPLANATION: JVM is the engine that executes bytecode."></textarea>' +
+                '<div style="font-size: 0.78rem; color: #64748b; margin-top: 4px;">Supports standard Moodle Question Bank export format (Aiken or GIFT).</div>' +
+                '<button type="button" class="rise-moodle-convert-btn" style="background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 700; cursor: pointer; margin-top: 8px; width: fit-content;">📥 Convert to Quiz</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="rise-quiz-tab-content is-activity" style="display: none;">' +
+              '<div class="rise-quiz-field">' +
+                '<label>Moodle Quiz Activity URL / ID</label>' +
+                '<input type="text" class="rise-moodle-act-url" placeholder="/mod/quiz/view.php?id=123" value="/mod/quiz/view.php?id=1">' +
+              '</div>' +
+              '<div class="rise-quiz-field">' +
+                '<label>Activity Title</label>' +
+                '<input type="text" class="rise-moodle-act-title" value="ការប្រឡងតេស្តពិន្ទុ (Official Moodle Quiz)">' +
+              '</div>' +
+              '<div class="rise-quiz-field">' +
+                '<label>Instructions</label>' +
+                '<textarea class="rise-moodle-act-desc" rows="3">សូមចុចប៊ូតុងខាងក្រោមដើម្បីចូលរួមធ្វើតេស្តប្រឡងពិន្ទុផ្លូវការនៅក្នុងប្រព័ន្ធ Moodle Quiz។</textarea>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rise-quiz-modal-footer">' +
+            '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">Apply to Lesson</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      $("body").append($modal);
+
+      var $optList = $modal.find(".rise-quiz-option-builder-list");
+
+      function renderOptions() {
+        $optList.empty();
+        options.forEach(function (opt, idx) {
+          var isCorr = idx === correctIndex ? 'checked="checked"' : '';
+          var $optRow = $('<div class="rise-quiz-option-builder-row">' +
+            '<input type="radio" name="rise_correct_choice" value="' + idx + '" ' + isCorr + ' title="Mark as correct answer">' +
+            '<input type="text" class="rise-opt-text-input" value="' + opt + '" placeholder="Choice text...">' +
+            '<button type="button" class="rise-opt-del-btn" style="background:#fee2e2;color:#dc2626;border:none;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">✕</button>' +
+          '</div>');
+
+          $optRow.find(".rise-opt-text-input").on("input", function () {
+            options[idx] = $(this).val();
+          });
+
+          $optRow.find('input[type="radio"]').on("change", function () {
+            correctIndex = idx;
+          });
+
+          $optRow.find(".rise-opt-del-btn").on("click", function () {
+            if (options.length <= 2) {
+              alert("Quiz must have at least 2 choices.");
+              return;
+            }
+            options.splice(idx, 1);
+            if (correctIndex >= options.length) correctIndex = 0;
+            renderOptions();
+          });
+
+          $optList.append($optRow);
+        });
+      }
+
+      renderOptions();
+
+      $modal.find(".rise-quiz-add-opt-btn").on("click", function () {
+        var letter = String.fromCharCode(65 + options.length);
+        options.push(letter + ". New Choice");
+        renderOptions();
+      });
+
+      // Tabs switching
+      $modal.find(".rise-quiz-tab-btn").on("click", function () {
+        var tab = $(this).data("tab");
+        $modal.find(".rise-quiz-tab-btn").removeClass("is-active");
+        $(this).addClass("is-active");
+        $modal.find(".rise-quiz-tab-content").hide();
+        $modal.find(".rise-quiz-tab-content.is-" + tab).show();
+      });
+
+      // Moodle Aiken / GIFT Importer
+      $modal.find(".rise-moodle-convert-btn").on("click", function () {
+        var rawText = $modal.find(".rise-moodle-import-input").val().trim();
+        if (!rawText) {
+          alert("Please paste questions in Aiken or GIFT format.");
+          return;
+        }
+
+        var lines = rawText.split("\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 0; });
+        var parsedQ = "";
+        var parsedOpts = [];
+        var parsedAnsLetter = "A";
+        var parsedExp = "";
+
+        lines.forEach(function (line) {
+          if (line.match(/^ANSWER:\s*([A-Z])/i)) {
+            parsedAnsLetter = line.match(/^ANSWER:\s*([A-Z])/i)[1].toUpperCase();
+          } else if (line.match(/^EXPLANATION:\s*(.*)/i) || line.match(/^FEEDBACK:\s*(.*)/i)) {
+            parsedExp = line.replace(/^(EXPLANATION|FEEDBACK):\s*/i, "");
+          } else if (line.match(/^[A-Z][\.\)]\s*(.*)/)) {
+            parsedOpts.push(line);
+          } else if (!parsedQ) {
+            parsedQ = line;
+          }
+        });
+
+        if (parsedQ && parsedOpts.length >= 2) {
+          questionText = parsedQ;
+          options = parsedOpts;
+          correctIndex = Math.max(0, parsedAnsLetter.charCodeAt(0) - 65);
+          if (parsedExp) explanation = parsedExp;
+
+          $modal.find(".rise-quiz-q-input").val(questionText);
+          $modal.find(".rise-quiz-exp-input").val(explanation);
+          renderOptions();
+
+          // Switch back to builder tab
+          $modal.find('.rise-quiz-tab-btn[data-tab="builder"]').trigger("click");
+          self.showToast("Moodle question imported successfully!");
+        } else {
+          alert("Could not parse question. Ensure format has question, choices (A., B., C.), and 'ANSWER: X'.");
+        }
+      });
+
+      $modal.find(".rise-image-modal-close, .rise-image-modal-btn.cancel").on("click", function () {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+
+      $modal.find(".rise-image-modal-btn.apply").on("click", function () {
+        var activeTab = $modal.find(".rise-quiz-tab-btn.is-active").data("tab");
+
+        if (activeTab === "activity") {
+          var actUrl = $modal.find(".rise-moodle-act-url").val().trim() || "/mod/quiz/view.php?id=1";
+          var actTitle = $modal.find(".rise-moodle-act-title").val().trim() || "Official Moodle Quiz";
+          var actDesc = $modal.find(".rise-moodle-act-desc").val().trim() || "Click below to attempt quiz.";
+
+          if (opts.onApply) {
+            opts.onApply({
+              isActivity: true,
+              url: actUrl,
+              title: actTitle,
+              desc: actDesc
+            });
+          }
+        } else {
+          var finalCat = $modal.find(".rise-quiz-cat-input").val().trim() || "Knowledge Check";
+          var finalQ = $modal.find(".rise-quiz-q-input").val().trim() || "Question";
+          var finalExp = $modal.find(".rise-quiz-exp-input").val().trim();
+
+          if (opts.onApply) {
+            opts.onApply({
+              isActivity: false,
+              category: finalCat,
+              question: finalQ,
+              options: options,
+              correctIndex: correctIndex,
+              explanation: finalExp
+            });
+          }
+        }
+
+        $modal.fadeOut(150, function () { $(this).remove(); });
+        self.showToast("Quiz updated successfully!");
       });
     };
 

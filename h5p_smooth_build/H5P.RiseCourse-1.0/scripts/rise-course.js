@@ -673,7 +673,78 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         });
       });
 
-      // 4. Process Quiz Blocks (MultiChoice, SingleChoice, TrueFalse)
+      // 4. Process Multi-Image Carousel / Slideshow Blocks
+      $container.find(".rise-carousel-container").each(function () {
+        var $car = $(this);
+        var $slides = $car.find(".rise-carousel-slide");
+        var $dots = $car.find(".rise-carousel-dot");
+        var slideIdx = parseInt($car.attr("data-slide-index"), 10) || 0;
+
+        function setSlide(i) {
+          if ($slides.length === 0) return;
+          if (i < 0) i = $slides.length - 1;
+          if (i >= $slides.length) i = 0;
+          slideIdx = i;
+          $car.attr("data-slide-index", slideIdx);
+          $slides.removeClass("is-active").eq(slideIdx).addClass("is-active");
+          $dots.removeClass("is-active").eq(slideIdx).addClass("is-active");
+        }
+
+        $car.find(".rise-carousel-btn.prev").off("click").on("click", function (e) {
+          e.stopPropagation();
+          setSlide(slideIdx - 1);
+        });
+
+        $car.find(".rise-carousel-btn.next").off("click").on("click", function (e) {
+          e.stopPropagation();
+          setSlide(slideIdx + 1);
+        });
+
+        $dots.off("click").on("click", function (e) {
+          e.stopPropagation();
+          var dIdx = parseInt($(this).attr("data-idx"), 10) || 0;
+          setSlide(dIdx);
+        });
+      });
+
+      // 5. Process Interactive Quiz Cards & Knowledge Checks
+      $container.find(".rise-quiz-card").each(function () {
+        var $qCard = $(this);
+        var $options = $qCard.find(".rise-quiz-option");
+        var $feedback = $qCard.find(".rise-quiz-feedback");
+        var $actions = $qCard.find(".rise-quiz-actions");
+        var $retryBtn = $qCard.find(".rise-quiz-retry-btn");
+        var correctIdx = parseInt($qCard.attr("data-correct"), 10) || 0;
+        var explanation = $qCard.attr("data-explanation") || "";
+
+        $options.off("click").on("click", function (e) {
+          e.stopPropagation();
+          if ($options.hasClass("is-correct") || $options.hasClass("is-incorrect")) return;
+
+          var chosenIdx = parseInt($(this).attr("data-opt-idx"), 10);
+          if (chosenIdx === correctIdx) {
+            $(this).addClass("is-correct");
+            $qCard.find(".rise-quiz-score-badge").text("1/1 (Correct)").css({ background: "#dcfce7", color: "#166534" });
+            $feedback.html('<strong>✓ Correct!</strong> ' + explanation).removeClass("is-incorrect").addClass("is-correct").slideDown(200);
+          } else {
+            $(this).addClass("is-incorrect");
+            $options.filter('[data-opt-idx="' + correctIdx + '"]').addClass("is-correct");
+            $qCard.find(".rise-quiz-score-badge").text("0/1 (Try Again)").css({ background: "#fee2e2", color: "#991b1b" });
+            $feedback.html('<strong>✕ Incorrect.</strong> ' + explanation).removeClass("is-correct").addClass("is-incorrect").slideDown(200);
+          }
+          $actions.show();
+        });
+
+        $retryBtn.off("click").on("click", function (e) {
+          e.stopPropagation();
+          $options.removeClass("is-correct is-incorrect is-selected");
+          $feedback.slideUp(150);
+          $actions.hide();
+          $qCard.find(".rise-quiz-score-badge").text("1 Point").css({ background: "#f1f5f9", color: "#64748b" });
+        });
+      });
+
+      // 6. Process Quiz Blocks (MultiChoice, SingleChoice, TrueFalse)
       $container.find(".h5p-multichoice, .h5p-single-choice-set, .h5p-true-false").each(function () {
         var $quiz = $(this);
         if ($quiz.find(".rise-quiz-header").length === 0) {
