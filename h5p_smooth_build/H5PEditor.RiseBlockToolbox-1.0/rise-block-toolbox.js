@@ -1111,17 +1111,7 @@
 
         $blockWrap.find(".is-edit").on("click", function (e) {
           e.stopPropagation();
-          var currentHtml = $blockWrap.find(".rise-canvas-block-inner").html();
-          self.openHtmlEditor({
-            content: currentHtml,
-            onApply: function (edited) {
-              if (edited !== null && edited !== undefined) {
-                $blockWrap.find(".rise-canvas-block-inner").html(edited);
-                self.saveAllBlocksFromCanvas($container, lesson);
-                self.renderActiveTabContent();
-              }
-            }
-          });
+          self.openBlockPropertyEditor($blockWrap, $container, lesson);
         });
 
         $blockWrap.find(".is-dup").on("click", function (e) {
@@ -1949,6 +1939,559 @@
         return $root;
       }
       return $("body");
+    };
+
+    /**
+     * Open Structured Visual Property Editor for any Block (No Raw HTML)
+     */
+    self.openBlockPropertyEditor = function ($blockWrap, $container, lesson) {
+      var $inner = $blockWrap.find(".rise-canvas-block-inner");
+      
+      // 1. Slideshow Carousel
+      if ($inner.find(".rise-carousel-container").length) {
+        var existingImages = [];
+        $inner.find(".rise-carousel-slide").each(function () {
+          var $s = $(this);
+          var src = $s.find("img").attr("src");
+          var cap = $s.find(".rise-carousel-slide-caption").text().trim();
+          if (src) existingImages.push({ url: src, caption: cap });
+        });
+        self.openImageEditor({
+          title: "Edit Slideshow Carousel (Multi-Image Upload)",
+          images: existingImages,
+          layout: "carousel",
+          onApply: function (pUrl, pAlt, imagesList, layout) {
+            if (layout === "carousel") {
+              var slidesHtml = "";
+              var dotsHtml = "";
+              imagesList.forEach(function (img, i) {
+                var isAct = i === 0 ? "is-active" : "";
+                slidesHtml += '<div class="rise-carousel-slide ' + isAct + '"><img src="' + img.url + '" alt="Slide ' + (i + 1) + '"><div class="rise-carousel-slide-caption">' + (img.caption || ('Slide ' + (i + 1))) + '</div></div>';
+                dotsHtml += '<span class="rise-carousel-dot ' + isAct + '" data-idx="' + i + '"></span>';
+              });
+              var newCarouselHtml = '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track">' + slidesHtml + '</div><button type="button" class="rise-carousel-btn prev" title="Previous Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="rise-carousel-btn next" title="Next Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button><div class="rise-carousel-dots">' + dotsHtml + '</div></div>';
+              $inner.html(newCarouselHtml);
+            } else if (layout === "grid2" || layout === "grid3") {
+              var gridCls = layout === "grid2" ? "rise-image-grid-2" : "rise-image-grid-3";
+              var cardsHtml = "";
+              imagesList.forEach(function (img, i) {
+                cardsHtml += '<div class="rise-image-card"><img src="' + img.url + '" alt="Item ' + (i + 1) + '"><div class="rise-image-card-caption">' + (img.caption || ('Item ' + (i + 1))) + '</div></div>';
+              });
+              $inner.html('<div class="' + gridCls + '">' + cardsHtml + '</div>');
+            } else {
+              $inner.html('<div class="rise-image-hero"><img src="' + pUrl + '" alt="' + pAlt + '"><div class="rise-image-hero-caption">' + pAlt + '</div></div>');
+            }
+            self.saveAllBlocksFromCanvas($container, lesson);
+            self.renderActiveTabContent();
+          }
+        });
+        return;
+      }
+
+      // 2. Multi-Image Grid (2-Column / 3-Column)
+      if ($inner.find(".rise-image-grid-2, .rise-image-grid-3").length) {
+        var existingImages = [];
+        $inner.find(".rise-image-card").each(function () {
+          var $c = $(this);
+          var src = $c.find("img").attr("src");
+          var cap = $c.find(".rise-image-card-caption").text().trim();
+          if (src) existingImages.push({ url: src, caption: cap });
+        });
+        var isGrid2 = $inner.find(".rise-image-grid-2").length > 0;
+        self.openImageEditor({
+          title: "Edit Image Gallery Grid",
+          images: existingImages,
+          layout: isGrid2 ? "grid2" : "grid3",
+          onApply: function (pUrl, pAlt, imagesList, layout) {
+            if (layout === "carousel") {
+              var slidesHtml = "";
+              var dotsHtml = "";
+              imagesList.forEach(function (img, i) {
+                var isAct = i === 0 ? "is-active" : "";
+                slidesHtml += '<div class="rise-carousel-slide ' + isAct + '"><img src="' + img.url + '" alt="Slide ' + (i + 1) + '"><div class="rise-carousel-slide-caption">' + (img.caption || ('Slide ' + (i + 1))) + '</div></div>';
+                dotsHtml += '<span class="rise-carousel-dot ' + isAct + '" data-idx="' + i + '"></span>';
+              });
+              var newCarouselHtml = '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track">' + slidesHtml + '</div><button type="button" class="rise-carousel-btn prev" title="Previous Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="rise-carousel-btn next" title="Next Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button><div class="rise-carousel-dots">' + dotsHtml + '</div></div>';
+              $inner.html(newCarouselHtml);
+            } else if (layout === "grid2" || layout === "grid3") {
+              var gridCls = layout === "grid2" ? "rise-image-grid-2" : "rise-image-grid-3";
+              var cardsHtml = "";
+              imagesList.forEach(function (img, i) {
+                cardsHtml += '<div class="rise-image-card"><img src="' + img.url + '" alt="Item ' + (i + 1) + '"><div class="rise-image-card-caption">' + (img.caption || ('Item ' + (i + 1))) + '</div></div>';
+              });
+              $inner.html('<div class="' + gridCls + '">' + cardsHtml + '</div>');
+            } else {
+              $inner.html('<div class="rise-image-hero"><img src="' + pUrl + '" alt="' + pAlt + '"><div class="rise-image-hero-caption">' + pAlt + '</div></div>');
+            }
+            self.saveAllBlocksFromCanvas($container, lesson);
+            self.renderActiveTabContent();
+          }
+        });
+        return;
+      }
+
+      // 3. Single Image Hero / Standalone Image (Not quote avatar)
+      if ($inner.find(".rise-image-hero").length || ($inner.find("img").length && !$inner.find(".rise-quote-block").length)) {
+        var src = $inner.find("img").attr("src") || "";
+        var cap = $inner.find(".rise-image-hero-caption").text().trim() || $inner.find("img").attr("alt") || "";
+        self.openImageEditor({
+          title: "Edit Image & Showcase",
+          currentUrl: src,
+          currentAlt: cap,
+          images: src ? [{ url: src, caption: cap }] : [],
+          layout: "single",
+          onApply: function (pUrl, pAlt, imagesList, layout) {
+            if (layout === "carousel") {
+              var slidesHtml = "";
+              var dotsHtml = "";
+              imagesList.forEach(function (img, i) {
+                var isAct = i === 0 ? "is-active" : "";
+                slidesHtml += '<div class="rise-carousel-slide ' + isAct + '"><img src="' + img.url + '" alt="Slide ' + (i + 1) + '"><div class="rise-carousel-slide-caption">' + (img.caption || ('Slide ' + (i + 1))) + '</div></div>';
+                dotsHtml += '<span class="rise-carousel-dot ' + isAct + '" data-idx="' + i + '"></span>';
+              });
+              var newCarouselHtml = '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track">' + slidesHtml + '</div><button type="button" class="rise-carousel-btn prev" title="Previous Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="rise-carousel-btn next" title="Next Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button><div class="rise-carousel-dots">' + dotsHtml + '</div></div>';
+              $inner.html(newCarouselHtml);
+            } else if (layout === "grid2" || layout === "grid3") {
+              var gridCls = layout === "grid2" ? "rise-image-grid-2" : "rise-image-grid-3";
+              var cardsHtml = "";
+              imagesList.forEach(function (img, i) {
+                cardsHtml += '<div class="rise-image-card"><img src="' + img.url + '" alt="Item ' + (i + 1) + '"><div class="rise-image-card-caption">' + (img.caption || ('Item ' + (i + 1))) + '</div></div>';
+              });
+              $inner.html('<div class="' + gridCls + '">' + cardsHtml + '</div>');
+            } else {
+              $inner.html('<div class="rise-image-hero"><img src="' + pUrl + '" alt="' + pAlt + '"><div class="rise-image-hero-caption">' + pAlt + '</div></div>');
+            }
+            self.saveAllBlocksFromCanvas($container, lesson);
+            self.renderActiveTabContent();
+          }
+        });
+        return;
+      }
+
+      // 4. Interactive Quiz Card
+      if ($inner.find(".rise-quiz-card").length) {
+        var $qCard = $inner.find(".rise-quiz-card");
+        var existingOpts = [];
+        $qCard.find(".rise-quiz-option").each(function () {
+          existingOpts.push($(this).find("span").first().text().trim());
+        });
+        self.openQuizEditor({
+          category: $qCard.find(".rise-quiz-tag").text().trim(),
+          question: $qCard.find(".rise-quiz-question").text().trim(),
+          options: existingOpts,
+          correctIndex: parseInt($qCard.attr("data-correct"), 10) || 0,
+          explanation: $qCard.attr("data-explanation") || "",
+          onApply: function (quizData) {
+            if (quizData.isActivity) {
+              var actHtml = '<div class="rise-moodle-embed-card" data-quiz-id="' + quizData.url + '"><div class="rise-moodle-embed-header-row"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-actions-top"></div></div><div class="rise-moodle-embed-title">' + quizData.title + '</div><div class="rise-moodle-embed-desc">' + quizData.desc + '</div><div class="rise-moodle-embed-btn-group"><button type="button" class="rise-moodle-embed-btn is-start"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Start Quiz Inline</span></button><a href="' + quizData.url + '" target="_blank" class="rise-moodle-embed-btn is-secondary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>Open in New Tab</span></a></div></div>';
+              $inner.html(actHtml);
+            } else {
+              var optsHtml = "";
+              quizData.options.forEach(function (opt, oIdx) {
+                optsHtml += '<div class="rise-quiz-option" data-opt-idx="' + oIdx + '"><span>' + opt + '</span><span class="rise-quiz-option-indicator"></span></div>';
+              });
+              var newQuizHtml = '<div class="rise-quiz-card" data-correct="' + quizData.correctIndex + '" data-explanation="' + quizData.explanation + '"><div class="rise-quiz-header"><div class="rise-quiz-tag">' + quizData.category + '</div><div class="rise-quiz-score-badge">1 Point</div></div><div class="rise-quiz-question">' + quizData.question + '</div><div class="rise-quiz-options">' + optsHtml + '</div><div class="rise-quiz-feedback"></div><div class="rise-quiz-actions" style="display: none;"><button type="button" class="rise-quiz-retry-btn"><span>🔄 Try Again</span></button></div></div>';
+              $inner.html(newQuizHtml);
+            }
+            self.saveAllBlocksFromCanvas($container, lesson);
+            self.renderActiveTabContent();
+          }
+        });
+        return;
+      }
+
+      // 5. Moodle Embed Card
+      if ($inner.find(".rise-moodle-embed-card").length) {
+        var $card = $inner.find(".rise-moodle-embed-card");
+        var quizId = $card.attr("data-quiz-id") || "1";
+        var quizUrl = $card.find("a.rise-moodle-embed-btn").attr("href") || ("/mod/quiz/view.php?id=" + quizId);
+        var quizTitle = $card.find(".rise-moodle-embed-title").text().trim() || "Official Moodle Quiz";
+        var quizDesc = $card.find(".rise-moodle-embed-desc").text().trim() || "";
+        self.openQuizEditor({
+          isActivity: true,
+          url: quizUrl,
+          title: quizTitle,
+          desc: quizDesc,
+          onApply: function (quizData) {
+            if (quizData.isActivity) {
+              var actHtml = '<div class="rise-moodle-embed-card" data-quiz-id="' + quizData.url + '"><div class="rise-moodle-embed-header-row"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-actions-top"></div></div><div class="rise-moodle-embed-title">' + quizData.title + '</div><div class="rise-moodle-embed-desc">' + quizData.desc + '</div><div class="rise-moodle-embed-btn-group"><button type="button" class="rise-moodle-embed-btn is-start"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Start Quiz Inline</span></button><a href="' + quizData.url + '" target="_blank" class="rise-moodle-embed-btn is-secondary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>Open in New Tab</span></a></div></div>';
+              $inner.html(actHtml);
+            } else {
+              var optsHtml = "";
+              quizData.options.forEach(function (opt, oIdx) {
+                optsHtml += '<div class="rise-quiz-option" data-opt-idx="' + oIdx + '"><span>' + opt + '</span><span class="rise-quiz-option-indicator"></span></div>';
+              });
+              var newQuizHtml = '<div class="rise-quiz-card" data-correct="' + quizData.correctIndex + '" data-explanation="' + quizData.explanation + '"><div class="rise-quiz-header"><div class="rise-quiz-tag">' + quizData.category + '</div><div class="rise-quiz-score-badge">1 Point</div></div><div class="rise-quiz-question">' + quizData.question + '</div><div class="rise-quiz-options">' + optsHtml + '</div><div class="rise-quiz-feedback"></div><div class="rise-quiz-actions" style="display: none;"><button type="button" class="rise-quiz-retry-btn"><span>🔄 Try Again</span></button></div></div>';
+              $inner.html(newQuizHtml);
+            }
+            self.saveAllBlocksFromCanvas($container, lesson);
+            self.renderActiveTabContent();
+          }
+        });
+        return;
+      }
+
+      // 6. Generic Modal Dialog Builder for All Other Blocks
+      $(".rise-prop-modal-backdrop").remove();
+
+      var isHeader = $inner.find(".rise-header-block").length > 0 || $inner.find(".rise-category-tag").length > 0;
+      var isQuote = $inner.find(".rise-quote-block").length > 0 || $inner.find(".rise-quote-text").length > 0;
+      var isCallout = $inner.find(".rise-callout, .rise-callout-info, .rise-callout-warning, .rise-callout-success").length > 0;
+      var isStat = $inner.find(".rise-stat-grid").length > 0;
+      var isList = $inner.find(".rise-bullet-list, .rise-check-list, ul, ol").length > 0;
+      var isVideo = $inner.find(".rise-video-card").length > 0 || $inner.find("iframe").length > 0;
+      var isAudio = $inner.find(".rise-audio-card").length > 0;
+
+      var modalTitle = "Edit Block Content";
+      var bodyFieldsHtml = "";
+
+      if (isHeader) {
+        modalTitle = "Edit Lesson Header";
+        var cat = $inner.find(".rise-category-tag").text().trim() || "Overview";
+        var title = $inner.find(".rise-main-title").text().trim() || "Lesson Title";
+        var desc = $inner.find(".rise-main-desc").text().trim() || "";
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🏷️ Category / Section Tag</label>' +
+          '<input type="text" class="rise-prop-input prop-header-cat" value="' + cat + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">📌 Lesson Title</label>' +
+          '<input type="text" class="rise-prop-input prop-header-title" value="' + title + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">📝 Overview Description</label>' +
+          '<textarea class="rise-prop-textarea prop-header-desc" rows="4">' + desc + '</textarea>' +
+        '</div>';
+      } else if (isQuote) {
+        modalTitle = "Edit Quote Block";
+        var qText = $inner.find(".rise-quote-text").text().replace(/^"|"$/g, "").trim() || "";
+        var aName = $inner.find(".rise-quote-name").text().trim() || "Instructor Name";
+        var aTitle = $inner.find(".rise-quote-title").text().trim() || "Role / Designation";
+        var aAvatar = $inner.find(".rise-quote-avatar").attr("src") || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80";
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">💬 Quote Text</label>' +
+          '<textarea class="rise-prop-textarea prop-quote-text" rows="3">' + qText + '</textarea>' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">👤 Author Name</label>' +
+          '<input type="text" class="rise-prop-input prop-quote-author" value="' + aName + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🎓 Author Role / Title</label>' +
+          '<input type="text" class="rise-prop-input prop-quote-title" value="' + aTitle + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🖼️ Author Photo / Avatar</label>' +
+          '<div class="rise-prop-img-box">' +
+            '<img src="' + aAvatar + '" class="rise-prop-img-thumb prop-quote-avatar-preview">' +
+            '<div class="rise-prop-img-inputs">' +
+              '<input type="text" class="rise-prop-input prop-quote-avatar" value="' + aAvatar + '" placeholder="Image URL...">' +
+              '<input type="file" class="prop-quote-file" accept="image/*" style="display: none;">' +
+              '<button type="button" class="rise-prop-btn-browse prop-quote-browse-btn">📁 Browse Photo...</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      } else if (isCallout) {
+        modalTitle = "Edit Callout Notice";
+        var curType = "info";
+        if ($inner.find(".rise-callout-warning").length) curType = "warning";
+        else if ($inner.find(".rise-callout-success").length) curType = "success";
+        var calloutText = $inner.text().trim() || "";
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🎨 Callout Style</label>' +
+          '<select class="rise-prop-select prop-callout-type">' +
+            '<option value="info" ' + (curType === "info" ? "selected" : "") + '>🔵 Note & Information (Blue)</option>' +
+            '<option value="warning" ' + (curType === "warning" ? "selected" : "") + '>🟠 Warning & Caution (Amber)</option>' +
+            '<option value="success" ' + (curType === "success" ? "selected" : "") + '>🟢 Pro Tip & Success (Green)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">📢 Message Content</label>' +
+          '<textarea class="rise-prop-textarea prop-callout-text" rows="4">' + calloutText + '</textarea>' +
+        '</div>';
+      } else if (isStat) {
+        modalTitle = "Edit Big Stat Metrics";
+        var statCards = [];
+        $inner.find(".rise-stat-card").each(function () {
+          statCards.push({
+            num: $(this).find(".rise-stat-number").text().trim() || "100%",
+            lbl: $(this).find(".rise-stat-label").text().trim() || "Metric Label"
+          });
+        });
+        if (!statCards.length) {
+          statCards = [{ num: "100%", lbl: "Cross-Platform" }, { num: "3B+", lbl: "Devices" }, { num: "#1", lbl: "Enterprise Choice" }];
+        }
+        var statRowsHtml = "";
+        statCards.forEach(function (sc, idx) {
+          statRowsHtml += '<div class="rise-prop-list-row prop-stat-row" data-idx="' + idx + '">' +
+            '<input type="text" class="rise-prop-input prop-stat-num" style="width: 120px; font-weight: 800; color: #2563eb;" value="' + sc.num + '" placeholder="e.g. 100%">' +
+            '<input type="text" class="rise-prop-input prop-stat-lbl" style="flex: 1;" value="' + sc.lbl + '" placeholder="Description / Label">' +
+            '<button type="button" class="rise-prop-list-del prop-stat-del" title="Delete">✕</button>' +
+          '</div>';
+        });
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">📊 Key Metric Cards</label>' +
+          '<div class="rise-prop-list-rows prop-stat-list-container">' + statRowsHtml + '</div>' +
+          '<button type="button" class="rise-prop-btn-add-item prop-add-stat-btn" style="margin-top: 8px;">+ Add Metric Card</button>' +
+        '</div>';
+      } else if (isList) {
+        modalTitle = "Edit List Items";
+        var listStyle = "glowing";
+        if ($inner.find(".rise-check-list").length) listStyle = "check";
+        else if ($inner.find("ol").length) listStyle = "numbered";
+        else if ($inner.find("ul:not(.rise-bullet-list)").length) listStyle = "bullet";
+
+        var listItems = [];
+        $inner.find("li").each(function () {
+          listItems.push($(this).text().trim());
+        });
+        if (!listItems.length) listItems = ["First list point", "Second list point"];
+
+        var listRowsHtml = "";
+        listItems.forEach(function (liText, idx) {
+          listRowsHtml += '<div class="rise-prop-list-row prop-list-item-row" data-idx="' + idx + '">' +
+            '<span class="rise-prop-list-row-handle">' + (idx + 1) + '.</span>' +
+            '<input type="text" class="rise-prop-input prop-list-item-val" style="flex: 1;" value="' + liText + '">' +
+            '<button type="button" class="rise-prop-list-del prop-list-del" title="Delete">✕</button>' +
+          '</div>';
+        });
+
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🎨 List Style</label>' +
+          '<select class="rise-prop-select prop-list-style">' +
+            '<option value="glowing" ' + (listStyle === "glowing" ? "selected" : "") + '>🔵 Glowing Blue Bullets</option>' +
+            '<option value="check" ' + (listStyle === "check" ? "selected" : "") + '>🟢 Checkmark Task List</option>' +
+            '<option value="numbered" ' + (listStyle === "numbered" ? "selected" : "") + '>🔢 Numbered Steps</option>' +
+            '<option value="bullet" ' + (listStyle === "bullet" ? "selected" : "") + '>⚫ Standard Bullets</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">📋 Items</label>' +
+          '<div class="rise-prop-list-rows prop-list-container">' + listRowsHtml + '</div>' +
+          '<button type="button" class="rise-prop-btn-add-item prop-add-list-item-btn" style="margin-top: 8px;">+ Add List Item</button>' +
+        '</div>';
+      } else if (isVideo) {
+        modalTitle = "Edit Video Lecture";
+        var vLabel = $inner.find(".rise-section-label").text().trim() || "Video Lecture";
+        var vTitle = $inner.find(".rise-section-heading").text().trim() || "Video Title";
+        var vUrl = $inner.find("iframe").attr("src") || "https://www.youtube.com/embed/eIrMbAQSU34";
+        var vCap = $inner.find(".rise-video-caption").text().trim() || "";
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🏷️ Section Badge</label>' +
+          '<input type="text" class="rise-prop-input prop-video-label" value="' + vLabel + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🎬 Video Title</label>' +
+          '<input type="text" class="rise-prop-input prop-video-title" value="' + vTitle + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🔗 YouTube / Video Embed URL</label>' +
+          '<input type="text" class="rise-prop-input prop-video-url" value="' + vUrl + '" placeholder="https://www.youtube.com/watch?v=...">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">📝 Caption & Notes</label>' +
+          '<textarea class="rise-prop-textarea prop-video-caption" rows="3">' + vCap + '</textarea>' +
+        '</div>';
+      } else if (isAudio) {
+        modalTitle = "Edit Audio Lesson";
+        var auTitle = $inner.find(".rise-audio-title").text().trim() || "Audio Lesson Overview";
+        var auDur = $inner.find(".rise-audio-duration").text().trim() || "Duration: 5 mins • Instructor";
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">🎧 Audio Title</label>' +
+          '<input type="text" class="rise-prop-input prop-audio-title" value="' + auTitle + '">' +
+        '</div>' +
+        '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">⏱️ Duration / Speaker Info</label>' +
+          '<input type="text" class="rise-prop-input prop-audio-dur" value="' + auDur + '">' +
+        '</div>';
+      } else {
+        // Generic Rich Paragraph / Body Text (Visual Mode: Clean text input, no raw HTML required)
+        modalTitle = "Edit Paragraph & Text";
+        var rawText = $inner.text().trim();
+        bodyFieldsHtml = '<div class="rise-prop-field">' +
+          '<label class="rise-prop-label">✍️ Paragraph Text Content</label>' +
+          '<div class="rise-prop-help">Type or paste your text below. Separate paragraphs with a blank line.</div>' +
+          '<textarea class="rise-prop-textarea prop-generic-text" rows="6" placeholder="Enter lesson text...">' + rawText + '</textarea>' +
+        '</div>';
+      }
+
+      var $modal = $('<div class="rise-prop-modal-backdrop">' +
+        '<div class="rise-prop-modal-dialog">' +
+          '<div class="rise-prop-modal-header">' +
+            '<div class="rise-prop-modal-title">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>' +
+              '<span>' + modalTitle + '</span>' +
+            '</div>' +
+            '<button type="button" class="rise-prop-modal-close" title="Close">✕</button>' +
+          '</div>' +
+          '<div class="rise-prop-modal-body">' + bodyFieldsHtml + '</div>' +
+          '<div class="rise-prop-modal-footer">' +
+            '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">Save Changes</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      self.getMountRoot().append($modal);
+
+      // Close handlers
+      $modal.find(".rise-prop-modal-close, .rise-image-modal-btn.cancel").on("click", function () {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+
+      $modal.on("click", function (e) {
+        if ($(e.target).hasClass("rise-prop-modal-backdrop")) {
+          $modal.fadeOut(150, function () { $(this).remove(); });
+        }
+      });
+
+      // Photo browse for quote avatar
+      if (isQuote) {
+        var $avatarInp = $modal.find(".prop-quote-avatar");
+        var $avatarPrev = $modal.find(".prop-quote-avatar-preview");
+        var $fileInp = $modal.find(".prop-quote-file");
+        $modal.find(".prop-quote-browse-btn").on("click", function () {
+          $fileInp.trigger("click");
+        });
+        $fileInp.on("change", function () {
+          if (this.files && this.files[0]) {
+            self.uploadImageFile(this.files[0], function (err, serverUrl, dataUrl) {
+              var finalUrl = serverUrl || dataUrl;
+              $avatarInp.val(finalUrl);
+              $avatarPrev.attr("src", finalUrl);
+            });
+          }
+        });
+        $avatarInp.on("input blur", function () {
+          $avatarPrev.attr("src", $(this).val());
+        });
+      }
+
+      // Dynamic stat rows
+      if (isStat) {
+        var $statContainer = $modal.find(".prop-stat-list-container");
+        $statContainer.on("click", ".prop-stat-del", function () {
+          $(this).closest(".prop-stat-row").remove();
+        });
+        $modal.find(".prop-add-stat-btn").on("click", function () {
+          var $newRow = $('<div class="rise-prop-list-row prop-stat-row">' +
+            '<input type="text" class="rise-prop-input prop-stat-num" style="width: 120px; font-weight: 800; color: #2563eb;" value="100%" placeholder="e.g. 100%">' +
+            '<input type="text" class="rise-prop-input prop-stat-lbl" style="flex: 1;" value="New Metric" placeholder="Description / Label">' +
+            '<button type="button" class="rise-prop-list-del prop-stat-del" title="Delete">✕</button>' +
+          '</div>');
+          $statContainer.append($newRow);
+        });
+      }
+
+      // Dynamic list rows
+      if (isList) {
+        var $listContainer = $modal.find(".prop-list-container");
+        $listContainer.on("click", ".prop-list-del", function () {
+          $(this).closest(".prop-list-item-row").remove();
+          $listContainer.find(".prop-list-item-row").each(function (idx) {
+            $(this).find(".rise-prop-list-row-handle").text((idx + 1) + ".");
+          });
+        });
+        $modal.find(".prop-add-list-item-btn").on("click", function () {
+          var nextNum = $listContainer.find(".prop-list-item-row").length + 1;
+          var $newRow = $('<div class="rise-prop-list-row prop-list-item-row">' +
+            '<span class="rise-prop-list-row-handle">' + nextNum + '.</span>' +
+            '<input type="text" class="rise-prop-input prop-list-item-val" style="flex: 1;" value="New list item point">' +
+            '<button type="button" class="rise-prop-list-del prop-list-del" title="Delete">✕</button>' +
+          '</div>');
+          $listContainer.append($newRow);
+        });
+      }
+
+      // Apply button handler
+      $modal.find(".rise-image-modal-btn.apply").on("click", function () {
+        if (isHeader) {
+          var newCat = $modal.find(".prop-header-cat").val().trim() || "Overview";
+          var newTitle = $modal.find(".prop-header-title").val().trim() || "Lesson Title";
+          var newDesc = $modal.find(".prop-header-desc").val().trim();
+          $inner.find(".rise-category-tag").text(newCat);
+          $inner.find(".rise-main-title").text(newTitle);
+          $inner.find(".rise-main-desc").text(newDesc);
+        } else if (isQuote) {
+          var newQ = $modal.find(".prop-quote-text").val().trim();
+          var newA = $modal.find(".prop-quote-author").val().trim();
+          var newT = $modal.find(".prop-quote-title").val().trim();
+          var newAv = $modal.find(".prop-quote-avatar").val().trim();
+          $inner.find(".rise-quote-text").text('"' + newQ + '"');
+          $inner.find(".rise-quote-name").text(newA);
+          $inner.find(".rise-quote-title").text(newT);
+          if (newAv) $inner.find(".rise-quote-avatar").attr("src", newAv);
+        } else if (isCallout) {
+          var cType = $modal.find(".prop-callout-type").val();
+          var cMsg = $modal.find(".prop-callout-text").val().trim();
+          var calloutHtml = "";
+          if (cType === "warning") {
+            calloutHtml = '<div class="rise-callout-warning">' + cMsg + '</div>';
+          } else if (cType === "success") {
+            calloutHtml = '<div class="rise-callout-success">' + cMsg + '</div>';
+          } else {
+            calloutHtml = '<div class="rise-callout rise-callout-info"><div>' + cMsg + '</div></div>';
+          }
+          $inner.html(calloutHtml);
+        } else if (isStat) {
+          var stats = [];
+          $modal.find(".prop-stat-row").each(function () {
+            var n = $(this).find(".prop-stat-num").val().trim();
+            var l = $(this).find(".prop-stat-lbl").val().trim();
+            if (n || l) stats.push({ num: n, lbl: l });
+          });
+          var statsHtml = stats.map(function (s) {
+            return '<div class="rise-stat-card"><div class="rise-stat-number">' + s.num + '</div><div class="rise-stat-label">' + s.lbl + '</div></div>';
+          }).join("");
+          $inner.html('<div class="rise-stat-grid">' + statsHtml + '</div>');
+        } else if (isList) {
+          var lStyle = $modal.find(".prop-list-style").val();
+          var items = [];
+          $modal.find(".prop-list-item-val").each(function () {
+            var val = $(this).val().trim();
+            if (val) items.push(val);
+          });
+          var tag = lStyle === "numbered" ? "ol" : "ul";
+          var cls = "";
+          if (lStyle === "glowing") cls = 'class="rise-bullet-list"';
+          else if (lStyle === "check") cls = 'class="rise-check-list"';
+          var itemsHtml = items.map(function (it) { return '<li>' + it + '</li>'; }).join("");
+          $inner.html('<' + tag + ' ' + cls + '>' + itemsHtml + '</' + tag + '>');
+        } else if (isVideo) {
+          var vl = $modal.find(".prop-video-label").val().trim() || "Video Lecture";
+          var vt = $modal.find(".prop-video-title").val().trim() || "Video Title";
+          var vu = $modal.find(".prop-video-url").val().trim() || "https://www.youtube.com/embed/eIrMbAQSU34";
+          var vc = $modal.find(".prop-video-caption").val().trim();
+          if (vu.indexOf("youtube.com/watch?v=") !== -1) {
+            vu = vu.replace("youtube.com/watch?v=", "youtube.com/embed/");
+          } else if (vu.indexOf("youtu.be/") !== -1) {
+            vu = vu.replace("youtu.be/", "youtube.com/embed/");
+          }
+          var videoHtml = '<div class="rise-video-card">' +
+            '<div class="rise-video-header"><div class="rise-section-label">' + vl + '</div><h3 class="rise-section-heading">' + vt + '</h3></div>' +
+            '<div class="rise-video-wrapper"><iframe src="' + vu + '" allowfullscreen></iframe></div>' +
+            '<div class="rise-video-caption">' + vc + '</div>' +
+          '</div>';
+          $inner.html(videoHtml);
+        } else if (isAudio) {
+          var at = $modal.find(".prop-audio-title").val().trim() || "Audio Lesson";
+          var ad = $modal.find(".prop-audio-dur").val().trim() || "Duration: 5 mins";
+          $inner.find(".rise-audio-title").text(at);
+          $inner.find(".rise-audio-duration").text(ad);
+        } else {
+          var rawTxt = $modal.find(".prop-generic-text").val().trim();
+          var pars = rawTxt.split("\n\n").filter(function(p) { return p.trim().length > 0; });
+          var paragraphsHtml = pars.map(function (p) {
+            return '<p style="font-size: 1.05rem; line-height: 1.75; color: #334155; margin: 14px 0;">' + p.replace(/\n/g, '<br>') + '</p>';
+          }).join("");
+          $inner.html(paragraphsHtml || rawTxt);
+        }
+
+        self.saveAllBlocksFromCanvas($container, lesson);
+        self.renderActiveTabContent();
+        $modal.fadeOut(150, function () { $(this).remove(); });
+        self.showToast("Block updated successfully!");
+      });
     };
 
     /**

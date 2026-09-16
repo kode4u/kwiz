@@ -17,6 +17,12 @@
   --rise-border: #e2e8f0;
 }
 
+/* Hide redundant raw H5P fieldsets so Moodle edit page stays compact */
+.field-name-courseMeta,
+.field-name-sections {
+  display: none !important;
+}
+
 /* --------------------------------------------------------------------------
    1. Studio Root Container (Full Width / Fullscreen Studio)
    -------------------------------------------------------------------------- */
@@ -26,7 +32,7 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  margin: 10px 0 30px 0;
+  margin: 10px 0 20px 0;
   font-family: var(--rise-font);
   display: flex;
   flex-direction: column;
@@ -228,8 +234,9 @@ body.rise-studio-body-fullscreen {
    -------------------------------------------------------------------------- */
 .rise-visual-workspace {
   display: flex;
-  height: calc(100vh - 120px);
-  min-height: 600px;
+  height: 640px;
+  max-height: 80vh;
+  min-height: 520px;
   background: #ffffff;
   position: relative;
   overflow: hidden;
@@ -807,14 +814,14 @@ body.rise-studio-body-fullscreen {
 .rise-canvas-cover-hero {
   position: relative;
   width: 100%;
-  min-height: 440px;
+  min-height: 240px;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 50px 24px;
+  padding: 30px 20px;
   box-sizing: border-box;
 }
 
@@ -2763,6 +2770,265 @@ body.is-rise-dragging .rise-canvas-drop-zone {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+/* ==========================================================================
+   Visual Block Property Editor Modal (No Raw HTML)
+   ========================================================================== */
+.rise-prop-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: riseFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--rise-font);
+}
+
+.rise-prop-modal-dialog {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+}
+
+.rise-prop-modal-header {
+  background: #0f172a;
+  color: #ffffff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+  flex-shrink: 0;
+}
+
+.rise-prop-modal-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f8fafc;
+}
+
+.rise-prop-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.rise-prop-modal-close:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.rise-prop-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.rise-prop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rise-prop-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rise-prop-help {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.rise-prop-input,
+.rise-prop-textarea,
+.rise-prop-select {
+  width: 100%;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #0f172a;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.rise-prop-input:focus,
+.rise-prop-textarea:focus,
+.rise-prop-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  background: #ffffff;
+}
+
+.rise-prop-textarea {
+  min-height: 90px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.rise-prop-img-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.rise-prop-img-thumb {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  flex-shrink: 0;
+}
+
+.rise-prop-img-inputs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rise-prop-btn-browse {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  transition: all 0.2s ease;
+}
+
+.rise-prop-btn-browse:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.rise-prop-list-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rise-prop-list-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rise-prop-list-row-handle {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 20px;
+  text-align: center;
+}
+
+.rise-prop-list-del {
+  background: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.rise-prop-list-del:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.rise-prop-btn-add-item {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.rise-prop-btn-add-item:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.rise-prop-modal-footer {
+  padding: 14px 20px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 
