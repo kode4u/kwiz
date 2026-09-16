@@ -810,176 +810,327 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         });
       });
 
-      // 5. Process Embedded Moodle Quizzes (Re-render Moodle Quiz into Rise Style)
-      $container.find("iframe, .rise-moodle-quiz").each(function () {
-        var $frame = $(this);
-        var src = $frame.attr("src") || $frame.attr("data-quiz-url") || "";
-        if (src.indexOf("mod/quiz") !== -1 || $frame.hasClass("rise-moodle-quiz")) {
-          $frame.addClass("rise-moodle-quiz-frame");
-          
-          var applyRiseQuizTheme = function () {
-            try {
-              var frameDoc = $frame.get(0).contentDocument || ($frame.get(0).contentWindow && $frame.get(0).contentWindow.document);
-              if (!frameDoc || !frameDoc.head) return;
-              if (frameDoc.getElementById("rise-moodle-quiz-injected-style")) return;
-
-              var styleEl = frameDoc.createElement("style");
-              styleEl.id = "rise-moodle-quiz-injected-style";
-              styleEl.textContent = `
-                #page-header, #page-footer, #nav-drawer, .navbar, .drawer, .activity-header, 
-                .secondary-navigation, .block, #region-main-settings-menu, .submitbtns .btn-secondary,
-                .mod_quiz-prev-nav, .qn_buttons, .info, .accesshide, #nav-message-popover-container,
-                .drawer-toggles, header#page-header, footer#page-footer {
-                  display: none !important;
-                }
-                html, body {
-                  background: transparent !important;
-                  padding: 0 !important;
-                  margin: 0 !important;
-                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  color: #1e293b !important;
-                }
-                #page, #page-content, #region-main, .region-main-wrapper, [role="main"] {
-                  background: transparent !important;
-                  padding: 0 !important;
-                  margin: 0 !important;
-                  border: none !important;
-                }
-                .que {
-                  background: #ffffff !important;
-                  border: 1px solid #e2e8f0 !important;
-                  border-radius: 16px !important;
-                  padding: 24px 28px !important;
-                  margin: 0 0 28px 0 !important;
-                  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
-                  transition: box-shadow 0.25s ease, border-color 0.25s ease !important;
-                }
-                .que:hover {
-                  border-color: #cbd5e1 !important;
-                  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08) !important;
-                }
-                .que .content {
-                  margin: 0 !important;
-                  padding: 0 !important;
-                }
-                .que .qtext {
-                  font-size: 1.25rem !important;
-                  font-weight: 700 !important;
-                  color: #0f172a !important;
-                  line-height: 1.6 !important;
-                  border-bottom: 1.5px solid #f1f5f9 !important;
-                  padding-bottom: 18px !important;
-                  margin-bottom: 20px !important;
-                }
-                .que .answer {
-                  display: flex !important;
-                  flex-direction: column !important;
-                  gap: 12px !important;
-                  margin-top: 16px !important;
-                }
-                .que .answer .r0, .que .answer .r1, .que .form-check {
-                  display: flex !important;
-                  align-items: center !important;
-                  padding: 14px 20px !important;
-                  border-radius: 10px !important;
-                  background: #f8fafc !important;
-                  border: 1.5px solid #e2e8f0 !important;
-                  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                  cursor: pointer !important;
-                  margin: 0 !important;
-                }
-                .que .answer .r0:hover, .que .answer .r1:hover, .que .form-check:hover {
-                  background: #f1f5f9 !important;
-                  border-color: #94a3b8 !important;
-                  transform: translateX(4px) !important;
-                }
-                .que .answer input[type="radio"]:checked + label,
-                .que .answer input[type="checkbox"]:checked + label,
-                .que .form-check:has(input:checked) {
-                  background: #eff6ff !important;
-                  border-color: #3b82f6 !important;
-                  box-shadow: 0 0 0 1px #3b82f6, 0 4px 12px rgba(59, 130, 246, 0.12) !important;
-                }
-                .que .form-check-input, .que input[type="radio"], .que input[type="checkbox"] {
-                  width: 20px !important;
-                  height: 20px !important;
-                  min-width: 20px !important;
-                  margin-right: 14px !important;
-                  cursor: pointer !important;
-                  accent-color: #2563eb !important;
-                }
-                .que .form-check-label, .que label {
-                  font-size: 1.05rem !important;
-                  color: #334155 !important;
-                  font-weight: 500 !important;
-                  cursor: pointer !important;
-                  margin: 0 !important;
-                  line-height: 1.5 !important;
-                }
-                .que .outcome, .que .feedback, .que .specificfeedback, .que .rightanswer {
-                  margin-top: 18px !important;
-                  padding: 16px 20px !important;
-                  border-radius: 10px !important;
-                  font-size: 0.98rem !important;
-                  line-height: 1.6 !important;
-                }
-                .que .outcome .feedback, .que.correct .outcome {
-                  background: #f0fdf4 !important;
-                  border: 1px solid #86efac !important;
-                  color: #166534 !important;
-                }
-                .que.incorrect .outcome {
-                  background: #fef2f2 !important;
-                  border: 1px solid #fca5a5 !important;
-                  color: #991b1b !important;
-                }
-                .submitbtns, .mod_quiz-next-nav {
-                  margin-top: 24px !important;
-                  display: flex !important;
-                  justify-content: flex-end !important;
-                }
-                .submitbtns input[type="submit"], .mod_quiz-next-nav input[type="submit"], .btn-primary {
-                  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
-                  color: #ffffff !important;
-                  border: none !important;
-                  border-radius: 8px !important;
-                  padding: 12px 32px !important;
-                  font-size: 1.02rem !important;
-                  font-weight: 700 !important;
-                  cursor: pointer !important;
-                  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.28) !important;
-                  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                }
-                .submitbtns input[type="submit"]:hover, .btn-primary:hover {
-                  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
-                  transform: translateY(-2px) !important;
-                  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.38) !important;
-                }
-              `;
-              frameDoc.head.appendChild(styleEl);
-
-              // Auto-adjust iframe height dynamically
-              var adjustHeight = function () {
-                var h = frameDoc.body.scrollHeight || frameDoc.documentElement.scrollHeight;
-                if (h > 120) {
-                  $frame.css("height", (h + 30) + "px");
-                }
-              };
-              adjustHeight();
-              setTimeout(adjustHeight, 400);
-              setTimeout(adjustHeight, 1200);
-
-              if (window.ResizeObserver) {
-                new ResizeObserver(adjustHeight).observe(frameDoc.body);
-              }
-            } catch (e) {
-              // Cross-origin fallback
+      // 5. Process Embedded Moodle Quizzes & .rise-moodle-embed-card
+      $container.find(".rise-moodle-embed-card").each(function () {
+        var $card = $(this);
+        var quizId = $card.attr("data-quiz-id") || "";
+        var quizUrl = $card.find("a.rise-moodle-embed-btn").attr("href") || ("/mod/quiz/view.php?id=" + (quizId || "1"));
+        
+        if (!$card.find(".rise-moodle-quiz-embed-container").length) {
+          var $btnRow = $card.find(".rise-moodle-embed-btn-group");
+          if (!$btnRow.length) {
+            $btnRow = $('<div class="rise-moodle-embed-btn-group"></div>');
+            var $origBtn = $card.find("a.rise-moodle-embed-btn");
+            if ($origBtn.length) {
+              $origBtn.replaceWith($btnRow);
+            } else {
+              $card.append($btnRow);
             }
-          };
+          }
 
-          $frame.on("load", applyRiseQuizTheme);
-          setTimeout(applyRiseQuizTheme, 500);
+          var $startBtn = $('<button type="button" class="rise-moodle-embed-btn is-start" title="Attempt Quiz Directly inside Lesson">' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+            '<span>Start Quiz Inline</span>' +
+          '</button>');
+
+          var $openExtBtn = $('<a href="' + quizUrl + '" target="_blank" class="rise-moodle-embed-btn is-secondary" title="Open Quiz in New Window">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+            '<span>Open in New Tab</span>' +
+          '</a>');
+
+          $btnRow.empty().append($startBtn).append($openExtBtn);
+
+          var $embedContainer = $('<div class="rise-moodle-quiz-embed-container" style="display: none;">' +
+            '<div class="rise-moodle-quiz-loading-overlay">' +
+              '<div class="rise-moodle-quiz-loading-spinner"></div>' +
+              '<span>Loading Official Moodle Quiz...</span>' +
+            '</div>' +
+          '</div>');
+          $card.append($embedContainer);
+
+          $startBtn.on("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var isCurrentlyVisible = $embedContainer.is(":visible");
+            if (isCurrentlyVisible) {
+              $embedContainer.slideUp(200);
+              $card.removeClass("is-expanded");
+              $startBtn.html('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Start Quiz Inline</span>');
+            } else {
+              $embedContainer.slideDown(250);
+              $card.addClass("is-expanded");
+              $startBtn.html('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Collapse Quiz</span>');
+
+              if (!$embedContainer.find("iframe").length) {
+                var $iframe = $('<iframe class="rise-moodle-quiz-embed-frame" src="' + quizUrl + '" allow="fullscreen" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>');
+                $embedContainer.append($iframe);
+
+                var setupIframeTheme = function () {
+                  try {
+                    var frameDoc = $iframe.get(0).contentDocument || ($iframe.get(0).contentWindow && $iframe.get(0).contentWindow.document);
+                    if (!frameDoc || !frameDoc.head) return;
+
+                    $embedContainer.find(".rise-moodle-quiz-loading-overlay").fadeOut(200);
+
+                    if (!frameDoc.getElementById("rise-moodle-quiz-injected-style")) {
+                      var styleEl = frameDoc.createElement("style");
+                      styleEl.id = "rise-moodle-quiz-injected-style";
+                      styleEl.textContent = `
+                        #page-header, #page-footer, #nav-drawer, .navbar, .drawer, .activity-header, 
+                        .secondary-navigation, .block, #region-main-settings-menu, .submitbtns .btn-secondary,
+                        .mod_quiz-prev-nav, .qn_buttons, .info, .accesshide, #nav-message-popover-container,
+                        .drawer-toggles, header#page-header, footer#page-footer {
+                          display: none !important;
+                        }
+                        html, body {
+                          background: #ffffff !important;
+                          padding: 16px 20px !important;
+                          margin: 0 !important;
+                          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                          color: #1e293b !important;
+                        }
+                        #page, #page-content, #region-main, .region-main-wrapper, [role="main"] {
+                          background: transparent !important;
+                          padding: 0 !important;
+                          margin: 0 !important;
+                          border: none !important;
+                        }
+                        .que {
+                          background: #ffffff !important;
+                          border: 1.5px solid #e2e8f0 !important;
+                          border-radius: 16px !important;
+                          padding: 24px 28px !important;
+                          margin: 0 0 24px 0 !important;
+                          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+                          transition: all 0.2s ease !important;
+                        }
+                        .que:hover {
+                          border-color: #cbd5e1 !important;
+                          box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08) !important;
+                        }
+                        .que .content {
+                          margin: 0 !important;
+                          padding: 0 !important;
+                        }
+                        .que .qtext {
+                          font-size: 1.25rem !important;
+                          font-weight: 700 !important;
+                          color: #0f172a !important;
+                          line-height: 1.6 !important;
+                          border-bottom: 1.5px solid #f1f5f9 !important;
+                          padding-bottom: 18px !important;
+                          margin-bottom: 20px !important;
+                        }
+                        .que .answer {
+                          display: flex !important;
+                          flex-direction: column !important;
+                          gap: 12px !important;
+                          margin-top: 16px !important;
+                        }
+                        .que .answer .r0, .que .answer .r1, .que .form-check {
+                          display: flex !important;
+                          align-items: center !important;
+                          padding: 14px 20px !important;
+                          border-radius: 10px !important;
+                          background: #f8fafc !important;
+                          border: 1.5px solid #e2e8f0 !important;
+                          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                          cursor: pointer !important;
+                          margin: 0 !important;
+                        }
+                        .que .answer .r0:hover, .que .answer .r1:hover, .que .form-check:hover {
+                          background: #f1f5f9 !important;
+                          border-color: #94a3b8 !important;
+                          transform: translateX(4px) !important;
+                        }
+                        .que .answer input[type="radio"]:checked + label,
+                        .que .answer input[type="checkbox"]:checked + label,
+                        .que .form-check:has(input:checked) {
+                          background: #eff6ff !important;
+                          border-color: #3b82f6 !important;
+                          box-shadow: 0 0 0 1px #3b82f6, 0 4px 12px rgba(59, 130, 246, 0.12) !important;
+                        }
+                        .que .form-check-input, .que input[type="radio"], .que input[type="checkbox"] {
+                          width: 20px !important;
+                          height: 20px !important;
+                          min-width: 20px !important;
+                          margin-right: 14px !important;
+                          cursor: pointer !important;
+                          accent-color: #2563eb !important;
+                        }
+                        .que .form-check-label, .que label {
+                          font-size: 1.05rem !important;
+                          color: #334155 !important;
+                          font-weight: 500 !important;
+                          cursor: pointer !important;
+                          margin: 0 !important;
+                          line-height: 1.5 !important;
+                        }
+                        .que .outcome, .que .feedback, .que .specificfeedback, .que .rightanswer {
+                          margin-top: 18px !important;
+                          padding: 16px 20px !important;
+                          border-radius: 10px !important;
+                          font-size: 0.98rem !important;
+                          line-height: 1.6 !important;
+                        }
+                        .que .outcome .feedback, .que.correct .outcome {
+                          background: #f0fdf4 !important;
+                          border: 1px solid #86efac !important;
+                          color: #166534 !important;
+                        }
+                        .que.incorrect .outcome {
+                          background: #fef2f2 !important;
+                          border: 1px solid #fca5a5 !important;
+                          color: #991b1b !important;
+                        }
+                        .submitbtns, .mod_quiz-next-nav {
+                          margin-top: 24px !important;
+                          display: flex !important;
+                          justify-content: flex-end !important;
+                        }
+                        .submitbtns input[type="submit"], .mod_quiz-next-nav input[type="submit"], .btn-primary, .btn-secondary {
+                          background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+                          color: #ffffff !important;
+                          border: none !important;
+                          border-radius: 8px !important;
+                          padding: 12px 32px !important;
+                          font-size: 1.02rem !important;
+                          font-weight: 700 !important;
+                          cursor: pointer !important;
+                          box-shadow: 0 4px 14px rgba(30, 58, 138, 0.28) !important;
+                          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                        }
+                        .submitbtns input[type="submit"]:hover, .btn-primary:hover {
+                          background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+                          transform: translateY(-2px) !important;
+                          box-shadow: 0 6px 20px rgba(30, 58, 138, 0.38) !important;
+                        }
+                      `;
+                      frameDoc.head.appendChild(styleEl);
+                    }
+
+                    var adjustHeight = function () {
+                      var h = frameDoc.body.scrollHeight || frameDoc.documentElement.scrollHeight;
+                      if (h > 200) {
+                        $iframe.css("height", (h + 30) + "px");
+                        $embedContainer.css("min-height", (h + 30) + "px");
+                      }
+                    };
+                    adjustHeight();
+                    setTimeout(adjustHeight, 300);
+                    setTimeout(adjustHeight, 1000);
+
+                    if (window.ResizeObserver) {
+                      new ResizeObserver(adjustHeight).observe(frameDoc.body);
+                    }
+                  } catch (err) {
+                    $embedContainer.find(".rise-moodle-quiz-loading-overlay").fadeOut(200);
+                  }
+                };
+
+                $iframe.on("load", setupIframeTheme);
+                setTimeout(setupIframeTheme, 600);
+              }
+            }
+          });
         }
+      });
+
+      // Standalone iframe Moodle quizzes
+      $container.find("iframe.rise-moodle-quiz, iframe[src*='mod/quiz']").each(function () {
+        var $frame = $(this);
+        $frame.addClass("rise-moodle-quiz-frame");
+        
+        var applyRiseQuizTheme = function () {
+          try {
+            var frameDoc = $frame.get(0).contentDocument || ($frame.get(0).contentWindow && $frame.get(0).contentWindow.document);
+            if (!frameDoc || !frameDoc.head) return;
+            if (frameDoc.getElementById("rise-moodle-quiz-injected-style")) return;
+
+            var styleEl = frameDoc.createElement("style");
+            styleEl.id = "rise-moodle-quiz-injected-style";
+            styleEl.textContent = `
+              #page-header, #page-footer, #nav-drawer, .navbar, .drawer, .activity-header, 
+              .secondary-navigation, .block, #region-main-settings-menu, .submitbtns .btn-secondary,
+              .mod_quiz-prev-nav, .qn_buttons, .info, .accesshide, #nav-message-popover-container,
+              .drawer-toggles, header#page-header, footer#page-footer {
+                display: none !important;
+              }
+              html, body {
+                background: #ffffff !important;
+                padding: 16px 20px !important;
+                margin: 0 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                color: #1e293b !important;
+              }
+              #page, #page-content, #region-main, .region-main-wrapper, [role="main"] {
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+              }
+              .que {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                border-radius: 16px !important;
+                padding: 24px 28px !important;
+                margin: 0 0 28px 0 !important;
+                box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+                transition: box-shadow 0.25s ease, border-color 0.25s ease !important;
+              }
+              .que .qtext {
+                font-size: 1.25rem !important;
+                font-weight: 700 !important;
+                color: #0f172a !important;
+                line-height: 1.6 !important;
+                border-bottom: 1.5px solid #f1f5f9 !important;
+                padding-bottom: 18px !important;
+                margin-bottom: 20px !important;
+              }
+              .que .answer {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                margin-top: 16px !important;
+              }
+              .que .answer .r0, .que .answer .r1, .que .form-check {
+                display: flex !important;
+                align-items: center !important;
+                padding: 14px 20px !important;
+                border-radius: 10px !important;
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                cursor: pointer !important;
+                margin: 0 !important;
+              }
+              .que .answer input[type="radio"]:checked + label,
+              .que .answer input[type="checkbox"]:checked + label,
+              .que .form-check:has(input:checked) {
+                background: #eff6ff !important;
+                border-color: #3b82f6 !important;
+              }
+            `;
+            frameDoc.head.appendChild(styleEl);
+
+            var adjustHeight = function () {
+              var h = frameDoc.body.scrollHeight || frameDoc.documentElement.scrollHeight;
+              if (h > 120) {
+                $frame.css("height", (h + 30) + "px");
+              }
+            };
+            adjustHeight();
+            setTimeout(adjustHeight, 400);
+            setTimeout(adjustHeight, 1200);
+
+            if (window.ResizeObserver) {
+              new ResizeObserver(adjustHeight).observe(frameDoc.body);
+            }
+          } catch (e) {}
+        };
+
+        $frame.on("load", applyRiseQuizTheme);
+        setTimeout(applyRiseQuizTheme, 500);
       });
 
       // 6. Process Video and Iframe Embeds (Auto Fill Width & 16:9 Aspect Ratio)

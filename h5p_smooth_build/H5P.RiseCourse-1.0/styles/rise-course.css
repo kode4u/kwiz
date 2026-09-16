@@ -2519,14 +2519,30 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
 .rise-moodle-embed-card {
   background: #0f172a !important;
   color: #ffffff !important;
-  border-radius: 12px !important;
+  border-radius: 16px !important;
   padding: 24px !important;
-  margin: 24px 0 !important;
+  margin: 28px 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 14px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  gap: 16px !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25) !important;
   border: 1px solid #1e293b !important;
+  position: relative !important;
+  transition: all 0.25s ease !important;
+}
+
+.rise-moodle-embed-card.is-expanded {
+  background: #0b1120 !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 16px 40px rgba(59, 130, 246, 0.2) !important;
+}
+
+.rise-moodle-embed-header-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
 }
 
 .rise-moodle-embed-badge {
@@ -2538,40 +2554,116 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
   font-size: 0.725rem !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
   padding: 4px 10px !important;
   border-radius: 6px !important;
   width: fit-content !important;
 }
 
 .rise-moodle-embed-title {
-  font-size: 1.3rem !important;
+  font-size: 1.35rem !important;
   font-weight: 800 !important;
   color: #ffffff !important;
+  margin: 0 !important;
 }
 
 .rise-moodle-embed-desc {
-  font-size: 0.9rem !important;
+  font-size: 0.925rem !important;
   color: #94a3b8 !important;
-  line-height: 1.5 !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+}
+
+.rise-moodle-embed-btn-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
 }
 
 .rise-moodle-embed-btn {
   background: #2563eb !important;
   color: #ffffff !important;
+  border: none !important;
   text-decoration: none !important;
-  padding: 12px 24px !important;
+  padding: 12px 22px !important;
   border-radius: 8px !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  width: fit-content !important;
-  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .rise-moodle-embed-btn:hover {
   background: #1d4ed8 !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
+}
+
+.rise-moodle-embed-btn.is-secondary {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.rise-moodle-embed-btn.is-secondary:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Embedded Quiz Frame Container inside Rise Card */
+.rise-moodle-quiz-embed-container {
+  width: 100% !important;
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  margin-top: 12px !important;
+  position: relative !important;
+  min-height: 480px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.rise-moodle-quiz-embed-frame {
+  width: 100% !important;
+  min-height: 520px !important;
+  border: none !important;
+  display: block !important;
+  background: #ffffff !important;
+}
+
+.rise-moodle-quiz-loading-overlay {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: #f8fafc !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  z-index: 10 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.rise-moodle-quiz-loading-spinner {
+  width: 36px !important;
+  height: 36px !important;
+  border: 3px solid #e2e8f0 !important;
+  border-top-color: #2563eb !important;
+  border-radius: 50% !important;
+  animation: riseSpin 0.8s linear infinite !important;
+}
+
+@keyframes riseSpin {
+  to { transform: rotate(360deg); }
 }

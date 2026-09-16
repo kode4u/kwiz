@@ -237,10 +237,10 @@
             id: "moodle_quiz_activity",
             name: "Moodle Quiz Block",
             badge: "Moodle Plugin",
-            desc: "Moodle Question Bank & Quiz activity embed",
+            desc: "Embeds official Moodle Quiz inline with full questions and logic in Articulate Rise style",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
-            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 10px;"><div style="color: #f97316; font-weight: bold;">Moodle Quiz</div><div>Official Course Exam</div></div>',
-            content: '<div class="rise-moodle-embed-card" data-quiz-id="1"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-title">ការប្រឡងតេស្តពិន្ទុ (Official Moodle Quiz)</div><div class="rise-moodle-embed-desc">សូមចុចប៊ូតុងខាងក្រោមដើម្បីចូលរួមធ្វើតេស្តប្រឡងពិន្ទុផ្លូវការនៅក្នុងប្រព័ន្ធ Moodle Quiz។</div><a href="/mod/quiz/view.php?id=1" target="_blank" class="rise-moodle-embed-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg><span>Open Moodle Quiz Test</span></a></div>'
+            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 10px;"><div style="color: #f97316; font-weight: bold;">Moodle Quiz Plugin</div><div>Official Course Exam</div></div>',
+            content: '<div class="rise-moodle-embed-card" data-quiz-id="1"><div class="rise-moodle-embed-header-row"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-actions-top"></div></div><div class="rise-moodle-embed-title">ការប្រឡងតេស្តពិន្ទុ (Official Moodle Quiz)</div><div class="rise-moodle-embed-desc">សូមចុចប៊ូតុងខាងក្រោមដើម្បីចូលរួមធ្វើតេស្តប្រឡងពិន្ទុផ្លូវការនៅក្នុងប្រព័ន្ធ Moodle Quiz។</div><div class="rise-moodle-embed-btn-group"><button type="button" class="rise-moodle-embed-btn is-start"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Start Quiz Inline</span></button><a href="/mod/quiz/view.php?id=1" target="_blank" class="rise-moodle-embed-btn is-secondary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>Open in New Tab</span></a></div></div>'
           },
           {
             id: "flip_flashcards",
@@ -1320,6 +1320,62 @@
               });
             });
           }
+        });
+
+        // 3. Process Moodle Quiz Embed Activity Cards
+        $blockWrap.find(".rise-moodle-embed-card").each(function () {
+          var $card = $(this);
+          var quizId = $card.attr("data-quiz-id") || "1";
+          var quizUrl = $card.find("a.rise-moodle-embed-btn").attr("href") || ("/mod/quiz/view.php?id=" + quizId);
+          var quizTitle = $card.find(".rise-moodle-embed-title").text().trim() || "Official Moodle Quiz";
+          var quizDesc = $card.find(".rise-moodle-embed-desc").text().trim() || "";
+
+          // Add Edit / Config Quiz button
+          if (!$card.find(".rise-moodle-config-btn").length) {
+            var $cfgBtn = $('<button type="button" class="rise-moodle-config-btn" style="position: absolute; top: 14px; right: 14px; z-index: 10; background: rgba(59, 130, 246, 0.2); color: #38bdf8; border: 1px solid #3b82f6; border-radius: 6px; padding: 4px 10px; font-size: 0.725rem; font-weight: 700; cursor: pointer;">' +
+              '<span>⚙️ Configure Quiz Embed</span>' +
+            '</button>');
+            $card.prepend($cfgBtn);
+
+            $cfgBtn.on("click", function (e) {
+              e.stopPropagation();
+              self.openQuizEditor({
+                isActivity: true,
+                url: quizUrl,
+                title: quizTitle,
+                desc: quizDesc,
+                onApply: function (quizData) {
+                  if (quizData.isActivity) {
+                    var actHtml = '<div class="rise-moodle-embed-card" data-quiz-id="' + quizData.url + '"><div class="rise-moodle-embed-header-row"><div class="rise-moodle-embed-badge">Moodle Quiz Plugin</div><div class="rise-moodle-embed-actions-top"></div></div><div class="rise-moodle-embed-title">' + quizData.title + '</div><div class="rise-moodle-embed-desc">' + quizData.desc + '</div><div class="rise-moodle-embed-btn-group"><button type="button" class="rise-moodle-embed-btn is-start"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Start Quiz Inline</span></button><a href="' + quizData.url + '" target="_blank" class="rise-moodle-embed-btn is-secondary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>Open in New Tab</span></a></div></div>';
+                    $blockWrap.find(".rise-canvas-block-inner").html(actHtml);
+                  } else {
+                    var optsHtml = "";
+                    quizData.options.forEach(function (opt, oIdx) {
+                      optsHtml += '<div class="rise-quiz-option" data-opt-idx="' + oIdx + '"><span>' + opt + '</span><span class="rise-quiz-option-indicator"></span></div>';
+                    });
+                    var newQuizHtml = '<div class="rise-quiz-card" data-correct="' + quizData.correctIndex + '" data-explanation="' + quizData.explanation + '"><div class="rise-quiz-header"><div class="rise-quiz-tag">' + quizData.category + '</div><div class="rise-quiz-score-badge">1 Point</div></div><div class="rise-quiz-question">' + quizData.question + '</div><div class="rise-quiz-options">' + optsHtml + '</div><div class="rise-quiz-feedback"></div><div class="rise-quiz-actions" style="display: none;"><button type="button" class="rise-quiz-retry-btn"><span>🔄 Try Again</span></button></div></div>';
+                    $blockWrap.find(".rise-canvas-block-inner").html(newQuizHtml);
+                  }
+                  self.saveAllBlocksFromCanvas($container, lesson);
+                  self.renderActiveTabContent();
+                }
+              });
+            });
+          }
+
+          // Toggle inline embed in studio
+          $card.find(".rise-moodle-embed-btn.is-start").off("click").on("click", function (e) {
+            e.stopPropagation();
+            var $embedContainer = $card.find(".rise-moodle-quiz-embed-container");
+            if (!$embedContainer.length) {
+              $embedContainer = $('<div class="rise-moodle-quiz-embed-container" style="display: none;">' +
+                '<iframe class="rise-moodle-quiz-embed-frame" src="' + quizUrl + '" allow="fullscreen"></iframe>' +
+              '</div>');
+              $card.append($embedContainer);
+            }
+            $embedContainer.slideToggle(200);
+            $card.toggleClass("is-expanded");
+          });
         });
 
         // 3. Attach image editing triggers to every image in this block
