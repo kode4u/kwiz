@@ -680,9 +680,22 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         var $slides = $car.find(".rise-carousel-slide");
         var $dots = $car.find(".rise-carousel-dot");
         var slideIdx = parseInt($car.attr("data-slide-index"), 10) || 0;
+        var autoSlideTimer = null;
+
+        // Ensure SVG chevrons for prev/next buttons
+        var $prevBtn = $car.find(".rise-carousel-btn.prev");
+        var $nextBtn = $car.find(".rise-carousel-btn.next");
+
+        if ($prevBtn.length && !$prevBtn.find("svg").length) {
+          $prevBtn.html('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>');
+        }
+        if ($nextBtn.length && !$nextBtn.find("svg").length) {
+          $nextBtn.html('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>');
+        }
 
         function setSlide(i) {
           if ($slides.length === 0) return;
+          $track.removeClass("is-peeking");
           if (i < 0) i = $slides.length - 1;
           if (i >= $slides.length) i = 0;
           slideIdx = i;
@@ -694,20 +707,57 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
         setSlide(slideIdx);
 
-        $car.find(".rise-carousel-btn.prev").off("click").on("click", function (e) {
+        function startAutoSlide() {
+          stopAutoSlide();
+          if ($slides.length > 1) {
+            autoSlideTimer = setInterval(function () {
+              setSlide(slideIdx + 1);
+            }, 3000);
+          }
+        }
+
+        function stopAutoSlide() {
+          if (autoSlideTimer) {
+            clearInterval(autoSlideTimer);
+            autoSlideTimer = null;
+          }
+        }
+
+        // Auto slide 3 seconds with pause on hover
+        startAutoSlide();
+        $car.off("mouseenter.riseCar").on("mouseenter.riseCar", stopAutoSlide);
+        $car.off("mouseleave.riseCar").on("mouseleave.riseCar", startAutoSlide);
+
+        // Teaser / Peek on start if more than 1 slide
+        if ($slides.length > 1 && !$car.data("has-peeked")) {
+          $car.data("has-peeked", true);
+          setTimeout(function () {
+            if (slideIdx === 0 && !$car.is(":hover")) {
+              $track.addClass("is-peeking");
+              setTimeout(function () {
+                $track.removeClass("is-peeking");
+              }, 950);
+            }
+          }, 600);
+        }
+
+        $prevBtn.off("click").on("click", function (e) {
           e.stopPropagation();
           setSlide(slideIdx - 1);
+          startAutoSlide();
         });
 
-        $car.find(".rise-carousel-btn.next").off("click").on("click", function (e) {
+        $nextBtn.off("click").on("click", function (e) {
           e.stopPropagation();
           setSlide(slideIdx + 1);
+          startAutoSlide();
         });
 
         $dots.off("click").on("click", function (e) {
           e.stopPropagation();
           var dIdx = parseInt($(this).attr("data-idx"), 10) || 0;
           setSlide(dIdx);
+          startAutoSlide();
         });
       });
 

@@ -2003,6 +2003,17 @@ body.is-rise-dragging .rise-canvas-drop-zone {
   box-sizing: border-box !important;
 }
 
+@keyframes riseCarouselPeek {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(-48px); }
+  65% { transform: translateX(-48px); }
+  100% { transform: translateX(0); }
+}
+
+.rise-carousel-track.is-peeking {
+  animation: riseCarouselPeek 0.95s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
 .rise-carousel-slide {
   flex: 0 0 100% !important;
   width: 100% !important;
@@ -2043,33 +2054,39 @@ body.is-rise-dragging .rise-canvas-drop-zone {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.65);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .rise-carousel-btn:hover {
   background: #2563eb;
-  border-color: #2563eb;
-  transform: translateY(-50%) scale(1.1);
+  border-color: #3b82f6;
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+.rise-carousel-btn svg {
+  display: block;
 }
 
 .rise-carousel-btn.prev {
-  left: 14px;
+  left: 16px;
 }
 
 .rise-carousel-btn.next {
-  right: 14px;
+  right: 16px;
 }
 
 .rise-carousel-dots {

@@ -170,7 +170,7 @@
             desc: "Multi-image carousel with slide navigation",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
             previewHtml: '<div style="background: #0f172a; border-radius: 6px; overflow: hidden; position: relative;"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 55px; object-fit: cover;"><div style="display: flex; justify-content: center; gap: 3px; padding: 3px; background: #0b1120;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #38bdf8;"></span><span style="width: 5px; height: 5px; border-radius: 50%; background: #475569;"></span></div></div>',
-            content: '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track"><div class="rise-carousel-slide is-active"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slide 1"><div class="rise-carousel-slide-caption"><strong>1. Code Editor & IDE</strong> — បរិស្ថានសម្រាប់សរសេរកូដ Java ប្រកបដោយប្រសិទ្ធភាព</div></div><div class="rise-carousel-slide"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" alt="Slide 2"><div class="rise-carousel-slide-caption"><strong>2. Java Architecture</strong> — ដំណើរការ Java Bytecode នៅលើ JVM</div></div></div><button type="button" class="rise-carousel-btn prev" title="Previous Slide">‹</button><button type="button" class="rise-carousel-btn next" title="Next Slide">›</button><div class="rise-carousel-dots"><span class="rise-carousel-dot is-active" data-idx="0"></span><span class="rise-carousel-dot" data-idx="1"></span></div></div>'
+            content: '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track"><div class="rise-carousel-slide is-active"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Slide 1"><div class="rise-carousel-slide-caption"><strong>1. Code Editor & IDE</strong> — បរិស្ថានសម្រាប់សរសេរកូដ Java ប្រកបដោយប្រសិទ្ធភាព</div></div><div class="rise-carousel-slide"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" alt="Slide 2"><div class="rise-carousel-slide-caption"><strong>2. Java Architecture</strong> — ដំណើរការ Java Bytecode នៅលើ JVM</div></div></div><button type="button" class="rise-carousel-btn prev" title="Previous Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="rise-carousel-btn next" title="Next Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button><div class="rise-carousel-dots"><span class="rise-carousel-dot is-active" data-idx="0"></span><span class="rise-carousel-dot" data-idx="1"></span></div></div>'
           },
           {
             id: "image_slider_preview",
@@ -1166,9 +1166,22 @@
           var $slides = $car.find(".rise-carousel-slide");
           var $dots = $car.find(".rise-carousel-dot");
           var slideIdx = parseInt($car.attr("data-slide-index"), 10) || 0;
+          var autoSlideTimer = null;
+
+          // Ensure SVG chevrons for prev/next buttons
+          var $prevBtn = $car.find(".rise-carousel-btn.prev");
+          var $nextBtn = $car.find(".rise-carousel-btn.next");
+
+          if ($prevBtn.length && !$prevBtn.find("svg").length) {
+            $prevBtn.html('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>');
+          }
+          if ($nextBtn.length && !$nextBtn.find("svg").length) {
+            $nextBtn.html('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>');
+          }
 
           function setSlide(i) {
             if ($slides.length === 0) return;
+            $track.removeClass("is-peeking");
             if (i < 0) i = $slides.length - 1;
             if (i >= $slides.length) i = 0;
             slideIdx = i;
@@ -1180,20 +1193,56 @@
 
           setSlide(slideIdx);
 
-          $car.find(".rise-carousel-btn.prev").off("click").on("click", function (e) {
+          function startAutoSlide() {
+            stopAutoSlide();
+            if ($slides.length > 1) {
+              autoSlideTimer = setInterval(function () {
+                setSlide(slideIdx + 1);
+              }, 3000);
+            }
+          }
+
+          function stopAutoSlide() {
+            if (autoSlideTimer) {
+              clearInterval(autoSlideTimer);
+              autoSlideTimer = null;
+            }
+          }
+
+          startAutoSlide();
+          $car.off("mouseenter.riseCar").on("mouseenter.riseCar", stopAutoSlide);
+          $car.off("mouseleave.riseCar").on("mouseleave.riseCar", startAutoSlide);
+
+          // Teaser / Peek on start if more than 1 slide
+          if ($slides.length > 1 && !$car.data("has-peeked")) {
+            $car.data("has-peeked", true);
+            setTimeout(function () {
+              if (slideIdx === 0 && !$car.is(":hover")) {
+                $track.addClass("is-peeking");
+                setTimeout(function () {
+                  $track.removeClass("is-peeking");
+                }, 950);
+              }
+            }, 600);
+          }
+
+          $prevBtn.off("click").on("click", function (e) {
             e.stopPropagation();
             setSlide(slideIdx - 1);
+            startAutoSlide();
           });
 
-          $car.find(".rise-carousel-btn.next").off("click").on("click", function (e) {
+          $nextBtn.off("click").on("click", function (e) {
             e.stopPropagation();
             setSlide(slideIdx + 1);
+            startAutoSlide();
           });
 
           $dots.off("click").on("click", function (e) {
             e.stopPropagation();
             var dIdx = parseInt($(this).attr("data-idx"), 10) || 0;
             setSlide(dIdx);
+            startAutoSlide();
           });
 
           // Add Manage Slides action button to carousel
@@ -1226,7 +1275,7 @@
                       slidesHtml += '<div class="rise-carousel-slide ' + isAct + '"><img src="' + img.url + '" alt="Slide ' + (i + 1) + '"><div class="rise-carousel-slide-caption">' + (img.caption || ('Slide ' + (i + 1))) + '</div></div>';
                       dotsHtml += '<span class="rise-carousel-dot ' + isAct + '" data-idx="' + i + '"></span>';
                     });
-                    var newCarouselHtml = '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track">' + slidesHtml + '</div><button type="button" class="rise-carousel-btn prev" title="Previous Slide">‹</button><button type="button" class="rise-carousel-btn next" title="Next Slide">›</button><div class="rise-carousel-dots">' + dotsHtml + '</div></div>';
+                    var newCarouselHtml = '<div class="rise-carousel-container" data-slide-index="0"><div class="rise-carousel-track">' + slidesHtml + '</div><button type="button" class="rise-carousel-btn prev" title="Previous Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="rise-carousel-btn next" title="Next Slide"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button><div class="rise-carousel-dots">' + dotsHtml + '</div></div>';
                     $blockWrap.find(".rise-canvas-block-inner").html(newCarouselHtml);
                   } else if (layout === "grid2" || layout === "grid3") {
                     var gridCls = layout === "grid2" ? "rise-image-grid-2" : "rise-image-grid-3";
