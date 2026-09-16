@@ -48,3 +48,21 @@
 .h5p-video.h5p-panopto iframe {
   display: block;
 }
+
+/* Full width responsive video player */
+.h5p-video {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 20px 0 !important;
+}
+
+.h5p-video > video {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+.h5p-video iframe {
+  width: 100% !important;
+}

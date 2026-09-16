@@ -891,6 +891,25 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           setTimeout(applyRiseQuizTheme, 500);
         }
       });
+
+      // 6. Process Video and Iframe Embeds (Auto Fill Width & 16:9 Aspect Ratio)
+      $container.find("iframe, video, .h5p-video").each(function () {
+        var $media = $(this);
+        if ($media.closest(".rise-code-window, .rise-moodle-quiz-frame, .h5p-audio-inner").length) return;
+        var src = $media.attr("src") || "";
+        // If it's YouTube / Vimeo / HTML5 video and NOT already inside .rise-video-wrapper
+        if ($media.is("video, .h5p-video") || src.indexOf("youtube") !== -1 || src.indexOf("youtu.be") !== -1 || src.indexOf("vimeo") !== -1) {
+          if (!$media.parent().hasClass("rise-video-wrapper") && !$media.hasClass("rise-video-wrapper") && !$media.closest(".rise-video-wrapper").length) {
+            // If it's inside a .rise-video-card, ensure direct wrapper
+            if ($media.parent().hasClass("rise-video-card")) {
+              $media.wrap('<div class="rise-video-wrapper"></div>');
+            } else if (!$media.hasClass("h5p-video")) {
+              // Wrap standalone iframe/video in a responsive 16:9 wrapper
+              $media.wrap('<div class="rise-video-wrapper" style="margin: 20px 0; border-radius: 14px; overflow: hidden;"></div>');
+            }
+          }
+        }
+      });
     };
 
     /**

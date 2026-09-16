@@ -793,3 +793,117 @@ ul.rise-bullet-list:not(.rise-has-dom-badges) > li::before,
   line-height: inherit !important;
   color: inherit !important;
 }
+
+/* ==========================================================================
+   Articulate Rise Full-Width Responsive Video Player
+   ========================================================================== */
+
+/* 1. Rise Video Card (Full Width Container) */
+.rise-video-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 28px 0 !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.rise-video-header {
+  padding: 18px 24px !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.rise-video-header .rise-section-label {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #3b82f6 !important;
+  margin-bottom: 4px !important;
+}
+
+.rise-video-header .rise-section-heading {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* 2. Responsive 16:9 Video Wrapper */
+.rise-video-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  padding-bottom: 56.25% !important; /* 16:9 Aspect Ratio */
+  height: 0 !important;
+  overflow: hidden !important;
+  background: #000000 !important;
+}
+
+.rise-video-wrapper iframe,
+.rise-video-wrapper video,
+.rise-video-wrapper object,
+.rise-video-wrapper embed {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  display: block !important;
+}
+
+/* 3. Rise Video Caption */
+.rise-video-caption {
+  padding: 14px 20px !important;
+  font-size: 0.95rem !important;
+  color: #64748b !important;
+  background: #ffffff !important;
+  border-top: 1px solid #f1f5f9 !important;
+  line-height: 1.5 !important;
+}
+
+/* 4. Native H5P.Video Full-Width & Pro Styling */
+.h5p-column .h5p-video,
+.h5p-video {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  margin: 24px 0 !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
+  background: #0f172a !important;
+}
+
+.h5p-column .h5p-video video,
+.h5p-video video {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  border-radius: 16px !important;
+}
+
+.h5p-column .h5p-video iframe,
+.h5p-video iframe {
+  width: 100% !important;
+  border: 0 !important;
+}
+
+/* 5. Any standalone YouTube/Vimeo iframe */
+.h5p-advanced-text iframe[src*="youtube.com"],
+.h5p-advanced-text iframe[src*="youtu.be"],
+.h5p-advanced-text iframe[src*="vimeo.com"],
+.h5p-column iframe[src*="youtube.com"],
+.h5p-column iframe[src*="youtu.be"],
+.h5p-column iframe[src*="vimeo.com"] {
+  width: 100% !important;
+  min-height: 420px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+}
