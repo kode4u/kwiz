@@ -1119,3 +1119,278 @@ body.is-rise-dragging .rise-canvas-drop-zone {
 .field-name-params .h5peditor-copypaste-wrap {
   display: none !important;
 }
+
+/* --------------------------------------------------------------------------
+   8. Image Editable Overlay & Upload Modal
+   -------------------------------------------------------------------------- */
+.rise-image-hero,
+.rise-image-card,
+.rise-quote-avatar-wrap {
+  position: relative;
+}
+
+.rise-img-edit-trigger {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 0.725rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+  z-index: 15;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.rise-image-hero:hover .rise-img-edit-trigger,
+.rise-image-card:hover .rise-img-edit-trigger,
+.rise-quote-block:hover .rise-img-edit-trigger,
+.rise-canvas-block-wrapper:hover .rise-img-edit-trigger {
+  opacity: 1;
+}
+
+.rise-img-edit-trigger:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+  transform: scale(1.04);
+}
+
+/* Modal Dialog */
+.rise-image-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: riseFadeIn 0.2s ease;
+  font-family: var(--rise-font);
+}
+
+@keyframes riseFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rise-image-modal-dialog {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 540px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid #e2e8f0;
+}
+
+.rise-image-modal-header {
+  background: #0f172a;
+  color: #ffffff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+}
+
+.rise-image-modal-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+}
+
+.rise-image-modal-close {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.rise-image-modal-close:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.rise-image-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* File Upload Drop Zone */
+.rise-image-upload-dropzone {
+  border: 2px dashed #38bdf8;
+  background: #f0f9ff;
+  border-radius: 10px;
+  padding: 22px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rise-image-upload-dropzone:hover,
+.rise-image-upload-dropzone.is-dragover {
+  border-color: #2563eb;
+  background: #e0f2fe;
+}
+
+.rise-image-browse-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.rise-image-browse-btn:hover {
+  background: #1d4ed8;
+}
+
+.rise-image-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rise-image-modal-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rise-image-modal-field input {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.rise-image-modal-field input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.rise-image-modal-preview-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rise-image-modal-preview-label {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.rise-image-modal-preview-img-wrap {
+  width: 100%;
+  height: 160px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rise-image-modal-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rise-image-modal-footer {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.rise-image-modal-btn {
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rise-image-modal-btn.cancel {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.rise-image-modal-btn.cancel:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.rise-image-modal-btn.apply {
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #2563eb;
+}
+
+.rise-image-modal-btn.apply:hover {
+  background: #1d4ed8;
+}
+

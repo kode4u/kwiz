@@ -592,13 +592,18 @@
       });
 
       // Change Cover Image
-      $cover.find(".rise-canvas-change-cover-btn").on("click", function () {
-        var url = prompt("Enter cover image URL (e.g. Unsplash URL):", coverImg);
-        if (url && url.trim()) {
-          meta.coverImageUrl = url.trim();
-          $cover.find(".rise-canvas-cover-hero").css("background-image", "url('" + url.trim() + "')");
-          self.syncField("courseMeta/coverImageUrl", url.trim());
-        }
+      $cover.find(".rise-canvas-change-cover-btn").on("click", function (e) {
+        e.stopPropagation();
+        self.openImageEditor({
+          title: "Change Cover Photo",
+          currentUrl: meta.coverImageUrl || coverImg,
+          currentAlt: meta.title || "Course Cover",
+          onApply: function (newUrl, newAlt) {
+            meta.coverImageUrl = newUrl;
+            $cover.find(".rise-canvas-cover-hero").css("background-image", "url('" + newUrl + "')");
+            self.syncField("courseMeta/coverImageUrl", newUrl);
+          }
+        });
       });
 
       function saveDescription() {
@@ -851,10 +856,35 @@
           }
         });
 
-        $blockWrap.find(".is-delete").on("click", function (e) {
-          e.stopPropagation();
-          $blockWrap.remove();
-          self.saveAllBlocksFromCanvas($container, lesson);
+        // Attach image editing triggers to every image in this block
+        $blockWrap.find(".rise-canvas-block-inner img").each(function () {
+          var $img = $(this);
+          var $imgParent = $img.parent();
+          if (!$imgParent.find(".rise-img-edit-trigger").length) {
+            $imgParent.css("position", "relative");
+            var $editBtn = $('<button type="button" class="rise-img-edit-trigger" title="Change / Upload Image">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+              '<span>Change Image</span>' +
+            '</button>');
+            $imgParent.append($editBtn);
+
+            $editBtn.add($img).on("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              self.openImageEditor({
+                title: "Edit & Upload Image",
+                currentUrl: $img.attr("src"),
+                currentAlt: $img.attr("alt") || "",
+                onApply: function (newUrl, newAlt) {
+                  $img.attr("src", newUrl);
+                  if (newAlt) {
+                    $img.attr("alt", newAlt);
+                  }
+                  self.saveAllBlocksFromCanvas($container, lesson);
+                }
+              });
+            });
+          }
         });
 
         $container.append($blockWrap);
@@ -1019,6 +1049,202 @@
             self.insertBlock(item.content, dropIdx);
           }
         }
+      });
+    };
+
+    /**
+     * Upload Image File to H5P/Moodle Server with instant DataURL fallback
+     */
+    self.uploadImageFile = function (file, callback) {
+      if (!file) return;
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var dataUrl = e.target.result;
+
+        try {
+          var ajaxUrl = (window.H5PEditor && typeof window.H5PEditor.getAjaxUrl === "function")
+            ? window.H5PEditor.getAjaxUrl("files")
+            : null;
+
+          if (ajaxUrl) {
+            var formData = new FormData();
+            formData.append("file", file, file.name);
+            formData.append("field", JSON.stringify({ name: "image", type: "image" }));
+            formData.append("contentId", (window.H5PEditor && window.H5PEditor.contentId) || 0);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", ajaxUrl, true);
+            xhr.onload = function () {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  var response = JSON.parse(xhr.responseText);
+                  if (response && response.path) {
+                    var serverPath = response.path;
+                    if (window.H5P && typeof window.H5P.getPath === "function") {
+                      serverPath = window.H5P.getPath(response.path, (window.H5PEditor && window.H5PEditor.contentId) || 0);
+                    }
+                    callback(null, serverPath, dataUrl);
+                    return;
+                  }
+                } catch (err) {}
+              }
+              callback(null, dataUrl, dataUrl);
+            };
+            xhr.onerror = function () {
+              callback(null, dataUrl, dataUrl);
+            };
+            xhr.send(formData);
+            return;
+          }
+        } catch (err) {}
+
+        callback(null, dataUrl, dataUrl);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    /**
+     * Open Image Settings and Upload Modal
+     */
+    self.openImageEditor = function (opts) {
+      opts = opts || {};
+      var currentUrl = opts.currentUrl || "";
+      var currentAlt = opts.currentAlt || "";
+      var modalTitle = opts.title || "Edit & Upload Image";
+
+      $(".rise-image-modal-backdrop").remove();
+
+      var $modal = $('<div class="rise-image-modal-backdrop">' +
+        '<div class="rise-image-modal-dialog">' +
+          '<div class="rise-image-modal-header">' +
+            '<div class="rise-image-modal-title">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+              '<span>' + modalTitle + '</span>' +
+            '</div>' +
+            '<button type="button" class="rise-image-modal-close" title="Close">✕</button>' +
+          '</div>' +
+          '<div class="rise-image-modal-body">' +
+            '<div class="rise-image-upload-dropzone">' +
+              '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+              '<div style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">Upload image from your computer</div>' +
+              '<div style="font-size: 0.78rem; color: #64748b;">Click browse or drag and drop image file here</div>' +
+              '<input type="file" class="rise-image-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" style="display: none;">' +
+              '<button type="button" class="rise-image-browse-btn">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
+                '<span>Choose File</span>' +
+              '</button>' +
+              '<div class="rise-image-upload-status" style="font-size: 0.75rem; font-weight: 700; color: #16a34a; display: none;"></div>' +
+            '</div>' +
+            '<div class="rise-image-modal-field">' +
+              '<label>Or Paste Web Image URL</label>' +
+              '<input type="text" class="rise-image-url-input" placeholder="https://images.unsplash.com/..." value="' + currentUrl + '">' +
+            '</div>' +
+            '<div class="rise-image-modal-field">' +
+              '<label>Image Caption / Alt Description</label>' +
+              '<input type="text" class="rise-image-alt-input" placeholder="Enter image description..." value="' + currentAlt + '">' +
+            '</div>' +
+            '<div class="rise-image-modal-preview-box">' +
+              '<div class="rise-image-modal-preview-label">Live Preview</div>' +
+              '<div class="rise-image-modal-preview-img-wrap">' +
+                '<img src="' + currentUrl + '" class="rise-image-modal-preview-img" alt="Preview" ' + (currentUrl ? '' : 'style="display:none;"') + '>' +
+                (!currentUrl ? '<span style="color: #94a3b8; font-size: 0.8rem;">No image selected</span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rise-image-modal-footer">' +
+            '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">Apply Image</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      $("body").append($modal);
+
+      var $fileInput = $modal.find(".rise-image-file-input");
+      var $urlInput = $modal.find(".rise-image-url-input");
+      var $altInput = $modal.find(".rise-image-alt-input");
+      var $previewImg = $modal.find(".rise-image-modal-preview-img");
+      var $previewWrap = $modal.find(".rise-image-modal-preview-img-wrap");
+      var $status = $modal.find(".rise-image-upload-status");
+      var selectedFileUrl = currentUrl;
+
+      function updatePreview(url) {
+        selectedFileUrl = url;
+        if (url) {
+          $previewImg.attr("src", url).show();
+          $previewWrap.find("span").hide();
+        } else {
+          $previewImg.hide();
+          if (!$previewWrap.find("span").length) {
+            $previewWrap.append('<span style="color: #94a3b8; font-size: 0.8rem;">No image selected</span>');
+          } else {
+            $previewWrap.find("span").show();
+          }
+        }
+      }
+
+      $urlInput.on("input", function () {
+        updatePreview($(this).val().trim());
+      });
+
+      $modal.find(".rise-image-browse-btn, .rise-image-upload-dropzone").on("click", function (e) {
+        if (e.target !== $fileInput[0]) {
+          $fileInput.trigger("click");
+        }
+      });
+
+      function handleFiles(files) {
+        if (!files || !files.length) return;
+        var file = files[0];
+        $status.text("Uploading " + file.name + "...").css("color", "#2563eb").show();
+        self.uploadImageFile(file, function (err, serverUrl, dataUrl) {
+          var finalUrl = serverUrl || dataUrl;
+          $urlInput.val(finalUrl);
+          updatePreview(finalUrl);
+          $status.text("Uploaded: " + file.name + " (" + Math.round(file.size / 1024) + " KB)").css("color", "#16a34a").show();
+        });
+      }
+
+      $fileInput.on("change", function () {
+        handleFiles(this.files);
+      });
+
+      var $dropzone = $modal.find(".rise-image-upload-dropzone");
+      $dropzone.on("dragover dragenter", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $dropzone.addClass("is-dragover");
+      }).on("dragleave drop", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $dropzone.removeClass("is-dragover");
+        if (e.type === "drop") {
+          var dt = e.originalEvent.dataTransfer;
+          if (dt && dt.files && dt.files.length) {
+            handleFiles(dt.files);
+          }
+        }
+      });
+
+      $modal.find(".rise-image-modal-close, .rise-image-modal-btn.cancel").on("click", function () {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+
+      $modal.on("click", function (e) {
+        if ($(e.target).hasClass("rise-image-modal-backdrop")) {
+          $modal.fadeOut(150, function () { $(this).remove(); });
+        }
+      });
+
+      $modal.find(".rise-image-modal-btn.apply").on("click", function () {
+        var finalUrl = $urlInput.val().trim() || selectedFileUrl;
+        var finalAlt = $altInput.val().trim();
+        if (opts.onApply && finalUrl) {
+          opts.onApply(finalUrl, finalAlt);
+        }
+        $modal.fadeOut(150, function () { $(this).remove(); });
+        self.showToast("Image updated successfully!");
       });
     };
 
