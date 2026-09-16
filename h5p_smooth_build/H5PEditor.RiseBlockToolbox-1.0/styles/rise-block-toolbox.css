@@ -1,6 +1,6 @@
 /* ==========================================================================
    Articulate Rise Live Visual Studio & Embedded Component Toolbox
-   Integrated Side-by-Side Studio Layout matching student preview.
+   Consistent, modern, high-contrast UI matching student preview.
    ========================================================================== */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap");
 
@@ -32,15 +32,17 @@
   flex-direction: column;
 }
 
-/* Top Studio Control Bar */
+/* --------------------------------------------------------------------------
+   2. Top Studio Control Bar & Consistent Buttons
+   -------------------------------------------------------------------------- */
 .rise-visual-top-bar {
-  background: #0f172a;
+  background: #0b1120;
   color: #ffffff;
-  padding: 12px 18px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   border-bottom: 1px solid #1e293b;
   flex-wrap: wrap;
   z-index: 10;
@@ -49,96 +51,106 @@
 .rise-visual-nav-pills {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
 }
 
+/* Unified consistent styling for all top-bar buttons */
+.rise-visual-pill-btn,
+.rise-visual-add-lesson-btn,
+.rise-visual-mode-btn {
+  height: 36px !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  font-size: 0.825rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  outline: none !important;
+}
+
+/* Default state for navigation pill button */
 .rise-visual-pill-btn {
-  background: #1e293b;
-  color: #94a3b8;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  background: #1e293b !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 .rise-visual-pill-btn:hover {
-  background: #334155;
-  color: #ffffff;
+  background: #334155 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
+/* Active state for navigation pill button */
 .rise-visual-pill-btn.is-active {
-  background: #2563eb;
-  color: #ffffff;
-  border-color: #3b82f6;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45) !important;
 }
 
+/* Add Lesson Button */
 .rise-visual-add-lesson-btn {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border: 1px dashed rgba(56, 189, 248, 0.4);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  background: rgba(56, 189, 248, 0.12) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
 }
 
 .rise-visual-add-lesson-btn:hover {
-  background: #38bdf8;
-  color: #0f172a;
+  background: #38bdf8 !important;
+  color: #0f172a !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3) !important;
 }
 
+/* View Mode Switcher Container */
 .rise-visual-mode-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background: #1e293b;
-  border-radius: 6px;
-  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 2px;
   gap: 2px;
 }
 
 .rise-visual-mode-btn {
-  background: transparent;
-  color: #94a3b8;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.2s ease;
+  height: 30px !important;
+  padding: 0 12px !important;
+  border-radius: 6px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #94a3b8 !important;
+  font-size: 0.775rem !important;
+}
+
+.rise-visual-mode-btn:hover {
+  color: #ffffff !important;
 }
 
 .rise-visual-mode-btn.is-active {
-  background: #0ea5e9;
-  color: #ffffff;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
 }
 
-/* Studio Main Workspace (Split Layout) */
+/* Studio Workspace Layout */
 .rise-visual-workspace {
   display: flex;
-  min-height: 600px;
+  min-height: 650px;
   background: #ffffff;
 }
 
 /* --------------------------------------------------------------------------
-   2. Embedded Left Sidebar Toolbox
+   3. Left Component Toolbox
    -------------------------------------------------------------------------- */
 .rise-visual-sidebar-toolbox {
   width: 280px;
@@ -226,7 +238,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 800px;
+  max-height: 850px;
 }
 
 .rise-toolbox-category {
@@ -399,7 +411,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. Main Live Visual Canvas Viewport
+   4. Main Live Visual Canvas Viewport
    -------------------------------------------------------------------------- */
 .rise-visual-canvas-area {
   flex: 1;
@@ -475,7 +487,12 @@
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-cover-btn:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
 }
 
 .rise-canvas-change-cover-btn {
@@ -633,7 +650,9 @@
   color: #ffffff;
 }
 
-/* Lesson Content & Blocks */
+/* --------------------------------------------------------------------------
+   5. Lesson Content & Blocks in Canvas
+   -------------------------------------------------------------------------- */
 .rise-canvas-lesson-body {
   max-width: 800px;
   margin: 0 auto;
@@ -674,14 +693,15 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  min-height: 100px;
 }
 
 .rise-canvas-block-wrapper {
   position: relative;
   background: #ffffff;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 4px;
+  padding: 8px 12px;
   transition: all 0.2s ease;
 }
 
@@ -734,32 +754,85 @@
   color: #ffffff;
 }
 
+/* Enhanced Drag & Drop Target Drop Zones */
 .rise-canvas-drop-zone {
-  border: 2px dashed #cbd5e1;
+  border: 2px dashed #94a3b8;
   border-radius: 8px;
+  min-height: 48px;
   padding: 12px;
   text-align: center;
-  color: #64748b;
-  font-size: 0.8rem;
+  color: #475569;
+  font-size: 0.85rem;
   font-weight: 700;
   background: #f8fafc;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.rise-canvas-drop-zone:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .rise-canvas-drop-zone.is-hovered,
 .rise-canvas-drop-zone.rise-drop-target-active {
+  border-color: #2563eb !important;
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+}
+
+/* Bottom Lesson Navigation Bar inside Canvas */
+.rise-canvas-lesson-nav-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 24px;
+  margin-top: 24px;
+}
+
+.rise-canvas-nav-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-nav-btn:hover {
+  background: #f8fafc;
   border-color: #2563eb;
-  background: #eff6ff;
   color: #2563eb;
-  transform: scale(1.01);
+}
+
+.rise-canvas-nav-btn.is-next {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.rise-canvas-nav-btn.is-next:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
 }
 
 /* --------------------------------------------------------------------------
-   4. Component Styles Inside Canvas
+   6. Rise Component Typography & Visuals
    -------------------------------------------------------------------------- */
 .rise-header-block {
   border-bottom: 2px solid #2563eb;
@@ -1004,7 +1077,7 @@
 .rise-quiz-option:hover { border-color: #2563eb; background: #eff6ff; }
 
 /* --------------------------------------------------------------------------
-   5. Clean H5P Form Hiding when Visual Mode is Active
+   7. Form Hiding & Clean Authoring Rules
    -------------------------------------------------------------------------- */
 .rise-visual-mode-active > .field,
 .rise-visual-mode-active > .h5p-editor-widget-group,
@@ -1016,7 +1089,6 @@
   display: none !important;
 }
 
-/* Hide noisy redundant copy/paste buttons */
 .field-name-content > .h5peditor-copypaste-wrap,
 .field-name-lessons .h5peditor-copypaste-wrap,
 .field-name-sections .h5peditor-copypaste-wrap,

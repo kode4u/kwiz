@@ -1,6 +1,6 @@
 /**
  * Articulate Rise Live Visual Studio & Embedded Component Toolbox for H5P
- * Pure SVG UI, integrated side-by-side WYSIWYG authoring studio.
+ * Pure SVG UI, integrated side-by-side WYSIWYG authoring studio with complete navigation.
  */
 (function ($) {
   "use strict";
@@ -51,7 +51,7 @@
   function RiseBlockToolbox() {
     var self = this;
 
-    self.activeTab = "cover"; // 'cover' or 'sIdx_lIdx' (e.g. '0_0')
+    self.activeTab = "cover"; // 'cover' or '0_0'
     self.activeViewMode = "visual"; // 'visual' or 'form'
 
     self.blocks = [
@@ -255,7 +255,7 @@
     };
 
     /**
-     * Render the Complete Studio (Top Bar + Left Embedded Toolbox + Right Live Canvas)
+     * Render Studio Container
      */
     self.renderStudio = function () {
       var $mount = $(".field-name-courseMeta, .h5peditor").first();
@@ -272,8 +272,9 @@
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
               '<span>Cover & Outline</span>' +
             '</button>' +
-            '<div class="rise-visual-lesson-pills" style="display: flex; gap: 6px;"></div>' +
-            '<button type="button" class="rise-visual-add-lesson-btn" title="Add a new lesson">' +
+            '<div class="rise-visual-lesson-pills" style="display: flex; gap: 8px;"></div>' +
+            '<button type="button" class="rise-visual-add-lesson-btn" title="Add a new lesson to course">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
               '<span>+ Add Lesson</span>' +
             '</button>' +
           '</div>' +
@@ -358,6 +359,7 @@
           $card.on("dragstart", function (e) {
             $previewTooltip.hide();
             $(this).addClass("is-dragging");
+            window.riseCurrentDraggedBlock = item;
             var dt = e.originalEvent.dataTransfer;
             dt.effectAllowed = "copy";
             dt.setData("text/plain", JSON.stringify(item));
@@ -405,17 +407,14 @@
         }
       });
 
-      // Default: active visual mode & hide old fields completely
+      // Default: active visual mode & hide old form fields
       $(".h5peditor, .h5peditor-form").addClass("rise-visual-mode-active");
       $(".field-name-courseMeta, .field-name-sections").hide();
 
       // Navigation tab switching
       $editorRoot.on("click", ".rise-visual-pill-btn", function () {
         var tab = $(this).data("tab");
-        self.activeTab = tab;
-        $editorRoot.find(".rise-visual-pill-btn").removeClass("is-active");
-        $(this).addClass("is-active");
-        self.renderActiveTabContent();
+        self.switchTab(tab);
       });
 
       // Add lesson button
@@ -424,6 +423,16 @@
       });
 
       self.updateStudio();
+    };
+
+    /**
+     * Switch active tab cleanly
+     */
+    self.switchTab = function (tabId) {
+      self.activeTab = tabId;
+      $(".rise-visual-pill-btn").removeClass("is-active");
+      $('.rise-visual-pill-btn[data-tab="' + tabId + '"]').addClass("is-active");
+      self.renderActiveTabContent();
     };
 
     /**
@@ -457,7 +466,7 @@
     };
 
     /**
-     * Update Studio Tabs & Content
+     * Update Studio Navigation Tabs
      */
     self.updateStudio = function () {
       var params = self.getParams();
@@ -473,7 +482,7 @@
               var isAct = self.activeTab === tabId ? "is-active" : "";
               var title = les.title || ("Lesson " + (lessonCount + 1));
               var $pill = $('<button type="button" class="rise-visual-pill-btn ' + isAct + '" data-tab="' + tabId + '">' +
-                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
                 '<span>' + title + '</span>' +
               '</button>');
               $pillsContainer.append($pill);
@@ -487,7 +496,7 @@
     };
 
     /**
-     * Render Active Tab Content in Right Canvas Area
+     * Render Active Tab Content in Canvas Viewport
      */
     self.renderActiveTabContent = function () {
       var params = self.getParams();
@@ -502,7 +511,7 @@
     };
 
     /**
-     * 1. Render Cover & Outline View
+     * 1. Render Cover & Outline Page
      */
     self.renderCoverPage = function ($canvas, params) {
       var meta = (params && params.courseMeta) || {};
@@ -533,7 +542,7 @@
           '</button>' +
           '<div class="rise-canvas-hero-content">' +
             '<h1 class="rise-canvas-title-editable" contenteditable="true" title="Click to edit course title">' + title + '</h1>' +
-            '<button type="button" class="rise-canvas-cover-btn">START COURSE</button>' +
+            '<button type="button" class="rise-canvas-cover-btn" title="Click to go to Lesson 1">START COURSE →</button>' +
           '</div>' +
         '</div>' +
         '<div class="rise-canvas-outline-body">' +
@@ -543,6 +552,12 @@
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
             '<span>Add Key Topic / Takeaway</span>' +
           '</button>' +
+          '<div class="rise-canvas-lesson-nav-footer">' +
+            '<div></div>' +
+            '<button type="button" class="rise-canvas-nav-btn is-next" data-goto="0_0">' +
+              '<span>Go to Lesson 1 →</span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
       '</div>');
 
@@ -554,6 +569,11 @@
           '<button type="button" class="rise-canvas-takeaway-delete" title="Remove">✕</button>' +
         '</div>');
         $list.append($card);
+      });
+
+      // Event: Navigate to Lesson 1
+      $cover.find(".rise-canvas-cover-btn, .rise-canvas-nav-btn.is-next").on("click", function () {
+        self.switchTab("0_0");
       });
 
       // Sync Title
@@ -608,7 +628,7 @@
     };
 
     /**
-     * 2. Render Lesson Content Canvas
+     * 2. Render Lesson Content Canvas with Complete Page Navigation
      */
     self.renderLessonPage = function ($canvas, params, tabId) {
       var parts = tabId.split("_");
@@ -618,26 +638,61 @@
       var sec = (params.sections && params.sections[sIdx]) || {};
       var lesson = (sec.lessons && sec.lessons[lIdx]) || { title: "New Lesson", content: { params: [] } };
 
+      // Calculate previous and next navigation targets
+      var prevTab = "cover";
+      var prevLabel = "← Cover & Outline";
+      if (lIdx > 0) {
+        prevTab = sIdx + "_" + (lIdx - 1);
+        prevLabel = "← " + ((sec.lessons[lIdx - 1] && sec.lessons[lIdx - 1].title) || "Previous Lesson");
+      }
+
+      var nextTab = null;
+      var nextLabel = null;
+      if (sec.lessons && lIdx < sec.lessons.length - 1) {
+        nextTab = sIdx + "_" + (lIdx + 1);
+        nextLabel = ((sec.lessons[lIdx + 1] && sec.lessons[lIdx + 1].title) || "Next Lesson") + " →";
+      }
+
       var $lessonView = $('<div class="rise-canvas-lesson-body">' +
         '<div class="rise-canvas-lesson-header-bar">' +
           '<div style="font-size: 0.75rem; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.05em;">' + (sec.sectionTitle || "SECTION") + '</div>' +
           '<h2 class="rise-canvas-lesson-title-editable" contenteditable="true" title="Click to edit lesson title">' + (lesson.title || "Lesson Title") + '</h2>' +
         '</div>' +
-        '<div class="rise-canvas-drop-zone top-zone">' +
+        '<div class="rise-canvas-drop-zone top-zone" data-drop-index="0">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-          '<span>Drop Rise Block Here (or Click on Left Toolbox)</span>' +
+          '<span>Drop Component Here (or Click on Left Toolbox)</span>' +
         '</div>' +
         '<div class="rise-canvas-blocks-list"></div>' +
-        '<div class="rise-canvas-drop-zone bottom-zone">' +
+        '<div class="rise-canvas-drop-zone bottom-zone" data-drop-index="end">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
           '<span>+ Drop block here to append</span>' +
         '</div>' +
+        '<div class="rise-canvas-lesson-nav-footer">' +
+          '<button type="button" class="rise-canvas-nav-btn is-prev" data-goto="' + prevTab + '">' +
+            '<span>' + prevLabel + '</span>' +
+          '</button>' +
+          (nextTab ?
+            '<button type="button" class="rise-canvas-nav-btn is-next" data-goto="' + nextTab + '"><span>' + nextLabel + '</span></button>' :
+            '<button type="button" class="rise-canvas-nav-btn is-next add-next-btn"><span>+ Add Next Lesson →</span></button>'
+          ) +
+        '</div>' +
       '</div>');
 
+      // Edit Lesson Title
       $lessonView.find(".rise-canvas-lesson-title-editable").on("input blur", function () {
         var newTitle = $(this).text().trim();
         lesson.title = newTitle;
         self.updateStudio();
+      });
+
+      // Navigation footer actions
+      $lessonView.find(".rise-canvas-nav-btn.is-prev, .rise-canvas-nav-btn.is-next:not(.add-next-btn)").on("click", function () {
+        var target = $(this).data("goto");
+        if (target) self.switchTab(target);
+      });
+
+      $lessonView.find(".add-next-btn").on("click", function () {
+        self.addNewLesson();
       });
 
       var $blocksList = $lessonView.find(".rise-canvas-blocks-list");
@@ -651,7 +706,7 @@
     };
 
     /**
-     * Parse HTML string or params
+     * Parse Lesson Content HTML
      */
     self.getLessonContentHtml = function (lesson) {
       if (!lesson.content) return "";
@@ -691,7 +746,7 @@
             '<button type="button" class="rise-canvas-action-btn is-delete" title="Delete">🗑️</button>' +
           '</div>' +
           '<div class="rise-canvas-block-inner" contenteditable="true">' + blockOuterHtml + '</div>' +
-          '<div class="rise-canvas-drop-zone mid-zone">' +
+          '<div class="rise-canvas-drop-zone mid-zone" data-drop-index="' + (idx + 1) + '">' +
             '<span>+ Drop block here</span>' +
           '</div>' +
         '</div>');
@@ -780,7 +835,7 @@
         }
       } catch (e) {}
 
-      self.showToast("Changes saved to course!");
+      self.showToast("Changes saved to lesson!");
     };
 
     /**
@@ -809,12 +864,17 @@
     };
 
     /**
-     * Insert Block Content
+     * Insert Block Content into target index or append
      */
-    self.insertBlock = function (blockHtml) {
+    self.insertBlock = function (blockHtml, targetIndex) {
+      // If on cover page, automatically switch to Lesson 1 or create one
       if (self.activeTab === "cover") {
-        self.showToast("Please select a Lesson tab to insert blocks.");
-        return;
+        var params = self.getParams();
+        if (!params.sections || !params.sections[0] || !params.sections[0].lessons || params.sections[0].lessons.length === 0) {
+          self.addNewLesson();
+        } else {
+          self.activeTab = "0_0";
+        }
       }
 
       var params = self.getParams();
@@ -826,7 +886,21 @@
       var lesson = (sec.lessons && sec.lessons[lIdx]) || {};
 
       var currentHtml = self.getLessonContentHtml(lesson);
-      var newHtml = currentHtml ? (currentHtml + "\n" + blockHtml) : blockHtml;
+      var newHtml = "";
+
+      if (targetIndex !== undefined && targetIndex !== null && targetIndex !== "end") {
+        var $temp = $("<div>" + currentHtml + "</div>");
+        var children = $temp.children();
+        var insertIdx = parseInt(targetIndex, 10);
+        if (insertIdx >= 0 && insertIdx < children.length) {
+          $(children[insertIdx]).before(blockHtml);
+          newHtml = $temp.html();
+        } else {
+          newHtml = currentHtml ? (currentHtml + "\n" + blockHtml) : blockHtml;
+        }
+      } else {
+        newHtml = currentHtml ? (currentHtml + "\n" + blockHtml) : blockHtml;
+      }
 
       lesson.content = newHtml;
       self.renderActiveTabContent();
@@ -834,33 +908,36 @@
     };
 
     /**
-     * Drag and Drop Zones
+     * Setup Reliable Drag & Drop across Workspace
      */
     self.setupDragAndDrop = function () {
-      $(document).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
+      $(document).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function (e) {
         e.preventDefault();
         e.originalEvent.dataTransfer.dropEffect = "copy";
-        $(this).addClass("rise-drop-target-active is-hovered");
+        if ($(this).hasClass("rise-canvas-drop-zone") || $(this).hasClass("rise-canvas-block-wrapper")) {
+          $(this).addClass("rise-drop-target-active is-hovered");
+        }
       });
 
-      $(document).on("dragleave", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function () {
+      $(document).on("dragleave", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function () {
         $(this).removeClass("rise-drop-target-active is-hovered");
       });
 
-      $(document).on("drop", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
+      $(document).on("drop", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function (e) {
         e.preventDefault();
-        $(this).removeClass("rise-drop-target-active is-hovered");
+        $(".rise-drop-target-active, .is-hovered").removeClass("rise-drop-target-active is-hovered");
 
-        var rawData = e.originalEvent.dataTransfer.getData("text/plain");
-        if (!rawData) return;
-
-        try {
-          var item = JSON.parse(rawData);
-          if (item.content) {
-            self.insertBlock(item.content);
+        var item = window.riseCurrentDraggedBlock;
+        if (!item) {
+          var rawData = e.originalEvent.dataTransfer.getData("text/plain");
+          if (rawData) {
+            try { item = JSON.parse(rawData); } catch (err) {}
           }
-        } catch (err) {
-          console.error("Drop error:", err);
+        }
+
+        if (item && item.content) {
+          var dropIdx = $(this).data("drop-index");
+          self.insertBlock(item.content, dropIdx);
         }
       });
     };
