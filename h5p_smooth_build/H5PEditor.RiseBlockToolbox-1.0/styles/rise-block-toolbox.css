@@ -318,104 +318,12 @@
   text-align: center !important;
 }
 
-/* ==========================================================================
-   2. Middle Canvas Live Preview with Edit Controls
-   ========================================================================== */
-.rise-canvas-control-bar {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 10px !important;
-  padding: 8px 14px !important;
-  margin: 12px 0 16px 0 !important;
-}
-
-.rise-canvas-toggle-group {
-  display: flex !important;
-  gap: 6px !important;
-}
-
-.rise-canvas-toggle-btn {
-  padding: 6px 14px !important;
-  border-radius: 6px !important;
-  font-size: 0.8rem !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  border: 1px solid transparent !important;
-  transition: all 0.2s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-.rise-canvas-toggle-btn.is-active {
-  background: #2563eb !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
-}
-
-.rise-canvas-toggle-btn:not(.is-active) {
-  background: #ffffff !important;
-  color: #64748b !important;
-  border-color: #cbd5e1 !important;
-}
-
-.rise-canvas-toggle-btn:not(.is-active):hover {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-.rise-editor-live-canvas {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 24px !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
-  margin: 12px 0 !important;
-  min-height: 120px !important;
-}
-
-.rise-canvas-block-item {
-  position: relative !important;
-  margin-bottom: 20px !important;
-  padding: 12px !important;
-  border-radius: 8px !important;
-  transition: all 0.2s ease !important;
-  border: 1px dashed transparent !important;
-}
-
-.rise-canvas-block-item:hover {
-  background: #f8fafc !important;
-  border-color: #93c5fd !important;
-}
-
-.rise-canvas-edit-btn {
-  position: absolute !important;
-  top: 8px !important;
-  right: 8px !important;
-  background: #2563eb !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 6px !important;
-  padding: 4px 10px !important;
-  font-size: 0.725rem !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
-  opacity: 0 !important;
-  transition: all 0.2s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-}
-
-.rise-canvas-block-item:hover .rise-canvas-edit-btn {
-  opacity: 1 !important;
-}
-
-.rise-canvas-edit-btn:hover {
-  background: #1d4ed8 !important;
-  transform: scale(1.05) !important;
+/* Hide noisy redundant copy/paste buttons on inner fields */
+.field-name-content > .h5peditor-copypaste-wrap,
+.field-name-lessons .h5peditor-copypaste-wrap,
+.field-name-sections .h5peditor-copypaste-wrap,
+.h5p-editor-column .h5peditor-copypaste-wrap,
+.field-name-text .h5peditor-copypaste-wrap,
+.field-name-params .h5peditor-copypaste-wrap {
+  display: none !important;
 }

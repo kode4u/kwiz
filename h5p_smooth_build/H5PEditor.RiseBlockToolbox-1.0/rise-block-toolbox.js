@@ -7,6 +7,44 @@
 
   var H5PEditor = window.H5PEditor = window.H5PEditor || {};
 
+  function fixCoreTranslations() {
+    var targets = [window];
+    try {
+      if (window.parent && window.parent !== window) targets.push(window.parent);
+      if (window.top && window.top !== window) targets.push(window.top);
+    } catch (e) {}
+
+    var fallbackCore = {
+      copyButton: "Copy",
+      pasteButton: "Paste",
+      pasteAndReplaceButton: "Paste & Replace",
+      pasteContent: "Paste Content",
+      confirmPasteContent: "Are you sure you want to replace current content?",
+      confirmPasteButtonText: "Replace",
+      copyToClipboard: "Copy to clipboard",
+      pasteFromClipboard: "Paste from clipboard",
+      copied: "Copied!",
+      pasteError: "Cannot paste",
+      expandAll: "Expand all",
+      collapseAll: "Collapse all",
+      inserted: "Inserted"
+    };
+
+    targets.forEach(function (win) {
+      try {
+        if (!win.H5PEditor) win.H5PEditor = {};
+        if (!win.H5PEditor.language) win.H5PEditor.language = {};
+        if (!win.H5PEditor.language.core) win.H5PEditor.language.core = {};
+        for (var k in fallbackCore) {
+          if (!win.H5PEditor.language.core[k]) {
+            win.H5PEditor.language.core[k] = fallbackCore[k];
+          }
+        }
+      } catch (err) {}
+    });
+  }
+  fixCoreTranslations();
+
   function RiseBlockToolbox() {
     var self = this;
 
@@ -529,6 +567,14 @@
           font-weight: 700 !important;
           text-align: center !important;
         }
+        .field-name-content > .h5peditor-copypaste-wrap,
+        .field-name-lessons .h5peditor-copypaste-wrap,
+        .field-name-sections .h5peditor-copypaste-wrap,
+        .h5p-editor-column .h5peditor-copypaste-wrap,
+        .field-name-text .h5peditor-copypaste-wrap,
+        .field-name-params .h5peditor-copypaste-wrap {
+          display: none !important;
+        }
       `;
       targetDoc.head.appendChild(style);
     };
@@ -792,6 +838,7 @@
   RiseBlockToolboxWidget.prototype.remove = function () {};
 
   RiseBlockToolboxWidget.initDock = function () {
+    fixCoreTranslations();
     var $jq = window.H5PEditor && window.H5PEditor.$ ? window.H5PEditor.$ : (window.H5P && window.H5P.jQuery ? window.H5P.jQuery : (window.jQuery || window.$));
     if (!$jq) return;
     if ($jq(".rise-toolbox-dock").length > 0) return;
