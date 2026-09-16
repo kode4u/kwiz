@@ -423,14 +423,70 @@
       });
 
       // Fullscreen Toggle
-      $editorRoot.find(".rise-visual-fullscreen-btn").on("click", function () {
-        self.isFullscreen = !self.isFullscreen;
-        $editorRoot.toggleClass("is-fullscreen", self.isFullscreen);
-        if (self.isFullscreen) {
-          $(this).find("span").text("Exit Fullscreen");
+      var $spacer = $('<div class="rise-fullscreen-spacer"></div>');
+      $editorRoot.after($spacer);
+
+      function getFullscreenElement() {
+        return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || null;
+      }
+
+      function updateFullscreenUI(isFs) {
+        self.isFullscreen = isFs;
+        $editorRoot.toggleClass("is-fullscreen", isFs);
+        $("body").toggleClass("rise-studio-body-fullscreen", isFs);
+        if (isFs) {
+          $editorRoot.find(".rise-visual-fullscreen-btn span").text("Exit Fullscreen");
         } else {
-          $(this).find("span").text("Fullscreen");
+          $editorRoot.find(".rise-visual-fullscreen-btn span").text("Fullscreen");
         }
+      }
+
+      $editorRoot.find(".rise-visual-fullscreen-btn").on("click", function () {
+        var elem = $editorRoot[0];
+        var isFs = !!getFullscreenElement() || self.isFullscreen;
+
+        if (!isFs) {
+          var req = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.mozRequestFullScreen || elem.msRequestFullscreen;
+          if (req) {
+            try {
+              var promise = req.call(elem);
+              if (promise && promise.catch) {
+                promise.catch(function () {
+                  updateFullscreenUI(true);
+                });
+              } else {
+                updateFullscreenUI(true);
+              }
+            } catch (err) {
+              updateFullscreenUI(true);
+            }
+          } else {
+            updateFullscreenUI(true);
+          }
+        } else {
+          var exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+          if (getFullscreenElement() && exit) {
+            try {
+              var p = exit.call(document);
+              if (p && p.catch) {
+                p.catch(function () {
+                  updateFullscreenUI(false);
+                });
+              } else {
+                updateFullscreenUI(false);
+              }
+            } catch (err) {
+              updateFullscreenUI(false);
+            }
+          } else {
+            updateFullscreenUI(false);
+          }
+        }
+      });
+
+      $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange", function () {
+        var isFs = !!getFullscreenElement();
+        updateFullscreenUI(isFs);
       });
 
       // Navigation outline item switching
