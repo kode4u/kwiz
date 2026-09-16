@@ -352,12 +352,13 @@
         '</div>' +
       '</div>');
 
+      self.$editorRoot = $editorRoot;
       $mount.before($editorRoot);
 
       // Render Right Toolbox components
       var $toolboxBody = $editorRoot.find(".rise-toolbox-body");
       var $previewTooltip = $('<div class="rise-live-preview-tooltip" style="display: none;"></div>');
-      $("body").append($previewTooltip);
+      self.getMountRoot().append($previewTooltip);
 
       self.blocks.forEach(function (cat) {
         var $cat = $('<div class="rise-toolbox-category">' +
@@ -1056,11 +1057,16 @@
         $blockWrap.find(".is-edit").on("click", function (e) {
           e.stopPropagation();
           var currentHtml = $blockWrap.find(".rise-canvas-block-inner").html();
-          var edited = prompt("Edit Block HTML / Text Content:", currentHtml);
-          if (edited !== null) {
-            $blockWrap.find(".rise-canvas-block-inner").html(edited);
-            self.saveAllBlocksFromCanvas($container, lesson);
-          }
+          self.openHtmlEditor({
+            content: currentHtml,
+            onApply: function (edited) {
+              if (edited !== null && edited !== undefined) {
+                $blockWrap.find(".rise-canvas-block-inner").html(edited);
+                self.saveAllBlocksFromCanvas($container, lesson);
+                self.renderActiveTabContent();
+              }
+            }
+          });
         });
 
         $blockWrap.find(".is-dup").on("click", function (e) {
@@ -1519,6 +1525,69 @@
     };
 
     /**
+     * Get root element to mount modals into (Ensures modals render on top without exiting fullscreen)
+     */
+    self.getMountRoot = function () {
+      if (self.$editorRoot && self.$editorRoot.length && document.body.contains(self.$editorRoot[0])) {
+        return self.$editorRoot;
+      }
+      var $root = $(".rise-visual-editor-root");
+      if ($root.length) {
+        return $root;
+      }
+      return $("body");
+    };
+
+    /**
+     * Open In-Place Block HTML & Content Editor Modal (Middle of screen, no fullscreen exit)
+     */
+    self.openHtmlEditor = function (opts) {
+      opts = opts || {};
+      var currentHtml = opts.content || "";
+      var onApply = opts.onApply || function () {};
+
+      $(".rise-html-modal-backdrop").remove();
+
+      var $modal = $('<div class="rise-html-modal-backdrop">' +
+        '<div class="rise-html-modal-dialog">' +
+          '<div class="rise-html-modal-header">' +
+            '<div class="rise-html-modal-title">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>' +
+              '<span>Edit Block Content & HTML</span>' +
+            '</div>' +
+            '<button type="button" class="rise-html-modal-close" title="Close">✕</button>' +
+          '</div>' +
+          '<div class="rise-html-modal-body">' +
+            '<div class="rise-html-modal-desc">Edit block HTML markup or plain text content directly below:</div>' +
+            '<textarea class="rise-html-modal-textarea" rows="14" placeholder="Enter HTML or text...">' + currentHtml + '</textarea>' +
+          '</div>' +
+          '<div class="rise-html-modal-footer">' +
+            '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">Save Changes</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      self.getMountRoot().append($modal);
+
+      $modal.find(".rise-html-modal-close, .rise-image-modal-btn.cancel").on("click", function () {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+
+      $modal.on("click", function (e) {
+        if ($(e.target).hasClass("rise-html-modal-backdrop")) {
+          $modal.fadeOut(150, function () { $(this).remove(); });
+        }
+      });
+
+      $modal.find(".rise-image-modal-btn.apply").on("click", function () {
+        var updatedHtml = $modal.find(".rise-html-modal-textarea").val();
+        onApply(updatedHtml);
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+    };
+
+    /**
      * Open Image Settings and Multi-Image Upload Modal
      */
     self.openImageEditor = function (opts) {
@@ -1587,7 +1656,7 @@
         '</div>' +
       '</div>');
 
-      $("body").append($modal);
+      self.getMountRoot().append($modal);
 
       var $fileInput = $modal.find(".rise-image-file-input");
       var $urlInput = $modal.find(".rise-image-url-input");
@@ -1704,7 +1773,7 @@
 
       $modal.find(".rise-image-modal-btn.apply").on("click", function () {
         if (imagesList.length === 0) {
-          alert("Please upload or add at least one image.");
+          self.showToast("⚠️ Please upload or add at least one image.");
           return;
         }
 
@@ -1801,7 +1870,7 @@
         '</div>' +
       '</div>');
 
-      $("body").append($modal);
+      self.getMountRoot().append($modal);
 
       var $optList = $modal.find(".rise-quiz-option-builder-list");
 
@@ -1825,7 +1894,7 @@
 
           $optRow.find(".rise-opt-del-btn").on("click", function () {
             if (options.length <= 2) {
-              alert("Quiz must have at least 2 choices.");
+              self.showToast("⚠️ Quiz must have at least 2 choices.");
               return;
             }
             options.splice(idx, 1);
@@ -1858,7 +1927,7 @@
       $modal.find(".rise-moodle-convert-btn").on("click", function () {
         var rawText = $modal.find(".rise-moodle-import-input").val().trim();
         if (!rawText) {
-          alert("Please paste questions in Aiken or GIFT format.");
+          self.showToast("⚠️ Please paste questions in Aiken or GIFT format.");
           return;
         }
 
@@ -1894,7 +1963,7 @@
           $modal.find('.rise-quiz-tab-btn[data-tab="builder"]').trigger("click");
           self.showToast("Moodle question imported successfully!");
         } else {
-          alert("Could not parse question. Ensure format has question, choices (A., B., C.), and 'ANSWER: X'.");
+          self.showToast("⚠️ Could not parse question. Ensure format has question, choices (A., B., C.), and 'ANSWER: X'.");
         }
       });
 
@@ -1976,7 +2045,7 @@
         '</div>' +
       '</div>');
 
-      $("body").append($modal);
+      self.getMountRoot().append($modal);
 
       var $frame = $modal.find(".rise-preview-viewport-frame");
       var $mount = $modal.find(".rise-preview-h5p-mount");
@@ -2043,7 +2112,7 @@
      */
     self.showToast = function (msg) {
       var $toast = $('<div style="position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #38bdf8; border: 1.5px solid #38bdf8; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; z-index: 2147483647; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">' + msg + '</div>');
-      $("body").append($toast);
+      self.getMountRoot().append($toast);
       setTimeout(function () {
         $toast.fadeOut(300, function () { $(this).remove(); });
       }, 2000);
