@@ -3007,6 +3007,10 @@
               '<span>Mobile</span>' +
             '</button>' +
           '</div>' +
+          '<button type="button" class="rise-preview-fullscreen-btn" title="Toggle Fullscreen">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>' +
+            '<span>Fullscreen</span>' +
+          '</button>' +
           '<button type="button" class="rise-preview-close-btn" title="Exit Preview Mode">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
             '<span>Close Preview</span>' +
@@ -3021,6 +3025,18 @@
 
       var $frame = $modal.find(".rise-preview-viewport-frame");
       var $mount = $modal.find(".rise-preview-h5p-mount");
+
+      // Fullscreen toggle for preview modal
+      $modal.find(".rise-preview-fullscreen-btn").on("click", function () {
+        var el = $modal[0] || document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      });
 
       // Device switcher handling
       $modal.find(".rise-device-btn").on("click", function () {

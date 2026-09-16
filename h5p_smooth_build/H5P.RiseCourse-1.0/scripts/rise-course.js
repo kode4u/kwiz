@@ -333,6 +333,17 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.showLesson(0);
       });
 
+      // Cover Fullscreen Button
+      var $coverFullscreenBtn = $("<button/>", {
+        type: "button",
+        class: "rise-cover-fullscreen-btn",
+        attr: { "aria-label": "Toggle Fullscreen", "title": "Toggle Fullscreen" },
+        html: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg><span>Fullscreen</span>'
+      }).on("click", function () {
+        self.toggleFullscreen();
+      });
+
+      $hero.append($coverFullscreenBtn);
       $heroContent.append($title).append($startBtn);
       $hero.append($heroOverlay).append($heroContent);
       $cover.append($hero);
@@ -431,6 +442,34 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
     };
 
     /**
+     * Toggle Fullscreen Mode for Student Course Player
+     */
+    self.toggleFullscreen = function () {
+      var rootEl = (self.$container && self.$container[0]) || (self.$wrapper && self.$wrapper[0]) || document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+        if (rootEl.requestFullscreen) {
+          rootEl.requestFullscreen();
+        } else if (rootEl.webkitRequestFullscreen) {
+          rootEl.webkitRequestFullscreen();
+        } else if (rootEl.mozRequestFullScreen) {
+          rootEl.mozRequestFullScreen();
+        } else if (rootEl.msRequestFullscreen) {
+          rootEl.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    };
+
+    /**
      * Create Top Header
      */
     self.createTopHeader = function () {
@@ -453,7 +492,18 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
       $info.append(self.$counter).append(self.$topTitle);
 
-      // Right: Exit Course Button
+      // Right: Actions (Fullscreen + Exit Course)
+      var $actions = $("<div/>", { class: "rise-top-header-actions" });
+
+      var $fullscreenBtn = $("<button/>", {
+        type: "button",
+        class: "rise-student-fullscreen-btn",
+        attr: { "aria-label": "Toggle Fullscreen", "title": "Toggle Fullscreen" },
+        html: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg><span>Fullscreen</span>'
+      }).on("click", function () {
+        self.toggleFullscreen();
+      });
+
       var $exitBtn = $("<button/>", {
         class: "rise-exit-course-btn",
         text: meta.exitButtonText || "EXIT COURSE"
@@ -461,7 +511,8 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.showCoverPage();
       });
 
-      $header.append($toggleBtn).append($info).append($exitBtn);
+      $actions.append($fullscreenBtn).append($exitBtn);
+      $header.append($toggleBtn).append($info).append($actions);
       return $header;
     };
 

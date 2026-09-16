@@ -1933,6 +1933,27 @@ body.is-rise-dragging .rise-canvas-drop-zone {
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
 }
 
+.rise-preview-fullscreen-btn {
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.rise-preview-fullscreen-btn:hover {
+  background: #334155;
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
 .rise-preview-close-btn {
   background: #ef4444;
   color: #ffffff;
@@ -2120,11 +2141,35 @@ body.is-rise-dragging .rise-canvas-drop-zone {
   box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
 }
 
+.rise-image-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 18px 0;
+}
+
 .rise-image-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   margin: 18px 0;
+}
+
+@media (max-width: 768px) {
+  .rise-image-grid-2,
+  .rise-image-grid-3,
+  .rise-stat-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+}
+
+.device-mobile .rise-image-grid-2,
+.device-mobile .rise-image-grid-3,
+.device-mobile .rise-stat-grid,
+.device-tablet .rise-image-grid-3 {
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
 }
 
 /* Multi-Image Upload Manager in Modal */
