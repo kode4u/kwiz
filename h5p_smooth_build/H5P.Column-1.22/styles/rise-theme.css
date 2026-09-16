@@ -381,21 +381,25 @@ body,
 }
 
 .h5p-single-choice-set .h5p-sc-alternative {
-  border: 1px solid var(--rise-border) !important;
-  border-radius: var(--rise-radius-sm) !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
   background: #ffffff !important;
-  padding: 14px 18px !important;
-  font-size: 0.95rem !important;
+  padding: 14px 20px !important;
+  font-size: 1rem !important;
   font-weight: 500 !important;
   color: var(--rise-text-heading) !important;
-  transition: var(--rise-transition) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
   margin-bottom: 10px !important;
   cursor: pointer !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .h5p-single-choice-set .h5p-sc-alternative:hover {
-  border-color: var(--rise-primary-border) !important;
-  background: var(--rise-primary-subtle) !important;
+  border-color: #3b82f6 !important;
+  background: #f8fafc !important;
+  box-shadow: 0 0 0 1.5px #3b82f6 !important;
+  transform: none !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -703,9 +707,9 @@ ol.rise-numbered-list:not(.rise-has-dom-badges) > li::before,
 }
 
 /* 2. Unordered / Bullet Lists */
-ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list),
+ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
 ul.rise-bullet-list,
-.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) {
+.h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) {
   list-style: none !important;
   padding: 0 !important;
   margin: 20px 0 !important;
@@ -714,9 +718,9 @@ ul.rise-bullet-list,
   gap: 12px !important;
 }
 
-ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list) > li,
+ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
 ul.rise-bullet-list > li,
-.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li {
+.h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer) {
   display: flex !important;
   align-items: center !important;
   gap: 16px !important;
@@ -733,9 +737,9 @@ ul.rise-bullet-list > li,
   box-sizing: border-box !important;
 }
 
-ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list) > li:hover,
+ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
 ul.rise-bullet-list > li:hover,
-.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li:hover {
+.h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover {
   transform: translateX(6px) !important;
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
@@ -766,9 +770,9 @@ ul.rise-bullet-list > li:hover,
   display: block !important;
 }
 
-ul:not(.rise-has-dom-badges):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list) > li::before,
+ul:not(.rise-has-dom-badges):not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-sidebar-lesson-list):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer)::before,
 ul.rise-bullet-list:not(.rise-has-dom-badges) > li::before,
-.h5p-advanced-text ul:not(.rise-has-dom-badges):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li::before {
+.h5p-advanced-text ul:not(.rise-has-dom-badges):not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer)::before {
   content: "" !important;
   width: 12px !important;
   height: 12px !important;

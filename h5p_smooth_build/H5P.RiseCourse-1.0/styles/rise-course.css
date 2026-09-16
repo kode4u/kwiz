@@ -952,10 +952,10 @@ button.h5p-question-check-answer:before,
   box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28);
 }
 
-/* Bullet Lists (Default for all <ul> in Rise Course, excluding UI elements) */
-.h5p-rise-course-root .rise-lesson-content-block ul,
-.h5p-rise-course-root .h5p-advanced-text ul,
-.h5p-rise-course-root ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress),
+/* Bullet Lists (Default for all <ul> in Rise Course, strictly excluding quiz & interactive options) */
+.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
+.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
+.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar):not(.h5p-theme),
 .rise-bullet-list {
   list-style: none !important;
   padding: 0 !important;
@@ -965,9 +965,9 @@ button.h5p-question-check-answer:before,
   gap: 12px !important;
 }
 
-.h5p-rise-course-root .rise-lesson-content-block ul > li,
-.h5p-rise-course-root .h5p-advanced-text ul > li,
-.h5p-rise-course-root ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li,
+.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
+.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
+.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
 .rise-bullet-list > li {
   display: flex !important;
   align-items: center !important;
@@ -986,9 +986,9 @@ button.h5p-question-check-answer:before,
   animation: riseItemFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
-.h5p-rise-course-root .rise-lesson-content-block ul > li:hover,
-.h5p-rise-course-root .h5p-advanced-text ul > li:hover,
-.h5p-rise-course-root ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li:hover,
+.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
+.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
+.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
 .rise-bullet-list > li:hover {
   transform: translateX(6px) !important;
   background: #ffffff !important;
@@ -1020,7 +1020,7 @@ button.h5p-question-check-answer:before,
   display: block !important;
 }
 
-.h5p-rise-course-root ul:not(.rise-has-dom-badges):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li::before,
+.h5p-rise-course-root ul:not(.rise-has-dom-badges):not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer)::before,
 .rise-bullet-list:not(.rise-has-dom-badges) > li::before {
   content: "" !important;
   width: 12px !important;
@@ -1664,8 +1664,132 @@ pre.rise-code-content {
 }
 
 /* --------------------------------------------------------------------------
-   13. H5P.TrueFalse Modern Rise Styling & Tofu Fix
+   13. Articulate Rise Quiz & Knowledge Check Styling
    -------------------------------------------------------------------------- */
+
+/* Reset any inherited list styles on quiz option containers */
+.h5p-rise-course-root .h5p-single-choice-set ul,
+.h5p-rise-course-root .h5p-multichoice ul,
+.h5p-rise-course-root ul.h5p-sc-alternatives,
+.h5p-rise-course-root ul.h5p-answers,
+.h5p-rise-course-root ul.h5p-question-answers,
+.h5p-single-choice-set ul,
+.h5p-multichoice ul,
+ul.h5p-sc-alternatives,
+ul.h5p-answers {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  animation: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.h5p-rise-course-root .h5p-single-choice-set ul > li,
+.h5p-rise-course-root .h5p-multichoice ul > li,
+.h5p-rise-course-root ul.h5p-sc-alternatives > li,
+.h5p-rise-course-root ul.h5p-answers > li,
+.h5p-single-choice-set ul > li,
+.h5p-multichoice ul > li,
+ul.h5p-sc-alternatives > li,
+ul.h5p-answers > li {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+.h5p-rise-course-root ul.h5p-sc-alternatives > li::before,
+.h5p-rise-course-root ul.h5p-answers > li::before,
+.h5p-single-choice-set ul > li::before,
+.h5p-multichoice ul > li::before,
+ul.h5p-sc-alternatives > li::before,
+ul.h5p-answers > li::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Single Choice Set Alternatives (Flat clean card, outline highlight on hover) */
+.h5p-sc-alternative,
+ul.h5p-sc-alternatives li.h5p-sc-alternative,
+.h5p-single-choice-set .h5p-sc-alternative {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 14px 20px !important;
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  cursor: pointer !important;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.h5p-sc-alternative:hover,
+ul.h5p-sc-alternatives li.h5p-sc-alternative:hover,
+.h5p-single-choice-set .h5p-sc-alternative:hover {
+  background: #f8fafc !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1.5px #3b82f6 !important;
+  transform: none !important;
+}
+
+.h5p-sc-alternative.h5p-sc-selected,
+ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
+.h5p-sc-alternative.rise-quiz-selected {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 1.5px #2563eb !important;
+  color: #1e3a8a !important;
+  transform: none !important;
+}
+
+/* MultiChoice Alternatives (Flat clean card, outline highlight on hover) */
+.h5p-multichoice .h5p-alternative-container {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 14px 20px !important;
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  cursor: pointer !important;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+}
+
+.h5p-multichoice .h5p-answer:hover .h5p-alternative-container {
+  background: #f8fafc !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1.5px #3b82f6 !important;
+  transform: none !important;
+}
+
+.h5p-multichoice .h5p-answer[aria-checked="true"] .h5p-alternative-container,
+.h5p-multichoice .h5p-alternative-container.rise-quiz-selected {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 1.5px #2563eb !important;
+  color: #1e3a8a !important;
+  transform: none !important;
+}
+
+/* True/False Styling */
 .h5p-true-false {
   margin: 24px 0 !important;
   background: transparent !important;
@@ -1685,20 +1809,22 @@ pre.rise-code-content {
   justify-content: center !important;
   padding: 16px 24px !important;
   background: #ffffff !important;
-  border: 2px solid #e2e8f0 !important;
+  border: 1.5px solid #e2e8f0 !important;
   border-radius: 12px !important;
   font-size: 1.1rem !important;
   font-weight: 700 !important;
   color: #1e293b !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .h5p-true-false-answer:hover {
   border-color: #3b82f6 !important;
   background: #f8fafc !important;
-  transform: translateY(-2px) !important;
+  box-shadow: 0 0 0 1.5px #3b82f6 !important;
+  transform: none !important;
 }
 
 .h5p-true-false-answer[aria-checked="true"],
@@ -1706,7 +1832,8 @@ pre.rise-code-content {
   background: #eff6ff !important;
   border-color: #2563eb !important;
   color: #1e3a8a !important;
-  box-shadow: 0 0 0 1px #2563eb !important;
+  box-shadow: 0 0 0 1.5px #2563eb !important;
+  transform: none !important;
 }
 
 /* Eliminate font tofu boxes in True/False */

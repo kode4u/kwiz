@@ -66,7 +66,7 @@
   box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28) !important;
 }
 
-.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) {
+.h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) {
   list-style: none !important;
   padding: 0 !important;
   margin: 20px 0 !important;
@@ -75,7 +75,7 @@
   gap: 12px !important;
 }
 
-.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li {
+.h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer) {
   display: flex !important;
   align-items: center !important;
   gap: 16px !important;
@@ -93,14 +93,14 @@
   margin: 0 !important;
 }
 
-.h5p-advanced-text ul:not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li:hover {
+.h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover {
   transform: translateX(6px) !important;
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
 }
 
-.h5p-advanced-text ul:not(.rise-has-dom-badges):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress) > li::before {
+.h5p-advanced-text ul:not(.rise-has-dom-badges):not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer)::before {
   content: "" !important;
   width: 12px !important;
   height: 12px !important;

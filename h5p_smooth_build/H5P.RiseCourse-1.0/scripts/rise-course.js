@@ -693,14 +693,16 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
       $lists.each(function () {
         var $list = $(this);
-        if ($list.closest(".h5p-summary-list, .ui-autocomplete, .rise-course-sections, .rise-lesson-list, .h5p-image-slider-progress, .rise-code-dots, .h5p-audio-inner").length) return;
+        // Exclude all quiz options, answers, scorebars, navigation, and special widgets
+        if ($list.is(".h5p-sc-alternatives, .h5p-answers, .h5p-question-answers, .h5p-choices, .h5p-summary-list, .rise-lesson-list, .rise-course-sections, .h5p-image-slider-progress, .h5p-dragnbar-ul, .h5p-joubelui-score-bar")) return;
+        if ($list.closest(".h5p-multichoice, .h5p-single-choice-set, .h5p-true-false, .h5p-question, .h5p-summary-list, .ui-autocomplete, .rise-course-sections, .rise-lesson-list, .h5p-image-slider-progress, .rise-code-dots, .h5p-audio-inner, .h5p-ba-navigation, .h5p-dialogcards, .h5p-drag-text").length) return;
         $list.addClass("rise-has-dom-badges");
         var isOrdered = $list.is("ol") || $list.hasClass("rise-numbered-list") || $list.hasClass("rise-steps-list-clean");
         var counter = 1;
         var $items = $list.is(".rise-steps-list-clean") ? $list.find(".rise-clean-step-item") : $list.find("> li");
         $items.each(function (idx) {
           var $li = $(this);
-          if ($li.hasClass("rise-list-item-enhanced")) return;
+          if ($li.hasClass("rise-list-item-enhanced") || $li.hasClass("h5p-sc-alternative") || $li.hasClass("h5p-answer") || $li.closest(".h5p-question").length) return;
           $li.addClass("rise-list-item-enhanced");
           $li.css("animation-delay", ((idx + 1) * 0.08) + "s");
 

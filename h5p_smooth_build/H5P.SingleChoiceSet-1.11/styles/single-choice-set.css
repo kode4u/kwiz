@@ -132,8 +132,10 @@ ul.h5p-sc-alternatives:not(.h5p-sc-selected) li.h5p-sc-alternative {
 
 ul.h5p-sc-alternatives li.h5p-sc-alternative:hover {
   filter: none;
-  border-color: transparent;
-  background-color: var(--h5p-theme-alternative-dark);
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1.5px #3b82f6 !important;
+  background-color: #f8fafc !important;
+  transform: none !important;
 }
 
 ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative,
