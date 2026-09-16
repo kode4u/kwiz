@@ -300,13 +300,83 @@ body.rise-studio-body-fullscreen {
   gap: 4px;
 }
 
-.rise-outline-section-label {
-  font-size: 0.68rem;
+.rise-outline-section-group {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rise-outline-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 4px 8px;
+  color: #94a3b8;
+  font-size: 0.72rem;
   font-weight: 800;
-  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 10px 8px 4px 8px;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+}
+
+.rise-outline-section-title {
+  flex: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s ease;
+}
+
+.rise-outline-section-title:hover {
+  color: #38bdf8;
+}
+
+.rise-outline-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.rise-outline-section-header:hover .rise-outline-section-actions {
+  opacity: 1;
+}
+
+.rise-sec-action-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.rise-sec-action-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.rise-sec-action-btn.is-del:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.rise-outline-section-lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .rise-outline-item {
@@ -330,6 +400,7 @@ body.rise-studio-body-fullscreen {
   min-height: 34px !important;
   box-sizing: border-box !important;
   list-style: none !important;
+  position: relative !important;
 }
 
 .rise-outline-item::before,
@@ -383,6 +454,69 @@ body.rise-studio-body-fullscreen {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   font-size: 0.8rem !important;
+}
+
+.rise-outline-item-actions {
+  display: none !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin-left: auto !important;
+}
+
+.rise-outline-item:hover .rise-outline-item-actions {
+  display: flex !important;
+}
+
+.rise-item-action-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  border-radius: 3px !important;
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  transition: all 0.15s ease !important;
+}
+
+.rise-item-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.rise-item-action-btn.is-del:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.rise-outline-add-cat-btn {
+  margin-top: 14px !important;
+  background: rgba(30, 41, 59, 0.8) !important;
+  color: #38bdf8 !important;
+  border: 1.5px dashed rgba(56, 189, 248, 0.4) !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.rise-outline-add-cat-btn:hover {
+  background: #1e293b !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
 }
 
 /* 2. Center Live Visual Canvas */

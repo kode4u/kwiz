@@ -629,8 +629,36 @@
       if (params.sections && params.sections.length > 0) {
         params.sections.forEach(function (sec, sIdx) {
           var secTitle = sec.sectionTitle || ("Section " + (sIdx + 1));
-          var $secLabel = $('<div class="rise-outline-section-label">' + secTitle + '</div>');
-          $tree.append($secLabel);
+          
+          var $secGroup = $('<div class="rise-outline-section-group" data-section-idx="' + sIdx + '">' +
+            '<div class="rise-outline-section-header">' +
+              '<span class="rise-outline-section-title" title="Click to rename Category">' + secTitle + '</span>' +
+              '<div class="rise-outline-section-actions">' +
+                '<button type="button" class="rise-sec-action-btn is-add-lesson" title="Add Sub-item / Lesson to this Category">➕</button>' +
+                '<button type="button" class="rise-sec-action-btn is-edit-cat" title="Rename Category">✏️</button>' +
+                '<button type="button" class="rise-sec-action-btn is-del is-del-cat" title="Delete Category">🗑️</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="rise-outline-section-lessons"></div>' +
+          '</div>');
+
+          // Section Header events
+          $secGroup.find(".rise-outline-section-title, .is-edit-cat").on("click", function (e) {
+            e.stopPropagation();
+            self.openCategoryModal(sIdx, false);
+          });
+
+          $secGroup.find(".is-add-lesson").on("click", function (e) {
+            e.stopPropagation();
+            self.openLessonModal(sIdx, -1, true);
+          });
+
+          $secGroup.find(".is-del-cat").on("click", function (e) {
+            e.stopPropagation();
+            self.deleteSection(sIdx);
+          });
+
+          var $lessonsContainer = $secGroup.find(".rise-outline-section-lessons");
 
           if (sec.lessons && sec.lessons.length > 0) {
             sec.lessons.forEach(function (les, lIdx) {
@@ -645,7 +673,22 @@
                   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
                 '</div>' +
                 '<span class="rise-outline-item-title">' + title + '</span>' +
+                '<div class="rise-outline-item-actions">' +
+                  '<button type="button" class="rise-item-action-btn is-edit-lesson" title="Rename / Edit Lesson">✏️</button>' +
+                  '<button type="button" class="rise-item-action-btn is-del is-del-lesson" title="Delete Lesson">🗑️</button>' +
+                '</div>' +
               '</div>');
+
+              // Lesson edit / delete buttons
+              $lessonItem.find(".is-edit-lesson").on("click", function (e) {
+                e.stopPropagation();
+                self.openLessonModal(sIdx, lIdx, false);
+              });
+
+              $lessonItem.find(".is-del-lesson").on("click", function (e) {
+                e.stopPropagation();
+                self.deleteLesson(sIdx, lIdx);
+              });
 
               // Drag to reorder lesson items
               $lessonItem.on("dragstart", function (e) {
@@ -726,12 +769,24 @@
                 $(".rise-outline-item").removeClass("drag-over-top drag-over-bottom is-reordering");
               });
 
-              $tree.append($lessonItem);
+              $lessonsContainer.append($lessonItem);
               lessonCount++;
             });
           }
+
+          $tree.append($secGroup);
         });
       }
+
+      // Add Category / Section button at bottom of outline
+      var $addCatBtn = $('<button type="button" class="rise-outline-add-cat-btn" title="Add New Category / Section">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+        '<span>Add Category / Section</span>' +
+      '</button>');
+      $addCatBtn.on("click", function () {
+        self.openCategoryModal(-1, true);
+      });
+      $tree.append($addCatBtn);
 
       self.updateTopBadge();
       self.renderActiveTabContent();
@@ -1335,30 +1390,283 @@
     };
 
     /**
-     * Add new lesson
+     * Add new Category / Section
+     */
+    self.addNewSection = function (title) {
+      var params = self.getParams();
+      if (!params.sections) params.sections = [];
+
+      var secNum = params.sections.length + 1;
+      var secTitle = title || ("ចំណាត់ថ្នាក់ទី " + secNum + " (Section " + secNum + ")");
+
+      var newSec = {
+        sectionTitle: secTitle,
+        lessons: []
+      };
+
+      var newLesson = {
+        title: "មេរៀនទី១: ការណែនាំ",
+        iconType: "overview",
+        content: ""
+      };
+      self.setLessonContentHtml(newLesson, '<div class="rise-header-block"><div class="rise-category-tag">' + secTitle + '</div><h2 class="rise-main-title">មេរៀនដំបូង</h2><p class="rise-main-desc">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ...</p></div>');
+      newSec.lessons.push(newLesson);
+
+      params.sections.push(newSec);
+      var sIdx = params.sections.length - 1;
+      self.activeTab = sIdx + "_0";
+      self.updateStudio();
+      self.showToast("New Category & Lesson added!");
+    };
+
+    /**
+     * Add new Lesson to a specific Section
+     */
+    self.addNewLessonToSection = function (sIdx, title) {
+      var params = self.getParams();
+      if (!params.sections) params.sections = [];
+      if (!params.sections[sIdx]) {
+        params.sections[sIdx] = { sectionTitle: "Course Section", lessons: [] };
+      }
+      var sec = params.sections[sIdx];
+      if (!sec.lessons) sec.lessons = [];
+
+      var newNum = sec.lessons.length + 1;
+      var lessonTitle = title || ("មេរៀនទី" + newNum + ": ចំណងជើងមេរៀនថ្មី");
+
+      var newLesson = {
+        title: lessonTitle,
+        iconType: "overview",
+        content: ""
+      };
+      self.setLessonContentHtml(newLesson, '<div class="rise-header-block"><div class="rise-category-tag">' + (sec.sectionTitle || 'Lesson') + '</div><h2 class="rise-main-title">' + lessonTitle + '</h2><p class="rise-main-desc">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ...</p></div>');
+      sec.lessons.push(newLesson);
+
+      self.activeTab = sIdx + "_" + (sec.lessons.length - 1);
+      self.updateStudio();
+      self.showToast("New Lesson added!");
+    };
+
+    /**
+     * Delete Section
+     */
+    self.deleteSection = function (sIdx) {
+      var params = self.getParams();
+      if (!params.sections || !params.sections[sIdx]) return;
+
+      if (params.sections.length <= 1) {
+        self.showToast("Cannot delete the only remaining section.");
+        return;
+      }
+
+      var secTitle = params.sections[sIdx].sectionTitle || ("Section " + (sIdx + 1));
+      if (!confirm('Are you sure you want to delete Category "' + secTitle + '" and all its lessons?')) {
+        return;
+      }
+
+      params.sections.splice(sIdx, 1);
+      self.activeTab = "cover";
+      self.updateStudio();
+      self.showToast("Category deleted.");
+    };
+
+    /**
+     * Delete Lesson
+     */
+    self.deleteLesson = function (sIdx, lIdx) {
+      var params = self.getParams();
+      if (!params.sections || !params.sections[sIdx] || !params.sections[sIdx].lessons || !params.sections[sIdx].lessons[lIdx]) return;
+
+      var sec = params.sections[sIdx];
+      var lesTitle = sec.lessons[lIdx].title || ("Lesson " + (lIdx + 1));
+
+      if (sec.lessons.length <= 1 && params.sections.length <= 1) {
+        self.showToast("Cannot delete the only lesson of the course.");
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete Lesson "' + lesTitle + '"?')) {
+        return;
+      }
+
+      sec.lessons.splice(lIdx, 1);
+      if (sec.lessons.length === 0) {
+        params.sections.splice(sIdx, 1);
+      }
+
+      self.activeTab = "cover";
+      self.updateStudio();
+      self.showToast("Lesson deleted.");
+    };
+
+    /**
+     * Open Category / Section Edit or Add Modal (In-place modal, middle of screen)
+     */
+    self.openCategoryModal = function (sIdx, isNew) {
+      var params = self.getParams();
+      if (!params.sections) params.sections = [];
+      var currentTitle = "";
+      if (!isNew && sIdx >= 0 && params.sections[sIdx]) {
+        currentTitle = params.sections[sIdx].sectionTitle || "";
+      }
+
+      $(".rise-category-modal-backdrop").remove();
+
+      var modalTitle = isNew ? "Add New Category / Section" : "Edit Category Title";
+      var btnText = isNew ? "Create Category" : "Save Changes";
+
+      var $modal = $('<div class="rise-category-modal-backdrop rise-html-modal-backdrop">' +
+        '<div class="rise-category-modal-dialog rise-html-modal-dialog" style="max-width: 480px;">' +
+          '<div class="rise-html-modal-header">' +
+            '<div class="rise-html-modal-title">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+              '<span>' + modalTitle + '</span>' +
+            '</div>' +
+            '<button type="button" class="rise-html-modal-close" title="Close">✕</button>' +
+          '</div>' +
+          '<div class="rise-html-modal-body" style="padding: 20px;">' +
+            '<label style="font-size: 0.825rem; font-weight: 700; color: #334155; margin-bottom: 6px; display: block;">Category / Section Title</label>' +
+            '<input type="text" class="rise-cat-input-title" value="' + $('<div>').text(currentTitle).html() + '" placeholder="e.g., មេរៀនទី១: មូលដ្ឋានគ្រឹះ (Basics)" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 0.95rem; box-sizing: border-box; outline: none; font-family: inherit;">' +
+          '</div>' +
+          '<div class="rise-html-modal-footer">' +
+            '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">' + btnText + '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      self.getMountRoot().append($modal);
+      $modal.find(".rise-cat-input-title").focus().select();
+
+      $modal.find(".rise-html-modal-close, .rise-image-modal-btn.cancel").on("click", function () {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+
+      $modal.on("click", function (e) {
+        if ($(e.target).hasClass("rise-category-modal-backdrop")) {
+          $modal.fadeOut(150, function () { $(this).remove(); });
+        }
+      });
+
+      function submitCategory() {
+        var val = $modal.find(".rise-cat-input-title").val().trim();
+        if (!val) {
+          val = isNew ? "ចំណាត់ថ្នាក់ថ្មី (New Category)" : "Category";
+        }
+        if (isNew) {
+          self.addNewSection(val);
+        } else if (sIdx >= 0 && params.sections[sIdx]) {
+          params.sections[sIdx].sectionTitle = val;
+          self.updateStudio();
+          self.showToast("Category updated!");
+        }
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      }
+
+      $modal.find(".rise-image-modal-btn.apply").on("click", submitCategory);
+      $modal.find(".rise-cat-input-title").on("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submitCategory();
+        }
+      });
+    };
+
+    /**
+     * Open Lesson Edit or Add Modal (In-place modal, middle of screen)
+     */
+    self.openLessonModal = function (sIdx, lIdx, isNew) {
+      var params = self.getParams();
+      if (!params.sections) params.sections = [];
+      if (!params.sections[sIdx]) {
+        params.sections[sIdx] = { sectionTitle: "Section", lessons: [] };
+      }
+      var sec = params.sections[sIdx];
+      var currentTitle = "";
+      if (!isNew && lIdx >= 0 && sec.lessons && sec.lessons[lIdx]) {
+        currentTitle = sec.lessons[lIdx].title || "";
+      }
+
+      $(".rise-lesson-modal-backdrop").remove();
+
+      var modalTitle = isNew ? "Add New Sub-item / Lesson" : "Edit Lesson Title";
+      var btnText = isNew ? "Add Lesson" : "Save Changes";
+
+      var $modal = $('<div class="rise-lesson-modal-backdrop rise-html-modal-backdrop">' +
+        '<div class="rise-lesson-modal-dialog rise-html-modal-dialog" style="max-width: 480px;">' +
+          '<div class="rise-html-modal-header">' +
+            '<div class="rise-html-modal-title">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+              '<span>' + modalTitle + '</span>' +
+            '</div>' +
+            '<button type="button" class="rise-html-modal-close" title="Close">✕</button>' +
+          '</div>' +
+          '<div class="rise-html-modal-body" style="padding: 20px;">' +
+            '<div style="font-size: 0.8rem; color: #2563eb; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Under: ' + (sec.sectionTitle || ("Section " + (sIdx + 1))) + '</div>' +
+            '<label style="font-size: 0.825rem; font-weight: 700; color: #334155; margin-bottom: 6px; display: block;">Lesson Title</label>' +
+            '<input type="text" class="rise-lesson-input-title" value="' + $('<div>').text(currentTitle).html() + '" placeholder="e.g., មេរៀនទី១: ការដំឡើង JDK" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 0.95rem; box-sizing: border-box; outline: none; font-family: inherit;">' +
+          '</div>' +
+          '<div class="rise-html-modal-footer">' +
+            '<button type="button" class="rise-image-modal-btn cancel">Cancel</button>' +
+            '<button type="button" class="rise-image-modal-btn apply">' + btnText + '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      self.getMountRoot().append($modal);
+      $modal.find(".rise-lesson-input-title").focus().select();
+
+      $modal.find(".rise-html-modal-close, .rise-image-modal-btn.cancel").on("click", function () {
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      });
+
+      $modal.on("click", function (e) {
+        if ($(e.target).hasClass("rise-lesson-modal-backdrop")) {
+          $modal.fadeOut(150, function () { $(this).remove(); });
+        }
+      });
+
+      function submitLesson() {
+        var val = $modal.find(".rise-lesson-input-title").val().trim();
+        if (isNew) {
+          self.addNewLessonToSection(sIdx, val);
+        } else if (lIdx >= 0 && sec.lessons && sec.lessons[lIdx]) {
+          if (!val) val = "Lesson " + (lIdx + 1);
+          sec.lessons[lIdx].title = val;
+          self.updateStudio();
+          self.showToast("Lesson title updated!");
+        }
+        $modal.fadeOut(150, function () { $(this).remove(); });
+      }
+
+      $modal.find(".rise-image-modal-btn.apply").on("click", submitLesson);
+      $modal.find(".rise-lesson-input-title").on("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submitLesson();
+        }
+      });
+    };
+
+    /**
+     * Add new lesson from top bar button or footer
      */
     self.addNewLesson = function () {
       var params = self.getParams();
       if (!params.sections) params.sections = [];
       if (params.sections.length === 0) {
-        params.sections.push({ sectionTitle: "មាតិកាមេរៀន (Course Lessons)", lessons: [] });
+        self.addNewSection("មាតិកាមេរៀន (Course Lessons)");
+        return;
       }
 
-      var sec = params.sections[0];
-      if (!sec.lessons) sec.lessons = [];
+      var sIdx = 0;
+      if (self.activeTab !== "cover") {
+        var parts = self.activeTab.split("_");
+        sIdx = parseInt(parts[0], 10) || 0;
+      }
+      if (sIdx >= params.sections.length) sIdx = params.sections.length - 1;
 
-      var newNum = sec.lessons.length + 1;
-      var newLesson = {
-        title: "មេរៀនទី" + newNum + ": ចំណងជើងមេរៀនថ្មី",
-        iconType: "overview",
-        content: ""
-      };
-      self.setLessonContentHtml(newLesson, '<div class="rise-header-block"><div class="rise-category-tag">Lesson ' + newNum + '</div><h2 class="rise-main-title">មេរៀនទី' + newNum + '</h2><p class="rise-main-desc">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ...</p></div>');
-      sec.lessons.push(newLesson);
-
-      self.activeTab = "0_" + (sec.lessons.length - 1);
-      self.updateStudio();
-      self.showToast("New Lesson added!");
+      self.openLessonModal(sIdx, -1, true);
     };
 
     /**
