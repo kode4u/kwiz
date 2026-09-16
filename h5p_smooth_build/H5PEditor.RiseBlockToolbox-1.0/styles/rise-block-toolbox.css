@@ -11,8 +11,8 @@
   width: 320px !important;
   background: #0f172a !important;
   color: #f8fafc !important;
-  z-index: 10050 !important;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35) !important;
+  z-index: 2147483640 !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
   display: flex !important;
   flex-direction: column !important;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -28,11 +28,11 @@
 /* Toggle Button on Edge */
 .rise-toolbox-toggle-btn {
   position: absolute !important;
-  top: 140px !important;
+  top: 160px !important;
   left: 320px !important;
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6) !important;
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
   border-left: none !important;
   border-radius: 0 10px 10px 0 !important;
   padding: 12px 14px !important;
@@ -40,24 +40,25 @@
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
-  font-size: 0.825rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.04em !important;
-  box-shadow: 4px 2px 14px rgba(0, 0, 0, 0.25) !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.4) !important;
   transition: all 0.2s ease !important;
-  z-index: 10051 !important;
+  z-index: 2147483645 !important;
+  outline: none !important;
 }
 
 .rise-toolbox-dock.is-collapsed .rise-toolbox-toggle-btn {
   left: 320px !important;
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6) !important;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6) !important;
   color: #ffffff !important;
 }
 
 .rise-toolbox-toggle-btn:hover {
-  background: #2563eb !important;
+  background: #1d4ed8 !important;
   color: #ffffff !important;
-  transform: translateX(3px) !important;
+  transform: scale(1.04) !important;
 }
 
 /* Header */

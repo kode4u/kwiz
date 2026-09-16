@@ -136,17 +136,96 @@
     ];
 
     self.init = function () {
-      if ($(".rise-toolbox-dock").length > 0) return;
+      self.ensureStyles(document);
+      try {
+        if (window.parent && window.parent.document && window.parent.document !== document) {
+          self.ensureStyles(window.parent.document);
+        }
+      } catch (e) {}
+
       self.renderDock();
       self.setupDragAndDrop();
       self.renderGalleryStudioModal();
+    };
+
+    self.ensureStyles = function (targetDoc) {
+      if (!targetDoc || targetDoc.getElementById("rise-toolbox-injected-styles")) return;
+      var style = targetDoc.createElement("style");
+      style.id = "rise-toolbox-injected-styles";
+      style.textContent = `
+        .rise-toolbox-dock {
+          position: fixed !important;
+          left: 0 !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          width: 320px !important;
+          background: #0f172a !important;
+          color: #f8fafc !important;
+          z-index: 2147483640 !important;
+          box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          box-sizing: border-box !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+          user-select: none !important;
+        }
+        .rise-toolbox-dock.is-collapsed {
+          transform: translateX(-320px) !important;
+        }
+        .rise-toolbox-toggle-btn {
+          position: absolute !important;
+          top: 160px !important;
+          left: 320px !important;
+          background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+          color: #ffffff !important;
+          border: 1px solid rgba(255, 255, 255, 0.35) !important;
+          border-left: none !important;
+          border-radius: 0 10px 10px 0 !important;
+          padding: 12px 14px !important;
+          cursor: pointer !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          font-size: 0.85rem !important;
+          font-weight: 800 !important;
+          letter-spacing: 0.05em !important;
+          box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.4) !important;
+          transition: all 0.2s ease !important;
+          z-index: 2147483645 !important;
+          outline: none !important;
+        }
+        .rise-toolbox-dock.is-collapsed .rise-toolbox-toggle-btn {
+          left: 320px !important;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6) !important;
+          color: #ffffff !important;
+        }
+        .rise-toolbox-toggle-btn:hover {
+          background: #1d4ed8 !important;
+          color: #ffffff !important;
+          transform: scale(1.04) !important;
+        }
+      `;
+      targetDoc.head.appendChild(style);
     };
 
     /**
      * Render Left Sidebar Toolbox Dock
      */
     self.renderDock = function () {
-      var $dock = $('<aside class="rise-toolbox-dock">' +
+      var targetDoc = document;
+      try {
+        if (window.parent && window.parent.document && window.parent.document.body) {
+          targetDoc = window.parent.document;
+        }
+      } catch (e) {
+        targetDoc = document;
+      }
+
+      var $target = $(targetDoc.body || document.body);
+      if ($target.find(".rise-toolbox-dock").length > 0 || $(".rise-toolbox-dock").length > 0) return;
+
+      var $dock = $('<aside class="rise-toolbox-dock is-collapsed">' +
         '<button type="button" class="rise-toolbox-toggle-btn" title="Toggle Rise Block Library">' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>' +
           '<span>BLOCKS</span>' +
@@ -233,7 +312,7 @@
         });
       });
 
-      $("body").append($dock);
+      $target.append($dock);
     };
 
     /**
