@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Articulate Rise Live Visual Studio & Embedded Component Toolbox
-   Consistent, modern, high-contrast UI matching student preview.
+   Articulate Rise Fullscreen Live Studio & Component Toolbox
+   Full-screen WYSIWYG authoring studio matching student preview.
    ========================================================================== */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap");
 
@@ -18,34 +18,55 @@
 }
 
 /* --------------------------------------------------------------------------
-   1. Root Studio Container & Layout
+   1. Studio Root Container (Full Width / Fullscreen Studio)
    -------------------------------------------------------------------------- */
 .rise-visual-editor-root {
-  background: #f8fafc;
+  background: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 10px 0 30px 0;
   font-family: var(--rise-font);
   display: flex;
   flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* True Immersive Fullscreen Mode */
+.rise-visual-editor-root.is-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483640 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  box-shadow: none !important;
 }
 
 /* --------------------------------------------------------------------------
-   2. Top Studio Control Bar & Consistent Buttons
+   2. Top Studio Navigation Bar
    -------------------------------------------------------------------------- */
 .rise-visual-top-bar {
   background: #0b1120;
   color: #ffffff;
-  padding: 10px 16px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   border-bottom: 1px solid #1e293b;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   z-index: 10;
+  height: 56px;
+  box-sizing: border-box;
 }
 
 .rise-visual-nav-pills {
@@ -53,12 +74,13 @@
   align-items: center;
   gap: 8px;
   overflow-x: auto;
+  flex: 1;
 }
 
-/* Unified consistent styling for all top-bar buttons */
+/* Unified Button Styling */
 .rise-visual-pill-btn,
 .rise-visual-add-lesson-btn,
-.rise-visual-mode-btn {
+.rise-visual-fullscreen-btn {
   height: 36px !important;
   box-sizing: border-box !important;
   border-radius: 8px !important;
@@ -76,7 +98,6 @@
   outline: none !important;
 }
 
-/* Default state for navigation pill button */
 .rise-visual-pill-btn {
   background: #1e293b !important;
   color: #cbd5e1 !important;
@@ -89,7 +110,6 @@
   border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Active state for navigation pill button */
 .rise-visual-pill-btn.is-active {
   background: #2563eb !important;
   color: #ffffff !important;
@@ -97,7 +117,6 @@
   box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45) !important;
 }
 
-/* Add Lesson Button */
 .rise-visual-add-lesson-btn {
   background: rgba(56, 189, 248, 0.12) !important;
   color: #38bdf8 !important;
@@ -111,60 +130,57 @@
   box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3) !important;
 }
 
-/* View Mode Switcher Container */
-.rise-visual-mode-toggle {
-  display: inline-flex;
-  align-items: center;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  padding: 2px;
-  gap: 2px;
-}
-
-.rise-visual-mode-btn {
-  height: 30px !important;
-  padding: 0 12px !important;
-  border-radius: 6px !important;
-  border: none !important;
-  background: transparent !important;
+/* Fullscreen Toggle Button */
+.rise-visual-fullscreen-btn {
+  background: #1e293b !important;
   color: #94a3b8 !important;
-  font-size: 0.775rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-.rise-visual-mode-btn:hover {
-  color: #ffffff !important;
+.rise-visual-fullscreen-btn:hover {
+  background: #334155 !important;
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
 }
 
-.rise-visual-mode-btn.is-active {
+.rise-visual-editor-root.is-fullscreen .rise-visual-fullscreen-btn {
   background: #2563eb !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
-}
-
-/* Studio Workspace Layout */
-.rise-visual-workspace {
-  display: flex;
-  min-height: 650px;
-  background: #ffffff;
+  border-color: #3b82f6 !important;
 }
 
 /* --------------------------------------------------------------------------
-   3. Left Component Toolbox
+   3. Studio Workspace (Split Layout)
    -------------------------------------------------------------------------- */
+.rise-visual-workspace {
+  display: flex;
+  height: calc(100vh - 120px);
+  min-height: 600px;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.rise-visual-editor-root.is-fullscreen .rise-visual-workspace {
+  height: calc(100vh - 56px);
+  min-height: 0;
+}
+
+/* Left Sidebar Toolbox */
 .rise-visual-sidebar-toolbox {
-  width: 280px;
-  min-width: 280px;
+  width: 290px;
+  min-width: 290px;
   background: #0f172a;
   color: #f8fafc;
   border-right: 1px solid #1e293b;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .rise-toolbox-header {
-  padding: 14px 12px 10px 12px;
+  padding: 14px 14px 10px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
@@ -238,7 +254,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 850px;
 }
 
 .rise-toolbox-category {
@@ -334,14 +349,14 @@
 /* Hover Preview Tooltip */
 .rise-live-preview-tooltip {
   position: fixed;
-  left: 310px;
+  left: 315px;
   width: 320px;
   background: #0b1120;
   border: 1px solid rgba(56, 189, 248, 0.4);
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
-  z-index: 2147483646;
+  z-index: 2147483647;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -419,21 +434,21 @@
   background: #ffffff;
   position: relative;
   overflow-y: auto;
-  max-height: 850px;
+  height: 100%;
 }
 
 /* Cover Hero Banner */
 .rise-canvas-cover-hero {
   position: relative;
   width: 100%;
-  min-height: 400px;
+  min-height: 440px;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 20px;
+  padding: 50px 24px;
   box-sizing: border-box;
 }
 
@@ -447,24 +462,24 @@
 .rise-canvas-hero-content {
   position: relative;
   z-index: 2;
-  max-width: 780px;
+  max-width: 820px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
 }
 
 .rise-canvas-title-editable {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.35;
   margin: 0;
   outline: none;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 6px;
-  border: 1px dashed transparent;
+  border: 1.5px dashed transparent;
   transition: all 0.2s ease;
   cursor: text;
 }
@@ -480,25 +495,26 @@
   color: #0f172a;
   border: none;
   border-radius: 30px;
-  padding: 12px 34px;
-  font-size: 0.9rem;
+  padding: 13px 36px;
+  font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
 }
 
 .rise-canvas-cover-btn:hover {
   background: #f1f5f9;
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .rise-canvas-change-cover-btn {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 16px;
+  right: 16px;
   z-index: 10;
   background: rgba(15, 23, 42, 0.75);
   color: #f8fafc;
@@ -522,13 +538,13 @@
 
 /* Outline & Glowing Bullets */
 .rise-canvas-outline-body {
-  max-width: 780px;
+  max-width: 820px;
   margin: 0 auto;
-  padding: 36px 24px 50px 24px;
+  padding: 40px 24px 60px 24px;
 }
 
 .rise-canvas-outline-intro {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 24px;
@@ -654,25 +670,25 @@
    5. Lesson Content & Blocks in Canvas
    -------------------------------------------------------------------------- */
 .rise-canvas-lesson-body {
-  max-width: 800px;
+  max-width: 840px;
   margin: 0 auto;
-  padding: 30px 24px 50px 24px;
+  padding: 36px 24px 60px 24px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .rise-canvas-lesson-header-bar {
   border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 14px;
-  margin-bottom: 6px;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .rise-canvas-lesson-title-editable {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #0f172a;
   outline: none;
@@ -692,7 +708,7 @@
 .rise-canvas-blocks-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   min-height: 100px;
 }
 
@@ -754,7 +770,7 @@
   color: #ffffff;
 }
 
-/* Enhanced Drag & Drop Target Drop Zones */
+/* Drag & Drop Target Drop Zones */
 .rise-canvas-drop-zone {
   border: 2px dashed #94a3b8;
   border-radius: 8px;
@@ -788,7 +804,7 @@
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
 }
 
-/* Bottom Lesson Navigation Bar inside Canvas */
+/* Bottom Lesson Navigation Bar */
 .rise-canvas-lesson-nav-footer {
   display: flex;
   align-items: center;
@@ -1077,18 +1093,16 @@
 .rise-quiz-option:hover { border-color: #2563eb; background: #eff6ff; }
 
 /* --------------------------------------------------------------------------
-   7. Form Hiding & Clean Authoring Rules
+   7. Permanently Hide Old Form Fields & Legacy Clutter
    -------------------------------------------------------------------------- */
-.rise-visual-mode-active > .field,
-.rise-visual-mode-active > .h5p-editor-widget-group,
-.rise-visual-mode-active .field-name-courseMeta,
-.rise-visual-mode-active .field-name-sections,
-.rise-visual-mode-active .field-name-extraTitle,
-.rise-visual-mode-active .h5peditor-form > .field,
-.rise-visual-mode-active .h5p-vtab-forms {
-  display: none !important;
-}
-
+.field-name-courseMeta,
+.field-name-sections,
+.field-name-extraTitle,
+.h5peditor-form > .field,
+.h5peditor > .field,
+.h5p-vtab-forms,
+.h5peditor .tree,
+.h5peditor .h5p-editor-widget-group,
 .field-name-content > .h5peditor-copypaste-wrap,
 .field-name-lessons .h5peditor-copypaste-wrap,
 .field-name-sections .h5peditor-copypaste-wrap,

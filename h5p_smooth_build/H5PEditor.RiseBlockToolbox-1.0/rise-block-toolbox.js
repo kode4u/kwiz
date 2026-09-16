@@ -1,6 +1,6 @@
 /**
- * Articulate Rise Live Visual Studio & Embedded Component Toolbox for H5P
- * Pure SVG UI, integrated side-by-side WYSIWYG authoring studio with complete navigation.
+ * Articulate Rise Fullscreen Live Studio & Component Toolbox for H5P
+ * Pure SVG UI, full-screen WYSIWYG authoring studio with complete navigation.
  */
 (function ($) {
   "use strict";
@@ -52,7 +52,7 @@
     var self = this;
 
     self.activeTab = "cover"; // 'cover' or '0_0'
-    self.activeViewMode = "visual"; // 'visual' or 'form'
+    self.isFullscreen = false;
 
     self.blocks = [
       // 1. Text & Headings
@@ -278,16 +278,10 @@
               '<span>+ Add Lesson</span>' +
             '</button>' +
           '</div>' +
-          '<div class="rise-visual-mode-toggle">' +
-            '<button type="button" class="rise-visual-mode-btn is-active" data-mode="visual">' +
-              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
-              '<span>Live Visual Editor</span>' +
-            '</button>' +
-            '<button type="button" class="rise-visual-mode-btn" data-mode="form">' +
-              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' +
-              '<span>Form Fields</span>' +
-            '</button>' +
-          '</div>' +
+          '<button type="button" class="rise-visual-fullscreen-btn" title="Toggle Fullscreen Studio">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>' +
+            '<span>Fullscreen</span>' +
+          '</button>' +
         '</div>' +
         '<div class="rise-visual-workspace">' +
           '<aside class="rise-visual-sidebar-toolbox">' +
@@ -389,27 +383,16 @@
         });
       });
 
-      // Mode toggling
-      $editorRoot.find(".rise-visual-mode-btn").on("click", function () {
-        var mode = $(this).data("mode");
-        self.activeViewMode = mode;
-        $editorRoot.find(".rise-visual-mode-btn").removeClass("is-active");
-        $(this).addClass("is-active");
-
-        if (mode === "visual") {
-          $editorRoot.find(".rise-visual-workspace").show();
-          $(".h5peditor, .h5peditor-form").addClass("rise-visual-mode-active");
-          $(".field-name-courseMeta, .field-name-sections").hide();
+      // Fullscreen Toggle
+      $editorRoot.find(".rise-visual-fullscreen-btn").on("click", function () {
+        self.isFullscreen = !self.isFullscreen;
+        $editorRoot.toggleClass("is-fullscreen", self.isFullscreen);
+        if (self.isFullscreen) {
+          $(this).find("span").text("Exit Fullscreen");
         } else {
-          $editorRoot.find(".rise-visual-workspace").hide();
-          $(".h5peditor, .h5peditor-form").removeClass("rise-visual-mode-active");
-          $(".field-name-courseMeta, .field-name-sections").show();
+          $(this).find("span").text("Fullscreen");
         }
       });
-
-      // Default: active visual mode & hide old form fields
-      $(".h5peditor, .h5peditor-form").addClass("rise-visual-mode-active");
-      $(".field-name-courseMeta, .field-name-sections").hide();
 
       // Navigation tab switching
       $editorRoot.on("click", ".rise-visual-pill-btn", function () {
@@ -638,7 +621,6 @@
       var sec = (params.sections && params.sections[sIdx]) || {};
       var lesson = (sec.lessons && sec.lessons[lIdx]) || { title: "New Lesson", content: { params: [] } };
 
-      // Calculate previous and next navigation targets
       var prevTab = "cover";
       var prevLabel = "← Cover & Outline";
       if (lIdx > 0) {
@@ -867,7 +849,6 @@
      * Insert Block Content into target index or append
      */
     self.insertBlock = function (blockHtml, targetIndex) {
-      // If on cover page, automatically switch to Lesson 1 or create one
       if (self.activeTab === "cover") {
         var params = self.getParams();
         if (!params.sections || !params.sections[0] || !params.sections[0].lessons || params.sections[0].lessons.length === 0) {
@@ -908,7 +889,7 @@
     };
 
     /**
-     * Setup Reliable Drag & Drop across Workspace
+     * Setup Drag & Drop across Workspace
      */
     self.setupDragAndDrop = function () {
       $(document).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper, .rise-visual-canvas-area", function (e) {
