@@ -1,6 +1,6 @@
 /**
- * Articulate Rise Block Library & Drag-and-Drop Toolbox for H5P Editor
- * Clean, professional, pure SVG UI without emoji icons.
+ * Articulate Rise Live Visual Editor & Left Component Toolbox for H5P
+ * Pure SVG UI, WYSIWYG live course authoring matching student preview.
  */
 (function ($) {
   "use strict";
@@ -45,8 +45,14 @@
   }
   fixCoreTranslations();
 
+  /**
+   * Main Toolbox & Live Canvas Controller
+   */
   function RiseBlockToolbox() {
     var self = this;
+
+    self.activeTab = "cover"; // 'cover' or lesson index (e.g. 0, 1)
+    self.activeViewMode = "visual"; // 'visual' or 'form'
 
     self.blocks = [
       // 1. Text & Headings
@@ -132,22 +138,13 @@
         catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>',
         items: [
           {
-            id: "numbered_list",
-            name: "Numbered List",
-            badge: "Steps",
-            desc: "Gradient number badges",
-            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>',
-            previewHtml: '<div style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; gap: 6px; align-items: center;"><span style="background: #2563eb; color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700;">1</span><span>ជំហានទី១: ដំឡើង JDK</span></div><div style="display: flex; gap: 6px; align-items: center;"><span style="background: #2563eb; color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700;">2</span><span>ជំហានទី២: បង្កើតគម្រោងថ្មី</span></div></div>',
-            content: '<ol class="rise-numbered-list"><li>ជំហានទី១: ដំឡើង JDK និងផ្ទៀងផ្ទាត់ Environment Variables</li><li>ជំហានទី២: បង្កើតគម្រោងថ្មីនៅក្នុង Code Editor</li><li>ជំហានទី៣: សរសេរកូដ និងដំណើរការកម្មវិធី (Run & Debug)</li></ol>'
-          },
-          {
-            id: "bullet_list",
-            name: "Bullet List",
-            badge: "Bullets",
-            desc: "Glowing pill dot badges",
-            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>',
-            previewHtml: '<div style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; gap: 6px; align-items: center;"><span style="background: #3b82f6; width: 6px; height: 6px; border-radius: 50%;"></span><span>ភាសាកូដ Java មានលក្ខណៈ OOP</span></div><div style="display: flex; gap: 6px; align-items: center;"><span style="background: #3b82f6; width: 6px; height: 6px; border-radius: 50%;"></span><span>ដំណើរការបានលើគ្រប់ OS</span></div></div>',
-            content: '<ul class="rise-bullet-list"><li>ចំណុចសំខាន់ទី១: ភាសាកូដ Java មានលក្ខណៈ Object-Oriented</li><li>ចំណុចសំខាន់ទី២: អាចដំណើរការបានលើគ្រប់ OS (Write Once, Run Anywhere)</li><li>ចំណុចសំខាន់ទី៣: មាន Class Libraries និង Community ធំទូលាយ</li></ul>'
+            id: "bullet_list_glowing",
+            name: "Glowing Bullet List",
+            badge: "List",
+            desc: "Card list with glowing blue dots",
+            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="4" cy="18" r="2"/></svg>',
+            previewHtml: '<div style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;"><div style="background: #f8fafc; padding: 4px; border-radius: 4px; display: flex; gap: 6px; align-items: center;"><span style="color: #2563eb;">●</span><span>ភាសាកូដ Java</span></div><div style="background: #f8fafc; padding: 4px; border-radius: 4px; display: flex; gap: 6px; align-items: center;"><span style="color: #2563eb;">●</span><span>ពាក្យបច្ចេកទេស Syntax</span></div></div>',
+            content: '<ul class="rise-bullet-list"><li>ភាសាកូដ Java</li><li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>ដំណើរការ នៃការសរសេរកូដ Java</li><li>លក្ខណៈរបស់ភាសា Java</li></ul>'
           },
           {
             id: "check_list",
@@ -193,15 +190,6 @@
             content: '<div class="rise-image-grid-2"><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80" alt="Editor"><div class="rise-image-card-caption"><strong>1. Code Editor & IDE</strong><br>បរិស្ថានសម្រាប់សរសេរកូដ</div></div><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" alt="Java"><div class="rise-image-card-caption"><strong>2. Java Architecture</strong><br>ដំណើរការលើ JVM</div></div></div>'
           },
           {
-            id: "grid_gallery_3",
-            name: "3-Column Grid",
-            badge: "Grid",
-            desc: "Triple photo card showcase",
-            iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="5" height="18" rx="1"/><rect x="9.5" y="3" width="5" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1"/></svg>',
-            previewHtml: '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;"><div style="background: #cbd5e1; height: 35px; border-radius: 3px;"></div><div style="background: #94a3b8; height: 35px; border-radius: 3px;"></div><div style="background: #64748b; height: 35px; border-radius: 3px;"></div></div>',
-            content: '<div class="rise-image-grid-3"><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Card 1"><div class="rise-image-card-caption"><strong>1. IntelliJ IDEA</strong><br>IDE សម័យទំនើប</div></div><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80" alt="Card 2"><div class="rise-image-card-caption"><strong>2. Java JVM</strong><br>Bytecode Engine</div></div><div class="rise-image-card"><img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80" alt="Card 3"><div class="rise-image-card-caption"><strong>3. Clean Code</strong><br>ស្ថាបត្យកម្មកូដ</div></div></div>'
-          },
-          {
             id: "video_lecture",
             name: "Video Card",
             badge: "Video",
@@ -221,10 +209,10 @@
           }
         ]
       },
-      // 5. Interactive & Code
+      // 5. Interactive & Quizzes
       {
-        category: "Interactive & Code",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+        category: "Interactive & Quizzes",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
         items: [
           {
             id: "flip_flashcards",
@@ -232,7 +220,7 @@
             badge: "Cards",
             desc: "Word on front, definition on back",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="14" rx="2"/><path d="M6 3h14a2 2 0 0 1 2 2v12"/></svg>',
-            previewHtml: '<div style="display: flex; gap: 4px;"><div style="background: #2563eb; color: #fff; padding: 10px 4px; border-radius: 4px; flex: 1; text-align: center; font-size: 10px; font-weight: bold;">JDK</div><div style="background: #0284c7; color: #fff; padding: 10px 4px; border-radius: 4px; flex: 1; text-align: center; font-size: 10px; font-weight: bold;">JRE</div><div style="background: #4f46e5; color: #fff; padding: 10px 4px; border-radius: 4px; flex: 1; text-align: center; font-size: 10px; font-weight: bold;">JVM</div></div>',
+            previewHtml: '<div style="display: flex; gap: 4px;"><div style="background: #2563eb; color: #fff; padding: 10px 4px; border-radius: 4px; flex: 1; text-align: center; font-size: 10px; font-weight: bold;">JDK</div><div style="background: #0284c7; color: #fff; padding: 10px 4px; border-radius: 4px; flex: 1; text-align: center; font-size: 10px; font-weight: bold;">JRE</div></div>',
             content: '<div class="rise-flashcard-grid"><div class="rise-flip-card"><div class="rise-flip-card-inner"><div class="rise-flip-card-front"><div class="rise-flip-word">JDK</div></div><div class="rise-flip-card-back"><div class="rise-flip-definition"><strong>JDK (Java Development Kit)</strong><br>កញ្ចប់ឧបករណ៍ពេញលេញសម្រាប់ Developer សរសេរ និង compile កូដ Java។</div></div></div></div><div class="rise-flip-card"><div class="rise-flip-card-inner"><div class="rise-flip-card-front"><div class="rise-flip-word">JRE</div></div><div class="rise-flip-card-back"><div class="rise-flip-definition"><strong>JRE (Java Runtime Environment)</strong><br>បរិស្ថានសម្រាប់ដំណើរការកម្មវិធី Java សម្រាប់ End-user។</div></div></div></div><div class="rise-flip-card"><div class="rise-flip-card-inner"><div class="rise-flip-card-front"><div class="rise-flip-word">JVM</div></div><div class="rise-flip-card-back"><div class="rise-flip-definition"><strong>JVM (Java Virtual Machine)</strong><br>ម៉ាស៊ីននិម្មិតដែលដំណើរការ Java Bytecode នៅលើគ្រប់ OS។</div></div></div></div></div>'
           },
           {
@@ -248,335 +236,32 @@
             id: "code_window",
             name: "Code Window",
             badge: "Code",
-            desc: "Mac dots and Copy button",
+            desc: "Dark macOS IDE terminal snippet",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
-            previewHtml: '<div style="background: #0f172a; border-radius: 4px; padding: 4px 6px; color: #38bdf8; font-family: monospace; font-size: 9px;"><span style="color: #f43f5e;">●</span> <span style="color: #f59e0b;">●</span> <span style="color: #10b981;">●</span><br>System.out.println("Hello");</div>',
-            content: '<pre class="rise-code-block" data-lang="java"><code>public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("ស្វាគមន៍មកកាន់ភាសា Java!");\n    }\n}</code></pre>'
-          }
-        ]
-      },
-      // 6. Knowledge Check & Quiz
-      {
-        category: "Knowledge Checks",
-        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-        items: [
+            previewHtml: '<div style="background: #0f172a; color: #38bdf8; border-radius: 4px; padding: 6px; font-family: monospace; font-size: 9px;">public class Main {<br>&nbsp;&nbsp;System.out.println("Hello");<br>}</div>',
+            content: '<div class="rise-code-block"><div class="rise-code-header"><div class="rise-code-dots"><div class="rise-code-dot red"></div><div class="rise-code-dot amber"></div><div class="rise-code-dot green"></div></div><div class="rise-code-lang">Java</div></div><pre class="rise-code-body"><code>public class Main {\n    public static void main(String[] args) {\n        System.out.println("ស្វាគមន៍មកកាន់ការសិក្សាភាសា Java!");\n    }\n}</code></pre></div>'
+          },
           {
-            id: "quick_quiz_card",
-            name: "Knowledge Check Card",
+            id: "quiz_check_card",
+            name: "Knowledge Check Quiz",
             badge: "Quiz",
-            desc: "Instant check answer and feedback",
+            desc: "Multiple choice check question",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-            previewHtml: '<div style="border: 1px solid #3b82f6; border-radius: 6px; padding: 6px; font-size: 10px;"><div style="color: #2563eb; font-weight: bold;">Question Check:</div><div>○ JDK &nbsp; ● JVM &nbsp; ○ JRE</div></div>',
-            content: '<div class="rise-quiz-card"><span class="rise-quiz-badge">Knowledge Check</span><div class="rise-quiz-question">តើឧបករណ៍មួយណាដែលទទួលខុសត្រូវក្នុងការដំណើរការ Java Bytecode ទៅជា Machine Code?</div><div class="rise-quiz-option" data-correct="false">A. JDK (Java Development Kit)</div><div class="rise-quiz-option" data-correct="true">B. JVM (Java Virtual Machine)</div><div class="rise-quiz-option" data-correct="false">C. JRE (Java Runtime Environment)</div><div class="rise-quiz-feedback" style="display: none;"></div><button type="button" class="rise-quiz-check-btn">ផ្ទៀងផ្ទាត់ចម្លើយ (Check Answer)</button></div>'
+            previewHtml: '<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 10px;"><strong>សំនួរ:</strong> តើ Java Bytecode ដំណើរការលើអ្វី?<div style="margin-top: 4px; color: #2563eb;">○ JVM</div></div>',
+            content: '<div class="rise-quiz-card"><div class="rise-quiz-tag">Knowledge Check</div><div class="rise-quiz-question">សំនួរត្រួតពិនិត្យការយល់ដឹង: តើកម្មវិធី Java Bytecode ដំណើរការនៅលើអ្វី?</div><div class="rise-quiz-options"><div class="rise-quiz-option">○ A. JVM (Java Virtual Machine)</div><div class="rise-quiz-option">○ B. Operating System Kernel ផ្ទាល់</div><div class="rise-quiz-option">○ C. Web Browser JavaScript Engine</div></div></div>'
           }
         ]
       }
     ];
 
-    self.init = function () {
-      self.ensureStyles(document);
-      try {
-        if (window.parent && window.parent.document && window.parent.document !== document) {
-          self.ensureStyles(window.parent.document);
-        }
-      } catch (e) {}
-
-      self.renderDock();
-      self.setupDragAndDrop();
-    };
-
     /**
-     * Inject Full CSS Stylesheet into Target Document
+     * Initialize Toolbox & Visual Canvas
      */
-    self.ensureStyles = function (targetDoc) {
-      if (!targetDoc || targetDoc.getElementById("rise-toolbox-full-styles")) return;
-      var style = targetDoc.createElement("style");
-      style.id = "rise-toolbox-full-styles";
-      style.textContent = `
-        .rise-toolbox-dock {
-          position: fixed !important;
-          left: 0 !important;
-          top: 0 !important;
-          bottom: 0 !important;
-          width: 320px !important;
-          background: #0f172a !important;
-          color: #f8fafc !important;
-          z-index: 2147483640 !important;
-          box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
-          display: flex !important;
-          flex-direction: column !important;
-          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
-          box-sizing: border-box !important;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-          user-select: none !important;
-        }
-        .rise-toolbox-dock.is-collapsed {
-          transform: translateX(-320px) !important;
-        }
-        .rise-toolbox-toggle-btn {
-          position: absolute !important;
-          top: 160px !important;
-          left: 320px !important;
-          background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
-          color: #ffffff !important;
-          border: 1px solid rgba(255, 255, 255, 0.35) !important;
-          border-left: none !important;
-          border-radius: 0 10px 10px 0 !important;
-          padding: 12px 14px !important;
-          cursor: pointer !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 8px !important;
-          font-size: 0.85rem !important;
-          font-weight: 800 !important;
-          letter-spacing: 0.05em !important;
-          box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.4) !important;
-          transition: all 0.2s ease !important;
-          z-index: 2147483645 !important;
-          outline: none !important;
-        }
-        .rise-toolbox-dock.is-collapsed .rise-toolbox-toggle-btn {
-          left: 320px !important;
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6) !important;
-          color: #ffffff !important;
-        }
-        .rise-toolbox-toggle-btn:hover {
-          background: #1d4ed8 !important;
-          color: #ffffff !important;
-          transform: scale(1.04) !important;
-        }
-        .rise-toolbox-header {
-          padding: 18px 16px 14px 16px !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 12px !important;
-          background: #0b1120 !important;
-        }
-        .rise-toolbox-title-row {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-        }
-        .rise-toolbox-title {
-          font-size: 0.95rem !important;
-          font-weight: 800 !important;
-          color: #ffffff !important;
-          letter-spacing: 0.05em !important;
-          text-transform: uppercase !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 8px !important;
-        }
-        .rise-toolbox-badge {
-          background: rgba(59, 130, 246, 0.25) !important;
-          color: #60a5fa !important;
-          border: 1px solid rgba(96, 165, 250, 0.4) !important;
-          font-size: 0.7rem !important;
-          padding: 3px 8px !important;
-          border-radius: 12px !important;
-          font-weight: 700 !important;
-        }
-        .rise-toolbox-search-wrapper {
-          position: relative !important;
-        }
-        .rise-toolbox-search-input {
-          width: 100% !important;
-          background: #1e293b !important;
-          border: 1px solid rgba(255, 255, 255, 0.15) !important;
-          border-radius: 8px !important;
-          padding: 9px 12px 9px 34px !important;
-          color: #ffffff !important;
-          font-size: 0.85rem !important;
-          outline: none !important;
-          box-sizing: border-box !important;
-          transition: all 0.2s ease !important;
-        }
-        .rise-toolbox-search-input:focus {
-          border-color: #3b82f6 !important;
-          background: #1e293b !important;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-        }
-        .rise-toolbox-search-icon {
-          position: absolute !important;
-          left: 10px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          color: #94a3b8 !important;
-          pointer-events: none !important;
-        }
-        .rise-toolbox-body {
-          flex: 1 !important;
-          overflow-y: auto !important;
-          padding: 14px 12px !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 16px !important;
-        }
-        .rise-toolbox-category {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 8px !important;
-        }
-        .rise-toolbox-category-title {
-          font-size: 0.725rem !important;
-          font-weight: 800 !important;
-          color: #94a3b8 !important;
-          letter-spacing: 0.06em !important;
-          text-transform: uppercase !important;
-          padding-left: 4px !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 6px !important;
-        }
-        .rise-toolbox-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, 1fr) !important;
-          gap: 8px !important;
-        }
-        .rise-toolbox-block-card {
-          background: #1e293b !important;
-          border: 1px solid rgba(255, 255, 255, 0.1) !important;
-          border-radius: 10px !important;
-          padding: 10px 8px !important;
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          justify-content: center !important;
-          text-align: center !important;
-          gap: 6px !important;
-          cursor: grab !important;
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-          position: relative !important;
-          box-sizing: border-box !important;
-        }
-        .rise-toolbox-block-card:hover {
-          background: #273549 !important;
-          border-color: #38bdf8 !important;
-          transform: translateY(-2px) !important;
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
-        }
-        .rise-toolbox-block-card:active {
-          cursor: grabbing !important;
-          transform: scale(0.96) !important;
-        }
-        .rise-toolbox-block-icon {
-          width: 32px !important;
-          height: 32px !important;
-          border-radius: 8px !important;
-          background: rgba(59, 130, 246, 0.15) !important;
-          color: #60a5fa !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
-          transition: all 0.2s ease !important;
-        }
-        .rise-toolbox-block-card:hover .rise-toolbox-block-icon {
-          background: #3b82f6 !important;
-          color: #ffffff !important;
-        }
-        .rise-toolbox-block-name {
-          font-size: 0.75rem !important;
-          font-weight: 700 !important;
-          color: #e2e8f0 !important;
-          line-height: 1.25 !important;
-        }
-        .rise-toolbox-block-tag {
-          font-size: 0.625rem !important;
-          font-weight: 700 !important;
-          color: #94a3b8 !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.04em !important;
-        }
-        .rise-toolbox-block-card.is-dragging {
-          opacity: 0.4 !important;
-          border: 1.5px dashed #38bdf8 !important;
-        }
-        .rise-drop-target-active {
-          outline: 2px dashed #3b82f6 !important;
-          outline-offset: 4px !important;
-          background: rgba(59, 130, 246, 0.08) !important;
-        }
-        .rise-live-preview-tooltip {
-          position: fixed !important;
-          left: 330px !important;
-          width: 340px !important;
-          background: #0b1120 !important;
-          border: 1px solid rgba(56, 189, 248, 0.4) !important;
-          border-radius: 12px !important;
-          padding: 14px !important;
-          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
-          z-index: 2147483646 !important;
-          pointer-events: none !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 10px !important;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-          animation: riseTooltipFade 0.2s ease !important;
-        }
-        @keyframes riseTooltipFade {
-          from { opacity: 0; transform: translateX(-8px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .rise-tooltip-header {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-          padding-bottom: 6px !important;
-        }
-        .rise-tooltip-title {
-          font-size: 0.85rem !important;
-          font-weight: 800 !important;
-          color: #ffffff !important;
-        }
-        .rise-tooltip-badge {
-          font-size: 0.65rem !important;
-          background: #1e3a8a !important;
-          color: #93c5fd !important;
-          padding: 2px 6px !important;
-          border-radius: 4px !important;
-          font-weight: 700 !important;
-          text-transform: uppercase !important;
-        }
-        .rise-tooltip-preview-frame {
-          background: #ffffff !important;
-          color: #1e293b !important;
-          border-radius: 8px !important;
-          padding: 10px !important;
-          max-height: 180px !important;
-          overflow: hidden !important;
-          font-size: 0.75rem !important;
-          box-shadow: inset 0 2px 6px rgba(0,0,0,0.1) !important;
-          line-height: 1.4 !important;
-        }
-        .rise-tooltip-preview-frame * {
-          max-width: 100% !important;
-          box-sizing: border-box !important;
-        }
-        .rise-tooltip-preview-frame img {
-          height: 60px !important;
-          width: 100% !important;
-          object-fit: cover !important;
-          border-radius: 4px !important;
-        }
-        .rise-tooltip-hint {
-          font-size: 0.7rem !important;
-          color: #38bdf8 !important;
-          font-weight: 700 !important;
-          text-align: center !important;
-        }
-        .field-name-content > .h5peditor-copypaste-wrap,
-        .field-name-lessons .h5peditor-copypaste-wrap,
-        .field-name-sections .h5peditor-copypaste-wrap,
-        .h5p-editor-column .h5peditor-copypaste-wrap,
-        .field-name-text .h5peditor-copypaste-wrap,
-        .field-name-params .h5peditor-copypaste-wrap {
-          display: none !important;
-        }
-      `;
-      targetDoc.head.appendChild(style);
+    self.init = function (widgetInstance) {
+      self.widget = widgetInstance;
+      self.renderDock();
+      self.renderVisualCanvas();
+      self.setupDragAndDrop();
     };
 
     /**
@@ -588,28 +273,26 @@
         if (window.parent && window.parent.document && window.parent.document.body) {
           targetDoc = window.parent.document;
         }
-      } catch (e) {
-        targetDoc = document;
-      }
+      } catch (e) {}
 
       var $target = $(targetDoc.body || document.body);
       if ($target.find(".rise-toolbox-dock").length > 0) return;
 
-      var $dock = $('<aside class="rise-toolbox-dock is-collapsed">' +
+      var $dock = $('<aside class="rise-toolbox-dock">' +
         '<button type="button" class="rise-toolbox-toggle-btn" title="Toggle Rise Block Library">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>' +
           '<span>BLOCKS</span>' +
         '</button>' +
         '<div class="rise-toolbox-header">' +
           '<div class="rise-toolbox-title-row">' +
             '<div class="rise-toolbox-title">' +
-              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>' +
               'Rise Blocks' +
             '</div>' +
             '<span class="rise-toolbox-badge">Drag & Drop</span>' +
           '</div>' +
           '<div class="rise-toolbox-search-wrapper">' +
-            '<svg class="rise-toolbox-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+            '<svg class="rise-toolbox-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
             '<input type="text" class="rise-toolbox-search-input" placeholder="Search components...">' +
           '</div>' +
         '</div>' +
@@ -617,8 +300,6 @@
       '</aside>');
 
       var $body = $dock.find(".rise-toolbox-body");
-
-      // Shared live preview tooltip element
       var $previewTooltip = $('<div class="rise-live-preview-tooltip" style="display: none;"></div>');
       $target.append($previewTooltip);
 
@@ -653,11 +334,11 @@
             $previewTooltip.stop(true, true).fadeOut(100);
           });
 
-          // Click to insert directly
+          // Click to insert directly into active lesson or active CKEditor
           $card.on("click", function (e) {
             e.preventDefault();
             $previewTooltip.hide();
-            self.insertBlockContent(item.content);
+            self.insertBlock(item.content);
           });
 
           // Drag Start
@@ -669,7 +350,7 @@
             dt.setData("text/plain", JSON.stringify(item));
           }).on("dragend", function () {
             $(this).removeClass("is-dragging");
-            $(".rise-drop-target-active").removeClass("rise-drop-target-active");
+            $(".rise-drop-target-active, .is-hovered").removeClass("rise-drop-target-active is-hovered");
           });
 
           $grid.append($card);
@@ -703,7 +384,502 @@
     };
 
     /**
-     * Setup HTML5 Drag & Drop Zones across H5P Editor
+     * Render the Live Visual Editor Canvas directly in H5PEditor
+     */
+    self.renderVisualCanvas = function () {
+      var $mount = $(".field-name-courseMeta, .h5peditor").first();
+      if (!$mount.length) return;
+      if ($(".rise-visual-editor-root").length > 0) {
+        self.updateVisualCanvas();
+        return;
+      }
+
+      var $editorRoot = $('<div class="rise-visual-editor-root">' +
+        '<div class="rise-visual-top-bar">' +
+          '<div class="rise-visual-nav-pills">' +
+            '<button type="button" class="rise-visual-pill-btn is-active" data-tab="cover">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+              '<span>Cover & Outline</span>' +
+            '</button>' +
+            '<div class="rise-visual-lesson-pills" style="display: flex; gap: 6px;"></div>' +
+            '<button type="button" class="rise-visual-add-lesson-btn" title="Add a new lesson">' +
+              '<span>+ Add Lesson</span>' +
+            '</button>' +
+          '</div>' +
+          '<div class="rise-visual-mode-toggle">' +
+            '<button type="button" class="rise-visual-mode-btn is-active" data-mode="visual">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+              '<span>Live Visual Editor</span>' +
+            '</button>' +
+            '<button type="button" class="rise-visual-mode-btn" data-mode="form">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' +
+              '<span>Form Fields</span>' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="rise-visual-viewport"></div>' +
+      '</div>');
+
+      $mount.before($editorRoot);
+
+      // Event handlers for mode toggling
+      $editorRoot.find(".rise-visual-mode-btn").on("click", function () {
+        var mode = $(this).data("mode");
+        self.activeViewMode = mode;
+        $editorRoot.find(".rise-visual-mode-btn").removeClass("is-active");
+        $(this).addClass("is-active");
+
+        if (mode === "visual") {
+          $editorRoot.find(".rise-visual-viewport").show();
+          $(".field-name-courseMeta, .field-name-sections").hide();
+        } else {
+          $editorRoot.find(".rise-visual-viewport").hide();
+          $(".field-name-courseMeta, .field-name-sections").show();
+        }
+      });
+
+      // Default: hide messy form fields and show visual editor
+      $(".field-name-courseMeta, .field-name-sections").hide();
+
+      // Navigation tab switching
+      $editorRoot.on("click", ".rise-visual-pill-btn", function () {
+        var tab = $(this).data("tab");
+        self.activeTab = tab;
+        $editorRoot.find(".rise-visual-pill-btn").removeClass("is-active");
+        $(this).addClass("is-active");
+        self.renderActiveTabContent();
+      });
+
+      // Add lesson button
+      $editorRoot.find(".rise-visual-add-lesson-btn").on("click", function () {
+        self.addNewLesson();
+      });
+
+      self.updateVisualCanvas();
+    };
+
+    /**
+     * Get Root H5P Parameters safely
+     */
+    self.getParams = function () {
+      if (self.widget && self.widget.parent && self.widget.parent.parent && self.widget.parent.parent.params) {
+        return self.widget.parent.parent.params;
+      }
+      if (window.H5PEditor && window.H5PEditor.instances && window.H5PEditor.instances.length > 0) {
+        return window.H5PEditor.instances[0].params;
+      }
+      return {
+        courseMeta: {
+          title: "មេរៀនទី១ ការណែនាំអំពីភាសាJava",
+          coverImageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1600&q=80",
+          description: "<p>នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:</p><ul><li>ភាសាកូដ Java</li><li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>ដំណើរការ នៃការសរសេរកូដ Java</li><li>លក្ខណៈរបស់ភាសា Java</li></ul>"
+        },
+        sections: [
+          {
+            sectionTitle: "ចាប់ផ្តើម",
+            lessons: [
+              {
+                title: "មេរៀនទី១: ការណែនាំ",
+                content: { params: [] }
+              }
+            ]
+          }
+        ]
+      };
+    };
+
+    /**
+     * Update Visual Canvas UI & Tabs
+     */
+    self.updateVisualCanvas = function () {
+      var params = self.getParams();
+      var $pillsContainer = $(".rise-visual-lesson-pills");
+      $pillsContainer.empty();
+
+      var lessonCount = 0;
+      if (params.sections && params.sections.length > 0) {
+        params.sections.forEach(function (sec, sIdx) {
+          if (sec.lessons && sec.lessons.length > 0) {
+            sec.lessons.forEach(function (les, lIdx) {
+              var tabId = sIdx + "_" + lIdx;
+              var isAct = self.activeTab === tabId ? "is-active" : "";
+              var title = les.title || ("Lesson " + (lessonCount + 1));
+              var $pill = $('<button type="button" class="rise-visual-pill-btn ' + isAct + '" data-tab="' + tabId + '">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+                '<span>' + title + '</span>' +
+              '</button>');
+              $pillsContainer.append($pill);
+              lessonCount++;
+            });
+          }
+        });
+      }
+
+      self.renderActiveTabContent();
+    };
+
+    /**
+     * Render the currently selected tab in the visual canvas
+     */
+    self.renderActiveTabContent = function () {
+      var params = self.getParams();
+      var $viewport = $(".rise-visual-viewport");
+      $viewport.empty();
+
+      if (self.activeTab === "cover") {
+        self.renderCoverPage($viewport, params);
+      } else {
+        self.renderLessonPage($viewport, params, self.activeTab);
+      }
+    };
+
+    /**
+     * 1. Render Cover & Course Outline (Matches user uploaded image!)
+     */
+    self.renderCoverPage = function ($viewport, params) {
+      var meta = (params && params.courseMeta) || {};
+      var title = meta.title || "មេរៀនទី១ ការណែនាំអំពីភាសាJava";
+      var coverImg = meta.coverImageUrl || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1600&q=80";
+      var desc = meta.description || "<p>នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:</p><ul><li>ភាសាកូដ Java</li><li>ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK</li><li>ដំណើរការ នៃការសរសេរកូដ Java</li><li>លក្ខណៈរបស់ភាសា Java</li></ul>";
+
+      // Parse list items from description if present
+      var $temp = $("<div>" + desc + "</div>");
+      var introText = $temp.find("p").first().text() || "នៅក្នុងមេរៀននេះ យើងនឹងសិក្សាអំពីចំណុចសំខាន់ៗមួយចំនួនដូចជា:";
+      var items = [];
+      $temp.find("li").each(function () {
+        items.push($(this).text().trim());
+      });
+      if (items.length === 0) {
+        items = [
+          "ភាសាកូដ Java",
+          "ពាក្យបច្ចេកទេស Syntax, Compiler, Interpreter, JVM, JRE, JDK",
+          "ដំណើរការ នៃការសរសេរកូដ Java",
+          "លក្ខណៈរបស់ភាសា Java"
+        ];
+      }
+
+      var $cover = $('<div class="rise-canvas-cover-page">' +
+        '<div class="rise-canvas-cover-hero" style="background-image: url(\'' + coverImg + '\');">' +
+          '<button type="button" class="rise-canvas-change-cover-btn" title="Change Hero Image">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+            '<span>Change Cover Photo</span>' +
+          '</button>' +
+          '<div class="rise-canvas-hero-content">' +
+            '<h1 class="rise-canvas-title-editable" contenteditable="true" title="Click to edit course title">' + title + '</h1>' +
+            '<button type="button" class="rise-canvas-cover-btn">START COURSE</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="rise-canvas-outline-body">' +
+          '<div class="rise-canvas-outline-intro" contenteditable="true" title="Click to edit introduction text">' + introText + '</div>' +
+          '<div class="rise-canvas-takeaways-list"></div>' +
+          '<button type="button" class="rise-canvas-add-takeaway-btn">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+            '<span>Add Key Topic / Takeaway</span>' +
+          '</button>' +
+        '</div>' +
+      '</div>');
+
+      var $list = $cover.find(".rise-canvas-takeaways-list");
+      items.forEach(function (txt, idx) {
+        var $card = $('<div class="rise-canvas-takeaway-card">' +
+          '<div class="rise-canvas-takeaway-dot"></div>' +
+          '<div class="rise-canvas-takeaway-text" contenteditable="true">' + txt + '</div>' +
+          '<button type="button" class="rise-canvas-takeaway-delete" title="Remove">✕</button>' +
+        '</div>');
+        $list.append($card);
+      });
+
+      // Event: Title edit
+      $cover.find(".rise-canvas-title-editable").on("input blur", function () {
+        var newTitle = $(this).text().trim();
+        meta.title = newTitle;
+        self.syncField("courseMeta/title", newTitle);
+      });
+
+      // Event: Cover Image Change
+      $cover.find(".rise-canvas-change-cover-btn").on("click", function () {
+        var url = prompt("Enter cover image URL (e.g. Unsplash URL):", coverImg);
+        if (url && url.trim()) {
+          meta.coverImageUrl = url.trim();
+          $cover.find(".rise-canvas-cover-hero").css("background-image", "url('" + url.trim() + "')");
+          self.syncField("courseMeta/coverImageUrl", url.trim());
+        }
+      });
+
+      // Event: Intro Text & Takeaway sync
+      function saveDescription() {
+        var pText = $cover.find(".rise-canvas-outline-intro").text().trim();
+        var html = "<p>" + pText + "</p><ul>";
+        $cover.find(".rise-canvas-takeaway-text").each(function () {
+          var val = $(this).text().trim();
+          if (val) html += "<li>" + val + "</li>";
+        });
+        html += "</ul>";
+        meta.description = html;
+        self.syncField("courseMeta/description", html);
+      }
+
+      $cover.find(".rise-canvas-outline-intro").on("input blur", saveDescription);
+      $cover.on("input blur", ".rise-canvas-takeaway-text", saveDescription);
+
+      // Event: Delete takeaway
+      $cover.on("click", ".rise-canvas-takeaway-delete", function () {
+        $(this).closest(".rise-canvas-takeaway-card").remove();
+        saveDescription();
+      });
+
+      // Event: Add takeaway
+      $cover.find(".rise-canvas-add-takeaway-btn").on("click", function () {
+        var $newCard = $('<div class="rise-canvas-takeaway-card">' +
+          '<div class="rise-canvas-takeaway-dot"></div>' +
+          '<div class="rise-canvas-takeaway-text" contenteditable="true">ចំណុចសំខាន់ថ្មី (New Topic)</div>' +
+          '<button type="button" class="rise-canvas-takeaway-delete" title="Remove">✕</button>' +
+        '</div>');
+        $list.append($newCard);
+        $newCard.find(".rise-canvas-takeaway-text").focus();
+        saveDescription();
+      });
+
+      $viewport.append($cover);
+    };
+
+    /**
+     * 2. Render Lesson Content Canvas (with drop zones & WYSIWYG editing)
+     */
+    self.renderLessonPage = function ($viewport, params, tabId) {
+      var parts = tabId.split("_");
+      var sIdx = parseInt(parts[0], 10) || 0;
+      var lIdx = parseInt(parts[1], 10) || 0;
+
+      var sec = (params.sections && params.sections[sIdx]) || {};
+      var lesson = (sec.lessons && sec.lessons[lIdx]) || { title: "New Lesson", content: { params: [] } };
+
+      var $lessonView = $('<div class="rise-canvas-lesson-body">' +
+        '<div class="rise-canvas-lesson-header-bar">' +
+          '<div style="font-size: 0.75rem; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.05em;">' + (sec.sectionTitle || "SECTION") + '</div>' +
+          '<h2 class="rise-canvas-lesson-title-editable" contenteditable="true" title="Click to edit lesson title">' + (lesson.title || "Lesson Title") + '</h2>' +
+        '</div>' +
+        '<div class="rise-canvas-drop-zone top-zone" data-pos="0">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+          '<span>Drop Rise Block Here (or Click any Component on Left)</span>' +
+        '</div>' +
+        '<div class="rise-canvas-blocks-list"></div>' +
+        '<div class="rise-canvas-drop-zone bottom-zone" data-pos="end">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+          '<span>+ Drop block here to append</span>' +
+        '</div>' +
+      '</div>');
+
+      // Sync Lesson Title
+      $lessonView.find(".rise-canvas-lesson-title-editable").on("input blur", function () {
+        var newTitle = $(this).text().trim();
+        lesson.title = newTitle;
+        self.updateVisualCanvas();
+      });
+
+      var $blocksList = $lessonView.find(".rise-canvas-blocks-list");
+      var rawContent = self.getLessonContentHtml(lesson);
+
+      if (rawContent && rawContent.trim()) {
+        self.renderRenderedBlocks($blocksList, rawContent, lesson);
+      }
+
+      $viewport.append($lessonView);
+    };
+
+    /**
+     * Parse HTML string or params into block elements
+     */
+    self.getLessonContentHtml = function (lesson) {
+      if (!lesson.content) return "";
+      if (typeof lesson.content === "string") return lesson.content;
+      if (lesson.content.params && Array.isArray(lesson.content.params)) {
+        var htmlArr = [];
+        lesson.content.params.forEach(function (p) {
+          if (p.content && p.content.params && p.content.params.text) {
+            htmlArr.push(p.content.params.text);
+          }
+        });
+        return htmlArr.join("\n");
+      }
+      return "";
+    };
+
+    /**
+     * Render blocks with action toolbar (Edit, Duplicate, Move Up/Down, Delete)
+     */
+    self.renderRenderedBlocks = function ($container, htmlContent, lesson) {
+      var $temp = $("<div>" + htmlContent + "</div>");
+      var children = $temp.children();
+
+      if (children.length === 0) {
+        $container.html('<div style="color: #94a3b8; text-align: center; padding: 30px 0; font-size: 0.9rem;">No blocks added yet. Drag or click any component from the left toolbox!</div>');
+        return;
+      }
+
+      children.each(function (idx) {
+        var blockOuterHtml = this.outerHTML;
+        var $blockWrap = $('<div class="rise-canvas-block-wrapper" data-block-index="' + idx + '">' +
+          '<div class="rise-canvas-block-actions">' +
+            '<button type="button" class="rise-canvas-action-btn is-edit" title="Edit HTML">✏️ Edit</button>' +
+            '<button type="button" class="rise-canvas-action-btn is-dup" title="Duplicate">📋 Copy</button>' +
+            '<button type="button" class="rise-canvas-action-btn is-up" title="Move Up">⬆️</button>' +
+            '<button type="button" class="rise-canvas-action-btn is-down" title="Move Down">⬇️</button>' +
+            '<button type="button" class="rise-canvas-action-btn is-delete" title="Delete">🗑️</button>' +
+          '</div>' +
+          '<div class="rise-canvas-block-inner" contenteditable="true">' + blockOuterHtml + '</div>' +
+          '<div class="rise-canvas-drop-zone mid-zone" data-pos="' + (idx + 1) + '">' +
+            '<span>+ Drop block here</span>' +
+          '</div>' +
+        '</div>');
+
+        // Direct contenteditable editing
+        $blockWrap.find(".rise-canvas-block-inner").on("blur", function () {
+          self.saveAllBlocksFromCanvas($container, lesson);
+        });
+
+        // Action: Edit HTML
+        $blockWrap.find(".is-edit").on("click", function (e) {
+          e.stopPropagation();
+          var currentHtml = $blockWrap.find(".rise-canvas-block-inner").html();
+          var edited = prompt("Edit Block HTML / Text Content:", currentHtml);
+          if (edited !== null) {
+            $blockWrap.find(".rise-canvas-block-inner").html(edited);
+            self.saveAllBlocksFromCanvas($container, lesson);
+          }
+        });
+
+        // Action: Duplicate
+        $blockWrap.find(".is-dup").on("click", function (e) {
+          e.stopPropagation();
+          var cloneHtml = $blockWrap.find(".rise-canvas-block-inner").html();
+          $blockWrap.after($blockWrap.clone(true));
+          self.saveAllBlocksFromCanvas($container, lesson);
+          self.renderActiveTabContent();
+        });
+
+        // Action: Move Up
+        $blockWrap.find(".is-up").on("click", function (e) {
+          e.stopPropagation();
+          var $prev = $blockWrap.prev(".rise-canvas-block-wrapper");
+          if ($prev.length) {
+            $blockWrap.insertBefore($prev);
+            self.saveAllBlocksFromCanvas($container, lesson);
+          }
+        });
+
+        // Action: Move Down
+        $blockWrap.find(".is-down").on("click", function (e) {
+          e.stopPropagation();
+          var $next = $blockWrap.next(".rise-canvas-block-wrapper");
+          if ($next.length) {
+            $blockWrap.insertAfter($next);
+            self.saveAllBlocksFromCanvas($container, lesson);
+          }
+        });
+
+        // Action: Delete
+        $blockWrap.find(".is-delete").on("click", function (e) {
+          e.stopPropagation();
+          $blockWrap.remove();
+          self.saveAllBlocksFromCanvas($container, lesson);
+        });
+
+        $container.append($blockWrap);
+      });
+    };
+
+    /**
+     * Save all blocks in the visual canvas back to H5P params & CKEditor
+     */
+    self.saveAllBlocksFromCanvas = function ($container, lesson) {
+      var htmlParts = [];
+      $container.find(".rise-canvas-block-inner").each(function () {
+        htmlParts.push($(this).html());
+      });
+      var fullHtml = htmlParts.join("\n");
+
+      // Update in lesson object
+      if (typeof lesson.content === "string") {
+        lesson.content = fullHtml;
+      } else if (lesson.content && lesson.content.params) {
+        lesson.content = {
+          library: "H5P.Column 1.22",
+          params: [
+            {
+              content: {
+                library: "H5P.AdvancedText 1.1",
+                params: { text: fullHtml }
+              }
+            }
+          ]
+        };
+      }
+
+      // Sync to CKEditor if available
+      try {
+        if (window.CKEDITOR && window.CKEDITOR.instances) {
+          for (var k in window.CKEDITOR.instances) {
+            window.CKEDITOR.instances[k].setData(fullHtml);
+          }
+        }
+      } catch (e) {}
+
+      self.showToast("Changes saved to course!");
+    };
+
+    /**
+     * Add a new lesson to the course
+     */
+    self.addNewLesson = function () {
+      var params = self.getParams();
+      if (!params.sections) params.sections = [];
+      if (params.sections.length === 0) {
+        params.sections.push({ sectionTitle: "មាតិកាមេរៀន (Course Lessons)", lessons: [] });
+      }
+
+      var sec = params.sections[0];
+      if (!sec.lessons) sec.lessons = [];
+
+      var newNum = sec.lessons.length + 1;
+      sec.lessons.push({
+        title: "មេរៀនទី" + newNum + ": ចំណងជើងមេរៀនថ្មី",
+        iconType: "overview",
+        content: '<div class="rise-header-block"><div class="rise-category-tag">Lesson ' + newNum + '</div><h2 class="rise-main-title">មេរៀនទី' + newNum + '</h2><p class="rise-main-desc">សូមបញ្ចូលខ្លឹមសារមេរៀននៅទីនេះ...</p></div>'
+      });
+
+      self.activeTab = "0_" + (sec.lessons.length - 1);
+      self.updateVisualCanvas();
+      self.showToast("New Lesson added!");
+    };
+
+    /**
+     * Insert Block Content into active lesson or drop position
+     */
+    self.insertBlock = function (blockHtml, dropPos) {
+      if (self.activeTab === "cover") {
+        self.showToast("Switch to a Lesson tab to insert blocks.");
+        return;
+      }
+
+      var params = self.getParams();
+      var parts = self.activeTab.split("_");
+      var sIdx = parseInt(parts[0], 10) || 0;
+      var lIdx = parseInt(parts[1], 10) || 0;
+
+      var sec = (params.sections && params.sections[sIdx]) || {};
+      var lesson = (sec.lessons && sec.lessons[lIdx]) || {};
+
+      var currentHtml = self.getLessonContentHtml(lesson);
+      var newHtml = currentHtml ? (currentHtml + "\n" + blockHtml) : blockHtml;
+
+      lesson.content = newHtml;
+      self.renderActiveTabContent();
+      self.showToast("Block added! Click to edit text.");
+    };
+
+    /**
+     * Setup Drag and Drop Zones on the Live Canvas
      */
     self.setupDragAndDrop = function () {
       var eventTargets = [document];
@@ -714,20 +890,19 @@
       } catch (e) {}
 
       eventTargets.forEach(function (doc) {
-        $(doc).on("dragover", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, [contenteditable='true']", function (e) {
+        $(doc).on("dragover", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
           e.preventDefault();
           e.originalEvent.dataTransfer.dropEffect = "copy";
-          $(this).addClass("rise-drop-target-active");
+          $(this).addClass("rise-drop-target-active is-hovered");
         });
 
-        $(doc).on("dragleave", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, [contenteditable='true']", function () {
-          $(this).removeClass("rise-drop-target-active");
+        $(doc).on("dragleave", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function () {
+          $(this).removeClass("rise-drop-target-active is-hovered");
         });
 
-        $(doc).on("drop", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, [contenteditable='true']", function (e) {
+        $(doc).on("drop", ".rise-canvas-drop-zone, .rise-canvas-block-wrapper", function (e) {
           e.preventDefault();
-          var $zone = $(this);
-          $zone.removeClass("rise-drop-target-active");
+          $(this).removeClass("rise-drop-target-active is-hovered");
 
           var rawData = e.originalEvent.dataTransfer.getData("text/plain");
           if (!rawData) return;
@@ -735,7 +910,7 @@
           try {
             var item = JSON.parse(rawData);
             if (item.content) {
-              self.insertBlockContent(item.content, $zone);
+              self.insertBlock(item.content);
             }
           } catch (err) {
             console.error("Drop error:", err);
@@ -745,48 +920,16 @@
     };
 
     /**
-     * Insert Block Content into active CKEditor or targeted Column container
+     * Sync value to underlying form inputs if present
      */
-    self.insertBlockContent = function (contentHtml, $target) {
-      var inserted = false;
-
-      var checkInstances = [];
+    self.syncField = function (path, val) {
       try {
-        if (window.CKEDITOR && window.CKEDITOR.instances) {
-          for (var k in window.CKEDITOR.instances) checkInstances.push(window.CKEDITOR.instances[k]);
-        }
-        if (window.parent && window.parent.CKEDITOR && window.parent.CKEDITOR.instances) {
-          for (var kp in window.parent.CKEDITOR.instances) checkInstances.push(window.parent.CKEDITOR.instances[kp]);
+        var inputName = path.split("/").pop();
+        var $inp = $(".field-name-" + inputName + " input, .field-name-" + inputName + " textarea");
+        if ($inp.length) {
+          $inp.val(val).trigger("change");
         }
       } catch (e) {}
-
-      var activeInstance = null;
-      for (var i = 0; i < checkInstances.length; i++) {
-        if (checkInstances[i].focusManager && checkInstances[i].focusManager.hasFocus) {
-          activeInstance = checkInstances[i];
-          break;
-        }
-      }
-      if (!activeInstance && checkInstances.length > 0) {
-        activeInstance = checkInstances[0];
-      }
-
-      if (activeInstance) {
-        activeInstance.insertHtml(contentHtml);
-        inserted = true;
-      }
-
-      if (!inserted) {
-        var $addBtn = $(".h5p-editor-column button, .field-name-content button.h5p-add-file, .field-name-content .h5p-add-author").first();
-        if ($addBtn.length) {
-          $addBtn.trigger("click");
-          setTimeout(function () {
-            self.insertBlockContent(contentHtml);
-          }, 300);
-        }
-      }
-
-      self.showToast("Block inserted! Click text to edit.");
     };
 
     /**
@@ -800,11 +943,11 @@
         }
       } catch (e) {}
 
-      var $toast = $('<div style="position: fixed; bottom: 28px; right: 28px; background: #0b1120; color: #38bdf8; border: 1.5px solid #38bdf8; padding: 12px 24px; border-radius: 10px; font-weight: 800; font-size: 0.9rem; z-index: 2147483647; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">' + msg + '</div>');
+      var $toast = $('<div style="position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #38bdf8; border: 1.5px solid #38bdf8; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; z-index: 2147483647; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">' + msg + '</div>');
       $(targetDoc.body || document.body).append($toast);
       setTimeout(function () {
         $toast.fadeOut(300, function () { $(this).remove(); });
-      }, 2000);
+      }, 2200);
     };
   }
 
@@ -822,13 +965,11 @@
     var self = this;
     self.$item = $(self.createFieldMarkup());
     $wrapper.append(self.$item);
-    RiseBlockToolboxWidget.initDock();
+    RiseBlockToolboxWidget.initDock(self);
   };
 
   RiseBlockToolboxWidget.prototype.createFieldMarkup = function () {
-    return '<div class="rise-toolbox-widget-status" style="padding: 10px 14px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; color: #166534; font-size: 13px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">' +
-      '<span><strong>Articulate Rise Blocks Active</strong> — Drag blocks from the left drawer into your lesson.</span>' +
-      '</div>';
+    return '<div class="rise-toolbox-widget-status" style="display: none;"></div>';
   };
 
   RiseBlockToolboxWidget.prototype.validate = function () {
@@ -837,13 +978,10 @@
 
   RiseBlockToolboxWidget.prototype.remove = function () {};
 
-  RiseBlockToolboxWidget.initDock = function () {
+  RiseBlockToolboxWidget.initDock = function (widgetInstance) {
     fixCoreTranslations();
-    var $jq = window.H5PEditor && window.H5PEditor.$ ? window.H5PEditor.$ : (window.H5P && window.H5P.jQuery ? window.H5P.jQuery : (window.jQuery || window.$));
-    if (!$jq) return;
-    if ($jq(".rise-toolbox-dock").length > 0) return;
     var toolbox = new RiseBlockToolbox();
-    toolbox.init();
+    toolbox.init(widgetInstance);
   };
 
   H5PEditor.widgets.riseBlockToolbox = H5PEditor.RiseBlockToolbox = RiseBlockToolboxWidget;
@@ -851,10 +989,9 @@
   if (typeof $ !== "undefined" && $) {
     $(function () {
       RiseBlockToolboxWidget.initDock();
-      setTimeout(RiseBlockToolboxWidget.initDock, 300);
-      setTimeout(RiseBlockToolboxWidget.initDock, 800);
-      setTimeout(RiseBlockToolboxWidget.initDock, 1500);
-      setTimeout(RiseBlockToolboxWidget.initDock, 3000);
+      setTimeout(RiseBlockToolboxWidget.initDock, 400);
+      setTimeout(RiseBlockToolboxWidget.initDock, 1000);
+      setTimeout(RiseBlockToolboxWidget.initDock, 2000);
     });
   } else {
     setTimeout(function () {

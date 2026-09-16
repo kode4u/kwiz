@@ -1,46 +1,63 @@
 /* ==========================================================================
-   Articulate Rise Block Library & Drag-and-Drop Toolbox Styles
+   Articulate Rise Live Visual Editor & Left Component Toolbox
+   Clean, modern, pure SVG UI matching student preview view.
    ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap");
 
-/* 1. Left Toolbox Dock */
+:root {
+  --rise-font: "Plus Jakarta Sans", "Kantumruy Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --rise-primary: #1e3a8a;
+  --rise-primary-hover: #1e40af;
+  --rise-accent: #38bdf8;
+  --rise-bg-body: #f8fafc;
+  --rise-bg-surface: #ffffff;
+  --rise-text-heading: #0f172a;
+  --rise-text-body: #334155;
+  --rise-text-muted: #64748b;
+  --rise-border: #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   1. Left Sidebar Toolbox Dock
+   -------------------------------------------------------------------------- */
 .rise-toolbox-dock {
   position: fixed !important;
   left: 0 !important;
   top: 0 !important;
   bottom: 0 !important;
-  width: 320px !important;
+  width: 290px !important;
   background: #0f172a !important;
   color: #f8fafc !important;
   z-index: 2147483640 !important;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45) !important;
   display: flex !important;
   flex-direction: column !important;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-family: var(--rise-font) !important;
   user-select: none !important;
 }
 
 .rise-toolbox-dock.is-collapsed {
-  transform: translateX(-320px) !important;
+  transform: translateX(-290px) !important;
 }
 
 /* Toggle Button on Edge */
 .rise-toolbox-toggle-btn {
   position: absolute !important;
-  top: 160px !important;
-  left: 320px !important;
-  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+  top: 140px !important;
+  left: 290px !important;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
   border-left: none !important;
   border-radius: 0 10px 10px 0 !important;
-  padding: 12px 14px !important;
+  padding: 10px 12px !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  font-size: 0.85rem !important;
+  gap: 6px !important;
+  font-size: 0.8rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.05em !important;
   box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.4) !important;
@@ -50,24 +67,22 @@
 }
 
 .rise-toolbox-dock.is-collapsed .rise-toolbox-toggle-btn {
-  left: 320px !important;
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6) !important;
-  color: #ffffff !important;
+  left: 290px !important;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a) !important;
 }
 
 .rise-toolbox-toggle-btn:hover {
   background: #1d4ed8 !important;
-  color: #ffffff !important;
   transform: scale(1.04) !important;
 }
 
 /* Header */
 .rise-toolbox-header {
-  padding: 18px 16px 14px 16px !important;
+  padding: 16px 14px 12px 14px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 12px !important;
+  gap: 10px !important;
   background: #0b1120 !important;
 }
 
@@ -78,23 +93,23 @@
 }
 
 .rise-toolbox-title {
-  font-size: 0.95rem !important;
+  font-size: 0.9rem !important;
   font-weight: 800 !important;
   color: #ffffff !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 6px !important;
 }
 
 .rise-toolbox-badge {
-  background: rgba(59, 130, 246, 0.25) !important;
-  color: #60a5fa !important;
-  border: 1px solid rgba(96, 165, 250, 0.4) !important;
-  font-size: 0.7rem !important;
-  padding: 3px 8px !important;
-  border-radius: 12px !important;
+  background: rgba(56, 189, 248, 0.2) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  font-size: 0.65rem !important;
+  padding: 2px 6px !important;
+  border-radius: 10px !important;
   font-weight: 700 !important;
 }
 
@@ -107,24 +122,24 @@
   width: 100% !important;
   background: #1e293b !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 8px !important;
-  padding: 9px 12px 9px 34px !important;
+  border-radius: 6px !important;
+  padding: 8px 10px 8px 30px !important;
   color: #ffffff !important;
-  font-size: 0.85rem !important;
+  font-size: 0.8rem !important;
   outline: none !important;
   box-sizing: border-box !important;
   transition: all 0.2s ease !important;
 }
 
 .rise-toolbox-search-input:focus {
-  border-color: #3b82f6 !important;
+  border-color: #38bdf8 !important;
   background: #1e293b !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
 }
 
 .rise-toolbox-search-icon {
   position: absolute !important;
-  left: 10px !important;
+  left: 9px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
   color: #94a3b8 !important;
@@ -135,25 +150,25 @@
 .rise-toolbox-body {
   flex: 1 !important;
   overflow-y: auto !important;
-  padding: 14px 12px !important;
+  padding: 12px 10px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 16px !important;
+  gap: 14px !important;
 }
 
 .rise-toolbox-category {
   display: flex !important;
   flex-direction: column !important;
-  gap: 8px !important;
+  gap: 6px !important;
 }
 
 .rise-toolbox-category-title {
-  font-size: 0.725rem !important;
+  font-size: 0.7rem !important;
   font-weight: 800 !important;
   color: #94a3b8 !important;
-  letter-spacing: 0.06em !important;
+  letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
-  padding-left: 4px !important;
+  padding-left: 2px !important;
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -162,21 +177,21 @@
 .rise-toolbox-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
-  gap: 8px !important;
+  gap: 6px !important;
 }
 
 /* Block Card */
 .rise-toolbox-block-card {
   background: #1e293b !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 10px !important;
-  padding: 10px 8px !important;
+  border-radius: 8px !important;
+  padding: 8px 6px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
-  gap: 6px !important;
+  gap: 4px !important;
   cursor: grab !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   position: relative !important;
@@ -187,7 +202,7 @@
   background: #273549 !important;
   border-color: #38bdf8 !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
 }
 
 .rise-toolbox-block-card:active {
@@ -196,11 +211,11 @@
 }
 
 .rise-toolbox-block-icon {
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 8px !important;
-  background: rgba(59, 130, 246, 0.15) !important;
-  color: #60a5fa !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -209,23 +224,22 @@
 }
 
 .rise-toolbox-block-card:hover .rise-toolbox-block-icon {
-  background: #3b82f6 !important;
-  color: #ffffff !important;
+  background: #38bdf8 !important;
+  color: #0f172a !important;
 }
 
 .rise-toolbox-block-name {
-  font-size: 0.75rem !important;
+  font-size: 0.725rem !important;
   font-weight: 700 !important;
   color: #e2e8f0 !important;
-  line-height: 1.25 !important;
+  line-height: 1.2 !important;
 }
 
 .rise-toolbox-block-tag {
-  font-size: 0.625rem !important;
+  font-size: 0.6rem !important;
   font-weight: 700 !important;
   color: #94a3b8 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
 }
 
 .rise-toolbox-block-card.is-dragging {
@@ -233,28 +247,22 @@
   border: 1.5px dashed #38bdf8 !important;
 }
 
-.rise-drop-target-active {
-  outline: 2px dashed #3b82f6 !important;
-  outline-offset: 4px !important;
-  background: rgba(59, 130, 246, 0.08) !important;
-}
-
-/* Floating Live Preview Hover Tooltip */
+/* Hover Preview Tooltip */
 .rise-live-preview-tooltip {
   position: fixed !important;
-  left: 330px !important;
-  width: 340px !important;
+  left: 300px !important;
+  width: 330px !important;
   background: #0b1120 !important;
   border: 1px solid rgba(56, 189, 248, 0.4) !important;
-  border-radius: 12px !important;
-  padding: 14px !important;
+  border-radius: 10px !important;
+  padding: 12px !important;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
   z-index: 2147483646 !important;
   pointer-events: none !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 10px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  gap: 8px !important;
+  font-family: var(--rise-font) !important;
   animation: riseTooltipFade 0.2s ease !important;
 }
 
@@ -268,20 +276,20 @@
   align-items: center !important;
   justify-content: space-between !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  padding-bottom: 6px !important;
+  padding-bottom: 4px !important;
 }
 
 .rise-tooltip-title {
-  font-size: 0.85rem !important;
+  font-size: 0.8rem !important;
   font-weight: 800 !important;
   color: #ffffff !important;
 }
 
 .rise-tooltip-badge {
-  font-size: 0.65rem !important;
+  font-size: 0.6rem !important;
   background: #1e3a8a !important;
   color: #93c5fd !important;
-  padding: 2px 6px !important;
+  padding: 2px 5px !important;
   border-radius: 4px !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -290,13 +298,13 @@
 .rise-tooltip-preview-frame {
   background: #ffffff !important;
   color: #1e293b !important;
-  border-radius: 8px !important;
-  padding: 10px !important;
-  max-height: 180px !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+  max-height: 160px !important;
   overflow: hidden !important;
   font-size: 0.75rem !important;
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.1) !important;
-  line-height: 1.4 !important;
+  line-height: 1.35 !important;
 }
 
 .rise-tooltip-preview-frame * {
@@ -305,20 +313,940 @@
 }
 
 .rise-tooltip-preview-frame img {
-  height: 60px !important;
+  height: 50px !important;
   width: 100% !important;
   object-fit: cover !important;
   border-radius: 4px !important;
 }
 
 .rise-tooltip-hint {
-  font-size: 0.7rem !important;
+  font-size: 0.65rem !important;
   color: #38bdf8 !important;
   font-weight: 700 !important;
   text-align: center !important;
 }
 
-/* Hide noisy redundant copy/paste buttons on inner fields */
+/* --------------------------------------------------------------------------
+   2. Main Live Visual Editor Canvas
+   -------------------------------------------------------------------------- */
+.rise-visual-editor-root {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  font-family: var(--rise-font);
+}
+
+/* Top Canvas Control Bar */
+.rise-visual-top-bar {
+  background: #0f172a;
+  color: #ffffff;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid #1e293b;
+  flex-wrap: wrap;
+}
+
+.rise-visual-nav-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.rise-visual-pill-btn {
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.rise-visual-pill-btn:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.rise-visual-pill-btn.is-active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.rise-visual-add-lesson-btn {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.rise-visual-add-lesson-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.rise-visual-mode-toggle {
+  display: flex;
+  align-items: center;
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.rise-visual-mode-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.rise-visual-mode-btn.is-active {
+  background: #0ea5e9;
+  color: #ffffff;
+}
+
+/* Canvas Viewport */
+.rise-visual-viewport {
+  background: #ffffff;
+  min-height: 500px;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   3. Cover Hero Page in Live Canvas
+   -------------------------------------------------------------------------- */
+.rise-canvas-cover-hero {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.rise-canvas-cover-hero:before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.85) 100%);
+}
+
+.rise-canvas-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 780px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.rise-canvas-title-editable {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
+  outline: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px dashed transparent;
+  transition: all 0.2s ease;
+  cursor: text;
+}
+
+.rise-canvas-title-editable:hover,
+.rise-canvas-title-editable:focus {
+  border-color: #38bdf8;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.rise-canvas-cover-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 34px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.rise-canvas-change-cover-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.75);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-change-cover-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Outline & Glowing Bullet Cards */
+.rise-canvas-outline-body {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 40px 24px 60px 24px;
+}
+
+.rise-canvas-outline-intro {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 24px;
+  outline: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px dashed transparent;
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-outline-intro:hover,
+.rise-canvas-outline-intro:focus {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+
+.rise-canvas-takeaways-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.rise-canvas-takeaway-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.rise-canvas-takeaway-card:hover {
+  border-color: #38bdf8;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.12);
+}
+
+.rise-canvas-takeaway-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eff6ff;
+  border: 2px solid #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rise-canvas-takeaway-dot:after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563eb;
+}
+
+.rise-canvas-takeaway-text {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  outline: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px dashed transparent;
+}
+
+.rise-canvas-takeaway-text:hover,
+.rise-canvas-takeaway-text:focus {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+
+.rise-canvas-takeaway-delete {
+  opacity: 0;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-takeaway-card:hover .rise-canvas-takeaway-delete {
+  opacity: 1;
+}
+
+.rise-canvas-add-takeaway-btn {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1.5px dashed #86efac;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-add-takeaway-btn:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   4. Lesson Viewport & Blocks inside Live Canvas
+   -------------------------------------------------------------------------- */
+.rise-canvas-lesson-body {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 36px 24px 60px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rise-canvas-lesson-header-bar {
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rise-canvas-lesson-title-editable {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  outline: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px dashed transparent;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+
+.rise-canvas-lesson-title-editable:hover,
+.rise-canvas-lesson-title-editable:focus {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+
+/* Blocks List & Drop Zones */
+.rise-canvas-blocks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rise-canvas-block-wrapper {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.rise-canvas-block-wrapper:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.15);
+}
+
+.rise-canvas-block-actions {
+  position: absolute;
+  top: -12px;
+  right: 12px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 2px 4px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.rise-canvas-block-wrapper:hover .rise-canvas-block-actions {
+  display: flex;
+}
+
+.rise-canvas-action-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+.rise-canvas-action-btn:hover {
+  background: #1e293b;
+  color: #38bdf8;
+}
+
+.rise-canvas-action-btn.is-delete:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Drop Zone */
+.rise-canvas-drop-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.rise-canvas-drop-zone.is-hovered,
+.rise-canvas-drop-zone.rise-drop-target-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+  transform: scale(1.01);
+}
+
+/* --------------------------------------------------------------------------
+   5. Rise Component Styles Inside Canvas
+   -------------------------------------------------------------------------- */
+.rise-header-block {
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 14px;
+  margin: 16px 0;
+}
+.rise-category-tag {
+  display: inline-block;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.rise-main-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+.rise-main-desc {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.rise-quote-block {
+  background: #f8fafc;
+  border-left: 4px solid #2563eb;
+  border-radius: 0 8px 8px 0;
+  padding: 18px 22px;
+  margin: 16px 0;
+}
+.rise-quote-text {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #1e293b;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.rise-quote-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rise-quote-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.rise-quote-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.rise-quote-title {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.rise-callout {
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.rise-callout-info {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  color: #1e3a8a;
+}
+.rise-callout-warning {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+.rise-callout-success {
+  background: #f0fdf4;
+  border-left: 4px solid #10b981;
+  color: #065f46;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.rise-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+.rise-stat-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 14px;
+  text-align: center;
+}
+.rise-stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.rise-stat-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rise-bullet-list,
+.rise-check-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rise-bullet-list li,
+.rise-check-list li {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rise-bullet-list li:before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2563eb;
+  flex-shrink: 0;
+}
+.rise-check-list li:before {
+  content: "✓";
+  color: #16a34a;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.rise-image-hero {
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 16px 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+.rise-image-hero img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
+}
+.rise-image-hero-caption {
+  background: #f8fafc;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+}
+
+.rise-image-grid-2,
+.rise-image-grid-3 {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0;
+}
+.rise-image-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.rise-image-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+.rise-image-card {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.rise-image-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+.rise-image-card-caption {
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.rise-video-card {
+  background: #0f172a;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 18px;
+  color: #ffffff;
+  margin: 16px 0;
+}
+.rise-section-label {
+  color: #38bdf8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.rise-section-heading {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0 0 14px 0;
+}
+.rise-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.rise-video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  border: none;
+}
+.rise-video-caption {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.rise-audio-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0;
+}
+.rise-audio-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.rise-audio-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.rise-audio-duration {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.rise-flashcard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 16px 0;
+}
+.rise-flip-card {
+  height: 140px;
+  perspective: 1000px;
+}
+.rise-flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+.rise-flip-card:hover .rise-flip-card-inner {
+  transform: rotateY(180deg);
+}
+.rise-flip-card-front,
+.rise-flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.rise-flip-card-front {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.rise-flip-card-back {
+  background: #0f172a;
+  color: #ffffff;
+  transform: rotateY(180deg);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.rise-tabs-container {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.rise-tabs-header {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+}
+.rise-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 12px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+}
+.rise-tab-btn.is-active {
+  background: #ffffff;
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+}
+.rise-tab-panel {
+  padding: 20px;
+  display: none;
+}
+.rise-tab-panel.is-active {
+  display: block;
+}
+
+.rise-code-block {
+  background: #0b1120;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.rise-code-header {
+  background: #1e293b;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rise-code-dots {
+  display: flex;
+  gap: 6px;
+}
+.rise-code-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.rise-code-dot.red { background: #ef4444; }
+.rise-code-dot.amber { background: #f59e0b; }
+.rise-code-dot.green { background: #10b981; }
+.rise-code-lang {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.rise-code-body {
+  padding: 16px 20px;
+  color: #f8fafc;
+  font-family: monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  overflow-x: auto;
+}
+
+.rise-quiz-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+}
+.rise-quiz-tag {
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.rise-quiz-question {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+.rise-quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rise-quiz-option {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rise-quiz-option:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+/* --------------------------------------------------------------------------
+   6. Hide noisy redundant copy/paste buttons & form clutter
+   -------------------------------------------------------------------------- */
 .field-name-content > .h5peditor-copypaste-wrap,
 .field-name-lessons .h5peditor-copypaste-wrap,
 .field-name-sections .h5peditor-copypaste-wrap,
