@@ -63,388 +63,258 @@
 
 /* Header */
 .rise-toolbox-header {
-  padding: 20px 18px 14px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: #0b1120;
+  padding: 18px 16px 14px 16px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  background: #0b1120 !important;
 }
 
 .rise-toolbox-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
 .rise-toolbox-title {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
 .rise-toolbox-badge {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: 700;
+  background: rgba(59, 130, 246, 0.25) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(96, 165, 250, 0.4) !important;
+  font-size: 0.7rem !important;
+  padding: 3px 8px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
 }
 
 /* Search Bar */
 .rise-toolbox-search-wrapper {
-  position: relative;
+  position: relative !important;
 }
 
 .rise-toolbox-search-input {
-  width: 100%;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 9px 12px 9px 34px;
-  color: #ffffff;
-  font-size: 0.85rem;
-  outline: none;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
+  width: 100% !important;
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+  padding: 9px 12px 9px 34px !important;
+  color: #ffffff !important;
+  font-size: 0.85rem !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
 }
 
 .rise-toolbox-search-input:focus {
-  border-color: #3b82f6;
-  background: #1e293b;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  border-color: #3b82f6 !important;
+  background: #1e293b !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
 }
 
 .rise-toolbox-search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  pointer-events: none;
+  position: absolute !important;
+  left: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #94a3b8 !important;
+  pointer-events: none !important;
 }
 
 /* Content List Area */
 .rise-toolbox-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 14px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
 }
 
 .rise-toolbox-category {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
 }
 
 .rise-toolbox-category-title {
-  font-size: 0.725rem;
-  font-weight: 800;
-  color: #94a3b8;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding-left: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 0.725rem !important;
+  font-weight: 800 !important;
+  color: #94a3b8 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  padding-left: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
 }
 
 .rise-toolbox-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
 }
 
 /* Block Card */
 .rise-toolbox-block-card {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 12px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 8px;
-  cursor: grab;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  padding: 10px 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 6px !important;
+  cursor: grab !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  box-sizing: border-box !important;
 }
 
 .rise-toolbox-block-card:hover {
-  background: #273549;
-  border-color: #38bdf8;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  background: #273549 !important;
+  border-color: #38bdf8 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
 .rise-toolbox-block-card:active {
-  cursor: grabbing;
-  transform: scale(0.96);
+  cursor: grabbing !important;
+  transform: scale(0.96) !important;
 }
 
 .rise-toolbox-block-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease !important;
 }
 
 .rise-toolbox-block-card:hover .rise-toolbox-block-icon {
-  background: #3b82f6;
-  color: #ffffff;
+  background: #3b82f6 !important;
+  color: #ffffff !important;
 }
 
 .rise-toolbox-block-name {
-  font-size: 0.775rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  line-height: 1.3;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #e2e8f0 !important;
+  line-height: 1.25 !important;
+}
+
+.rise-toolbox-block-tag {
+  font-size: 0.625rem !important;
+  font-weight: 700 !important;
+  color: #94a3b8 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
 }
 
 .rise-toolbox-block-card.is-dragging {
-  opacity: 0.4;
-  border: 1.5px dashed #38bdf8;
+  opacity: 0.4 !important;
+  border: 1.5px dashed #38bdf8 !important;
 }
 
 /* Drop Zone Highlight in H5P Editor */
 .rise-drop-target-active {
   outline: 2px dashed #3b82f6 !important;
   outline-offset: 4px !important;
-  background: rgba(59, 130, 246, 0.05) !important;
+  background: rgba(59, 130, 246, 0.08) !important;
 }
 
-.rise-drop-indicator {
-  height: 6px;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-  border-radius: 3px;
-  margin: 8px 0;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
-  animation: pulseDrop 1s infinite alternate;
+/* Floating Live Preview Hover Tooltip */
+.rise-live-preview-tooltip {
+  position: fixed !important;
+  left: 330px !important;
+  width: 340px !important;
+  background: #0b1120 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  border-radius: 12px !important;
+  padding: 14px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+  z-index: 2147483646 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  animation: riseTooltipFade 0.2s ease !important;
 }
 
-@keyframes pulseDrop {
-  from { opacity: 0.6; transform: scaleY(0.9); }
-  to { opacity: 1; transform: scaleY(1.3); }
+@keyframes riseTooltipFade {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* ==========================================================================
-   2. Gallery Studio Modal (Live Preview & Style Selection)
-   ========================================================================== */
-.rise-gallery-studio-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 10060;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  box-sizing: border-box;
+.rise-tooltip-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding-bottom: 6px !important;
 }
 
-.rise-gallery-studio-modal {
-  background: #ffffff;
-  border-radius: 18px;
-  width: 100%;
-  max-width: 860px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-  animation: riseModalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.rise-tooltip-title {
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
 }
 
-@keyframes riseModalPop {
-  0% { opacity: 0; transform: scale(0.92) translateY(20px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+.rise-tooltip-badge {
+  font-size: 0.65rem !important;
+  background: #1e3a8a !important;
+  color: #93c5fd !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
 }
 
-.rise-gallery-studio-header {
-  padding: 18px 24px;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #f8fafc;
+.rise-tooltip-preview-frame {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  max-height: 180px !important;
+  overflow: hidden !important;
+  font-size: 0.75rem !important;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.1) !important;
+  line-height: 1.4 !important;
 }
 
-.rise-gallery-studio-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #0f172a;
+.rise-tooltip-preview-frame * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
-.rise-gallery-studio-close-btn {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  color: #64748b;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+.rise-tooltip-preview-frame img {
+  height: 60px !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  border-radius: 4px !important;
 }
 
-.rise-gallery-studio-close-btn:hover {
-  background: #e2e8f0;
-  color: #0f172a;
-}
-
-.rise-gallery-studio-body {
-  padding: 24px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Style Selector Carousel Cards */
-.rise-studio-style-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.rise-studio-style-card {
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 14px;
-  cursor: pointer;
-  background: #ffffff;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.rise-studio-style-card:hover {
-  border-color: #93c5fd;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.1);
-}
-
-.rise-studio-style-card.is-selected {
-  border-color: #2563eb;
-  background: #eff6ff;
-  box-shadow: 0 0 0 2px #2563eb, 0 6px 18px rgba(37, 99, 235, 0.18);
-}
-
-.rise-studio-preview-thumb {
-  height: 90px;
-  border-radius: 8px;
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.rise-studio-style-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.rise-studio-style-desc {
-  font-size: 0.775rem;
-  color: #64748b;
-  line-height: 1.4;
-}
-
-/* Form inputs in modal */
-.rise-studio-form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.rise-studio-form-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #334155;
-}
-
-.rise-studio-form-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.rise-studio-form-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.rise-gallery-studio-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.rise-studio-cancel-btn {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.rise-studio-cancel-btn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.rise-studio-insert-btn {
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 26px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
-  transition: all 0.2s ease;
-}
-
-.rise-studio-insert-btn:hover {
-  background: linear-gradient(135deg, #1e40af, #2563eb);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.35);
+.rise-tooltip-hint {
+  font-size: 0.7rem !important;
+  color: #38bdf8 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
 }
