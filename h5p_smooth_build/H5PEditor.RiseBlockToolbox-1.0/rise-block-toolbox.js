@@ -1,5 +1,6 @@
 /**
- * Articulate Rise Block Library & Drag-and-Drop Toolbox with Live Canvas Preview for H5P Editor
+ * Articulate Rise Block Library & Drag-and-Drop Toolbox for H5P Editor
+ * Clean, professional, pure SVG UI without emoji icons.
  */
 (function ($) {
   "use strict";
@@ -13,13 +14,13 @@
       // 1. Text & Headings
       {
         category: "Text & Headers",
-        icon: "📝",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>',
         items: [
           {
             id: "heading_hero",
             name: "Lesson Header",
             badge: "Header",
-            desc: "Category tag, main title & description",
+            desc: "Category tag, main title and description",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>',
             previewHtml: '<div style="border-bottom: 2px solid #2563eb; padding-bottom: 6px;"><span style="background: #eff6ff; color: #2563eb; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">OVERVIEW</span><h4 style="margin: 4px 0 2px 0; font-size: 13px; color: #0f172a;">Lesson Title</h4><p style="margin: 0; font-size: 11px; color: #64748b;">Short lesson overview description...</p></div>',
             content: '<div class="rise-header-block"><div class="rise-category-tag">Overview</div><h2 class="rise-main-title">ចំណងជើងមេរៀន (Lesson Title)</h2><p class="rise-main-desc">ការពិពណ៌នាសង្ខេបអំពីខ្លឹមសារមេរៀន និងចំណុចសំខាន់ៗដែលត្រូវសិក្សា...</p></div>'
@@ -35,11 +36,11 @@
           },
           {
             id: "quote_testimonial",
-            name: "Quote / Expert",
+            name: "Quote Block",
             badge: "Quote",
-            desc: "Quote card with avatar & author",
+            desc: "Quote card with author and title",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 7 1 8 3 8z"/><path d="M17 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 7 1 8 3 8z"/></svg>',
-            previewHtml: '<div style="background: #f8fafc; border-left: 3px solid #2563eb; padding: 6px 8px; font-size: 10px; font-style: italic;">"ការសរសេរកូដគឺជាសិល្បៈនៃការដោះស្រាយបញ្ហា" <br><strong style="font-style: normal; color: #0f172a;">— Senior Developer</strong></div>',
+            previewHtml: '<div style="background: #f8fafc; border-left: 3px solid #2563eb; padding: 6px 8px; font-size: 10px; font-style: italic;">"Clean Code makes systems scalable and easy to maintain." <br><strong style="font-style: normal; color: #0f172a;">— Lead Instructor</strong></div>',
             content: '<div class="rise-quote-block"><div class="rise-quote-text">"ការសរសេរកូដឱ្យស្អាត (Clean Code) គឺមិនត្រឹមតែសម្រាប់ម៉ាស៊ីនដំណើរការនោះទេ គឺសម្រាប់មនុស្សអាន និងអភិវឌ្ឍបន្ត។"</div><div class="rise-quote-author"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Author" class="rise-quote-avatar"><div class="rise-quote-info"><div class="rise-quote-name">សាស្ត្រាចារ្យកុំព្យូទ័រ (Lead Instructor)</div><div class="rise-quote-title">Software Engineer & Educator</div></div></div></div>'
           }
         ]
@@ -47,7 +48,7 @@
       // 2. Statements & Callouts
       {
         category: "Callouts & Stats",
-        icon: "💡",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
         items: [
           {
             id: "callout_note",
@@ -65,7 +66,7 @@
             desc: "Caution and alert card",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
             previewHtml: '<div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 6px 8px; border-radius: 4px; font-size: 11px; color: #92400e;"><strong>ប្រយ័ត្ន:</strong> ត្រូវកំណត់ JAVA_HOME ឱ្យបានត្រឹមត្រូវ។</div>',
-            content: '<div class="rise-callout-warning"><strong>⚠️ ការប្រុងប្រយ័ត្ន (Warning):</strong> សូមប្រាកដថាអ្នកបានកំណត់ Path Environment Variable ត្រឹមត្រូវ មុននឹងចាប់ផ្តើមដំណើរការ Compile កូដ។</div>'
+            content: '<div class="rise-callout-warning"><strong>ការប្រុងប្រយ័ត្ន (Warning):</strong> សូមប្រាកដថាអ្នកបានកំណត់ Path Environment Variable ត្រឹមត្រូវ មុននឹងចាប់ផ្តើមដំណើរការ Compile កូដ។</div>'
           },
           {
             id: "callout_success",
@@ -74,7 +75,7 @@
             desc: "Best practice pro tip",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
             previewHtml: '<div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 6px 8px; border-radius: 4px; font-size: 11px; color: #065f46;"><strong>គន្លឹះល្អ:</strong> ប្រើប្រាស់ Shortcut Keys ដើម្បីបង្កើនល្បឿន។</div>',
-            content: '<div class="rise-callout-success"><strong>💡 គន្លឹះល្អ (Pro Tip):</strong> ការប្រើប្រាស់ IDE Shortcuts នឹងជួយបង្កើនល្បឿនក្នុងការសរសេរ និង Format កូដរបស់អ្នកបានលឿនជាងមុនទ្វេដង។</div>'
+            content: '<div class="rise-callout-success"><strong>គន្លឹះល្អ (Pro Tip):</strong> ការប្រើប្រាស់ IDE Shortcuts នឹងជួយបង្កើនល្បឿនក្នុងការសរសេរ និង Format កូដរបស់អ្នកបានលឿនជាងមុនទ្វេដង។</div>'
           },
           {
             id: "stat_big_number",
@@ -90,7 +91,7 @@
       // 3. Lists & Steps
       {
         category: "Lists & Steps",
-        icon: "🔢",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>',
         items: [
           {
             id: "numbered_list",
@@ -133,7 +134,7 @@
       // 4. Media & Galleries
       {
         category: "Media & Galleries",
-        icon: "🖼️",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
         items: [
           {
             id: "image_slider_preview",
@@ -168,24 +169,24 @@
             badge: "Video",
             desc: "YouTube/Video with header",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
-            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px; border-radius: 6px; font-size: 10px; display: flex; align-items: center; justify-content: center; height: 50px;"><span style="color: #38bdf8;">▶ YouTube Video 16:9</span></div>',
+            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px; border-radius: 6px; font-size: 10px; display: flex; align-items: center; justify-content: center; height: 50px;"><span style="color: #38bdf8;">YouTube Video 16:9</span></div>',
             content: '<div class="rise-video-card"><div class="rise-video-header"><div class="rise-section-label">Video Lecture</div><h3 class="rise-section-heading">ការណែនាំភាសា Java និងដំណើរការ Installation</h3></div><div class="rise-video-wrapper"><iframe src="https://www.youtube.com/embed/eIrMbAQSU34" allowfullscreen></iframe></div><div class="rise-video-caption">វីដេអូបង្រៀនលម្អិតអំពី Java Ecosystem និងការសរសេរកូដជំហានដំបូង។</div></div>'
           },
           {
             id: "audio_podcast",
-            name: "Audio Lecture",
+            name: "Audio Card",
             badge: "Audio",
-            desc: "Podcast voiceover card",
+            desc: "Voiceover audio player card",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>',
-            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px 10px; border-radius: 6px; display: flex; align-items: center; gap: 6px; font-size: 10px;"><span style="background: #2563eb; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;">▶</span><span>Audio Lesson (5:30)</span></div>',
-            content: '<div class="rise-audio-card"><div class="rise-audio-play-btn">▶</div><div class="rise-audio-info"><div class="rise-audio-title">🎙️ ការសង្ខេបមេរៀនជាសំឡេង (Audio Podcast Overview)</div><div class="rise-audio-duration">រយៈពេល: 5 នាទី 30 វិនាទី • ដោយសាស្រ្តាចារ្យបង្រៀន</div></div></div>'
+            previewHtml: '<div style="background: #0f172a; color: #fff; padding: 6px 10px; border-radius: 6px; display: flex; align-items: center; gap: 6px; font-size: 10px;"><span style="background: #2563eb; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; color: #fff;">▶</span><span>Audio Lesson (5:30)</span></div>',
+            content: '<div class="rise-audio-card"><div class="rise-audio-play-btn">▶</div><div class="rise-audio-info"><div class="rise-audio-title">ការសង្ខេបមេរៀនជាសំឡេង (Audio Podcast Overview)</div><div class="rise-audio-duration">រយៈពេល: 5 នាទី 30 វិនាទី • ដោយសាស្រ្តាចារ្យបង្រៀន</div></div></div>'
           }
         ]
       },
       // 5. Interactive & Code
       {
         category: "Interactive & Code",
-        icon: "💡",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
         items: [
           {
             id: "flip_flashcards",
@@ -209,7 +210,7 @@
             id: "code_window",
             name: "Code Window",
             badge: "Code",
-            desc: "Mac dots & Copy button",
+            desc: "Mac dots and Copy button",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
             previewHtml: '<div style="background: #0f172a; border-radius: 4px; padding: 4px 6px; color: #38bdf8; font-family: monospace; font-size: 9px;"><span style="color: #f43f5e;">●</span> <span style="color: #f59e0b;">●</span> <span style="color: #10b981;">●</span><br>System.out.println("Hello");</div>',
             content: '<pre class="rise-code-block" data-lang="java"><code>public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("ស្វាគមន៍មកកាន់ភាសា Java!");\n    }\n}</code></pre>'
@@ -219,13 +220,13 @@
       // 6. Knowledge Check & Quiz
       {
         category: "Knowledge Checks",
-        icon: "🎯",
+        catSvg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
         items: [
           {
             id: "quick_quiz_card",
             name: "Knowledge Check Card",
             badge: "Quiz",
-            desc: "Instant check answer & feedback",
+            desc: "Instant check answer and feedback",
             iconSvg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
             previewHtml: '<div style="border: 1px solid #3b82f6; border-radius: 6px; padding: 6px; font-size: 10px;"><div style="color: #2563eb; font-weight: bold;">Question Check:</div><div>○ JDK &nbsp; ● JVM &nbsp; ○ JRE</div></div>',
             content: '<div class="rise-quiz-card"><span class="rise-quiz-badge">Knowledge Check</span><div class="rise-quiz-question">តើឧបករណ៍មួយណាដែលទទួលខុសត្រូវក្នុងការដំណើរការ Java Bytecode ទៅជា Machine Code?</div><div class="rise-quiz-option" data-correct="false">A. JDK (Java Development Kit)</div><div class="rise-quiz-option" data-correct="true">B. JVM (Java Virtual Machine)</div><div class="rise-quiz-option" data-correct="false">C. JRE (Java Runtime Environment)</div><div class="rise-quiz-feedback" style="display: none;"></div><button type="button" class="rise-quiz-check-btn">ផ្ទៀងផ្ទាត់ចម្លើយ (Check Answer)</button></div>'
@@ -244,7 +245,6 @@
 
       self.renderDock();
       self.setupDragAndDrop();
-      self.setupMiddleLiveCanvasPreview();
     };
 
     /**
@@ -529,93 +529,6 @@
           font-weight: 700 !important;
           text-align: center !important;
         }
-        .rise-canvas-control-bar {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          background: #f8fafc !important;
-          border: 1px solid #e2e8f0 !important;
-          border-radius: 10px !important;
-          padding: 8px 14px !important;
-          margin: 12px 0 16px 0 !important;
-        }
-        .rise-canvas-toggle-group {
-          display: flex !important;
-          gap: 6px !important;
-        }
-        .rise-canvas-toggle-btn {
-          padding: 6px 14px !important;
-          border-radius: 6px !important;
-          font-size: 0.8rem !important;
-          font-weight: 700 !important;
-          cursor: pointer !important;
-          border: 1px solid transparent !important;
-          transition: all 0.2s ease !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 6px !important;
-        }
-        .rise-canvas-toggle-btn.is-active {
-          background: #2563eb !important;
-          color: #ffffff !important;
-          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
-        }
-        .rise-canvas-toggle-btn:not(.is-active) {
-          background: #ffffff !important;
-          color: #64748b !important;
-          border-color: #cbd5e1 !important;
-        }
-        .rise-canvas-toggle-btn:not(.is-active):hover {
-          background: #f1f5f9 !important;
-          color: #0f172a !important;
-        }
-        .rise-editor-live-canvas {
-          background: #ffffff !important;
-          border: 1px solid #e2e8f0 !important;
-          border-radius: 12px !important;
-          padding: 24px !important;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
-          margin: 12px 0 !important;
-          min-height: 120px !important;
-        }
-        .rise-canvas-block-item {
-          position: relative !important;
-          margin-bottom: 20px !important;
-          padding: 12px !important;
-          border-radius: 8px !important;
-          transition: all 0.2s ease !important;
-          border: 1px dashed transparent !important;
-        }
-        .rise-canvas-block-item:hover {
-          background: #f8fafc !important;
-          border-color: #93c5fd !important;
-        }
-        .rise-canvas-edit-btn {
-          position: absolute !important;
-          top: 8px !important;
-          right: 8px !important;
-          background: #2563eb !important;
-          color: #ffffff !important;
-          border: none !important;
-          border-radius: 6px !important;
-          padding: 4px 10px !important;
-          font-size: 0.725rem !important;
-          font-weight: 700 !important;
-          cursor: pointer !important;
-          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
-          opacity: 0 !important;
-          transition: all 0.2s ease !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 4px !important;
-        }
-        .rise-canvas-block-item:hover .rise-canvas-edit-btn {
-          opacity: 1 !important;
-        }
-        .rise-canvas-edit-btn:hover {
-          background: #1d4ed8 !important;
-          transform: scale(1.05) !important;
-        }
       `;
       targetDoc.head.appendChild(style);
     };
@@ -665,7 +578,7 @@
 
       self.blocks.forEach(function (cat) {
         var $cat = $('<div class="rise-toolbox-category">' +
-          '<div class="rise-toolbox-category-title">' + cat.icon + ' ' + cat.category + '</div>' +
+          '<div class="rise-toolbox-category-title">' + (cat.catSvg || '') + ' ' + cat.category + '</div>' +
           '<div class="rise-toolbox-grid"></div>' +
         '</div>');
 
@@ -688,7 +601,7 @@
                 '<span class="rise-tooltip-badge">' + (item.badge || "PREVIEW") + '</span>' +
               '</div>' +
               '<div class="rise-tooltip-preview-frame">' + item.previewHtml + '</div>' +
-              '<div class="rise-tooltip-hint">✨ Click or Drag to insert instantly</div>'
+              '<div class="rise-tooltip-hint">Click or Drag to insert instantly</div>'
             ).css({ top: topPos + "px" }).stop(true, true).fadeIn(150);
           }).on("mouseleave", function () {
             $previewTooltip.stop(true, true).fadeOut(100);
@@ -744,86 +657,6 @@
     };
 
     /**
-     * Setup Middle Canvas Live Preview with [Edit] buttons
-     */
-    self.setupMiddleLiveCanvasPreview = function () {
-      setInterval(function () {
-        $(".field-name-content, .h5p-editor-column").each(function () {
-          var $contentArea = $(this);
-          if ($contentArea.prev(".rise-canvas-control-bar").length > 0) return;
-
-          var $bar = $('<div class="rise-canvas-control-bar">' +
-            '<div class="rise-canvas-toggle-group">' +
-              '<button type="button" class="rise-canvas-toggle-btn is-active btn-preview">👁️ Live Canvas Preview</button>' +
-              '<button type="button" class="rise-canvas-toggle-btn btn-fields">⚙️ Field Editor</button>' +
-            '</div>' +
-            '<div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">✨ Articulate Rise Canvas Mode</div>' +
-          '</div>');
-
-          var $liveCanvas = $('<div class="rise-editor-live-canvas"></div>');
-          $contentArea.before($bar);
-          $contentArea.before($liveCanvas);
-
-          var updateLiveCanvas = function () {
-            $liveCanvas.empty();
-            var hasAnyBlock = false;
-
-            // Collect text from CKEditors and column items
-            $contentArea.find(".h5peditor-ckeditor-container, .field-name-text").each(function () {
-              var $ckContainer = $(this);
-              var html = "";
-              var editorId = $ckContainer.find("textarea, div[contenteditable]").attr("id");
-              if (editorId && window.CKEDITOR && CKEDITOR.instances[editorId]) {
-                html = CKEDITOR.instances[editorId].getData();
-              } else {
-                html = $ckContainer.find(".cke_contents iframe").contents().find("body").html() || $ckContainer.find("textarea").val() || "";
-              }
-
-              if (html && html.trim() && html !== "<p></p>") {
-                hasAnyBlock = true;
-                var $blockItem = $('<div class="rise-canvas-block-item">' +
-                  '<button type="button" class="rise-canvas-edit-btn">✏️ Edit Content</button>' +
-                  '<div class="rise-canvas-block-body">' + html + '</div>' +
-                '</div>');
-
-                $blockItem.find(".rise-canvas-edit-btn").on("click", function () {
-                  $bar.find(".btn-fields").trigger("click");
-                  $ckContainer[0].scrollIntoView({ behavior: "smooth", block: "center" });
-                  if (editorId && window.CKEDITOR && CKEDITOR.instances[editorId]) {
-                    CKEDITOR.instances[editorId].focus();
-                  }
-                });
-
-                $liveCanvas.append($blockItem);
-              }
-            });
-
-            if (!hasAnyBlock) {
-              $liveCanvas.html('<div style="text-align: center; padding: 24px; color: #94a3b8; font-size: 0.9rem;"><em>Drag blocks from the left toolbox or click <strong>[+ Add]</strong> below to insert content.</em></div>');
-            }
-          };
-
-          $bar.find(".btn-preview").on("click", function () {
-            $(this).addClass("is-active").siblings().removeClass("is-active");
-            $liveCanvas.show();
-            $contentArea.hide();
-            updateLiveCanvas();
-          });
-
-          $bar.find(".btn-fields").on("click", function () {
-            $(this).addClass("is-active").siblings().removeClass("is-active");
-            $liveCanvas.hide();
-            $contentArea.show();
-          });
-
-          // Start in Live Canvas mode
-          $bar.find(".btn-preview").trigger("click");
-          self.updateActiveCanvas = updateLiveCanvas;
-        });
-      }, 1000);
-    };
-
-    /**
      * Setup HTML5 Drag & Drop Zones across H5P Editor
      */
     self.setupDragAndDrop = function () {
@@ -835,17 +668,17 @@
       } catch (e) {}
 
       eventTargets.forEach(function (doc) {
-        $(doc).on("dragover", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, .rise-editor-live-canvas", function (e) {
+        $(doc).on("dragover", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, [contenteditable='true']", function (e) {
           e.preventDefault();
           e.originalEvent.dataTransfer.dropEffect = "copy";
           $(this).addClass("rise-drop-target-active");
         });
 
-        $(doc).on("dragleave", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, .rise-editor-live-canvas", function () {
+        $(doc).on("dragleave", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, [contenteditable='true']", function () {
           $(this).removeClass("rise-drop-target-active");
         });
 
-        $(doc).on("drop", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, .rise-editor-live-canvas", function (e) {
+        $(doc).on("drop", ".h5p-editor-column, .field-name-content, .h5peditor-ckeditor-container, .h5p-list-instances, [contenteditable='true']", function (e) {
           e.preventDefault();
           var $zone = $(this);
           $zone.removeClass("rise-drop-target-active");
@@ -907,11 +740,7 @@
         }
       }
 
-      if (self.updateActiveCanvas) {
-        setTimeout(self.updateActiveCanvas, 300);
-      }
-
-      self.showToast("Block added to Live Canvas! ✓");
+      self.showToast("Block inserted! Click text to edit.");
     };
 
     /**
@@ -929,7 +758,7 @@
       $(targetDoc.body || document.body).append($toast);
       setTimeout(function () {
         $toast.fadeOut(300, function () { $(this).remove(); });
-      }, 2200);
+      }, 2000);
     };
   }
 
@@ -952,7 +781,7 @@
 
   RiseBlockToolboxWidget.prototype.createFieldMarkup = function () {
     return '<div class="rise-toolbox-widget-status" style="padding: 10px 14px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; color: #166534; font-size: 13px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">' +
-      '<span>✨ <strong>Articulate Rise Block Toolbox Active</strong> (Live Canvas Preview Enabled)</span>' +
+      '<span><strong>Articulate Rise Blocks Active</strong> — Drag blocks from the left drawer into your lesson.</span>' +
       '</div>';
   };
 
