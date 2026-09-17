@@ -1245,13 +1245,151 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
             // If it's inside a .rise-video-card, ensure direct wrapper
             if ($media.parent().hasClass("rise-video-card")) {
               $media.wrap('<div class="rise-video-wrapper"></div>');
-            } else if (!$media.hasClass("h5p-video")) {
-              // Wrap standalone iframe/video in a responsive 16:9 wrapper
-              $media.wrap('<div class="rise-video-wrapper" style="margin: 20px 0; border-radius: 14px; overflow: hidden;"></div>');
             }
           }
         }
       });
+
+      // 7. Apply Show-on-Scroll Animation to all content items
+      self.applyScrollReveal($container);
+    };
+
+    /**
+     * Initialize Scroll-on-Reveal Animation Engine
+     */
+    self.initScrollReveal = function () {
+      if (self.scrollObserverInitialized) return;
+      self.scrollObserverInitialized = true;
+
+      if (window.IntersectionObserver) {
+        self.scrollObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting || entry.intersectionRatio > 0) {
+              var target = entry.target;
+              target.classList.add("is-visible");
+              self.scrollObserver.unobserve(target);
+            }
+          });
+        }, {
+          root: null,
+          rootMargin: "0px 0px -15px 0px",
+          threshold: [0, 0.05, 0.1]
+        });
+      }
+
+      // Scroll and resize listener for fallback or iframe scroll sync
+      var checkVisibleElements = function () {
+        if (!self.$container) return;
+        var windowHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+        self.$container.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
+          var el = this;
+          var rect = el.getBoundingClientRect();
+          if (rect.top <= windowHeight + 30 && rect.bottom >= -30) {
+            el.classList.add("is-visible");
+            if (self.scrollObserver) {
+              self.scrollObserver.unobserve(el);
+            }
+          }
+        });
+      };
+
+      $(window).on("scroll resize orientationchange", checkVisibleElements);
+      if (self.$courseView && self.$courseView.length) {
+        self.$courseView.on("scroll", checkVisibleElements);
+      }
+    };
+
+    /**
+     * Apply Scroll Reveal to Content Items
+     */
+    self.applyScrollReveal = function ($context) {
+      if (!$context || !$context.length) return;
+      self.initScrollReveal();
+
+      var selectorList = [
+        ".h5p-column-content > .h5p-column-content-block",
+        ".h5p-column-content > div",
+        ".rise-lesson-content-block > *:not(.h5p-column)",
+        ".rise-code-window",
+        ".rise-flip-card",
+        ".rise-carousel-container",
+        ".rise-quiz-card",
+        ".rise-moodle-embed-card",
+        ".rise-term-card",
+        ".rise-callout",
+        ".rise-callout-warning",
+        ".rise-callout-success",
+        ".rise-stat-card",
+        ".rise-timeline-item",
+        ".rise-audio-card",
+        ".rise-tabs-container",
+        ".rise-video-card",
+        ".h5p-image",
+        ".h5p-image-slider",
+        ".h5p-video",
+        ".h5p-audio",
+        ".h5p-dialogcards",
+        ".h5p-accordion",
+        ".h5p-multichoice",
+        ".h5p-single-choice-set",
+        ".h5p-true-false",
+        ".h5p-blanks",
+        ".h5p-drag-text",
+        ".h5p-summary",
+        ".h5p-table",
+        ".rise-clean-step-item",
+        ".rise-list-item-enhanced",
+        ".h5p-advanced-text > h1",
+        ".h5p-advanced-text > h2",
+        ".h5p-advanced-text > h3",
+        ".h5p-advanced-text > h4",
+        ".h5p-advanced-text > p",
+        ".h5p-advanced-text > blockquote",
+        ".h5p-advanced-text > table"
+      ].join(", ");
+
+      var $targets = $context.is(selectorList) ? $context.add($context.find(selectorList)) : $context.find(selectorList);
+      var windowHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+
+      $targets.each(function () {
+        var $el = $(this);
+        // Do not apply to sidebar, header, bottom nav, or nested toolbox
+        if ($el.closest(".rise-sidebar, .rise-top-bar, .rise-bottom-action-bar, .h5peditor").length) return;
+        if ($el.hasClass("rise-scroll-reveal")) return;
+
+        $el.addClass("rise-scroll-reveal");
+
+        // Stagger micro-delay for sequential items
+        var sIdx = $el.index();
+        if (sIdx >= 0 && sIdx < 8) {
+          $el.attr("data-reveal-stagger", (sIdx % 5) + 1);
+        }
+
+        var domEl = $el[0];
+        if (domEl) {
+          var rect = domEl.getBoundingClientRect();
+          if (rect.top <= windowHeight && rect.bottom >= 0) {
+            $el.addClass("is-visible");
+          } else if (self.scrollObserver) {
+            self.scrollObserver.observe(domEl);
+          } else {
+            $el.addClass("is-visible");
+          }
+        }
+      });
+
+      // Safety fallback: reveal items in view after a small interval
+      setTimeout(function () {
+        $context.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
+          var rect = this.getBoundingClientRect();
+          if (rect.top <= windowHeight && rect.bottom >= 0) {
+            this.classList.add("is-visible");
+            if (self.scrollObserver) {
+              self.scrollObserver.unobserve(this);
+            }
+          }
+        });
+      }, 350);
     };
 
     /**
