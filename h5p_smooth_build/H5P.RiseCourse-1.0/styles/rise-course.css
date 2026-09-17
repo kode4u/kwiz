@@ -288,11 +288,12 @@
 
 .rise-sidebar-lesson-list {
   list-style: none !important;
-  padding: 4px 8px !important;
+  padding: 4px 12px 10px 12px !important;
   margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 3px !important;
+  gap: 6px !important;
+  box-sizing: border-box !important;
 }
 
 .rise-sidebar-lesson-item {
@@ -300,15 +301,17 @@
   flex-direction: row !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 8px 12px !important;
-  min-height: 36px !important;
+  padding: 9px 12px !important;
+  min-height: 40px !important;
   cursor: pointer !important;
-  border-radius: 6px !important;
-  border-left: 3px solid transparent !important;
-  transition: all 0.15s ease !important;
-  list-style: none !important;
-  background: transparent !important;
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
   box-sizing: border-box !important;
+  margin: 0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  transition: all 0.2s ease !important;
+  list-style: none !important;
 }
 
 .rise-sidebar-lesson-item::before,
@@ -323,12 +326,16 @@
 }
 
 .rise-sidebar-lesson-item:hover {
-  background: #f1f5f9 !important;
+  background: #f8fafc !important;
+  border-color: #93c5fd !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
 }
 
 .rise-sidebar-lesson-item.active {
   background: #eff6ff !important;
-  border-left-color: #2563eb !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.12) !important;
 }
 
 .rise-sidebar-lesson-item.active .rise-sidebar-lesson-text {
@@ -1084,7 +1091,7 @@ button.h5p-question-check-answer:before,
 .h5p-rise-course-root ol > li:hover,
 .rise-numbered-list > li:hover,
 .rise-steps-list-clean .rise-clean-step-item:hover {
-  transform: translateX(6px) !important;
+  transform: translateY(-2px) !important;
   border-color: #93c5fd !important;
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.12) !important;
 }
@@ -1125,10 +1132,10 @@ button.h5p-question-check-answer:before,
   box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28);
 }
 
-/* Bullet Lists (Default for all <ul> in Rise Course, strictly excluding quiz & interactive options) */
-.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
-.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
-.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar):not(.h5p-theme),
+/* Bullet Lists (Default for all <ul> in Rise Course, strictly excluding quiz, interactive options & sidebar) */
+.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
+.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar),
+.h5p-rise-course-root:not(.rise-sidebar) ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar):not(.h5p-theme),
 .rise-bullet-list {
   list-style: none !important;
   padding: 0 !important;
@@ -1138,9 +1145,9 @@ button.h5p-question-check-answer:before,
   gap: 12px !important;
 }
 
-.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
-.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
-.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer),
+.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):not(.rise-sidebar-lesson-item),
+.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):not(.rise-sidebar-lesson-item),
+.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):not(.rise-sidebar-lesson-item),
 .rise-bullet-list > li {
   display: flex !important;
   align-items: center !important;
@@ -1159,11 +1166,11 @@ button.h5p-question-check-answer:before,
   animation: riseItemFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
-.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
-.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
-.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):hover,
+.h5p-rise-course-root .rise-lesson-content-block ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):not(.rise-sidebar-lesson-item):hover,
+.h5p-rise-course-root .h5p-advanced-text ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):not(.rise-sidebar-lesson-item):hover,
+.h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-question-answers):not(.h5p-choices):not(.h5p-summary-list):not(.ui-autocomplete):not(.rise-course-sections):not(.rise-lesson-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav):not(.h5p-image-slider-progress):not(.h5p-dragnbar-ul):not(.h5p-joubelui-score-bar) > li:not(.h5p-sc-alternative):not(.h5p-answer):not(.rise-sidebar-lesson-item):hover,
 .rise-bullet-list > li:hover {
-  transform: translateX(6px) !important;
+  transform: translateY(-2px) !important;
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
