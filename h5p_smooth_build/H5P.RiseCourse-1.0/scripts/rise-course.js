@@ -604,6 +604,65 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
     };
 
     /**
+     * Scroll smoothly to top of content across standalone and iframe (Moodle) contexts
+     */
+    self.scrollToTop = function () {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
+      if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+      }
+      if (document.body) {
+        document.body.scrollTop = 0;
+      }
+
+      // Scroll inner container elements if scrollable
+      if (self.$mainArea && self.$mainArea.length) {
+        self.$mainArea.scrollTop(0);
+      }
+      if (self.$lessonContainer && self.$lessonContainer.length) {
+        self.$lessonContainer.scrollTop(0);
+      }
+      if (self.$courseView && self.$courseView.length) {
+        self.$courseView.scrollTop(0);
+      }
+      if (self.$wrapper && self.$wrapper.length) {
+        self.$wrapper.scrollTop(0);
+      }
+
+      // Scroll top header or active container into view
+      if (self.$topHeader && self.$topHeader.length && self.$topHeader[0]) {
+        try {
+          self.$topHeader[0].scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (e) {
+          try { self.$topHeader[0].scrollIntoView(true); } catch (e2) {}
+        }
+      } else if (self.$courseView && self.$courseView.length && self.$courseView[0] && self.$courseView.is(":visible")) {
+        try {
+          self.$courseView[0].scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (e) {}
+      } else if (self.$coverPage && self.$coverPage.length && self.$coverPage[0] && self.$coverPage.is(":visible")) {
+        try {
+          self.$coverPage[0].scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (e) {}
+      }
+
+      // Scroll parent iframe in host LMS (Moodle) if accessible
+      try {
+        if (window.frameElement) {
+          window.frameElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else if (window.parent && window.parent !== window) {
+          window.parent.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+        }
+      } catch (e) {
+        // Fallback for cross-origin iframes
+      }
+    };
+
+    /**
      * Switch to Cover View
      */
     self.showCoverPage = function () {
@@ -616,7 +675,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       setTimeout(runCoverEnhance, 50);
       setTimeout(runCoverEnhance, 150);
       setTimeout(runCoverEnhance, 300);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      self.scrollToTop();
       self.trigger("resize");
     };
 
@@ -633,6 +692,9 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       // Hide cover and show course view
       self.$coverPage.hide();
       self.$courseView.show();
+
+      // Immediately scroll to top when starting transition
+      self.scrollToTop();
 
       // Update Top Header
       self.$counter.text("Lesson " + (index + 1) + " of " + self.lessons.length);
@@ -681,8 +743,11 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           setTimeout(runEnhance, 1200);
         }
 
-        // Scroll to top smoothly
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Scroll to top smoothly during and after rendering
+        self.scrollToTop();
+        setTimeout(self.scrollToTop, 50);
+        setTimeout(self.scrollToTop, 150);
+        setTimeout(self.scrollToTop, 300);
         self.trigger("resize");
         self.isTransitioning = false;
       };
@@ -691,7 +756,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       if ($currentBlock.length > 0 && $currentBlock.is(":visible")) {
         self.isTransitioning = true;
         $currentBlock.removeClass("rise-slide-up-active").addClass("rise-slide-up-exit");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        self.scrollToTop();
         setTimeout(renderIncomingLesson, 280);
       } else {
         renderIncomingLesson();
@@ -1625,6 +1690,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
      * Mark Current Lesson Complete and Advance
      */
     self.completeAndAdvance = function () {
+      self.scrollToTop();
       self.completedLessons[self.currentLessonIndex] = true;
 
       // Update Sidebar completion ring
