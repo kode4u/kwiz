@@ -3,7 +3,7 @@
   "description": "Multi-lesson course module with left sidebar navigation, top header, progress tracking, and next button flow.",
   "majorVersion": 1,
   "minorVersion": 0,
-  "patchVersion": 52,
+  "patchVersion": 53,
   "runnable": 1,
   "author": "Antigravity",
   "license": "MIT",

@@ -624,7 +624,7 @@
   max-width: 840px;
   width: 100%;
   margin: 0 auto;
-  padding: 40px 24px 20px 24px;
+  padding: 24px 24px 8px 24px;
   box-sizing: border-box;
 }
 
@@ -646,26 +646,29 @@
 .rise-bottom-action-bar {
   max-width: 840px;
   width: 100%;
-  margin: 0 auto 60px auto;
-  padding: 20px 24px;
+  margin: 0 auto 24px auto;
+  padding: 8px 24px 16px 24px;
   box-sizing: border-box;
   text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .rise-next-lesson-btn {
   background: var(--rise-primary);
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  padding: 14px 44px;
-  font-size: 1.05rem;
+  border-radius: 8px;
+  padding: 12px 36px;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  display: inline-block;
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+  min-width: 220px;
+  max-width: 340px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.25);
   transition: var(--rise-transition);
 }
 
@@ -706,6 +709,37 @@
     display: block;
   }
 
+  .rise-lesson-viewport {
+    padding: 16px 14px 10px 14px;
+  }
+
+  .rise-bottom-action-bar {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 8px 0 0 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 -4px 18px rgba(15, 23, 42, 0.08);
+    z-index: 85;
+    box-sizing: border-box;
+  }
+
+  .rise-next-lesson-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 13px 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+
   .rise-top-header {
     padding: 10px 14px;
   }
@@ -718,6 +752,38 @@
     padding: 6px 10px;
     font-size: 0.725rem;
   }
+}
+
+/* Device Switcher Mobile Preview Support */
+.device-mobile .rise-lesson-viewport {
+  padding: 16px 14px 10px 14px;
+}
+
+.device-mobile .rise-bottom-action-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 8px 0 0 0;
+  padding: 10px 16px 12px 16px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 -4px 18px rgba(15, 23, 42, 0.08);
+  z-index: 85;
+  box-sizing: border-box;
+}
+
+.device-mobile .rise-next-lesson-btn {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding: 13px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
 }
 
 
