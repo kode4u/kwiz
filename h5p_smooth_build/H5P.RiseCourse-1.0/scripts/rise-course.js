@@ -517,10 +517,15 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
     };
 
     /**
-     * Create Bottom Action Bar with Next Lesson Button
+     * Create Bottom Action Bar with Next Lesson Button & Quiz Gate Hint
      */
     self.createBottomActionBar = function () {
       var $bar = $("<div/>", { class: "rise-bottom-action-bar" });
+      self.$quizGateHint = $("<div/>", {
+        class: "rise-quiz-gate-hint",
+        html: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>សូមឆ្លើយ និងពិនិត្យមើលចម្លើយ (Check Answer) ជាមុនសិន ដើម្បីបន្តទៅមុខ</span>'
+      }).hide();
+
       self.$nextBtn = $("<button/>", {
         class: "rise-next-lesson-btn",
         text: "បន្ទាប់"
@@ -528,8 +533,74 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.completeAndAdvance();
       });
 
-      $bar.append(self.$nextBtn);
+      $bar.append(self.$quizGateHint).append(self.$nextBtn);
       return $bar;
+    };
+
+    /**
+     * Check if Current Lesson has MCQ / Quiz and Gate Next Button until Checked
+     */
+    self.checkLessonQuizGate = function (index, $wrapper) {
+      if (!$wrapper || !$wrapper.length) return;
+      if (!self.$nextBtn || !self.$nextBtn.length) return;
+
+      // If already completed in current session, allow immediate progression
+      if (self.completedLessons[index]) {
+        if (self.$quizGateHint) self.$quizGateHint.hide();
+        self.$nextBtn.show().removeClass("rise-btn-locked");
+        return;
+      }
+
+      var $quizzes = $wrapper.find(".h5p-multichoice, .h5p-single-choice-set, .h5p-true-false, .h5p-question, .rise-quiz-card, .h5p-blanks, .h5p-drag-text");
+
+      // If no quiz/mcq in this lesson, show next button immediately
+      if ($quizzes.length === 0) {
+        if (self.$quizGateHint) self.$quizGateHint.hide();
+        self.$nextBtn.show().removeClass("rise-btn-locked");
+        return;
+      }
+
+      // Check if user has already answered/checked in the DOM
+      var isAlreadyChecked = false;
+      $quizzes.each(function () {
+        var $q = $(this);
+        if ($q.find(".h5p-question-check-answer:disabled, .h5p-question-try-again:visible, .h5p-question-retry:visible, .rise-quiz-feedback:visible, .h5p-sc-alternative.h5p-sc-selected, .h5p-sc-alternative.h5p-sc-is-correct, .h5p-sc-alternative.h5p-sc-is-wrong, .rise-quiz-option.is-correct, .rise-quiz-option.is-incorrect, .h5p-question-scorebar:visible, .h5p-joubelui-score-bar:visible").length > 0) {
+          isAlreadyChecked = true;
+        }
+      });
+
+      if (isAlreadyChecked) {
+        if (self.$quizGateHint) self.$quizGateHint.hide();
+        self.$nextBtn.stop(true, true).fadeIn(250).removeClass("rise-btn-locked");
+        return;
+      }
+
+      // Lock Next Button & Show Quiz Gate Hint
+      self.$nextBtn.hide().addClass("rise-btn-locked");
+      if (self.$quizGateHint) self.$quizGateHint.stop(true, true).fadeIn(250);
+
+      var unlockNextBtn = function () {
+        if (self.$quizGateHint) self.$quizGateHint.stop(true, true).slideUp(180);
+        self.$nextBtn.stop(true, true).fadeIn(300).removeClass("rise-btn-locked");
+      };
+
+      // 1. Listen for clicks on check answer buttons, options, radio buttons, choice alternatives
+      $wrapper.off("click.riseQuizGate").on("click.riseQuizGate", ".h5p-question-check-answer, button.h5p-question-check-answer, .rise-quiz-option, .h5p-sc-alternative, .h5p-true-false-answer, .h5p-question-finish, .h5p-summary-list > li, input[type='radio'], input[type='checkbox']", function () {
+        setTimeout(function () {
+          unlockNextBtn();
+        }, 200);
+      });
+
+      // 2. Listen to xAPI events if instance exists
+      var les = self.lessons[index];
+      if (les && les.instance && les.instance.on) {
+        les.instance.on("xAPI", function (event) {
+          var verb = event.getVerb ? event.getVerb() : "";
+          if (verb === "answered" || verb === "completed" || verb === "passed" || verb === "failed") {
+            unlockNextBtn();
+          }
+        });
+      }
     };
 
     /**
@@ -600,6 +671,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
             if (self.$container) {
               self.enhanceContentBlocks(self.$container);
             }
+            self.checkLessonQuizGate(index, les.$wrapper);
           };
           runEnhance();
           setTimeout(runEnhance, 50);
@@ -1565,13 +1637,85 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       self.$progressBar.css("width", percent + "%");
       self.$progressText.text(percent + "% COMPLETE");
 
-      // Advance to Next Lesson or Complete
+      // Advance to Next Lesson or Complete Course
       if (self.currentLessonIndex < self.lessons.length - 1) {
         self.showLesson(self.currentLessonIndex + 1);
       } else {
-        alert("សូមអបអរសាទរ! អ្នកបានបញ្ចប់មេរៀនទាំងអស់ហើយ (Congratulations! Course Completed).");
-        self.showCoverPage();
+        self.showCourseCompletionModal();
       }
+    };
+
+    /**
+     * Show Beautiful Articulate Rise Course Completion Modal Dialog
+     */
+    self.showCourseCompletionModal = function () {
+      $(".rise-completion-modal-backdrop").remove();
+
+      var totalLessons = self.lessons.length;
+      var completedCount = Object.keys(self.completedLessons).length;
+
+      var $modalBackdrop = $('<div class="rise-completion-modal-backdrop">' +
+        '<div class="rise-completion-modal">' +
+          '<button type="button" class="rise-completion-modal-close" title="បិទ (Close)">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+          '</button>' +
+          '<div class="rise-completion-icon-wrapper">' +
+            '<svg class="rise-completion-trophy-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">' +
+              '<circle cx="12" cy="8" r="7"/>' +
+              '<polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>' +
+            '</svg>' +
+          '</div>' +
+          '<h2 class="rise-completion-title">សូមអបអរសាទរ!</h2>' +
+          '<p class="rise-completion-subtitle">អ្នកបានបញ្ចប់មេរៀនទាំងអស់ហើយ (Congratulations! Course Completed).</p>' +
+          '<div class="rise-completion-stats-card">' +
+            '<div class="rise-completion-stat-item">' +
+              '<span class="stat-value">100%</span>' +
+              '<span class="stat-label">វឌ្ឍនភាព (Progress)</span>' +
+            '</div>' +
+            '<div class="rise-completion-stat-divider"></div>' +
+            '<div class="rise-completion-stat-item">' +
+              '<span class="stat-value">' + completedCount + '/' + totalLessons + '</span>' +
+              '<span class="stat-label">មេរៀន (Lessons)</span>' +
+            '</div>' +
+            '<div class="rise-completion-stat-divider"></div>' +
+            '<div class="rise-completion-stat-item">' +
+              '<span class="stat-value text-green">ជោគជ័យ ✓</span>' +
+              '<span class="stat-label">ស្ថានភាព (Status)</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rise-completion-actions">' +
+            '<button type="button" class="rise-completion-btn-primary">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' +
+              '<span>ត្រឡប់ទៅទំព័រដើម (Course Overview)</span>' +
+            '</button>' +
+            '<button type="button" class="rise-completion-btn-secondary">' +
+              '<span>ពិនិត្យមេរៀនឡើងវិញ (Review Lessons)</span>' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+
+      self.$wrapper.append($modalBackdrop);
+
+      setTimeout(function () {
+        $modalBackdrop.addClass("is-visible");
+      }, 15);
+
+      // Close handlers
+      $modalBackdrop.find(".rise-completion-modal-close, .rise-completion-btn-secondary").on("click", function () {
+        $modalBackdrop.removeClass("is-visible");
+        setTimeout(function () {
+          $modalBackdrop.remove();
+        }, 280);
+      });
+
+      $modalBackdrop.find(".rise-completion-btn-primary").on("click", function () {
+        $modalBackdrop.removeClass("is-visible");
+        setTimeout(function () {
+          $modalBackdrop.remove();
+          self.showCoverPage();
+        }, 280);
+      });
     };
 
     /**
