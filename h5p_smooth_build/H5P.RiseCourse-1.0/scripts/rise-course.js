@@ -297,6 +297,11 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.isSidebarOpen = false;
         self.$courseView.addClass("sidebar-collapsed");
       }
+
+      $(window).on("resize orientationchange", function () {
+        self.updateSidebarHeight();
+      });
+      self.updateSidebarHeight();
     };
 
     /**
@@ -382,18 +387,19 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       $sbHeaderContent.append($sbTitle).append($sbProgress);
       $sbThumb.append($sbHeaderContent);
 
-      // Close Button for Drawer (Mobile & Small Screen)
+      // Close Button for Sidebar (Desktop & Mobile)
       var $closeBtn = $("<button/>", {
         class: "rise-sidebar-close-btn",
-        attr: { "aria-label": "Close Sidebar" },
-        html: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        type: "button",
+        attr: { "aria-label": "Close Sidebar", "title": "បិទផ្ទាំងមេរៀន (Close Sidebar)" },
+        html: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
       }).on("click", function (e) {
+        e.preventDefault();
         e.stopPropagation();
         self.toggleSidebar(false);
       });
-      $sbThumb.append($closeBtn);
 
-      $sbHeader.append($sbThumb);
+      $sbHeader.append($sbThumb).append($closeBtn);
       $sb.append($sbHeader);
 
       // Sections & Lessons Navigation List
@@ -1785,6 +1791,20 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
     };
 
     /**
+     * Update Sidebar Dynamic Height & Scrollable Region
+     */
+    self.updateSidebarHeight = function () {
+      if (!self.$sidebar || !self.$sidebar.length) return;
+      var vh = window.innerHeight || document.documentElement.clientHeight || 800;
+      var $header = self.$sidebar.find(".rise-sidebar-header");
+      var headerH = ($header.length ? $header.outerHeight() : 160) || 160;
+      var navH = Math.max(vh - headerH, 180);
+      self.$sidebar.find(".rise-sidebar-nav").css({
+        "max-height": navH + "px"
+      });
+    };
+
+    /**
      * Toggle Sidebar Collapsed State
      */
     self.toggleSidebar = function (open) {
@@ -1792,6 +1812,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       if (open) {
         self.$courseView.removeClass("sidebar-collapsed");
         self.$backdrop.addClass("show");
+        self.updateSidebarHeight();
       } else {
         self.$courseView.addClass("sidebar-collapsed");
         self.$backdrop.removeClass("show");
