@@ -183,11 +183,13 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  max-height: 100vh;
   position: sticky;
   top: 0;
-  overflow-y: auto;
+  overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 50;
+  box-sizing: border-box;
 }
 
 .rise-course-view.sidebar-collapsed .rise-sidebar {
@@ -195,7 +197,12 @@
 }
 
 .rise-sidebar-header {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   border-bottom: 1px solid var(--rise-border);
+  background: #0f172a;
 }
 
 .rise-sidebar-thumb {
@@ -259,10 +266,32 @@
   text-transform: uppercase;
 }
 
-/* Sidebar Nav Sections */
+/* Sidebar Nav Sections - Scrolls independently */
 .rise-sidebar-nav {
   padding: 18px 0;
-  flex: 1;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.rise-sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.rise-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rise-sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.rise-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
 }
 
 .rise-sidebar-section-group {
@@ -694,6 +723,11 @@
     top: 0;
     left: 0;
     bottom: 0;
+    height: 100% !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
     transform: translateX(-100%);
     margin-left: 0 !important;
     z-index: 100;
