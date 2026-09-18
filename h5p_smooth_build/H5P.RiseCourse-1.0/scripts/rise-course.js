@@ -1402,13 +1402,60 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       if (self.scrollObserverInitialized) return;
       self.scrollObserverInitialized = true;
 
+      var revealQueue = [];
+      var isProcessingQueue = false;
+
+      var drainRevealQueue = function () {
+        if (!revealQueue.length) {
+          isProcessingQueue = false;
+          return;
+        }
+        isProcessingQueue = true;
+
+        // Sort items by vertical page position (strict top-to-bottom order)
+        revealQueue.sort(function (a, b) {
+          var rectA = a.getBoundingClientRect();
+          var rectB = b.getBoundingClientRect();
+          return rectA.top - rectB.top;
+        });
+
+        var delay = 0;
+        var pendingItems = revealQueue.splice(0, revealQueue.length);
+        pendingItems.forEach(function (el, idx) {
+          setTimeout(function () {
+            if (el && !el.classList.contains("is-visible")) {
+              el.classList.add("is-visible");
+            }
+          }, idx * 90);
+          delay = idx * 90;
+        });
+
+        setTimeout(function () {
+          isProcessingQueue = false;
+          if (revealQueue.length > 0) {
+            drainRevealQueue();
+          }
+        }, delay + 60);
+      };
+
+      self.enqueueRevealItem = function (domEl) {
+        if (!domEl || domEl.classList.contains("is-visible")) return;
+        if (revealQueue.indexOf(domEl) === -1) {
+          revealQueue.push(domEl);
+        }
+        if (!isProcessingQueue) {
+          // Micro-tick to batch elements entering at the same moment
+          setTimeout(drainRevealQueue, 25);
+        }
+      };
+
       if (window.IntersectionObserver) {
         self.scrollObserver = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
             if (entry.isIntersecting || entry.intersectionRatio > 0) {
               var target = entry.target;
-              target.classList.add("is-visible");
               self.scrollObserver.unobserve(target);
+              self.enqueueRevealItem(target);
             }
           });
         }, {
@@ -1418,7 +1465,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         });
       }
 
-      // RAF-debounced scroll and resize listener for fallback or iframe scroll sync
+      // RAF-debounced scroll listener for fallback or iframe scroll sync
       var isRafScheduled = false;
       var checkVisibleElements = function () {
         if (isRafScheduled) return;
@@ -1431,10 +1478,10 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
             var el = this;
             var rect = el.getBoundingClientRect();
             if (rect.top <= windowHeight + 40 && rect.bottom >= -40) {
-              el.classList.add("is-visible");
               if (self.scrollObserver) {
                 self.scrollObserver.unobserve(el);
               }
+              self.enqueueRevealItem(el);
             }
           });
         });
@@ -1497,37 +1544,16 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
         $el.addClass("rise-scroll-reveal");
 
-        // Stagger micro-delay for sequential items
-        var sIdx = $el.index();
-        if (sIdx >= 0 && sIdx < 6) {
-          $el.attr("data-reveal-stagger", (sIdx % 5) + 1);
-        }
-
         var domEl = $el[0];
         if (domEl) {
           var rect = domEl.getBoundingClientRect();
-          if (rect.top <= windowHeight && rect.bottom >= 0) {
-            $el.addClass("is-visible");
+          if (rect.top <= windowHeight + 30 && rect.bottom >= -30) {
+            self.enqueueRevealItem(domEl);
           } else if (self.scrollObserver) {
             self.scrollObserver.observe(domEl);
-          } else {
-            $el.addClass("is-visible");
           }
         }
       });
-
-      // Quick fallback: reveal items in view after mount
-      setTimeout(function () {
-        $context.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
-          var rect = this.getBoundingClientRect();
-          if (rect.top <= windowHeight && rect.bottom >= 0) {
-            this.classList.add("is-visible");
-            if (self.scrollObserver) {
-              self.scrollObserver.unobserve(this);
-            }
-          }
-        });
-      }, 150);
     };
 
     /**

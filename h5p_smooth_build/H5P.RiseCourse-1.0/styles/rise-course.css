@@ -2894,25 +2894,19 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
 }
 
 /* ==========================================================================
-   Smooth Show-on-Scroll Animations (Desktop & Mobile)
+   Sequential Cascading Animations (Top to Bottom One-by-One)
    ========================================================================== */
 .rise-scroll-reveal {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1), transform 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  opacity: 0 !important;
+  transform: translateY(22px) !important;
+  transition: opacity 0.52s cubic-bezier(0.16, 1, 0.3, 1), transform 0.52s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: opacity, transform;
 }
 
 .rise-scroll-reveal.is-visible {
   opacity: 1 !important;
   transform: translateY(0) !important;
 }
-
-/* Staggered micro-delays for sequential items */
-.rise-scroll-reveal[data-reveal-stagger="1"] { transition-delay: 0.03s !important; }
-.rise-scroll-reveal[data-reveal-stagger="2"] { transition-delay: 0.06s !important; }
-.rise-scroll-reveal[data-reveal-stagger="3"] { transition-delay: 0.09s !important; }
-.rise-scroll-reveal[data-reveal-stagger="4"] { transition-delay: 0.12s !important; }
-.rise-scroll-reveal[data-reveal-stagger="5"] { transition-delay: 0.15s !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .rise-scroll-reveal,
