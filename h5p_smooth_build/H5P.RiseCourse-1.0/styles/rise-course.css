@@ -669,22 +669,18 @@
 @keyframes risePageFadeExit {
   0% {
     opacity: 1;
-    transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-8px);
   }
 }
 
 @keyframes risePageFadeEnter {
   0% {
     opacity: 0;
-    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -702,12 +698,12 @@
 }
 
 .rise-lesson-content-block.rise-slide-up-exit {
-  animation: risePageFadeExit 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+  animation: risePageFadeExit 0.16s ease-in forwards !important;
   pointer-events: none !important;
 }
 
 .rise-lesson-content-block.rise-slide-up-active {
-  animation: risePageFadeEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: risePageFadeEnter 0.25s ease-out forwards !important;
 }
 
 /* Bottom Action Bar (Next Button) */
@@ -2898,14 +2894,16 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
    ========================================================================== */
 .rise-scroll-reveal {
   opacity: 0 !important;
-  transform: translateY(22px) !important;
-  transition: opacity 0.52s cubic-bezier(0.16, 1, 0.3, 1), transform 0.52s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transform: translate3d(0, 28px, 0) !important;
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) !important;
   will-change: opacity, transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .rise-scroll-reveal.is-visible {
   opacity: 1 !important;
-  transform: translateY(0) !important;
+  transform: translate3d(0, 0, 0) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
