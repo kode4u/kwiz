@@ -1426,8 +1426,8 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
             if (el && !el.classList.contains("is-visible")) {
               el.classList.add("is-visible");
             }
-          }, idx * 160);
-          delay = idx * 160;
+          }, idx * 240);
+          delay = idx * 240;
         });
 
         setTimeout(function () {
@@ -1435,7 +1435,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           if (revealQueue.length > 0) {
             drainRevealQueue();
           }
-        }, delay + 80);
+        }, delay + 100);
       };
 
       self.enqueueRevealItem = function (domEl) {
@@ -1445,7 +1445,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         }
         if (!isProcessingQueue) {
           // Micro-tick to batch elements entering at the same moment
-          setTimeout(drainRevealQueue, 35);
+          setTimeout(drainRevealQueue, 45);
         }
       };
 

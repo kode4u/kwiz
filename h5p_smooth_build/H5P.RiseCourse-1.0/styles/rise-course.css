@@ -2890,12 +2890,12 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
 }
 
 /* ==========================================================================
-   Sequential Cascading Animations (Top to Bottom One-by-One)
+   Sequential Cascading Animations (Top to Bottom One-by-One, Slow & Smooth)
    ========================================================================== */
 .rise-scroll-reveal {
   opacity: 0 !important;
-  transform: translate3d(0, 28px, 0) !important;
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  transform: translate3d(0, 32px, 0) !important;
+  transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: opacity, transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
