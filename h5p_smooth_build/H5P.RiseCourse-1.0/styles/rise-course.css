@@ -669,9 +669,11 @@
 @keyframes risePageFadeExit {
   0% {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
   100% {
     opacity: 0;
+    transform: translate3d(0, -20px, 0);
   }
 }
 
@@ -698,7 +700,7 @@
 }
 
 .rise-lesson-content-block.rise-slide-up-exit {
-  animation: risePageFadeExit 0.16s ease-in forwards !important;
+  animation: risePageFadeExit 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
   pointer-events: none !important;
 }
 

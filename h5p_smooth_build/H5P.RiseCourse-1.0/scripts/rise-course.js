@@ -699,9 +699,6 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       self.$coverPage.hide();
       self.$courseView.show();
 
-      // Immediately scroll to top when starting transition
-      self.scrollToTop();
-
       // Update Top Header
       self.$counter.text("Lesson " + (index + 1) + " of " + self.lessons.length);
       self.$topTitle.text(les.title);
@@ -749,7 +746,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           setTimeout(runEnhance, 1200);
         }
 
-        // Scroll to top smoothly during and after rendering
+        // Scroll to top cleanly when incoming lesson mounts
         self.scrollToTop();
         setTimeout(self.scrollToTop, 80);
         self.trigger("resize");
@@ -760,9 +757,12 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       if ($currentBlock.length > 0 && $currentBlock.is(":visible")) {
         self.isTransitioning = true;
         $currentBlock.removeClass("rise-slide-up-active").addClass("rise-slide-up-exit");
-        self.scrollToTop();
-        setTimeout(renderIncomingLesson, 180);
+        setTimeout(function () {
+          self.scrollToTop();
+          renderIncomingLesson();
+        }, 340);
       } else {
+        self.scrollToTop();
         renderIncomingLesson();
       }
     };
@@ -1717,7 +1717,6 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
      * Mark Current Lesson Complete and Advance
      */
     self.completeAndAdvance = function () {
-      self.scrollToTop();
       self.completedLessons[self.currentLessonIndex] = true;
 
       // Update Sidebar completion ring
