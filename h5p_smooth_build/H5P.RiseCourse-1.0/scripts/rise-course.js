@@ -1034,7 +1034,6 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           var $li = $(this);
           if ($li.hasClass("rise-list-item-enhanced") || $li.hasClass("h5p-sc-alternative") || $li.hasClass("h5p-answer") || $li.hasClass("rise-sidebar-lesson-item") || $li.closest(".h5p-question, .rise-sidebar, .rise-visual-outline-sidebar").length) return;
           $li.addClass("rise-list-item-enhanced");
-          $li.css("animation-delay", ((idx + 1) * 0.08) + "s");
 
           var rawHtml = $li.html().trim();
           if (isOrdered) {
@@ -1501,8 +1500,20 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       self.initScrollReveal();
 
       var selectorList = [
-        ".h5p-column-content > .h5p-column-content-block",
-        ".rise-lesson-content-block > *:not(.h5p-column)",
+        // 1. Text Headings, Paragraphs, Blockquotes, Tables
+        ".h5p-advanced-text > h1",
+        ".h5p-advanced-text > h2",
+        ".h5p-advanced-text > h3",
+        ".h5p-advanced-text > h4",
+        ".h5p-advanced-text > p",
+        ".h5p-advanced-text > blockquote",
+        ".h5p-advanced-text > table",
+        // 2. Individual Ordered & Unordered List Items
+        ".rise-list-item-enhanced",
+        ".rise-clean-step-item",
+        ".h5p-rise-course-root ol > li",
+        ".h5p-rise-course-root ul:not(.h5p-sc-alternatives):not(.h5p-answers):not(.h5p-choices):not(.h5p-summary-list):not(.rise-sidebar-lesson-list):not(.rise-sidebar-nav) > li",
+        // 3. Custom Rich Components & Cards
         ".rise-code-window",
         ".rise-flip-card",
         ".rise-carousel-container",
@@ -1515,6 +1526,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         ".rise-audio-card",
         ".rise-tabs-container",
         ".rise-video-card",
+        // 4. Standalone H5P Media & Interactive Widgets
         ".h5p-image",
         ".h5p-image-slider",
         ".h5p-video",
@@ -1527,9 +1539,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         ".h5p-blanks",
         ".h5p-drag-text",
         ".h5p-summary",
-        ".h5p-table",
-        ".rise-clean-step-item",
-        ".rise-list-item-enhanced"
+        ".h5p-table"
       ].join(", ");
 
       var $targets = $context.is(selectorList) ? $context.add($context.find(selectorList)) : $context.find(selectorList);
@@ -1537,9 +1547,8 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
       $targets.each(function () {
         var $el = $(this);
-        // Do not apply to sidebar, header, bottom nav, nested toolbox, or nested children of already revealable parents
-        if ($el.closest(".rise-sidebar, .rise-top-bar, .rise-bottom-action-bar, .h5peditor").length) return;
-        if ($el.parents(".rise-scroll-reveal").length > 0) return;
+        // Exclude sidebar, navigation, toolbox, or items inside question options / sidebar
+        if ($el.closest(".rise-sidebar, .rise-top-bar, .rise-bottom-action-bar, .h5peditor, .rise-sidebar-lesson-list, .rise-sidebar-nav, .h5p-choices, .h5p-answers, .h5p-sc-alternatives").length) return;
         if ($el.hasClass("rise-scroll-reveal")) return;
 
         $el.addClass("rise-scroll-reveal");
@@ -1547,7 +1556,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         var domEl = $el[0];
         if (domEl) {
           var rect = domEl.getBoundingClientRect();
-          if (rect.top <= windowHeight + 30 && rect.bottom >= -30) {
+          if (rect.top <= windowHeight + 40 && rect.bottom >= -40) {
             self.enqueueRevealItem(domEl);
           } else if (self.scrollObserver) {
             self.scrollObserver.observe(domEl);
