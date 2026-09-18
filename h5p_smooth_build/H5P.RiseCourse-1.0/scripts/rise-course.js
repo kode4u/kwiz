@@ -1426,8 +1426,8 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
             if (el && !el.classList.contains("is-visible")) {
               el.classList.add("is-visible");
             }
-          }, idx * 240);
-          delay = idx * 240;
+          }, idx * 180);
+          delay = idx * 180;
         });
 
         setTimeout(function () {
@@ -1435,7 +1435,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           if (revealQueue.length > 0) {
             drainRevealQueue();
           }
-        }, delay + 100);
+        }, delay + 80);
       };
 
       self.enqueueRevealItem = function (domEl) {
