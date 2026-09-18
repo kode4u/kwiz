@@ -666,21 +666,21 @@
 }
 
 /* Lesson Viewport & Page Transitions */
-@keyframes risePageSlideUpExit {
+@keyframes risePageFadeExit {
   0% {
     opacity: 1;
     transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-50px);
+    transform: translateY(-8px);
   }
 }
 
-@keyframes risePageSlideUpEnter {
+@keyframes risePageFadeEnter {
   0% {
     opacity: 0;
-    transform: translateY(70px);
+    transform: translateY(12px);
   }
   100% {
     opacity: 1;
@@ -702,13 +702,12 @@
 }
 
 .rise-lesson-content-block.rise-slide-up-exit {
-  animation: risePageSlideUpExit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  animation: risePageFadeExit 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
   pointer-events: none !important;
 }
 
 .rise-lesson-content-block.rise-slide-up-active {
-  animation: risePageSlideUpEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity;
+  animation: risePageFadeEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 /* Bottom Action Bar (Next Button) */
@@ -1419,23 +1418,13 @@ ul.rise-check-list > li::before {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: riseFadeInUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-.rise-step-item:nth-child(1) { animation-delay: 0.15s; }
-.rise-step-item:nth-child(2) { animation-delay: 0.35s; }
-.rise-step-item:nth-child(3) { animation-delay: 0.55s; }
-.rise-step-item:nth-child(4) { animation-delay: 0.75s; }
-.rise-step-item:nth-child(5) { animation-delay: 0.95s; }
-.rise-step-item:nth-child(6) { animation-delay: 1.15s; }
 
 .rise-step-item:hover {
   border-color: #cbd5e1;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 .rise-step-badge {
@@ -1487,10 +1476,8 @@ ul.rise-check-list > li::before {
   color: #1e293b;
   font-size: 1.025rem;
   line-height: 1.65;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: riseFadeInUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: 0.4s;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .rise-callout-info {
@@ -2910,10 +2897,9 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
    Smooth Show-on-Scroll Animations (Desktop & Mobile)
    ========================================================================== */
 .rise-scroll-reveal {
-  opacity: 0 !important;
-  transform: translateY(18px) !important;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  will-change: opacity, transform !important;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1), transform 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .rise-scroll-reveal.is-visible {
@@ -2922,17 +2908,20 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
 }
 
 /* Staggered micro-delays for sequential items */
-.rise-scroll-reveal[data-reveal-stagger="1"] { transition-delay: 0.04s !important; }
-.rise-scroll-reveal[data-reveal-stagger="2"] { transition-delay: 0.08s !important; }
-.rise-scroll-reveal[data-reveal-stagger="3"] { transition-delay: 0.12s !important; }
-.rise-scroll-reveal[data-reveal-stagger="4"] { transition-delay: 0.16s !important; }
-.rise-scroll-reveal[data-reveal-stagger="5"] { transition-delay: 0.20s !important; }
+.rise-scroll-reveal[data-reveal-stagger="1"] { transition-delay: 0.03s !important; }
+.rise-scroll-reveal[data-reveal-stagger="2"] { transition-delay: 0.06s !important; }
+.rise-scroll-reveal[data-reveal-stagger="3"] { transition-delay: 0.09s !important; }
+.rise-scroll-reveal[data-reveal-stagger="4"] { transition-delay: 0.12s !important; }
+.rise-scroll-reveal[data-reveal-stagger="5"] { transition-delay: 0.15s !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise-scroll-reveal {
+  .rise-scroll-reveal,
+  .rise-lesson-content-block.rise-slide-up-exit,
+  .rise-lesson-content-block.rise-slide-up-active {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
   }
 }
 

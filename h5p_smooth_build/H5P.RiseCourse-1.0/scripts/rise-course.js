@@ -751,9 +751,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
         // Scroll to top smoothly during and after rendering
         self.scrollToTop();
-        setTimeout(self.scrollToTop, 50);
-        setTimeout(self.scrollToTop, 150);
-        setTimeout(self.scrollToTop, 300);
+        setTimeout(self.scrollToTop, 80);
         self.trigger("resize");
         self.isTransitioning = false;
       };
@@ -763,7 +761,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         self.isTransitioning = true;
         $currentBlock.removeClass("rise-slide-up-active").addClass("rise-slide-up-exit");
         self.scrollToTop();
-        setTimeout(renderIncomingLesson, 280);
+        setTimeout(renderIncomingLesson, 180);
       } else {
         renderIncomingLesson();
       }
@@ -1415,24 +1413,30 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           });
         }, {
           root: null,
-          rootMargin: "0px 0px -15px 0px",
-          threshold: [0, 0.05, 0.1]
+          rootMargin: "0px 0px -20px 0px",
+          threshold: [0, 0.05]
         });
       }
 
-      // Scroll and resize listener for fallback or iframe scroll sync
+      // RAF-debounced scroll and resize listener for fallback or iframe scroll sync
+      var isRafScheduled = false;
       var checkVisibleElements = function () {
-        if (!self.$container) return;
-        var windowHeight = window.innerHeight || document.documentElement.clientHeight || 800;
-        self.$container.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
-          var el = this;
-          var rect = el.getBoundingClientRect();
-          if (rect.top <= windowHeight + 30 && rect.bottom >= -30) {
-            el.classList.add("is-visible");
-            if (self.scrollObserver) {
-              self.scrollObserver.unobserve(el);
+        if (isRafScheduled) return;
+        isRafScheduled = true;
+        window.requestAnimationFrame(function () {
+          isRafScheduled = false;
+          if (!self.$container) return;
+          var windowHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+          self.$container.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
+            var el = this;
+            var rect = el.getBoundingClientRect();
+            if (rect.top <= windowHeight + 40 && rect.bottom >= -40) {
+              el.classList.add("is-visible");
+              if (self.scrollObserver) {
+                self.scrollObserver.unobserve(el);
+              }
             }
-          }
+          });
         });
       };
 
@@ -1451,7 +1455,6 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
       var selectorList = [
         ".h5p-column-content > .h5p-column-content-block",
-        ".h5p-column-content > div",
         ".rise-lesson-content-block > *:not(.h5p-column)",
         ".rise-code-window",
         ".rise-flip-card",
@@ -1460,8 +1463,6 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         ".rise-moodle-embed-card",
         ".rise-term-card",
         ".rise-callout",
-        ".rise-callout-warning",
-        ".rise-callout-success",
         ".rise-stat-card",
         ".rise-timeline-item",
         ".rise-audio-card",
@@ -1481,14 +1482,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         ".h5p-summary",
         ".h5p-table",
         ".rise-clean-step-item",
-        ".rise-list-item-enhanced",
-        ".h5p-advanced-text > h1",
-        ".h5p-advanced-text > h2",
-        ".h5p-advanced-text > h3",
-        ".h5p-advanced-text > h4",
-        ".h5p-advanced-text > p",
-        ".h5p-advanced-text > blockquote",
-        ".h5p-advanced-text > table"
+        ".rise-list-item-enhanced"
       ].join(", ");
 
       var $targets = $context.is(selectorList) ? $context.add($context.find(selectorList)) : $context.find(selectorList);
@@ -1496,15 +1490,16 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
 
       $targets.each(function () {
         var $el = $(this);
-        // Do not apply to sidebar, header, bottom nav, or nested toolbox
+        // Do not apply to sidebar, header, bottom nav, nested toolbox, or nested children of already revealable parents
         if ($el.closest(".rise-sidebar, .rise-top-bar, .rise-bottom-action-bar, .h5peditor").length) return;
+        if ($el.parents(".rise-scroll-reveal").length > 0) return;
         if ($el.hasClass("rise-scroll-reveal")) return;
 
         $el.addClass("rise-scroll-reveal");
 
         // Stagger micro-delay for sequential items
         var sIdx = $el.index();
-        if (sIdx >= 0 && sIdx < 8) {
+        if (sIdx >= 0 && sIdx < 6) {
           $el.attr("data-reveal-stagger", (sIdx % 5) + 1);
         }
 
@@ -1521,7 +1516,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         }
       });
 
-      // Safety fallback: reveal items in view after a small interval
+      // Quick fallback: reveal items in view after mount
       setTimeout(function () {
         $context.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
           var rect = this.getBoundingClientRect();
@@ -1532,7 +1527,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
             }
           }
         });
-      }, 350);
+      }, 150);
     };
 
     /**
