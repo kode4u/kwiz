@@ -3163,4 +3163,164 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
   }
 }
 
+/* ==========================================================================
+   Hide Component / Category Badges on Top
+   ========================================================================== */
+.rise-category-tag,
+.rise-section-label,
+.rise-header-block .rise-category-tag {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Image Lightbox & Fullscreen Zoom Animation
+   ========================================================================== */
+body.rise-lightbox-open {
+  overflow: hidden !important;
+}
+
+.rise-zoomable-image {
+  cursor: zoom-in !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, filter 0.25s ease !important;
+}
+
+.rise-zoomable-image:hover {
+  filter: brightness(1.03) contrast(1.02);
+}
+
+.rise-image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.rise-image-lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.rise-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 29, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.rise-lightbox-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 92vw;
+  max-height: 90vh;
+  transform: scale(0.85);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rise-image-lightbox.is-open .rise-lightbox-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.rise-lightbox-img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  background: #000000;
+}
+
+.rise-lightbox-img {
+  max-width: 90vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+}
+
+.rise-lightbox-close-btn {
+  position: absolute;
+  top: -48px;
+  right: -8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0;
+  outline: none;
+}
+
+.rise-lightbox-close-btn:hover {
+  background: rgba(239, 68, 68, 0.95);
+  border-color: rgba(239, 68, 68, 1);
+  color: #ffffff;
+  transform: scale(1.08) rotate(90deg);
+}
+
+.rise-lightbox-caption {
+  margin-top: 14px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 22px;
+  border-radius: 9999px;
+  max-width: 80vw;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.rise-lightbox-caption:empty {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .rise-lightbox-close-btn {
+    top: -42px;
+    right: 0px;
+    width: 36px;
+    height: 36px;
+  }
+  .rise-lightbox-img {
+    max-height: 70vh;
+  }
+}
+
 

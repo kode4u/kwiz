@@ -1390,8 +1390,98 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         }
       });
 
-      // 7. Apply Show-on-Scroll Animation to all content items
+      // 7. Initialize & Bind Image Lightbox / Fullscreen Zoom on click
+      self.initImageLightbox();
+      $container.find("img").each(function () {
+        var $img = $(this);
+        // Exclude icons, avatars, dots, editor tools
+        if ($img.closest(".rise-sidebar, .rise-top-bar, .rise-dot, .h5peditor, .rise-code-dots, .h5p-joubelui-button").length) return;
+        if ($img.hasClass("rise-no-zoom")) return;
+        if ($img.data("rise-lightbox-bound")) return;
+        $img.data("rise-lightbox-bound", true);
+
+        $img.addClass("rise-zoomable-image");
+
+        $img.off("click.risezoom").on("click.risezoom", function (e) {
+          if ($img.closest(".h5p-drag-text, .h5p-summary, .h5p-sc-alternative").length) return;
+          var src = $img.attr("src") || "";
+          if (!src) return;
+
+          var caption = "";
+          var $cardCap = $img.closest(".rise-image-card, .rise-image-hero").find(".rise-image-card-caption, .rise-image-hero-caption");
+          if ($cardCap.length) {
+            caption = $cardCap.text();
+          } else if ($img.attr("alt") && $img.attr("alt") !== "image" && $img.attr("alt") !== "Zoomed image") {
+            caption = $img.attr("alt");
+          } else if ($img.siblings("figcaption, .h5p-image-caption").length) {
+            caption = $img.siblings("figcaption, .h5p-image-caption").text();
+          }
+
+          self.openLightbox(src, caption);
+        });
+      });
+
+      // 8. Apply Show-on-Scroll Animation to all content items
       self.applyScrollReveal($container);
+    };
+
+    /**
+     * Initialize Global Image Lightbox & Fullscreen Zoom
+     */
+    self.initImageLightbox = function () {
+      if (self.lightboxInitialized) return;
+      self.lightboxInitialized = true;
+
+      var $lightbox = $("#rise-image-lightbox-modal");
+      if (!$lightbox.length) {
+        $lightbox = $(
+          '<div id="rise-image-lightbox-modal" class="rise-image-lightbox" role="dialog" aria-modal="true" aria-label="Image Preview">' +
+            '<div class="rise-lightbox-backdrop" title="Click to close"></div>' +
+            '<div class="rise-lightbox-content">' +
+              '<button type="button" class="rise-lightbox-close-btn" aria-label="Close image preview" title="Close (Esc)">' +
+                '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+              '</button>' +
+              '<div class="rise-lightbox-img-wrap">' +
+                '<img class="rise-lightbox-img" src="" alt="Zoomed image" />' +
+              '</div>' +
+              '<div class="rise-lightbox-caption"></div>' +
+            '</div>' +
+          '</div>'
+        );
+        $("body").append($lightbox);
+      }
+
+      var closeLightbox = function () {
+        $lightbox.removeClass("is-open");
+        $("body").removeClass("rise-lightbox-open");
+      };
+
+      $lightbox.find(".rise-lightbox-backdrop, .rise-lightbox-close-btn").off("click.riselightbox").on("click.riselightbox", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeLightbox();
+      });
+
+      $(document).off("keydown.riselightbox").on("keydown.riselightbox", function (e) {
+        if (e.key === "Escape" || e.keyCode === 27) {
+          if ($lightbox.hasClass("is-open")) {
+            closeLightbox();
+          }
+        }
+      });
+
+      self.openLightbox = function (src, caption) {
+        if (!src) return;
+        $lightbox.find(".rise-lightbox-img").attr("src", src);
+        var $caption = $lightbox.find(".rise-lightbox-caption");
+        if (caption && caption.trim().length > 0) {
+          $caption.text(caption.trim()).show();
+        } else {
+          $caption.text("").hide();
+        }
+        $lightbox.addClass("is-open");
+        $("body").addClass("rise-lightbox-open");
+      };
     };
 
     /**
