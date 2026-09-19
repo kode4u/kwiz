@@ -760,7 +760,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         setTimeout(function () {
           self.scrollToTop();
           renderIncomingLesson();
-        }, 340);
+        }, 240);
       } else {
         self.scrollToTop();
         renderIncomingLesson();
@@ -1401,50 +1401,10 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
       if (self.scrollObserverInitialized) return;
       self.scrollObserverInitialized = true;
 
-      var revealQueue = [];
-      var isProcessingQueue = false;
-
-      var drainRevealQueue = function () {
-        if (!revealQueue.length) {
-          isProcessingQueue = false;
-          return;
-        }
-        isProcessingQueue = true;
-
-        // Sort items by vertical page position (strict top-to-bottom order)
-        revealQueue.sort(function (a, b) {
-          var rectA = a.getBoundingClientRect();
-          var rectB = b.getBoundingClientRect();
-          return rectA.top - rectB.top;
-        });
-
-        var delay = 0;
-        var pendingItems = revealQueue.splice(0, revealQueue.length);
-        pendingItems.forEach(function (el, idx) {
-          setTimeout(function () {
-            if (el && !el.classList.contains("is-visible")) {
-              el.classList.add("is-visible");
-            }
-          }, idx * 180);
-          delay = idx * 180;
-        });
-
-        setTimeout(function () {
-          isProcessingQueue = false;
-          if (revealQueue.length > 0) {
-            drainRevealQueue();
-          }
-        }, delay + 80);
-      };
-
       self.enqueueRevealItem = function (domEl) {
-        if (!domEl || domEl.classList.contains("is-visible")) return;
-        if (revealQueue.indexOf(domEl) === -1) {
-          revealQueue.push(domEl);
-        }
-        if (!isProcessingQueue) {
-          // Micro-tick to batch elements entering at the same moment
-          setTimeout(drainRevealQueue, 45);
+        if (!domEl) return;
+        if (!domEl.classList.contains("is-visible")) {
+          domEl.classList.add("is-visible");
         }
       };
 
@@ -1459,7 +1419,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           });
         }, {
           root: null,
-          rootMargin: "0px 0px -20px 0px",
+          rootMargin: "0px 0px 60px 0px",
           threshold: [0, 0.05]
         });
       }
@@ -1476,7 +1436,7 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
           self.$container.find(".rise-scroll-reveal:not(.is-visible)").each(function () {
             var el = this;
             var rect = el.getBoundingClientRect();
-            if (rect.top <= windowHeight + 40 && rect.bottom >= -40) {
+            if (rect.top <= windowHeight + 60 && rect.bottom >= -60) {
               if (self.scrollObserver) {
                 self.scrollObserver.unobserve(el);
               }
@@ -1551,15 +1511,16 @@ H5P.RiseCourse = (function ($, EventDispatcher) {
         if ($el.closest(".rise-sidebar, .rise-top-bar, .rise-bottom-action-bar, .h5peditor, .rise-sidebar-lesson-list, .rise-sidebar-nav, .h5p-choices, .h5p-answers, .h5p-sc-alternatives").length) return;
         if ($el.hasClass("rise-scroll-reveal")) return;
 
-        $el.addClass("rise-scroll-reveal");
-
         var domEl = $el[0];
         if (domEl) {
           var rect = domEl.getBoundingClientRect();
-          if (rect.top <= windowHeight + 40 && rect.bottom >= -40) {
-            self.enqueueRevealItem(domEl);
-          } else if (self.scrollObserver) {
-            self.scrollObserver.observe(domEl);
+          if (rect.top <= windowHeight + 80 && rect.bottom >= -80) {
+            $el.addClass("rise-scroll-reveal is-visible");
+          } else {
+            $el.addClass("rise-scroll-reveal");
+            if (self.scrollObserver) {
+              self.scrollObserver.observe(domEl);
+            }
           }
         }
       });

@@ -673,16 +673,18 @@
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, 16px, 0);
   }
 }
 
-@keyframes risePageFadeEnter {
+@keyframes riseFadeInFromTop {
   0% {
     opacity: 0;
+    transform: translate3d(0, -28px, 0);
   }
   100% {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -700,12 +702,13 @@
 }
 
 .rise-lesson-content-block.rise-slide-up-exit {
-  animation: risePageFadeExit 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  animation: risePageFadeExit 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
   pointer-events: none !important;
 }
 
 .rise-lesson-content-block.rise-slide-up-active {
-  animation: risePageFadeEnter 0.25s ease-out forwards !important;
+  animation: riseFadeInFromTop 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: opacity, transform;
 }
 
 /* Bottom Action Bar (Next Button) */
@@ -2892,16 +2895,18 @@ ul.h5p-sc-alternatives.h5p-sc-selected li.h5p-sc-alternative.h5p-sc-selected,
 }
 
 /* ==========================================================================
-   Sequential Cascading Animations (Top to Bottom One-by-One, Pure Slow Fade-In)
+   Smooth Fade-In From Top (Clean, GPU Accelerated, No Jerky Queue)
    ========================================================================== */
 .rise-scroll-reveal {
   opacity: 0 !important;
-  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  will-change: opacity;
+  transform: translate3d(0, -18px, 0);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: opacity, transform;
 }
 
 .rise-scroll-reveal.is-visible {
   opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
