@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG Evaluation &amp; Telemetry Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --secondary: #4cc9f0;
+      --success: #2ec4b6;
+      --warning: #ff9f1c;
+      --danger: #e63946;
+      --dark-bg: #0f172a;
+      --card-border: #e2e8f0;
+    }
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #1e293b;
+    }
+    .navbar-custom {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      padding: 1.25rem 1.5rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    }
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .timing-bar-container {
+      height: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      background: #e2e8f0;
+      margin-bottom: 1rem;
+    }
+    .timing-segment {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      transition: width 0.3s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      padding: 0 4px;
+    }
+    .table-custom {
+      font-size: 0.88rem;
+    }
+    .table-custom th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border-color);
+    }
+    .code-block {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.86rem;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid #1e293b;
+    }
+    .choice-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+    }
+    .choice-item.correct {
+      background: #f0fdf4;
+      border-color: #22c55e;
+    }
+    pre.json-viewer {
+      background: #0f172a;
+      color: #a5f3fc;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2 px-4 sticky-top">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center gap-3">
+        <span class="fs-4 text-warning">⚡</span>
+        <div>
+          <a class="navbar-brand fw-bold mb-0 fs-5" href="#">RAG Evaluation &amp; Telemetry Dashboard</a>
+          <div class="text-secondary small" style="font-size: 0.76rem;">Course-Grounded Programming MCQ Generation &bull; Self-Hosted RAG Pipeline</div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span id="system-status-badge" class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> System Online</span>
+        <a href="http://localhost:8080/course/view.php?id=2" target="_blank" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-mortarboard me-1"></i> Course in Moodle
+        </a>
+        <button id="btn-refresh" class="btn btn-primary btn-sm px-3" onclick="loadDashboardData()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4 py-4">
+
+    <!-- Row 1: Global KPIs Across All Iterations -->
+    <div class="row g-3 mb-4">
+      <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="kpi-card border-start border-4 border-primary">
+          <div class="kpi-label">Total Iterations</div>
+          <div class="kpi-value" id="kpi-iterations">0</div>
+          <div class="kpi-sub">Evaluation runs</div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="kpi-card border-start border-4 border-info">
+          <div class="kpi-label">Total Questions</div>
+          <div class="kpi-value" id="kpi-questions">0</div>
+          <div class="kpi-sub">MCQs synthesized</div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="kpi-card border-start border-4 border-success">
+          <div class="kpi-label">Mean T<sub>E2E</sub></div>
+          <div class="kpi-value" id="kpi-avg-e2e">0.0s</div>
+          <div class="kpi-sub">End-to-End Latency</div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="kpi-card border-start border-4 border-warning">
+          <div class="kpi-label">Mean T<sub>KB</sub></div>
+          <div class="kpi-value" id="kpi-avg-kb">0.0s</div>
+          <div class="kpi-sub">Vector Cache &amp; Index</div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="kpi-card border-start border-4 border-primary">
+          <div class="kpi-label">AST Pass Rate</div>
+          <div class="kpi-value" id="kpi-ast-rate">100%</div>
+          <div class="kpi-sub">Syntax &amp; Exec valid</div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="kpi-card border-start border-4 border-secondary">
+          <div class="kpi-label">Cache Hit Ratio</div>
+          <div class="kpi-value" id="kpi-cache-hit">0%</div>
+          <div class="kpi-sub">SHA-256 Vector Chunks</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Iteration Selection & Control Bar -->
+    <div class="section-card p-3 mb-4">
+      <div class="row align-items-center g-3">
+        <div class="col-md-5">
+          <label for="iteration-select" class="form-label fw-bold text-dark mb-1 small text-uppercase">
+            <i class="bi bi-layers me-1 text-primary"></i> Select Evaluation Iteration
+          </label>
+          <select id="iteration-select" class="form-select form-select-lg" onchange="onIterationSelected(this.value)" style="font-size: 0.95rem;">
+            <option value="">Loading iterations...</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2 align-items-end">
+          <button class="btn btn-outline-secondary btn-sm" onclick="stepIteration(-1)" title="Previous Iteration">
+            <i class="bi bi-chevron-left me-1"></i> Prev
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="stepIteration(1)" title="Next Iteration">
+            Next <i class="bi bi-chevron-right ms-1"></i>
+          </button>
+          <span id="iteration-counter-pill" class="badge bg-dark text-light py-2 px-3 align-self-center" style="font-size: 0.85rem;">
+            Iteration #0
+          </span>
+        </div>
+        <div class="col-md-3 text-md-end d-flex justify-content-md-end gap-2 align-items-end">
+          <button class="btn btn-outline-danger btn-sm" onclick="confirmResetCounter()" title="Reset Iteration Counter">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Counter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Selected Iteration Details -->
+    <div id="iteration-details-container">
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="text-center py-5 section-card">
+        <i class="bi bi-clipboard-data text-muted" style="font-size: 3rem;"></i>
+        <h5 class="text-muted mt-3">No Iteration Logs Found</h5>
+        <p class="text-muted small">Run a question generation job from Moodle or API to record Iteration #1.</p>
+      </div>
+
+      <!-- Loaded Details -->
+      <div id="details-view" style="display: none;">
+        
+        <!-- Iteration Metadata & Hardware Bar -->
+        <div class="row g-3 mb-4">
+          <div class="col-lg-8">
+            <div class="section-card h-100 p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h4 id="iter-title" class="fw-bold text-dark mb-1">Iteration #1: Python Control Flow</h4>
+                  <div class="text-muted small d-flex gap-3 flex-wrap">
+                    <span><i class="bi bi-calendar-event me-1"></i> <span id="iter-timestamp">--</span></span>
+                    <span><i class="bi bi-fingerprint me-1"></i> UUID: <code id="iter-uuid">--</code></span>
+                  </div>
+                </div>
+                <span id="iter-status-badge" class="badge bg-success fs-6 px-3 py-2">Success</span>
+              </div>
+
+              <div class="row g-3 pt-2 border-top">
+                <div class="col-sm-3 col-6">
+                  <div class="small text-muted">Model</div>
+                  <div class="fw-bold text-dark" id="iter-model">qwen2.5-coder:7b</div>
+                </div>
+                <div class="col-sm-3 col-6">
+                  <div class="small text-muted">Backend</div>
+                  <div class="fw-bold text-dark" id="iter-backend">local (Ollama)</div>
+                </div>
+                <div class="col-sm-3 col-6">
+                  <div class="small text-muted">Difficulty &bull; Lang</div>
+                  <div class="fw-bold text-dark" id="iter-difficulty">medium &bull; en</div>
+                </div>
+                <div class="col-sm-3 col-6">
+                  <div class="small text-muted">Top-K Retrieved</div>
+                  <div class="fw-bold text-dark" id="iter-topk">3 chunks</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hardware Environment Snapshot -->
+          <div class="col-lg-4">
+            <div class="section-card h-100 p-4">
+              <h6 class="fw-bold text-dark mb-3"><i class="bi bi-cpu me-2 text-primary"></i>Hardware Snapshot</h6>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                  <span>CPU Utilization</span>
+                  <span class="fw-bold text-dark" id="hw-cpu">--%</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div id="hw-cpu-bar" class="progress-bar bg-primary" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                  <span>RAM Usage</span>
+                  <span class="fw-bold text-dark" id="hw-ram">-- / -- MB</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div id="hw-ram-bar" class="progress-bar bg-info" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="small text-muted mt-3 pt-2 border-top d-flex justify-content-between">
+                <span>Single GPU Constraint</span>
+                <span class="badge bg-secondary">Apple M-Series / MPS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Decomposed Latency Waterfall -->
+        <div class="section-card mb-4">
+          <div class="section-header">
+            <h5><i class="bi bi-stopwatch text-warning"></i> Decomposed Latency Waterfall &bull; T<sub>E2E</sub> = <span id="waterfall-total-ms" class="text-primary">0 ms</span></h5>
+            <span class="badge bg-light text-dark border">RAG Pipeline Instrumentation</span>
+          </div>
+          <div class="p-4">
+            
+            <!-- Stacked Color Bar -->
+            <div class="timing-bar-container" id="timing-bar">
+              <div id="bar-kb" class="timing-segment" style="background: #3b82f6; width: 25%;" title="T_KB: Indexing & Cache">T_KB</div>
+              <div id="bar-retrieval" class="timing-segment" style="background: #06b6d4; width: 10%;" title="T_retrieval: Search">Retrieval</div>
+              <div id="bar-prompt" class="timing-segment" style="background: #8b5cf6; width: 5%;" title="T_prompt: Template">Prompt</div>
+              <div id="bar-llm" class="timing-segment" style="background: #10b981; width: 50%;" title="T_LLM: Inference">T_LLM</div>
+              <div id="bar-val" class="timing-segment" style="background: #f59e0b; width: 10%;" title="T_validation: AST Check">AST</div>
+            </div>
+
+            <!-- Detailed Millisecond Cards -->
+            <div class="row g-3 pt-2">
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3 border">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="text-primary">1. Knowledge Base Indexing (T<sub>KB</sub>)</strong>
+                    <span class="badge bg-primary" id="val-tkb">0 ms</span>
+                  </div>
+                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.82rem;">
+                    <tr><td class="text-muted">Text Extraction (T<sub>extract</sub>)</td><td class="text-end font-monospace" id="val-extract">0.00 ms</td></tr>
+                    <tr><td class="text-muted">Sliding Chunking (T<sub>chunk</sub>)</td><td class="text-end font-monospace" id="val-chunk">0.00 ms</td></tr>
+                    <tr><td class="text-muted">SHA-256 Hashing (T<sub>hash</sub>)</td><td class="text-end font-monospace" id="val-hash">0.00 ms</td></tr>
+                    <tr><td class="text-muted">Cache Lookup (T<sub>lookup</sub>)</td><td class="text-end font-monospace" id="val-lookup">0.00 ms</td></tr>
+                    <tr><td class="text-muted">Vector Embedding (T<sub>embed</sub>)</td><td class="text-end font-monospace" id="val-embed">0.00 ms</td></tr>
+                    <tr><td class="text-muted">FAISS/Cosine Index (T<sub>index</sub>)</td><td class="text-end font-monospace" id="val-index">0.00 ms</td></tr>
+                  </table>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3 border">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="text-success">2. MCQ Generation Phase (T<sub>GEN</sub>)</strong>
+                    <span class="badge bg-success" id="val-tgen">0 ms</span>
+                  </div>
+                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.82rem;">
+                    <tr><td class="text-muted">Query Embedding (T<sub>query</sub>)</td><td class="text-end font-monospace" id="val-query">0.00 ms</td></tr>
+                    <tr><td class="text-muted">Vector Retrieval (T<sub>retrieval</sub>)</td><td class="text-end font-monospace" id="val-retrieval">0.00 ms</td></tr>
+                    <tr><td class="text-muted">Prompt Formatting (T<sub>prompt</sub>)</td><td class="text-end font-monospace" id="val-prompt">0.00 ms</td></tr>
+                    <tr><td class="text-muted">LLM Forward Pass (T<sub>LLM</sub>)</td><td class="text-end font-monospace" id="val-llm">0.00 ms</td></tr>
+                    <tr><td class="text-muted">AST Code Validation (T<sub>val</sub>)</td><td class="text-end font-monospace" id="val-validation">0.00 ms</td></tr>
+                    <tr><td class="text-muted">Retries Latency (T<sub>retry</sub>)</td><td class="text-end font-monospace" id="val-retry">0.00 ms</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Caching & Quality Telemetry Badges -->
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-white">
+                  <div class="small text-muted fw-bold mb-1">Incremental Cache Efficiency</div>
+                  <div class="d-flex gap-3 align-items-center">
+                    <div class="fs-5 fw-bold text-dark"><span id="cache-hits">0</span> Hits / <span id="cache-misses">0</span> Misses</div>
+                    <span class="badge bg-info text-dark fs-6" id="cache-ratio-badge">0% Hit Ratio</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-white">
+                  <div class="small text-muted fw-bold mb-1">Code AST Syntax Verification</div>
+                  <div class="d-flex gap-3 align-items-center">
+                    <div class="fs-5 fw-bold text-dark"><span id="ast-passed">0</span> Passed / <span id="ast-failed">0</span> Failed</div>
+                    <span class="badge bg-success fs-6" id="ast-pass-badge">100% Pass Rate</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Generated Questions View -->
+        <div class="section-card mb-4">
+          <div class="section-header">
+            <h5><i class="bi bi-question-circle text-primary"></i> Generated Questions Preview &bull; <span id="questions-count-badge" class="text-primary">0 questions</span></h5>
+            <span class="badge bg-light text-dark border">Directly Verified in Moodle Question Bank</span>
+          </div>
+          <div class="p-4" id="questions-container">
+            <!-- Rendered Question Cards -->
+          </div>
+        </div>
+
+        <!-- Raw Iteration JSON Panel -->
+        <div class="section-card mb-4">
+          <div class="section-header">
+            <h5><i class="bi bi-filetype-json text-info"></i> Raw Telemetry JSON Payload</h5>
+            <button class="btn btn-outline-secondary btn-sm" onclick="copyJsonToClipboard()">
+              <i class="bi bi-clipboard me-1"></i> Copy JSON
+            </button>
+          </div>
+          <div class="p-3">
+            <pre id="raw-json-viewer" class="json-viewer m-0">{}</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Row 4: Historical Iterations Table -->
+    <div class="section-card mb-4">
+      <div class="section-header">
+        <h5><i class="bi bi-clock-history text-secondary"></i> Historical Iterations Log</h5>
+        <div class="small text-muted">Click any row to inspect complete decomposed metrics</div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-custom align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="width: 90px;">Iter #</th>
+              <th>Timestamp</th>
+              <th>Topic</th>
+              <th>Category</th>
+              <th>Model</th>
+              <th>Count</th>
+              <th>T<sub>KB</sub></th>
+              <th>T<sub>LLM</sub></th>
+              <th>T<sub>E2E</sub></th>
+              <th>Cache Hit</th>
+              <th>AST Pass</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody id="iterations-table-body">
+            <tr>
+              <td colspan="13" class="text-center py-4 text-muted">No iterations recorded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="text-center py-3 text-muted small border-top bg-white">
+    Self-Hosted RAG Pipeline Telemetry &bull; Moodle 4.3+ Question Bank Integration &bull; 
+    <a href="http://localhost:5001/api/dashboard/stats" target="_blank" class="text-decoration-none">Stats API</a> &bull;
+    <a href="http://localhost:5001/api/dashboard/iterations" target="_blank" class="text-decoration-none">Iterations API</a>
+  </footer>
+
+  <script>
+    let allIterations = [];
+    let selectedIterationNumber = null;
+
+    async function loadDashboardData() {
+      const btn = document.getElementById('btn-refresh');
+      if (btn) btn.classList.add('disabled');
+
+      try {
+        // 1. Fetch Global Stats
+        const statsResp = await fetch('/api/dashboard/stats');
+        if (statsResp.ok) {
+          const stats = await statsResp.json();
+          renderGlobalStats(stats);
+        }
+
+        // 2. Fetch Iterations List
+        const itersResp = await fetch('/api/dashboard/iterations');
+        if (itersResp.ok) {
+          const data = await itersResp.json();
+          allIterations = data.iterations || [];
+          renderIterationsSelector(allIterations);
+          renderIterationsTable(allIterations);
+
+          if (allIterations.length > 0) {
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('details-view').style.display = 'block';
+
+            // Default to latest iteration if none selected
+            if (!selectedIterationNumber || !allIterations.find(it => it.iteration_number === selectedIterationNumber)) {
+              selectedIterationNumber = allIterations[0].iteration_number;
+            }
+            loadIterationDetail(selectedIterationNumber);
+          } else {
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('details-view').style.display = 'none';
+          }
+        }
+      } catch (err) {
+        console.error('Error loading dashboard data:', err);
+      } finally {
+        if (btn) btn.classList.remove('disabled');
+      }
+    }
+
+    function renderGlobalStats(s) {
+      document.getElementById('kpi-iterations').textContent = s.total_iterations || 0;
+      document.getElementById('kpi-questions').textContent = s.total_questions || 0;
+      document.getElementById('kpi-avg-e2e').textContent = (s.avg_t_e2e_ms ? (s.avg_t_e2e_ms / 1000).toFixed(2) : '0.0') + 's';
+      document.getElementById('kpi-avg-kb').textContent = (s.avg_t_kb_ms ? (s.avg_t_kb_ms / 1000).toFixed(2) : '0.0') + 's';
+      document.getElementById('kpi-ast-rate').textContent = ((s.avg_ast_pass_rate !== undefined ? s.avg_ast_pass_rate : 1.0) * 100).toFixed(1) + '%';
+      document.getElementById('kpi-cache-hit').textContent = ((s.avg_hit_ratio || 0.0) * 100).toFixed(1) + '%';
+    }
+
+    function renderIterationsSelector(list) {
+      const select = document.getElementById('iteration-select');
+      if (!select) return;
+
+      if (list.length === 0) {
+        select.innerHTML = '<option value="">No iterations available</option>';
+        return;
+      }
+
+      let html = '';
+      list.forEach(item => {
+        const sel = item.iteration_number === selectedIterationNumber ? 'selected' : '';
+        const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : '';
+        html += `<option value="${item.iteration_number}" ${sel}>Iteration #${item.iteration_number}: ${escapeHtml(item.topic || 'General')} (${item.n_questions || 0} MCQs, ${timeStr})</option>`;
+      });
+      select.innerHTML = html;
+    }
+
+    function onIterationSelected(val) {
+      if (!val) return;
+      selectedIterationNumber = parseInt(val, 10);
+      loadIterationDetail(selectedIterationNumber);
+    }
+
+    function stepIteration(delta) {
+      if (!allIterations || allIterations.length === 0) return;
+      const idx = allIterations.findIndex(it => it.iteration_number === selectedIterationNumber);
+      if (idx === -1) return;
+      const newIdx = idx - delta; // reverse because list is sorted descending
+      if (newIdx >= 0 && newIdx < allIterations.length) {
+        selectedIterationNumber = allIterations[newIdx].iteration_number;
+        const select = document.getElementById('iteration-select');
+        if (select) select.value = selectedIterationNumber;
+        loadIterationDetail(selectedIterationNumber);
+      }
+    }
+
+    async function loadIterationDetail(iterNum) {
+      try {
+        const resp = await fetch(`/api/dashboard/iteration/${iterNum}`);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        renderIterationDetailView(data);
+      } catch (err) {
+        console.error(`Error loading iteration #${iterNum}:`, err);
+      }
+    }
+
+    function renderIterationDetailView(rec) {
+      selectedIterationNumber = rec.iteration_number;
+      document.getElementById('iteration-counter-pill').textContent = `Iteration #${rec.iteration_number}`;
+
+      // Metadata
+      document.getElementById('iter-title').textContent = `Iteration #${rec.iteration_number}: ${rec.topic || 'MCQ Generation'}`;
+      document.getElementById('iter-timestamp').textContent = rec.timestamp ? new Date(rec.timestamp).toLocaleString() : '--';
+      document.getElementById('iter-uuid').textContent = rec.request_uuid || '--';
+      document.getElementById('iter-model').textContent = rec.model || '--';
+      document.getElementById('iter-backend').textContent = `${rec.backend || 'local'} (${rec.backend === 'local' ? 'Ollama' : 'Cloud API'})`;
+      document.getElementById('iter-difficulty').textContent = `${rec.difficulty || 'medium'} • ${rec.language || 'en'}`;
+      document.getElementById('iter-topk').textContent = `${rec.top_k || 3} chunks (${rec.corpus_tokens || 0} tokens)`;
+
+      const statusBadge = document.getElementById('iter-status-badge');
+      if (rec.status === 'success') {
+        statusBadge.className = 'badge bg-success fs-6 px-3 py-2';
+        statusBadge.textContent = 'Success';
+      } else {
+        statusBadge.className = 'badge bg-danger fs-6 px-3 py-2';
+        statusBadge.textContent = 'Failed';
+      }
+
+      // Hardware
+      const hw = rec.hardware || {};
+      const cpu = hw.cpu_percent !== undefined ? hw.cpu_percent : 0;
+      document.getElementById('hw-cpu').textContent = `${cpu}%`;
+      document.getElementById('hw-cpu-bar').style.width = `${Math.min(100, cpu)}%`;
+
+      const ramUsed = hw.ram_used_mb || 0;
+      const ramTotal = hw.ram_total_mb || 0;
+      const ramPct = hw.ram_percent || (ramTotal > 0 ? (ramUsed / ramTotal * 100).toFixed(1) : 0);
+      document.getElementById('hw-ram').textContent = `${ramUsed} / ${ramTotal} MB (${ramPct}%)`;
+      document.getElementById('hw-ram-bar').style.width = `${Math.min(100, ramPct)}%`;
+
+      // Decomposed Timings
+      const t = rec.timings || {};
+      const t_e2e = t.t_e2e_ms || 0.0;
+      const t_kb = t.t_kb_ms || 0.0;
+      const t_gen = t.t_gen_ms || 0.0;
+      const t_llm = t.t_llm_ms || 0.0;
+      const t_val = t.t_validation_ms || 0.0;
+      const t_ret = t.t_retrieval_ms || 0.0;
+      const t_prompt = t.t_prompt_ms || 0.0;
+
+      document.getElementById('waterfall-total-ms').textContent = `${t_e2e.toLocaleString()} ms (${(t_e2e / 1000).toFixed(2)}s)`;
+      document.getElementById('val-tkb').textContent = `${t_kb} ms`;
+      document.getElementById('val-extract').textContent = `${(t.t_extract_ms || 0).toFixed(2)} ms`;
+      document.getElementById('val-chunk').textContent = `${(t.t_chunk_ms || 0).toFixed(2)} ms`;
+      document.getElementById('val-hash').textContent = `${(t.t_hash_ms || 0).toFixed(2)} ms`;
+      document.getElementById('val-lookup').textContent = `${(t.t_lookup_ms || 0).toFixed(2)} ms`;
+      document.getElementById('val-embed').textContent = `${(t.t_embed_ms || 0).toFixed(2)} ms`;
+      document.getElementById('val-index').textContent = `${(t.t_index_ms || 0).toFixed(2)} ms`;
+
+      document.getElementById('val-tgen').textContent = `${t_gen} ms`;
+      document.getElementById('val-query').textContent = `${(t.t_query_embed_ms || 0).toFixed(2)} ms`;
+      document.getElementById('val-retrieval').textContent = `${t_ret.toFixed(2)} ms`;
+      document.getElementById('val-prompt').textContent = `${t_prompt.toFixed(2)} ms`;
+      document.getElementById('val-llm').textContent = `${t_llm.toFixed(2)} ms`;
+      document.getElementById('val-validation').textContent = `${t_val.toFixed(2)} ms`;
+      document.getElementById('val-retry').textContent = `${(t.t_retry_ms || 0).toFixed(2)} ms`;
+
+      // Dynamic Timing Bar Segments
+      const safeTotal = Math.max(1, t_e2e);
+      document.getElementById('bar-kb').style.width = `${Math.max(4, (t_kb / safeTotal * 100))}%`;
+      document.getElementById('bar-retrieval').style.width = `${Math.max(2, (t_ret / safeTotal * 100))}%`;
+      document.getElementById('bar-prompt').style.width = `${Math.max(2, (t_prompt / safeTotal * 100))}%`;
+      document.getElementById('bar-llm').style.width = `${Math.max(10, (t_llm / safeTotal * 100))}%`;
+      document.getElementById('bar-val').style.width = `${Math.max(2, (t_val / safeTotal * 100))}%`;
+
+      // Cache & AST Verification
+      const c = rec.cache || {};
+      document.getElementById('cache-hits').textContent = c.cache_hits || 0;
+      document.getElementById('cache-misses').textContent = c.cache_misses || 0;
+      const hitRatio = c.hit_ratio !== undefined ? (c.hit_ratio * 100).toFixed(1) : '0.0';
+      document.getElementById('cache-ratio-badge').textContent = `${hitRatio}% Hit Ratio`;
+
+      const v = rec.validation || {};
+      document.getElementById('ast-passed').textContent = v.validation_passed || 0;
+      document.getElementById('ast-failed').textContent = v.validation_failed || 0;
+      const astRate = v.ast_pass_rate !== undefined ? (v.ast_pass_rate * 100).toFixed(1) : '100.0';
+      document.getElementById('ast-pass-badge').textContent = `${astRate}% Pass Rate`;
+
+      // Render Questions
+      const qList = rec.questions || [];
+      document.getElementById('questions-count-badge').textContent = `${qList.length} questions`;
+      renderQuestions(qList);
+
+      // Raw JSON
+      document.getElementById('raw-json-viewer').textContent = JSON.stringify(rec, null, 2);
+    }
+
+    function renderQuestions(questions) {
+      const container = document.getElementById('questions-container');
+      if (!container) return;
+
+      if (!questions || questions.length === 0) {
+        container.innerHTML = '<div class="text-muted text-center py-3">No questions synthesized in this iteration.</div>';
+        return;
+      }
+
+      let html = '';
+      questions.forEach((q, idx) => {
+        let questionText = q.question || '';
+        let codeHtml = '';
+        if (questionText.includes('```')) {
+          const parts = questionText.split(/(```[\s\S]*?```)/g);
+          questionText = parts.map(p => {
+            if (p.startsWith('```')) {
+              const code = p.replace(/^```[a-zA-Z]*
+?/, '').replace(/```$/, '');
+              return `<div class="code-block"><code>${escapeHtml(code)}</code></div>`;
+            }
+            return escapeHtml(p);
+          }).join('');
+        } else {
+          questionText = escapeHtml(questionText);
+        }
+
+        let choicesHtml = '';
+        const choices = q.choices || [];
+        const correctIdx = q.correct_index;
+
+        choices.forEach((c, cIdx) => {
+          const cText = typeof c === 'object' ? c.text : c;
+          const isCorrect = cIdx === correctIdx || (typeof c === 'object' && c.is_correct);
+          const letter = String.fromCharCode(65 + cIdx);
+
+          if (isCorrect) {
+            choicesHtml += `
+              <div class="choice-item correct">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-success rounded-circle" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">${letter}</span>
+                  <span class="fw-bold text-success-emphasis">${escapeHtml(cText)}</span>
+                </div>
+                <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i> Correct</span>
+              </div>
+            `;
+          } else {
+            choicesHtml += `
+              <div class="choice-item">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-secondary rounded-circle" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">${letter}</span>
+                  <span class="text-dark">${escapeHtml(cText)}</span>
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        let explHtml = '';
+        if (q.explanation) {
+          explHtml = `
+            <div class="p-3 bg-light rounded-2 border-start border-4 border-primary mt-2 small text-muted">
+              <strong class="text-dark">Explanation:</strong> ${escapeHtml(q.explanation)}
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="card border mb-3 shadow-none" style="border-radius: 10px;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark fs-6">Question ${idx + 1}</span>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle">${escapeHtml(q.difficulty || 'medium')}</span>
+                  ${q.bloom_level ? `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">${escapeHtml(q.bloom_level)}</span>` : ''}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-shield-check me-1"></i> AST Verified</span>
+                </div>
+              </div>
+              <div class="mb-3 fs-6">${questionText}</div>
+              <div class="choices-wrapper mb-2">${choicesHtml}</div>
+              ${explHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderIterationsTable(list) {
+      const tbody = document.getElementById('iterations-table-body');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" class="text-center py-4 text-muted">No iterations recorded yet.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      list.forEach(item => {
+        const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString() : '--';
+        const e2eSec = item.t_e2e_ms ? (item.t_e2e_ms / 1000).toFixed(2) + 's' : '0.0s';
+        const kbSec = item.t_kb_ms ? (item.t_kb_ms / 1000).toFixed(2) + 's' : '0.0s';
+        const llmSec = item.t_llm_ms ? (item.t_llm_ms / 1000).toFixed(2) + 's' : '0.0s';
+        const hitRatio = item.hit_ratio !== undefined ? (item.hit_ratio * 100).toFixed(0) + '%' : '0%';
+        const astRate = item.ast_pass_rate !== undefined ? (item.ast_pass_rate * 100).toFixed(0) + '%' : '100%';
+        const isSelected = item.iteration_number === selectedIterationNumber ? 'table-primary' : '';
+
+        html += `
+          <tr class="${isSelected}" style="cursor: pointer;" onclick="loadIterationDetail(${item.iteration_number})">
+            <td class="fw-bold">#${item.iteration_number}</td>
+            <td class="text-muted small">${timeStr}</td>
+            <td class="fw-semibold text-dark">${escapeHtml(item.topic || 'General')}</td>
+            <td class="text-muted small">${escapeHtml(item.category_name || 'Default')}</td>
+            <td class="small"><code class="text-primary">${escapeHtml(item.model || 'qwen2.5')}</code></td>
+            <td class="fw-bold text-center">${item.n_questions || 0}</td>
+            <td class="font-monospace small">${kbSec}</td>
+            <td class="font-monospace small">${llmSec}</td>
+            <td class="font-monospace small fw-bold text-dark">${e2eSec}</td>
+            <td><span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">${hitRatio}</span></td>
+            <td><span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">${astRate}</span></td>
+            <td><span class="badge ${item.status === 'success' ? 'bg-success' : 'bg-danger'}">${item.status || 'success'}</span></td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="event.stopPropagation(); loadIterationDetail(${item.iteration_number})">
+                Inspect
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    async function confirmResetCounter() {
+      const confirmVal = confirm("Are you sure you want to reset the iteration counter?\n\nThis will reset the next generation run back to Iteration #1. Historical iteration files will remain saved.");
+      if (!confirmVal) return;
+
+      try {
+        const resp = await fetch('/api/dashboard/reset', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ start: 1 })
+        });
+        if (resp.ok) {
+          alert('Iteration counter reset back to 0. The next run will be Iteration #1.');
+          loadDashboardData();
+        }
+      } catch (err) {
+        alert('Failed to reset iteration counter: ' + err);
+      }
+    }
+
+    function copyJsonToClipboard() {
+      const text = document.getElementById('raw-json-viewer').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Raw iteration JSON copied to clipboard!');
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str || typeof str !== 'string') return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    // Auto-load on open
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+      setInterval(loadDashboardData, 10000);
+    });
+  </script>
+</body>
+</html>

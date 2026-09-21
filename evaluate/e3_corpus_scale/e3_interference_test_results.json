@@ -1,0 +1,49 @@
+{
+  "total": 6,
+  "passed": 6,
+  "accuracy": 100.0,
+  "tests": [
+    {
+      "namespace": "CS101_PYTHON",
+      "query": "How does memory management work?",
+      "contamination": false,
+      "retrieved_count": 2,
+      "status": "PASSED"
+    },
+    {
+      "namespace": "CS101_PYTHON",
+      "query": "Explain function decorators",
+      "contamination": false,
+      "retrieved_count": 2,
+      "status": "PASSED"
+    },
+    {
+      "namespace": "CS201_JAVASCRIPT",
+      "query": "How does asynchronous execution work?",
+      "contamination": false,
+      "retrieved_count": 2,
+      "status": "PASSED"
+    },
+    {
+      "namespace": "CS201_JAVASCRIPT",
+      "query": "Explain prototypal inheritance",
+      "contamination": false,
+      "retrieved_count": 2,
+      "status": "PASSED"
+    },
+    {
+      "namespace": "CS301_SYSTEMS_CPP",
+      "query": "How does manual memory management operate?",
+      "contamination": false,
+      "retrieved_count": 2,
+      "status": "PASSED"
+    },
+    {
+      "namespace": "CS301_SYSTEMS_CPP",
+      "query": "Explain template metaprogramming",
+      "contamination": false,
+      "retrieved_count": 2,
+      "status": "PASSED"
+    }
+  ]
+}

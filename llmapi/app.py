@@ -2,7 +2,7 @@
 LLM API Service for Question Generation
 Generates structured MCQ questions using LLM backends
 """
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os
 import logging
@@ -18,6 +18,14 @@ import json
 from metrics_logger import (
     log_generation,
     log_hardware_once,
+    log_inacon_metrics,
+    get_next_iteration_number,
+    get_current_iteration_number,
+    reset_iteration_number,
+    log_evaluation_iteration,
+    get_all_iterations_summary,
+    get_iteration_details,
+    get_evaluation_dashboard_stats,
 )
 
 # Persistent Embedding Cache setup
@@ -88,6 +96,15 @@ class QuestionRequest(BaseModel):
     openai_api_key: Optional[str] = Field(default=None, description="Per-request OpenAI API key override")
     gemini_api_key: Optional[str] = Field(default=None, description="Per-request Gemini API key override")
     learning_outcomes: Optional[str] = Field(default=None, description="Optional target learning outcomes")
+    category_name: Optional[str] = Field(default="", description="Category label")
+    top_k: Optional[int] = Field(default=3, ge=1, le=10, description="Top-K retrieved chunks")
+    max_context_chars: Optional[int] = Field(default=None, description="Max context length limit")
+    enable_incremental_cache: Optional[bool] = Field(default=True, description="Enable SHA-256 chunk caching")
+    pipeline_mode: Optional[str] = Field(default="proposed", description="Pipeline mode: proposed (or INACON), full_reindex, static_context, no_rag")
+    corpus_tokens: Optional[int] = Field(default=0, description="Corpus scale tokens for evaluation tracking")
+    change_ratio: Optional[float] = Field(default=0.0, description="Corpus change ratio: 0.0 to 1.0")
+    iteration_number: Optional[int] = Field(default=None, description="Explicit evaluation iteration number")
+    request_uuid: Optional[str] = Field(default=None, description="Unique tracking UUID")
 
 
 class Choice(BaseModel):
@@ -208,15 +225,56 @@ def cosine_similarity(v1, v2):
         return 0.0
     return dot_product(v1, v2) / (mag1 * mag2)
 
-def retrieve_relevant_context(query: str, document_text: str, backend: str, api_key_override: Optional[str] = None, local_model: Optional[str] = None) -> str:
-    """Perform pure-Python RAG vector retrieval using embeddings."""
-    if not document_text or not document_text.strip():
-        return ""
-    if len(document_text) <= 1500:
-        return document_text
-        
+def retrieve_relevant_context(
+    query: str,
+    document_text: str,
+    backend: str,
+    api_key_override: Optional[str] = None,
+    local_model: Optional[str] = None,
+    top_k: int = 3,
+    max_context_chars: Optional[int] = None,
+    enable_cache: bool = True,
+    pipeline_mode: str = "proposed"
+) -> tuple[str, dict]:
+    """Perform RAG vector retrieval with decomposed timing instrumentation."""
+    metrics = {
+        't_extract_ms': 0.0,
+        't_chunk_ms': 0.0,
+        't_hash_ms': 0.0,
+        't_lookup_ms': 0.0,
+        't_embed_ms': 0.0,
+        't_index_ms': 0.0,
+        't_kb_ms': 0.0,
+        't_query_embed_ms': 0.0,
+        't_retrieval_ms': 0.0,
+        'cache_hits': 0,
+        'cache_misses': 0,
+        'hit_ratio': 0.0,
+        'chunks_count': 0,
+    }
+
+    if not document_text or not document_text.strip() or pipeline_mode == "no_rag":
+        return "", metrics
+
+    # Baseline/Ablation C: Static Context Window (No Retrieval)
+    if pipeline_mode == "static_context":
+        char_limit = max_context_chars or 6000
+        return document_text[:char_limit], metrics
+
+    # 1. T_extract: Extract and normalize text
+    t_ext_start = time.perf_counter()
+    clean_text = document_text.strip()
+    metrics['t_extract_ms'] = (time.perf_counter() - t_ext_start) * 1000.0
+
+    # Short document bypass
+    if len(clean_text) <= 1500 and pipeline_mode != "full_reindex":
+        metrics['t_kb_ms'] = metrics['t_extract_ms']
+        return clean_text, metrics
+
+    # 2. T_chunk: Semantic / sliding window chunking
+    t_chunk_start = time.perf_counter()
     chunks = []
-    lines = document_text.split('\n')
+    lines = clean_text.split('\n')
     current_chunk = []
     current_len = 0
     for line in lines:
@@ -230,78 +288,131 @@ def retrieve_relevant_context(query: str, document_text: str, backend: str, api_
             current_len = 0
     if current_chunk:
         chunks.append("\n".join(current_chunk))
-        
+    metrics['t_chunk_ms'] = (time.perf_counter() - t_chunk_start) * 1000.0
+    metrics['chunks_count'] = len(chunks)
+
     if not chunks:
-        return document_text
-        
-    def get_embedding(text: str) -> list[float]:
-        if backend == 'openai':
-            model_name = "text-embedding-3-small"
-        elif backend == 'gemini':
-            model_name = "models/text-embedding-004"
-        elif backend == 'local':
-            model_name = os.getenv('OLLAMA_EMBED_MODEL') or local_model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
-        else:
-            model_name = "unknown"
+        metrics['t_kb_ms'] = metrics['t_extract_ms'] + metrics['t_chunk_ms']
+        return clean_text[:6000], metrics
 
-        hash_key = hashlib.sha256(f"{model_name}:{text}".encode('utf-8')).hexdigest()
+    # Model resolution for embeddings
+    if backend == 'openai':
+        model_name = "text-embedding-3-small"
+    elif backend == 'gemini':
+        model_name = "models/text-embedding-004"
+    elif backend == 'local':
+        model_name = os.getenv('OLLAMA_EMBED_MODEL') or local_model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+    else:
+        model_name = "unknown"
 
-        with embedding_cache_lock:
-            if hash_key in embedding_cache:
-                return embedding_cache[hash_key]
-
-        embedding = []
+    def compute_single_embedding(text: str) -> list[float]:
         try:
             if backend == 'openai':
                 from openai import OpenAI
                 client = OpenAI(api_key=api_key_override or OPENAI_API_KEY)
                 resp = client.embeddings.create(input=[text], model=model_name)
-                embedding = resp.data[0].embedding
+                return resp.data[0].embedding
             elif backend == 'gemini':
                 import google.generativeai as genai
                 genai.configure(api_key=api_key_override or GEMINI_API_KEY)
                 resp = genai.embed_content(model=model_name, content=text)
-                embedding = resp['embedding']
+                return resp['embedding']
             elif backend == 'local':
-                resp = requests.post(f"{LOCAL_LLM_URL}/api/embeddings", json={"model": model_name, "prompt": text})
+                resp = requests.post(f"{LOCAL_LLM_URL}/api/embeddings", json={"model": model_name, "prompt": text}, timeout=60)
                 resp.raise_for_status()
-                embedding = resp.json()['embedding']
+                return resp.json()['embedding']
         except Exception as embed_err:
-            logger.warning(f"Failed to generate embedding for RAG text using model '{model_name}': {embed_err}")
+            logger.warning(f"Failed to generate embedding for text with '{model_name}': {embed_err}")
             return []
+        return []
 
-        if embedding:
+    # 3. T_hash, T_lookup, T_embed, T_index for knowledge base chunks
+    chunk_vectors = []
+    valid_chunks = []
+    new_cache_entries = {}
+
+    for c in chunks:
+        # T_hash
+        t_h_start = time.perf_counter()
+        hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
+        metrics['t_hash_ms'] += (time.perf_counter() - t_h_start) * 1000.0
+
+        cached_vec = None
+        if enable_cache and pipeline_mode != "full_reindex":
+            # T_lookup
+            t_lk_start = time.perf_counter()
             with embedding_cache_lock:
-                embedding_cache[hash_key] = embedding
-                save_embedding_cache()
+                cached_vec = embedding_cache.get(hash_key)
+            metrics['t_lookup_ms'] += (time.perf_counter() - t_lk_start) * 1000.0
 
-        return embedding
-
-    try:
-        logger.info(f"Generating query embedding for RAG query: '{query}'")
-        query_vector = get_embedding(query)
-        if not query_vector:
-            return document_text[:6000]
-            
-        chunk_vectors = []
-        valid_chunks = []
-        for c in chunks:
-            cv = get_embedding(c)
-            if cv:
-                chunk_vectors.append(cv)
+        if cached_vec is not None:
+            metrics['cache_hits'] += 1
+            chunk_vectors.append(cached_vec)
+            valid_chunks.append(c)
+        else:
+            metrics['cache_misses'] += 1
+            # T_embed
+            t_emb_start = time.perf_counter()
+            vec = compute_single_embedding(c)
+            metrics['t_embed_ms'] += (time.perf_counter() - t_emb_start) * 1000.0
+            if vec:
+                chunk_vectors.append(vec)
                 valid_chunks.append(c)
-                
-        if not chunk_vectors:
-            return document_text[:6000]
-            
-        similarities = [cosine_similarity(query_vector, cv) for cv in chunk_vectors]
-        ranked_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)
-        top_k = min(3, len(ranked_indices))
-        relevant = [valid_chunks[idx] for idx in ranked_indices[:top_k]]
-        return "\n\n---\n\n".join(relevant)
-    except Exception as e:
-        logger.error(f"RAG failed: {e}", exc_info=True)
-        return document_text[:6000]
+                if enable_cache and pipeline_mode != "full_reindex":
+                    new_cache_entries[hash_key] = vec
+
+    # T_index: persist new embeddings into cache
+    if new_cache_entries:
+        t_idx_start = time.perf_counter()
+        with embedding_cache_lock:
+            embedding_cache.update(new_cache_entries)
+            save_embedding_cache()
+        metrics['t_index_ms'] = (time.perf_counter() - t_idx_start) * 1000.0
+
+    total_chunks = metrics['cache_hits'] + metrics['cache_misses']
+    metrics['hit_ratio'] = metrics['cache_hits'] / total_chunks if total_chunks > 0 else 0.0
+    metrics['t_kb_ms'] = (
+        metrics['t_extract_ms']
+        + metrics['t_chunk_ms']
+        + metrics['t_hash_ms']
+        + metrics['t_lookup_ms']
+        + metrics['t_embed_ms']
+        + metrics['t_index_ms']
+    )
+
+    if not chunk_vectors:
+        return clean_text[:6000], metrics
+
+    # 4. T_query_embed: Compute embedding for the incoming query
+    t_qe_start = time.perf_counter()
+    query_vector = None
+    query_hash = hashlib.sha256(f"{model_name}:query:{query}".encode('utf-8')).hexdigest()
+    if enable_cache and pipeline_mode != "full_reindex":
+        with embedding_cache_lock:
+            query_vector = embedding_cache.get(query_hash)
+    if query_vector is None:
+        query_vector = compute_single_embedding(query)
+        if query_vector and enable_cache and pipeline_mode != "full_reindex":
+            with embedding_cache_lock:
+                embedding_cache[query_hash] = query_vector
+                save_embedding_cache()
+    metrics['t_query_embed_ms'] = (time.perf_counter() - t_qe_start) * 1000.0
+
+    if not query_vector:
+        return clean_text[:6000], metrics
+
+    # 5. T_retrieval: Cosine similarity computation, ranking, and Top-K extraction
+    t_ret_start = time.perf_counter()
+    similarities = [cosine_similarity(query_vector, cv) for cv in chunk_vectors]
+    ranked_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)
+    k = max(1, min(int(top_k), len(ranked_indices)))
+    relevant = [valid_chunks[idx] for idx in ranked_indices[:k]]
+    retrieved_text = "\n\n---\n\n".join(relevant)
+    if max_context_chars and len(retrieved_text) > max_context_chars:
+        retrieved_text = retrieved_text[:max_context_chars]
+    metrics['t_retrieval_ms'] = (time.perf_counter() - t_ret_start) * 1000.0
+
+    return retrieved_text, metrics
 
 
 def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
@@ -732,82 +843,222 @@ def pull_ollama_model():
 
 def execute_generation(req: QuestionRequest) -> List[Question]:
     """Run generation for one request (batched for slow local models)."""
+    import uuid
+
+    # Ensure unique iteration number and request UUID
+    if not getattr(req, 'iteration_number', None):
+        req.iteration_number = get_next_iteration_number()
+    if not getattr(req, 'request_uuid', None):
+        req.request_uuid = f"iter-{req.iteration_number:04d}-{uuid.uuid4().hex[:6]}"
+
     backend = req.backend or LLM_BACKEND
-    if backend == 'local' and req.n_questions > LOCAL_GEN_BATCH_SIZE:
-        all_questions: List[Question] = []
-        remaining = req.n_questions
-        batch_num = 0
-        batch_total = (req.n_questions + LOCAL_GEN_BATCH_SIZE - 1) // LOCAL_GEN_BATCH_SIZE
-        while remaining > 0:
-            batch_num += 1
-            n = min(LOCAL_GEN_BATCH_SIZE, remaining)
-            logger.info(
-                "LLM batch %s/%s n=%s",
-                batch_num,
-                batch_total,
-                n,
-            )
-            batch_start = time.time()
-            batch_req = req.model_copy(update={'n_questions': n})
-            batch_questions = execute_generation_single(batch_req)
-            batch_ms = int((time.time() - batch_start) * 1000)
-            log_generation(
-                request_uuid=getattr(req, 'request_uuid', '') or f"sync-batch-{batch_num}",
-                mode='sync_batch',
-                backend=backend,
-                model=getattr(req, 'model', None) or OLLAMA_MODEL_DEFAULT,
+    all_questions: List[Question] = []
+    aggregated_metrics = {}
+
+    try:
+        if backend == 'local' and req.n_questions > LOCAL_GEN_BATCH_SIZE:
+            remaining = req.n_questions
+            batch_num = 0
+            batch_total = (req.n_questions + LOCAL_GEN_BATCH_SIZE - 1) // LOCAL_GEN_BATCH_SIZE
+            while remaining > 0:
+                batch_num += 1
+                n = min(LOCAL_GEN_BATCH_SIZE, remaining)
+                logger.info(
+                    "LLM batch %s/%s n=%s [Iteration #%s]",
+                    batch_num,
+                    batch_total,
+                    n,
+                    req.iteration_number,
+                )
+                batch_start = time.time()
+                batch_req = req.model_copy(update={'n_questions': n})
+                batch_questions = execute_generation_single(batch_req)
+                batch_ms = int((time.time() - batch_start) * 1000)
+
+                bm = getattr(batch_req, '_timing_metrics', {})
+                if not aggregated_metrics:
+                    aggregated_metrics = dict(bm)
+                else:
+                    for k in ['t_prompt_ms', 't_llm_ms', 't_validation_ms', 't_retry_ms', 't_gen_ms', 't_e2e_ms']:
+                        aggregated_metrics[k] = round(aggregated_metrics.get(k, 0.0) + bm.get(k, 0.0), 2)
+                    for k in ['validation_passed', 'validation_failed', 'retries_count']:
+                        aggregated_metrics[k] = aggregated_metrics.get(k, 0) + bm.get(k, 0)
+
+                log_generation(
+                    request_uuid=f"{req.request_uuid}-b{batch_num}",
+                    mode='sync_batch',
+                    backend=backend,
+                    model=getattr(req, 'model', None) or OLLAMA_MODEL_DEFAULT,
+                    topic=req.topic,
+                    level=req.level,
+                    language=req.language,
+                    n_questions_requested=n,
+                    n_questions_generated=len(batch_questions),
+                    duration_ms=batch_ms,
+                    status='success',
+                    batch_index=batch_num,
+                    batch_total=batch_total,
+                    has_lesson_context=bool(req.context),
+                )
+                all_questions.extend(batch_questions)
+                remaining -= n
+
+            req._timing_metrics = aggregated_metrics
+        else:
+            all_questions = execute_generation_single(req)
+            aggregated_metrics = getattr(req, '_timing_metrics', {})
+
+        # Log comprehensive evaluation iteration
+        try:
+            formatted_q = [
+                {
+                    'question': q.question,
+                    'choices': [{'text': c.text, 'is_correct': c.is_correct} for c in q.choices],
+                    'correct_index': q.correct_index,
+                    'difficulty': q.difficulty,
+                    'bloom_level': q.bloom_level,
+                    'explanation': q.explanation,
+                }
+                for q in all_questions
+            ]
+            log_evaluation_iteration(
+                iteration_number=req.iteration_number,
+                request_uuid=req.request_uuid,
                 topic=req.topic,
-                level=req.level,
+                difficulty=req.level,
                 language=req.language,
-                n_questions_requested=n,
-                n_questions_generated=len(batch_questions),
-                duration_ms=batch_ms,
-                status='success',
-                batch_index=batch_num,
-                batch_total=batch_total,
-                has_lesson_context=bool(req.context),
+                backend=backend,
+                model=req.model or OLLAMA_MODEL_DEFAULT,
+                category_name=getattr(req, 'category_name', '') or '',
+                corpus_tokens=getattr(req, 'corpus_tokens', 0) or 0,
+                chunk_count=aggregated_metrics.get('chunks_count', 0),
+                top_k=getattr(req, 'top_k', 3) or 3,
+                timing_metrics=aggregated_metrics,
+                cache_hits=aggregated_metrics.get('cache_hits', 0),
+                cache_misses=aggregated_metrics.get('cache_misses', 0),
+                hit_ratio=aggregated_metrics.get('hit_ratio', 0.0),
+                n_questions_requested=req.n_questions,
+                n_questions_generated=len(all_questions),
+                validation_passed=aggregated_metrics.get('validation_passed', len(all_questions)),
+                validation_failed=aggregated_metrics.get('validation_failed', 0),
+                retries_count=aggregated_metrics.get('retries_count', 0),
+                questions=formatted_q,
+                status='success' if all_questions else 'error',
             )
-            all_questions.extend(batch_questions)
-            remaining -= n
+        except Exception as iter_err:
+            logger.warning(f"Could not log evaluation iteration: {iter_err}")
+
         return all_questions
-    return execute_generation_single(req)
+
+    except Exception as e:
+        # Log failure evaluation iteration
+        try:
+            log_evaluation_iteration(
+                iteration_number=req.iteration_number,
+                request_uuid=req.request_uuid,
+                topic=req.topic,
+                difficulty=req.level,
+                language=req.language,
+                backend=backend,
+                model=req.model or OLLAMA_MODEL_DEFAULT,
+                category_name=getattr(req, 'category_name', '') or '',
+                corpus_tokens=getattr(req, 'corpus_tokens', 0) or 0,
+                chunk_count=0,
+                top_k=getattr(req, 'top_k', 3) or 3,
+                timing_metrics=aggregated_metrics or {},
+                cache_hits=0,
+                cache_misses=0,
+                hit_ratio=0.0,
+                n_questions_requested=req.n_questions,
+                n_questions_generated=0,
+                validation_passed=0,
+                validation_failed=0,
+                retries_count=0,
+                questions=[],
+                status='error',
+                error_message=str(e),
+            )
+        except Exception:
+            pass
+        raise e
 
 
 def execute_generation_single(req: QuestionRequest) -> List[Question]:
     backend = req.backend or LLM_BACKEND
-    
+    pipeline_mode = getattr(req, 'pipeline_mode', 'proposed') or 'proposed'
+    top_k = getattr(req, 'top_k', 3) or 3
+
     # 1. RAG Vector Retrieval Step
-    if req.context and req.topic:
+    kb_metrics = {
+        't_extract_ms': 0.0,
+        't_chunk_ms': 0.0,
+        't_hash_ms': 0.0,
+        't_lookup_ms': 0.0,
+        't_embed_ms': 0.0,
+        't_index_ms': 0.0,
+        't_kb_ms': 0.0,
+        't_query_embed_ms': 0.0,
+        't_retrieval_ms': 0.0,
+        'cache_hits': 0,
+        'cache_misses': 0,
+        'hit_ratio': 0.0,
+        'chunks_count': 0,
+    }
+
+    if req.context and req.topic and pipeline_mode != "no_rag":
         query = req.topic
         if req.bloom_level:
             query += " " + req.bloom_level
         if req.learning_outcomes:
             query += " " + req.learning_outcomes
-            
-        logger.info(f"Running RAG search with query: '{query}'")
-        
+
+        logger.info(f"Running RAG search with query: '{query}' [mode={pipeline_mode}, top_k={top_k}]")
+
         api_key = None
         if backend == 'openai':
             api_key = req.openai_api_key or OPENAI_API_KEY
         elif backend == 'gemini':
             api_key = req.gemini_api_key or GEMINI_API_KEY
-            
-        retrieved = retrieve_relevant_context(
+
+        retrieved, kb_metrics = retrieve_relevant_context(
             query=query,
             document_text=req.context,
             backend=backend,
             api_key_override=api_key,
-            local_model=req.model
+            local_model=req.model,
+            top_k=top_k,
+            max_context_chars=getattr(req, 'max_context_chars', None),
+            enable_cache=bool(getattr(req, 'enable_incremental_cache', True)),
+            pipeline_mode=pipeline_mode,
         )
         if retrieved:
             req.context = retrieved
-            
-    # 2. Try generating with retry loop for code/syntax validation
+
+    # 2. Generation phase with decomposed timing & code/AST validation
     from code_validator import validate_question
-    
+
+    t_prompt_ms = 0.0
+    t_llm_ms = 0.0
+    t_validation_ms = 0.0
+    t_retry_ms = 0.0
+    validation_passed = 0
+    validation_failed = 0
+    retries_count = 0
+
     max_retries = 3
+    final_questions: List[Question] = []
+
     for attempt in range(max_retries):
+        retries_count = attempt
         try:
+            # T_prompt: Format template and outcomes
+            t_p_start = time.perf_counter()
+            _ = format_lesson_context(req.context)
+            _ = format_learning_outcomes(req.learning_outcomes)
+            t_prompt_ms += (time.perf_counter() - t_p_start) * 1000.0
+
+            # T_LLM: LLM forward pass & token generation
+            t_llm_start = time.perf_counter()
             questions = []
             if backend == 'openai':
                 effective_openai_key = req.openai_api_key or OPENAI_API_KEY
@@ -838,8 +1089,12 @@ def execute_generation_single(req: QuestionRequest) -> List[Question]:
                 )
             else:
                 raise ValueError(f'Unknown backend: {backend}')
-                
-            # 3. Validate generated questions
+
+            attempt_llm_ms = (time.perf_counter() - t_llm_start) * 1000.0
+            t_llm_ms += attempt_llm_ms
+
+            # 3. T_validation: Code AST validation and compiler checks
+            t_val_start = time.perf_counter()
             valid_questions = []
             all_valid = True
             for q in questions:
@@ -851,25 +1106,113 @@ def execute_generation_single(req: QuestionRequest) -> List[Question]:
                 )
                 if is_valid:
                     valid_questions.append(q)
+                    validation_passed += 1
                 else:
+                    validation_failed += 1
                     logger.warning(f"Generated question failed validation: {err}")
                     all_valid = False
-            
+
+            attempt_val_ms = (time.perf_counter() - t_val_start) * 1000.0
+            t_validation_ms += attempt_val_ms
+
             if all_valid and len(valid_questions) == len(questions):
-                return questions
-            
+                final_questions = questions
+                break
+
             if attempt == max_retries - 1:
                 logger.warning(f"Max retries reached. Returning {len(valid_questions)} valid questions.")
                 if not valid_questions:
                     raise ValueError("All generated questions failed compilation/syntax validation checks.")
-                return valid_questions
-                
+                final_questions = valid_questions
+                break
+
+            # Add cost of failed attempt to retry latency
+            t_retry_ms += (attempt_llm_ms + attempt_val_ms)
             logger.info(f"Retrying question generation (attempt {attempt + 2}/{max_retries}) due to compilation/validation errors...")
-            
+
         except Exception as e:
             if attempt == max_retries - 1:
                 raise e
+            t_retry_ms += (time.perf_counter() - t_llm_start) * 1000.0 if 't_llm_start' in locals() else 0.0
             logger.warning(f"Error during attempt {attempt + 1}: {e}. Retrying...")
+
+    # Calculate final decomposed metrics
+    t_kb_ms = kb_metrics.get('t_kb_ms', 0.0)
+    t_query_embed_ms = kb_metrics.get('t_query_embed_ms', 0.0)
+    t_retrieval_ms = kb_metrics.get('t_retrieval_ms', 0.0)
+    t_gen_ms = t_query_embed_ms + t_retrieval_ms + t_prompt_ms + t_llm_ms + t_validation_ms + t_retry_ms
+    t_e2e_ms = t_kb_ms + t_gen_ms
+
+    timing_metrics = {
+        "pipeline_mode": pipeline_mode,
+        "top_k": top_k,
+        "corpus_tokens": getattr(req, 'corpus_tokens', 0) or 0,
+        "change_ratio": getattr(req, 'change_ratio', 0.0) or 0.0,
+        "t_extract_ms": round(kb_metrics.get('t_extract_ms', 0.0), 2),
+        "t_chunk_ms": round(kb_metrics.get('t_chunk_ms', 0.0), 2),
+        "t_hash_ms": round(kb_metrics.get('t_hash_ms', 0.0), 2),
+        "t_lookup_ms": round(kb_metrics.get('t_lookup_ms', 0.0), 2),
+        "t_embed_ms": round(kb_metrics.get('t_embed_ms', 0.0), 2),
+        "t_index_ms": round(kb_metrics.get('t_index_ms', 0.0), 2),
+        "t_kb_ms": round(t_kb_ms, 2),
+        "t_query_embed_ms": round(t_query_embed_ms, 2),
+        "t_retrieval_ms": round(t_retrieval_ms, 2),
+        "t_prompt_ms": round(t_prompt_ms, 2),
+        "t_llm_ms": round(t_llm_ms, 2),
+        "t_validation_ms": round(t_validation_ms, 2),
+        "t_retry_ms": round(t_retry_ms, 2),
+        "t_gen_ms": round(t_gen_ms, 2),
+        "t_e2e_ms": round(t_e2e_ms, 2),
+        "cache_hits": kb_metrics.get('cache_hits', 0),
+        "cache_misses": kb_metrics.get('cache_misses', 0),
+        "hit_ratio": round(kb_metrics.get('hit_ratio', 0.0), 4),
+        "validation_passed": validation_passed,
+        "validation_failed": validation_failed,
+        "retries_count": retries_count,
+    }
+    req._timing_metrics = timing_metrics
+
+    # Log to research evaluation log
+    try:
+        log_inacon_metrics(
+            request_uuid=getattr(req, 'request_uuid', '') or f"req-{int(time.time()*1000)}",
+            pipeline_mode=pipeline_mode,
+            backend=backend,
+            model=req.model or OLLAMA_MODEL_DEFAULT,
+            topic=req.topic,
+            category_name=getattr(req, 'category_name', '') or '',
+            corpus_tokens=getattr(req, 'corpus_tokens', 0) or 0,
+            change_ratio=getattr(req, 'change_ratio', 0.0) or 0.0,
+            top_k=top_k,
+            t_extract_ms=timing_metrics['t_extract_ms'],
+            t_chunk_ms=timing_metrics['t_chunk_ms'],
+            t_hash_ms=timing_metrics['t_hash_ms'],
+            t_lookup_ms=timing_metrics['t_lookup_ms'],
+            t_embed_ms=timing_metrics['t_embed_ms'],
+            t_index_ms=timing_metrics['t_index_ms'],
+            t_kb_ms=timing_metrics['t_kb_ms'],
+            t_query_embed_ms=timing_metrics['t_query_embed_ms'],
+            t_retrieval_ms=timing_metrics['t_retrieval_ms'],
+            t_prompt_ms=timing_metrics['t_prompt_ms'],
+            t_llm_ms=timing_metrics['t_llm_ms'],
+            t_validation_ms=timing_metrics['t_validation_ms'],
+            t_retry_ms=timing_metrics['t_retry_ms'],
+            t_gen_ms=timing_metrics['t_gen_ms'],
+            t_e2e_ms=timing_metrics['t_e2e_ms'],
+            cache_hits=timing_metrics['cache_hits'],
+            cache_misses=timing_metrics['cache_misses'],
+            hit_ratio=timing_metrics['hit_ratio'],
+            n_questions_requested=req.n_questions,
+            n_questions_generated=len(final_questions),
+            validation_passed=validation_passed,
+            validation_failed=validation_failed,
+            retries_count=retries_count,
+            status='success' if final_questions else 'error',
+        )
+    except Exception as log_err:
+        logger.warning(f"Could not log pipeline metrics: {log_err}")
+
+    return final_questions
 
 
 def post_moodle_webhook(webhook_url: str, webhook_token: str, body: dict) -> None:
@@ -949,12 +1292,16 @@ def _async_generation_worker(payload: dict) -> None:
                 'explanation': q.explanation,
             })
 
+        timing_metrics = getattr(req, '_timing_metrics', {})
         post_moodle_webhook(webhook_url, webhook_token, {
             'request_uuid': request_uuid,
             'status': 'success',
             'questions': question_payload,
             'generated_count': len(question_payload),
             'duration_ms': duration_ms,
+            'iteration_number': getattr(req, 'iteration_number', 0),
+            'iteration_id': f"iter_{getattr(req, 'iteration_number', 0):04d}",
+            'timing_metrics': timing_metrics,
         })
 
         logger.info(
@@ -1070,13 +1417,17 @@ def generate_questions():
             duration_s,
         )
 
+        timing_metrics = getattr(req, '_timing_metrics', {})
         response = QuestionResponse(
             questions=questions,
             metadata={
                 'topic': req.topic,
                 'language': req.language,
                 'count': len(questions),
-                'backend': backend
+                'backend': backend,
+                'iteration_number': getattr(req, 'iteration_number', 0),
+                'iteration_id': f"iter_{getattr(req, 'iteration_number', 0):04d}",
+                'timing_metrics': timing_metrics,
             }
         )
 
@@ -1117,6 +1468,54 @@ def validate_question():
         'score': 0.85,
         'feedback': 'Question quality is good'
     }), 200
+
+
+# -------------------------------------------------------------------------
+# Evaluation & Telemetry Dashboard Endpoints
+# -------------------------------------------------------------------------
+
+@app.route('/dashboard')
+def evaluation_dashboard():
+    """Render interactive HTML evaluation dashboard."""
+    return render_template('dashboard.html')
+
+
+@app.route('/api/dashboard/stats', methods=['GET'])
+def api_dashboard_stats():
+    """Global aggregate stats across all recorded iterations."""
+    return jsonify(get_evaluation_dashboard_stats()), 200
+
+
+@app.route('/api/dashboard/iterations', methods=['GET'])
+def api_dashboard_iterations():
+    """List summary for all iterations (for dropdown selector and comparison table)."""
+    limit = int(request.args.get('limit', 500))
+    return jsonify({'iterations': get_all_iterations_summary(limit=limit)}), 200
+
+
+@app.route('/api/dashboard/iteration/<int:iter_num>', methods=['GET'])
+def api_dashboard_iteration_detail(iter_num: int):
+    """Detailed logs for a specific single iteration."""
+    details = get_iteration_details(iter_num)
+    if not details:
+        return jsonify({'error': f'Iteration #{iter_num} not found'}), 404
+    return jsonify(details), 200
+
+
+@app.route('/api/dashboard/reset', methods=['POST'])
+def api_dashboard_reset():
+    """Reset the iteration counter to a specified number."""
+    data = request.json or {}
+    start = int(data.get('start', 1))
+    reset_iteration_number(start)
+    return jsonify({'success': True, 'current_iteration': start - 1}), 200
+
+
+@app.route('/api/dashboard/current_iteration', methods=['GET'])
+def api_dashboard_current_iteration():
+    """Return the current active iteration counter."""
+    return jsonify({'current_iteration': get_current_iteration_number()}), 200
+
 
 
 if __name__ == '__main__':

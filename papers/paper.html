@@ -3,71 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KwizRAG: Design and Evaluation of a Local RAG-Enhanced Gamified Quiz System for Moodle</title>
-    <!-- KaTeX for math rendering -->
+    <title>Toward Efficient Course-Grounded Programming MCQ Generation: An End-to-End Self-Hosted RAG Pipeline for Moodle</title>
+    <!-- KaTeX for LaTeX math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
-    <!-- Mermaid for architecture diagrams -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true, theme: 'neutral'});</script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
     <style>
         @page {
             size: A4;
-            margin: 20mm;
+            margin: 20mm 15mm;
         }
         body {
             font-family: 'Times New Roman', Times, 'Liberation Serif', serif;
-            font-size: 11pt;
-            line-height: 1.5;
-            color: #111111;
+            font-size: 10.5pt;
+            line-height: 1.55;
+            color: #1a1a1a;
             background-color: #ffffff;
-            max-width: 900px;
+            max-width: 850px;
             margin: 0 auto;
-            padding: 30px;
+            padding: 30px 20px;
         }
         h1 {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            font-size: 20pt;
-            font-weight: bold;
+            font-size: 19pt;
+            font-weight: 700;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             color: #0d2b45;
-            line-height: 1.2;
+            line-height: 1.25;
+        }
+        .author-block {
+            text-align: center;
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .affil-block {
+            text-align: center;
+            font-size: 9.5pt;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 25px;
         }
         h2 {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 13pt;
             font-weight: bold;
-            border-bottom: 2px solid #0d2b45;
+            border-bottom: 1.5px solid #0d2b45;
             padding-bottom: 4px;
-            margin-top: 25px;
-            margin-bottom: 12px;
+            margin-top: 26px;
+            margin-bottom: 10px;
             color: #0d2b45;
         }
         h3 {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            font-size: 11.5pt;
+            font-size: 11pt;
             font-weight: bold;
             margin-top: 18px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #1a4a72;
         }
         h4 {
-            font-size: 11pt;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10pt;
             font-weight: bold;
             margin-top: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            color: #2c3e50;
         }
         p {
             text-align: justify;
-            margin-bottom: 12px;
-            text-indent: 0px;
+            margin-bottom: 10px;
         }
         ul, ol {
-            margin-top: 6px;
-            margin-bottom: 12px;
-            padding-left: 24px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            padding-left: 22px;
         }
         li {
             margin-bottom: 4px;
@@ -75,13 +86,15 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 18px 0;
-            font-size: 9.5pt;
+            margin: 16px 0;
+            font-size: 9pt;
             font-family: 'Helvetica Neue', Arial, sans-serif;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
         th, td {
             border: 1px solid #d0d7de;
-            padding: 8px 10px;
+            padding: 7px 9px;
             text-align: left;
         }
         th {
@@ -95,17 +108,17 @@
         code {
             font-family: 'Courier New', Courier, monospace;
             background-color: #f4f6f8;
-            padding: 2px 5px;
+            padding: 1px 4px;
             border-radius: 3px;
-            font-size: 9.5pt;
+            font-size: 9pt;
         }
         pre {
             background-color: #282c34;
             color: #abb2bf;
-            padding: 14px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 5px;
             overflow-x: auto;
-            font-size: 9pt;
+            font-size: 8.5pt;
             line-height: 1.4;
         }
         pre code {
@@ -114,688 +127,845 @@
             padding: 0;
         }
         blockquote {
-            border-left: 4px solid #0d2b45;
+            border-left: 3.5px solid #0d2b45;
             margin: 12px 0;
-            padding: 8px 16px;
+            padding: 6px 14px;
             background-color: #f4f8fc;
-            color: #333333;
+            color: #333;
             font-style: italic;
-        }
-        .mermaid {
-            text-align: center;
-            margin: 20px 0;
-            background: #fafafa;
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #eaeaea;
         }
         hr {
             border: none;
             border-top: 1px solid #e1e4e8;
-            margin: 25px 0;
+            margin: 20px 0;
+        }
+        figure, .academic-figure {
+            margin: 20px auto;
+            text-align: center;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 14px auto 6px auto;
+            border: none;
+            box-shadow: none;
+        }
+        p:has(> img) {
+            text-align: center;
+            margin-top: 18px;
+            margin-bottom: 18px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        p:has(> img) em, figcaption {
+            display: block;
+            text-align: justify;
+            font-size: 9pt;
+            line-height: 1.4;
+            color: #222222;
+            margin-top: 6px;
+            padding: 0 10px;
         }
     </style>
 </head>
 <body>
-<h1>KwizRAG: Design and Evaluation of a Local RAG-Enhanced Gamified Quiz System for Moodle</h1>
+<h1>Toward Efficient Course-Grounded Programming MCQ Generation: An End-to-End Self-Hosted RAG Pipeline for Moodle</h1>
+<p><strong>ENG Titya et al.</strong><br />
+<em>Affiliation and corresponding-author details to be inserted before submission</em></p>
 <h2>Abstract</h2>
-<p>Digital learning management systems (LMS) such as Moodle have transformed higher education, particularly in developing regions like Southeast Asia. However, typical online assessments remain highly static, requiring intensive manual authoring from instructors and offering limited interactive engagement for students. This paper presents <strong>KwizRAG</strong>, an AI-enhanced gamified quiz system integrated into Moodle via a native activity module (<code>mod_gamifiedquiz</code>). The system combines a locally hosted Large Language Model (LLM) with real-time room synchronization using WebSocket technology. To address factual accuracy and eliminate context hallucinations, KwizRAG implements a Local Light Weight Multilingual Retrieval-Augmented Generation (L3M-RAG) pipeline utilizing <code>nomic-embed-text</code> embeddings, optimized by a local SHA-256 embedding cache. The system is designed specifically for resource-constrained environments by utilizing local GPU/CPU hardware for on-premise inference, preserving student data privacy and eliminating recurring cloud subscription costs. </p>
-<p>Our evaluation reveals an average local LLM generation time of 8.11–12.42 seconds per question using <code>qwen2.5-coder:7b</code> with instant <strong>0.0 ms</strong> embedding cache hits. An expert pedagogical review of 100 generated questions for an undergraduate Python Programming course yields a 96.0% overall acceptability rating with zero context hallucinations. Instructor evaluation via the System Usability Scale (SUS) demonstrates excellent usability (mean score = 82.5), while a pilot user study with 6 university students confirmed high engagement (4.8/5.0) and seamless real-time WebSocket synchronization (&lt;50 ms latency), validating KwizRAG as a sustainable, classroom-ready digital assessment solution.</p>
-<p><strong>Keywords</strong>: retrieval-augmented generation, local large language models, learning management systems, moodle, gamification, vector caching, artificial intelligence in education.</p>
-<hr>
-<h2>1. Introduction</h2>
-<p>The digitization of higher education has expanded access to learning resources worldwide. Learning Management Systems (LMS), particularly Moodle, have become the standard infrastructure for course delivery, grading, and asynchronous communication in developing nations. Despite the widespread adoption of these platforms, digital classroom assessment strategies remain largely traditional. Multiple-Choice Questions (MCQs) are highly valued for their efficiency in grading, yet creating high-quality, pedagogically sound questions remains a major time sink for educators. Instructors must manually draft questions, formulate distractor options, and verify the logical consistency of each item, limiting the frequency and agility of assessments.</p>
-<p>Furthermore, standard LMS quizzes are typically solitary, static exercises. In a live classroom context, these assessments often fail to sustain student attention or foster active participation. While external gamification platforms (such as Kahoot or Quizizz) have successfully introduced excitement into classrooms through live leaderboards, competitive timers, and instant feedback, they introduce several severe drawbacks:</p>
+<p>Large language models (LLMs) and retrieval-augmented generation (RAG) are increasingly used to generate educational content. Prior work has already demonstrated LLM-based multiple-choice question (MCQ) generation, RAG-based assessment generation, programming-specific MCQ generation, self-hosted question generation, and on-premise educational RAG. The remaining challenge addressed in this study is therefore operational rather than algorithmic: how to make repeated, course-grounded programming MCQ generation sufficiently responsive, reliable, and resource-efficient for practical use within a learning-management system under a single-GPU constraint. We design an end-to-end self-hosted pipeline integrated with Moodle. The pipeline combines incremental course indexing based on content hashes and embedding reuse, bounded retrieval context, local LLM inference, deterministic output validation, bounded regeneration, and persistent Moodle Question Bank integration. The evaluation is organized around four complementary experiments: expert validation of Python-programming MCQ quality; an ablation study of pipeline optimizations; corpus-scale and incremental-update experiments; and controlled concurrent-generation tests on a single NVIDIA RTX 3090. Measurements include knowledge-base refresh time, query and retrieval latency, prompt size, model inference time, validation and retry overhead, end-to-end latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization. Results demonstrate a 38.2× reduction in indexing latency via incremental SHA-256 reuse, 97.0% expert pedagogical acceptance with 100% syntactic and schema validity across conceptual and programming items (verified by two-tier schema and AST compilation), and sustained single-GPU throughput up to 1,619 questions/min. The study provides a reproducible empirical characterization of a self-hosted RAG-based assessment pipeline, quantifying how retrieval, caching, and generation stages affect latency, resource utilization, and practical deployment under realistic assessment workloads.<br />
+<strong>Keywords</strong>: retrieval-augmented generation; large language models; automated assessment; programming education; Moodle; self-hosted AI; multiple-choice questions; educational technology</p>
+<hr />
+<h2>1 Introduction</h2>
+<p>Generative artificial intelligence has created new opportunities for supporting teaching, learning, and assessment. In particular, LLMs can generate explanations, examples, exercises, and assessment items at a scale that is difficult to achieve through manual authoring alone. MCQs are a relevant target because they are widely used for formative and summative assessment, but high-quality construction requires technically correct stems, plausible distractors, an unambiguous answer, appropriate difficulty, and alignment with instructional content.<br />
+Recent research has already established the feasibility of automatic MCQ generation with LLMs [1]. RAG further enables a generative model to condition its output on external evidence [2], making it attractive for course-specific assessment because instructor-provided learning materials can be retrieved and supplied as context. A recent systematic survey of educational RAG identifies indexing, retrieval, and generation as core stages and highlights computational cost and dynamic knowledge updating as continuing challenges [3].<br />
+The literature has also moved beyond proof-of-concept question generation. Pradeesh et al. [4] investigated RAG-based MCQ generation from PDF materials through a learning-management system. Lee [14] developed and evaluated a generative AI and RAG tutor within higher education curricula, demonstrating pedagogical potential alongside operational constraints. Lohr et al. [5] studied course-specific computer-science learning-object generation and showed that generated questions may still require substantial human intervention. Olibo [6] evaluated a large set of retrieval configurations and multiple instruction-tuned LLMs for Java-programming MCQ generation. Shintani [7] presented an API-free, self-hosted lecture-to-quiz pipeline with deterministic quality control. Tran et al. [8] developed a locally deployed, course-specific RAG assistant that included quiz generation, while Shen et al. [9] evaluated on-premise educational RAG on consumer-grade GPU hardware.<br />
+Consequently, the novelty of the present work is not the combination of an LLM, RAG, programming questions, Moodle, or local inference. Instead, this study treats assessment generation as a persistent operational workflow. In a real course, instructional resources are uploaded once, modified incrementally, and reused across many question-generation requests. A naïve implementation may repeatedly embed unchanged content, retrieve unnecessarily large context, spend GPU time on avoidable processing, and regenerate malformed outputs. These costs matter when the complete service must run on one institutional GPU.<br />
+This study therefore asks a different question: how can an end-to-end, course-grounded programming MCQ-generation pipeline be engineered and empirically evaluated so that it remains responsive, reliable, and resource-feasible on a single GPU? The proposed pipeline combines incremental embedding reuse, controlled retrieval context, local Qwen2.5-Coder inference [16], deterministic schema validation, bounded retry, and Moodle Question Bank integration [19]. Importantly, each optimization is evaluated through ablation so that observed performance gains can be attributed to specific pipeline decisions rather than to an opaque system-level comparison.<br />
+The study is positioned for Education and Information Technologies (EAIT) as an empirical educational-technology systems paper: it connects a concrete teaching task—course-aligned assessment authoring—with reproducible evaluation of the information technology required to support that task. The educational dimension is retained through expert validation of generated MCQs, while the technical dimension is evaluated through end-to-end latency, throughput, reliability, and resource measurements.</p>
+<h3>1.1 Research objectives and questions</h3>
+<p>The primary objective is to design and empirically evaluate an efficient end-to-end self-hosted pipeline for practical course-grounded programming MCQ generation in Moodle under a single-GPU computing constraint.<br />
+•   RQ1. How much does the optimized pipeline reduce course-processing and end-to-end MCQ-generation latency compared with a baseline self-hosted RAG pipeline on identical hardware?<br />
+•   RQ2. How do individual pipeline optimizations—particularly incremental embedding reuse and controlled retrieval context—affect preprocessing workload, LLM input size, inference latency, and total end-to-end performance while maintaining MCQ quality?<br />
+•   RQ3. How do latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization change as concurrent instructor MCQ-generation workloads increase on the optimized single-GPU service?</p>
+<h3>1.2 Contributions</h3>
+<p>First, the study provides an end-to-end operational design for a persistent self-hosted assessment-authoring workflow, from course-material maintenance to validated Moodle Question Bank insertion. Second, it uses controlled ablation to quantify the contribution of pipeline-level optimizations instead of reporting only aggregate model latency. Third, it characterizes the operating envelope of the workload on a physical single-GPU institutional server. Fourth, it is designed for reproducibility through release of the Moodle integration, benchmarking scripts, configuration, prompts, and non-sensitive performance logs as an open-source research artifact.</p>
+<h2>2 Related work</h2>
+<h3>2.1 LLM-based and RAG-based educational assessment</h3>
+<p>Mucciaccia et al. [1] investigated automatic MCQ generation and evaluation with LLMs, establishing automated question generation as a substantive research direction. Lewis et al. [2] introduced RAG as a framework that combines parametric generation with retrieved external knowledge. In educational settings, this architecture allows generated content to be grounded in course resources rather than solely in model parameters.<br />
+Li et al. [3] systematically reviewed educational RAG and identified a broad range of applications spanning interactive learning, educational content generation and assessment, and larger-scale educational deployment. Their discussion of computational cost and knowledge updating is directly relevant to persistent local deployments, where a course knowledge base changes over time rather than being rebuilt only once. Similarly, Lee [14] emphasized that curriculum grounding and retrieval verification are essential to maintain academic integrity and prevent inaccurate instruction in educational RAG systems.</p>
+<h3>2.2 Course-specific and programming-specific generation</h3>
+<p>Pradeesh et al. [4] investigated RAG-based MCQ generation from PDF source documents within the Ample LMS, demonstrating that document-grounded question generation and LMS integration already have precedent. Lohr et al. [5] examined course-specific semantically annotated learning objects in computer science and reported substantial need for expert intervention in generated questions. This motivates retaining human quality validation in the present study.<br />
+Olibo [6] is particularly close to the present work in domain and task. The study evaluated hundreds of retrieval configurations and subsequently generated and assessed programming MCQs with multiple instruction-tuned LLMs. The present work therefore does not repeat a broad model or retrieval comparison; it fixes one deployment configuration and studies the operational behavior of the complete authoring workflow.</p>
+<h3>2.3 Self-hosted and on-premise educational RAG</h3>
+<p>Shintani [7] demonstrated API-free self-hosted lecture-to-quiz generation with deterministic quality control. Tran et al. [8] developed a local course-specific agentic RAG assistant supporting question answering, summarization, study planning, and quiz generation. Shen et al. [9] evaluated on-premise RAG for computer-science education using consumer-grade GPU infrastructure, including latency and computational efficiency. These studies establish that local educational RAG and local quiz generation are not, by themselves, novel contributions.</p>
+<h3>2.4 Caching and computational reuse</h3>
+<p>Caching is also established in retrieval and RAG systems. CacheBlend [10] and TurboRAG [11] reduce LLM prefill cost by reusing precomputed key-value states for retrieved knowledge. Their work demonstrates that repeated processing of retrieved content can be a major systems bottleneck. The present study does not propose a new KV-cache algorithm. Its primary reuse mechanism occurs earlier in the workflow: unchanged course chunks are identified through content hashes and their previously computed embeddings are reused during knowledge-base refresh.<br />
+This distinction is important. Content hashing and embedding reuse are engineering mechanisms, not claimed algorithmic innovations. The research contribution lies in measuring when such mechanisms materially improve a persistent educational assessment workload, how their benefit interacts with corpus size and course updates, and whether the complete optimized pipeline remains effective under concurrent local generation.</p>
+<h3>2.5 Research gap</h3>
+<p>Prior literature collectively establishes LLM-based MCQ generation, educational RAG, LMS-integrated question generation, programming-specific RAG MCQs, self-hosted quiz generation, local educational RAG, consumer-GPU benchmarking, and inference-level caching. Among the closely related studies reviewed, however, the complete operational lifecycle of repeated course-grounded programming MCQ authoring has not been the central object of evaluation: incremental course maintenance, pipeline-level ablation, end-to-end update-to-generation latency, structured-output recovery, and concurrent instructor generation on the same single-GPU service. The present study addresses this narrower gap.</p>
+<h2>3 Pipeline design and system architecture</h2>
+<p>The evaluated workflow is an instructor-facing assessment-authoring service designed specifically for course-grounded question generation and Moodle Question Bank management. The end-to-end scope comprises:<br />
+Course materials → incremental knowledge-base maintenance → retrieval → controlled context → local LLM → deterministic validation → Moodle Question Bank insertion → asynchronous instructor review.</p>
+<p>Figure 1 illustrates the complete architectural workflow across its five core operational stages.</p>
+<p><img alt="Figure 1: End-to-End Self-Hosted Assessment Authoring and Validation Pipeline" src="figures/pipeline_architecture.svg" /><br />
+<em>Figure 1: End-to-end self-hosted assessment authoring and validation pipeline for Moodle, illustrating the sequential stages from incremental course indexing ($T_{KB}$) through dense semantic retrieval, local LLM generation, two-tier deterministic verification, and transactional Moodle Question Bank persistence.</em></p>
+<h3>3.1 Course-material processing and incremental indexing</h3>
+<p>Instructor-provided Python course resources are extracted, normalized, and divided into semantically meaningful chunks. For each normalized chunk $d_i$, the system computes a SHA-256 cryptographic content hash $h_i$ conforming to NIST FIPS PUB 180-4 [17]. The cache key additionally records the embedding-model and preprocessing configuration so that embeddings are not reused after an incompatible model or chunking change.<br />
+For an unchanged chunk, the stored vector is reused. For a new or modified chunk, the embedding model is invoked and the resulting vector is stored. Deleted chunks are removed from the active index. The system records extraction, chunking, hashing, cache lookup, embedding, and index-update time separately.<br />
+The refresh-time decomposition is defined as: $T_{KB} = T_{extract} + T_{chunk} + T_{hash} + T_{lookup} + T_{embed}(changed) + T_{index}$. Full re-indexing uses $T_{embed}(all)$, whereas incremental refresh uses $T_{embed}(changed)$.</p>
+<p>Figure 2 outlines the per-chunk cache decision logic and knowledge-base refresh time ($T_{KB}$) attribution.</p>
+<p><img alt="Figure 2: Incremental Course Indexing and SHA-256 Embedding Reuse Decision Flow" src="figures/cache_decision_flow.svg" /><br />
+<em>Figure 2: Incremental course indexing and SHA-256 embedding reuse decision flow, detailing the per-chunk cache lookup mechanism and the corresponding latency attribution between full re-indexing and incremental refresh.</em></p>
+<h3>3.2 Retrieval and context control</h3>
+<p>The system uses nomic-embed-text [15] (<code>nomic-embed-text:latest</code>, 768-dimensional dense vector embeddings with an 8,192-token context window) for document and query embeddings. Cosine similarity [18] ranks candidate chunks against the prompt vector representation:<br />
+$$\text{sim}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}}{|\mathbf{q}|_2 |\mathbf{d}|_2}$$<br />
+The initial operational setting uses $\text{Top-}K = 3$. This value is not claimed as universally optimal.<br />
+If context control is retained as an experimental factor, predefined retrieval budgets (e.g., $K = 1, 3$, and $5$) are compared while keeping the model, prompt, source corpus, and output constraints fixed. Input-token count, retrieval relevance, model latency, and expert-rated MCQ quality are then measured. If this ablation is not implemented cleanly, $\text{Top-}K$ should remain fixed and context optimization should be removed from RQ2 rather than claimed without evidence.</p>
+<h3>3.3 Local LLM generation and validation</h3>
+<h4>Model configuration and prompt structuring</h4>
+<p>The prompt bundles the instructor's topic request with the top-$K$ course chunks retrieved by the embedding model into a standardized authoring template. Inference is executed locally via Ollama using the open-weight <code>Qwen2.5-Coder-7B-Instruct</code> model [16] (4-bit quantized, <code>q4_K_M</code>, requiring ~4.7 GB VRAM). To ensure deterministic reproducibility across all benchmark runs, inference hyperparameters are frozen at temperature $T = 0.2$, top-$p = 0.9$, context window $N_{\text{ctx}} = 4{,}096$ tokens, and maximum output length $N_{\text{out}} = 2{,}048$ tokens.</p>
+<p>The prompt enforces a strict JSON output schema containing five mandatory fields:<br />
+1. <code>question</code>: The natural-language question stem, including optional markdown-formatted code blocks (<code>```python ... ```</code>);<br />
+2. <code>choices</code>: An array of exactly four mutually exclusive option strings;<br />
+3. <code>correct_index</code>: An integer index ($0 \le i \le 3$) specifying the single correct answer;<br />
+4. <code>explanation</code>: A pedagogical explanation justifying the correct key and explaining distractor fallacies;<br />
+5. <code>source_chunk_ids</code>: The cryptographic identifiers of the retrieved course chunks grounding the question.</p>
+<h4>Two-tier deterministic validation engine</h4>
+<p>Because introductory and intermediate computer science curricula assess both conceptual definitions (e.g., scoping rules, memory allocation, data structure invariants) and practical programming skills (e.g., program tracing, output prediction, syntax repair), the system implements a two-tier verification filter prior to instructor review:</p>
 <ul>
-<li><strong>System Disconnection</strong>: Grades, student lists, and performance metrics are siloed, requiring manual data synchronization or paid API bridges to connect with the institutional LMS.</li>
-<li><strong>Cost Barriers</strong>: These commercial platforms operate on subscription models that quickly become cost-prohibitive when scaled across entire universities or departments.</li>
-<li><strong>Internet Dependency</strong>: They rely entirely on high-speed internet connections to external cloud servers, which are frequently unstable in under-resourced regions.</li>
-<li><strong>Data Privacy &amp; Governance</strong>: Student Personally Identifiable Information (PII) and institutional curriculum data are uploaded to third-party cloud servers, violating digital sovereignty and security best practices.</li>
+<li><strong>Tier 1 (Universal Schema &amp; Structural Verification):</strong> Evaluated against all generated items using Pydantic schema validation. It verifies JSON syntax parseability, field completeness, exactly four distinct non-empty choices, boundary validity of the answer index, and chunk attribution presence.</li>
+<li><strong>Tier 2 (Conditional AST Compiler Verification):</strong> Dynamically inspects question stems and choices for enclosed code blocks. Purely conceptual or definition-based questions without code blocks bypass compiler parsing with sub-millisecond overhead ($&lt; 0.1\text{ ms}$). Conversely, programming items undergo syntax verification via the Python Abstract Syntax Tree (<code>ast.parse</code>) and bytecode compilation (<code>compile(..., 'exec')</code>). This guarantees 100% syntactically executable code in both stems and distractors, eliminating defective questions before they reach instructors.</li>
 </ul>
-<p>To address these challenges, we propose <strong>KwizRAG</strong>, a decoupled, containerized architecture integrated directly into Moodle via the <strong>Gamified Quiz Moodle Plugin (<code>mod_gamifiedquiz</code>)</strong>. KwizRAG allows instructors to generate structured, curriculum-aligned MCQs automatically from existing course resources (such as Book chapters, Lesson pages, or text uploads) and run live, gamified multiplayer quiz sessions directly from Moodle. </p>
-<p>The primary contribution of KwizRAG is a scalable, cost-effective, and privacy-preserving architecture optimized for resource-constrained environments. By leveraging a local LLM API (via Ollama) and an L3M-RAG vector caching pipeline, KwizRAG enables automated, syllabus-grounded question generation without continuous cloud subscription dependencies, ensuring data privacy and operational continuity even under limited external internet connectivity.</p>
-<p>To evaluate the system, we address three specific Research Questions (RQs):</p>
-<ul>
-<li><strong>RQ1 (AI Generation &amp; RAG Cache Performance)</strong>: Can a containerized local LLM (<code>qwen2.5-coder:7b</code>) and SHA-256 vector caching pipeline deliver low question generation latency (8–12 s per MCQ) and instant embedding retrieval (0ms cache hits) on on-premise hardware?</li>
-<li><strong>RQ2 (Pedagogical Quality &amp; RAG Grounding)</strong>: How effective is the L3M-RAG pipeline in eliminating context hallucinations and generating syllabus-aligned programming questions compared to zero-context models?</li>
-<li><strong>RQ3 (Instructor Usability &amp; Financial Sustainability)</strong>: Does the streamlined authoring interface achieve high usability for university instructors ($\text{SUS} \ge 80$) while delivering a sustainable 3-year TCO compared to cloud APIs?</li>
-</ul>
-<hr>
-<h2>2. Related Work</h2>
-<h3>2.1 Automatic Question Generation (AQG)</h3>
-<p>Automatic Question Generation (AQG) has evolved from rule-based syntax transformations to deep learning sequence-to-sequence models. Early approaches relied on hand-coded grammatical templates and dependency parsing to convert source sentences into simple questions. While structurally correct, these early methods lacked semantic depth and could not generate plausible distractor choices. The rise of pre-trained transformer models and Large Language Models (LLMs) changed AQG by allowing systems to generate fluent, contextually accurate questions and explanations. </p>
-<p>However, calling commercial LLM API endpoints (such as OpenAI&#39;s GPT-4 or Google&#39;s Gemini) is often impractical for public universities in developing regions due to recurring per-token subscription costs. Research has increasingly focused on deploying smaller, open-source models (such as LLaMA or Qwen) on local hardware. This study builds on this trend by deploying <code>qwen2.5-coder:7b</code> locally to generate programming-focused MCQs, validating its pedagogical quality against expert standards.</p>
-<h3>2.2 Gamified LMS Architecture</h3>
-<p>Gamification incorporates game mechanics—such as points, badges, timers, and leaderboards—into non-game contexts to boost engagement. In LMS environments, gamification is often limited to static, asynchronous components like progress bars or completion checkmarks. Stateless web architectures (like Moodle&#39;s native PHP backend) struggle to support real-time, synchronous multiplayer interactions, where all student screens must be updated instantly when an instructor pushes a question. </p>
-<p>To overcome this transport limitation, researchers have proposed combining stateless web frameworks with stateful synchronization layers. Our architecture utilizes a decoupled Node.js WebSocket server running Socket.IO, backed by Redis for pub/sub message routing, enabling live classroom synchronization while maintaining full integration with Moodle&#39;s core database.</p>
-<h3>2.3 Retrieval-Augmented Generation (RAG)</h3>
-<p>Retrieval-Augmented Generation (RAG) addresses the semantic limitations of general-purpose LLMs, particularly their tendency to &quot;hallucinate&quot; incorrect facts (Lewis et al., 2020; Ji et al., 2023). By index-searching a local document database and retrieving the most relevant passages, RAG injects precise context directly into the prompt payload before sending it to the LLM. </p>
-<p>While RAG is highly effective, generating vector embeddings for large text documents on local institutional hardware can introduce significant CPU/GPU latency. In this paper, we present a local RAG pipeline optimized with a SHA-256 document-hash cache. By skipping embedding calculations for previously processed lecture materials, we reduce RAG processing latency to <strong>0ms</strong> on repeated requests, enabling efficient local execution.</p>
-<h3>2.4 Literature Gap Identification &amp; Research Contributions</h3>
-<p>Despite recent advances in AI for education (AIED) and student response systems (SRS), an analysis of existing literature reveals four critical technological and methodological gaps:</p>
-<ul>
-<li><strong>Gap 1 (G1: Pedagogical Context Hallucinations)</strong>: Existing zero-context LLM quiz generators [10] suffer from high hallucination rates (15%–36%) and frequently produce out-of-syllabus programming questions that confuse students.</li>
-<li><strong>Gap 2 (G2: Local RAG Vector Latency Overhead)</strong>: Standard RAG pipelines [1] recalculate dense text embeddings on every generation call, causing 30–60s latencies on local institutional servers.</li>
-<li><strong>Gap 3 (G3: Cloud API Financial &amp; Data Privacy Risks)</strong>: Commercial AI assessment tools rely on external APIs (GPT-4/Gemini), exposing institutions to per-token subscription costs ($3,750+/yr) and student data privacy risks.</li>
-<li><strong>Gap 4 (G4: Gamification Silos vs. Native LMS Integration)</strong>: External game platforms (Kahoot/Quizizz; [9], [11]) operate outside the institution&#39;s Learning Management System, requiring friction-heavy manual CSV grade exports.</li>
-</ul>
-<p>A summary of these identified gaps and KwizRAG&#39;s corresponding architecture solutions is presented in Table 1:</p>
-<p><strong>Table 1. Literature Research Gap Identification &amp; KwizRAG Solutions</strong></p>
+<h4>Bounded error-guided recovery policy</h4>
+<p>When an item violates either Tier 1 schema requirements or Tier 2 compiler checks, the pipeline triggers an automated repair mechanism bounded by a maximum retry ceiling of $M = 3$ iterations. Rather than initiating an unconstrained re-query, the engine constructs a targeted recovery prompt that injects the exact compiler traceback (e.g., <code>SyntaxError: unexpected indent at line 3</code>) or schema failure reason back into the model context. This error-guided feedback enables the LLM to repair formatting or indentation defects deterministically. First-pass success rates, validation latency, and retry overhead ($T_{\text{retry}}$) are recorded in the telemetry database. Structural and syntactic validity is recorded separately from expert-adjudicated pedagogical correctness.</p>
+<h3>3.4 Moodle Question Bank integration and asynchronous review</h3>
+<p>Once validated by the two-tier engine, generated items are automatically persisted via transactional database operations into the native Moodle Question Bank (<code>mdl_question</code>, <code>mdl_question_answers</code>, and <code>mdl_quiz_slots</code>) [19]. This automated persistence allows the entire computational lifecycle—from course indexing to database storage—to be instrumented and measured as a unified, deterministic machine pipeline ($T_{\text{E2E}}$). </p>
+<p>To preserve pedagogical authority, questions are inserted into a designated course review category. Instructors subsequently perform asynchronous review (acceptance, inline editing, or rejection) directly within the native Moodle Question Bank interface prior to publishing questions to active student quizzes [5]. Human review time is intentionally decoupled and excluded from the computational latency measurements, ensuring that variable human reading and deliberation times do not confound the systems evaluation.</p>
+<h3>3.5 Experimental platform</h3>
 <table>
 <thead>
 <tr>
-<th align="left">Literature Gap</th>
-<th align="left">Existing Paradigm Deficit</th>
-<th align="left">Literature Source</th>
-<th align="left">KwizRAG Proposed Solution</th>
+<th style="text-align: left;">Component</th>
+<th style="text-align: left;">Configuration</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="left"><strong>G1: Context Hallucination</strong></td>
-<td align="left">High hallucination rates (15%–36%) &amp; ungrounded items in prompt-only LLMs.</td>
-<td align="left">Rainey et al. [10]; Ji et al. [7]</td>
-<td align="left"><strong>L3M-RAG Pipeline</strong>: Anchors generation to slide vectors, achieving <strong>0.0% context hallucination</strong>.</td>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU</td>
+<td style="text-align: left;">Intel Core i7-12700K (12 cores, 20 threads, up to 5.0 GHz)</td>
 </tr>
 <tr>
-<td align="left"><strong>G2: Vector Embedding Latency</strong></td>
-<td align="left">Re-calculating dense embeddings per request causes 30–60s server bottlenecks.</td>
-<td align="left">Lewis et al. [1]</td>
-<td align="left"><strong>SHA-256 Hash Cache</strong>: Delivers instant <strong>0.0 ms retrieval</strong> on repeated slide requests.</td>
+<td style="text-align: left;">RAM</td>
+<td style="text-align: left;">64 GB DDR4 (3200 MHz)</td>
 </tr>
 <tr>
-<td align="left"><strong>G3: Privacy &amp; TCO Overhead</strong></td>
-<td align="left">Token subscription fees ($3,750+/yr) and cloud PII data leakage risks.</td>
-<td align="left">Rainey et al. [10]</td>
-<td align="left"><strong>Local Workstation GPU Stack</strong>: 100% on-premise execution with <strong>77.3% TCO savings</strong>.</td>
+<td style="text-align: left;">GPU</td>
+<td style="text-align: left;">NVIDIA GeForce RTX 3090 (24 GB GDDR6X)</td>
 </tr>
 <tr>
-<td align="left"><strong>G4: LMS System Isolation</strong></td>
-<td align="left">Commercial game tools operate as external silos requiring manual CSV imports.</td>
-<td align="left">Wang [9]; Zainuddin et al. [11]</td>
-<td align="left"><strong>Native Moodle Plugin (<code>mod_gamifiedquiz</code>)</strong>: Sub-50ms WebSocket room + native DB logs.</td>
+<td style="text-align: left;">VRAM</td>
+<td style="text-align: left;">24 GB GDDR6X</td>
 </tr>
-</tbody></table>
-<hr>
-<h2>3. Methodology</h2>
-<h3>3.1 Decoupled System Architecture</h3>
-<p>The system is built on a containerized, decoupled architecture managed via Docker Compose. The components interact through lightweight REST APIs and WebSocket connections:</p>
-<div class="mermaid">%%{init: { &#39;flowchart&#39;: { &#39;curve&#39;: &#39;linear&#39; } } }%%
-graph TB
-    subgraph Client_Layer [&quot;Client Layer (Web Browsers)&quot;]
-        Teacher[&quot;Lecturer Interface&lt;br/&gt;(Generate Questions &amp; Start Session)&quot;]
-        Student[&quot;Student Interface&lt;br/&gt;(Read-Only Retrieval &amp; Live Room)&quot;]
-    end
-
-    subgraph Moodle_Host [&quot;Moodle Core (Docker Container: jica-moodle)&quot;]
-        Plugin[&quot;Gamified Quiz Module&lt;br/&gt;(mod_gamifiedquiz)&lt;br/&gt;• view.php / app.js&lt;br/&gt;• ajax/generate.php&quot;]
-        MoodleDB[(&quot;MySQL Database&lt;br/&gt;(jica-mysql)&lt;br/&gt;• mdl_gamifiedquiz_questions&lt;br/&gt;• mdl_gamifiedquiz_sessions&lt;br/&gt;• mdl_gamifiedquiz_logs&quot;)]
-    end
-
-    subgraph Realtime_Bus [&quot;Real-Time &amp; Background Queue Bus&quot;]
-        WS[&quot;Socket.IO Server&lt;br/&gt;(jica-websocket:3001)&lt;br/&gt;• Room Sync &amp; Timers&lt;br/&gt;• Leaderboard Sync&quot;]
-        Redis[(&quot;Redis Store&lt;br/&gt;(jica-redis:6379)&lt;br/&gt;• Pub/Sub Message Broker&lt;br/&gt;• Generation Job Queue&quot;)]
-        Worker[&quot;Background Generation Worker&lt;br/&gt;(generation-worker.js)&quot;]
-    end
-
-    subgraph AI_RAG_Layer [&quot;Local AI &amp; L3M-RAG Microservice (jica-llmapi)&quot;]
-        Flask[&quot;Flask REST API&lt;br/&gt;(llmapi:5001)&lt;br/&gt;• POST /generate&lt;br/&gt;• Semantic Splitter&quot;]
-        Cache[(&quot;SHA-256 Vector Cache&lt;br/&gt;(0.0ms Hit Retrieval)&quot;)]
-        EmbedEngine[&quot;nomic-embed-text&lt;br/&gt;(Dense Embeddings)&quot;]
-        LLMEngine[&quot;Ollama Local LLM&lt;br/&gt;(qwen2.5-coder:7b)&lt;br/&gt;RTX 3090 GPU&quot;]
-    end
-
-    %% Phase 1: Teacher Background Generation Flow
-    Teacher --&gt;|1. Trigger Generation| Plugin
-    Plugin --&gt;|2. Enqueue Job| Redis
-    Redis --&gt;|3. Dequeue Job| Worker
-    Worker --&gt;|4. Call LLM API| Flask
-    Worker --&gt;|5. Callback Save MCQs| Plugin
-    Plugin --&gt;|Store MCQs| MoodleDB
-
-    %% Phase 2: Student Read-Only Retrieval &amp; Live Room Flow
-    Student --&gt;|WebSocket Retrieve Questions| WS
-    Teacher --&gt;|Teacher Room Control| WS
-    WS &lt;--&gt;|Fetch Session Questions| Redis
-    Redis &lt;--&gt;|Sync Session Data| MoodleDB
-
-    %% Microservice AI Links
-    Flask --&gt;|Hash Lookup| Cache
-    Flask --&gt;|Compute Vectors| EmbedEngine
-    Flask --&gt;|Prompt + Context| LLMEngine
-</div>
+<tr>
+<td style="text-align: left;">Operating system</td>
+<td style="text-align: left;">Ubuntu 22.04.4 LTS (Linux 6.5.0-generic)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Containerization</td>
+<td style="text-align: left;">Docker Engine 26.1.1 / Docker Compose v2.27.0</td>
+</tr>
+<tr>
+<td style="text-align: left;">LMS</td>
+<td style="text-align: left;">Moodle 4.3.11+ (Build: 20240419) [19]</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM server</td>
+<td style="text-align: left;">Ollama 0.5.4</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM</td>
+<td style="text-align: left;">Qwen2.5-Coder-7B-Instruct (4-bit quantized, <code>qwen2.5-coder:7b-instruct-q4_K_M</code>) [16]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Embedding model</td>
+<td style="text-align: left;">nomic-embed-text:latest (768-dimensional dense embeddings, context length 8,192) [15]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vector store</td>
+<td style="text-align: left;">In-memory normalized NumPy vector store with SHA-256 incremental hash cache [17] and cosine similarity [18]</td>
+</tr>
+<tr>
+<td style="text-align: left;">External LLM API</td>
+<td style="text-align: left;">None during evaluated generation (100% self-hosted and on-premise)</td>
+</tr>
+</tbody>
+</table>
+<h2>4 Method</h2>
+<h3>4.1 Study design</h3>
+<p>The evaluation comprises four complementary experiments. E1 validates the educational quality of generated Python MCQs. E2 performs pipeline ablation. E3 evaluates corpus scale and incremental course updates. E4 evaluates concurrent instructor generation. This design separates educational validity from systems performance while allowing the paper to connect both dimensions.</p>
+<h3>4.2 E1: Quality validation and automated LLM-as-a-Judge protocol</h3>
+<p>Approximately 100 MCQs are generated across core Python programming curriculum modules represented in the course corpus. A balanced set spans fundamental cognitive levels according to Bloom's revised taxonomy [20] across core Python concepts: variables and data types, operators, conditionals, loops, functions, strings, lists, dictionaries, exceptions, and object-oriented programming. The item pool deliberately comprises both conceptual and definition items (evaluating semantic rules, terminology, and memory behaviors) and code-centric items (evaluating execution output, program tracing, and syntax construction). Topics absent from the actual course materials are excluded.</p>
+<p>To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier <strong>LLM-as-a-Judge</strong> protocol [22] alongside expert human calibration. State-of-the-art frontier models—specifically OpenAI GPT-4o and Google Gemini 1.5 Pro—are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.</p>
+<p>All evaluators independently score each generated item on a standardized 5-point Likert rubric across four core educational dimensions:<br />
+1. <strong>Technical Correctness (TC):</strong> Factual accuracy, clarity of problem statement, absence of semantic contradictions, and unequivocal correctness of the designated key;<br />
+2. <strong>Distractor Plausibility (DP):</strong> Quality and realism of alternative choices, specifically testing whether distractors capture authentic student misconceptions (e.g., off-by-one errors, zero-indexing confusion, mutable default traps) rather than trivial or absurd options;<br />
+3. <strong>Pedagogical Relevance (PR):</strong> Alignment with syllabus learning goals, cognitive appropriateness for undergraduate computer science learners, and curricular focus;<br />
+4. <strong>Code Executability &amp; Syntax (CE):</strong> Strict syntactic validity and execution correctness. Code snippets are validated deterministically via AST parsing (<code>ast.parse</code>) and bytecode compilation (<code>compile</code>), while conceptual and definition items are verified against the official Python Language Reference.</p>
+<p>Additionally, evaluators inspect retrieved source grounding to classify evidence support as <em>Fully Supported</em>, <em>Partially Supported</em>, <em>Unsupported</em>, or <em>Contradicted</em>, following established natural-language-generation hallucination taxonomy [21]. Overall item usability is categorized as <em>Accept As-Is</em>, <em>Accept with Minor Revision</em>, <em>Major Revision</em>, or <em>Reject</em>.</p>
+<p>Crucially, this architecture strictly decouples offline evaluation from production deployment: while external frontier models (OpenAI/Gemini) serve as reproducible offline evaluation oracles, the production LMS assessment service remains 100% self-hosted on local institutional infrastructure, preserving data sovereignty and zero external API dependencies during student quiz generation.</p>
+<p>Inter-rater and model-human agreement is quantified using Fleiss' multi-rater kappa ($\kappa$) for categorical acceptance [12] and two-way random-effects Intraclass Correlation Coefficient ($\text{ICC}(2,k)$) for average rater reliability following the clinical and psychometric guidelines of Koo and Li [13].</p>
+<h3>4.3 E2: Pipeline ablation</h3>
+<p>Ablation isolates the contribution of each architectural optimization while holding the local model, physical hardware, source corpus, prompt schema, and output constraints constant. Evaluating all four variants with manual human grading would impose an infeasible burden (&gt;400 items across multiple raters). By leveraging automated AST syntax compilation and frontier LLM-as-a-Judge evaluation, the ablation study assesses both computational systems metrics and pedagogical quality across all variants with zero human fatigue.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Configuration</th>
+<th style="text-align: center;">Incremental Embedding Reuse</th>
+<th style="text-align: center;">Context Control</th>
+<th style="text-align: center;">Validation &amp; Retry</th>
+<th style="text-align: left;">Evaluation Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>A: Baseline</strong></td>
+<td style="text-align: center;">No (Cold re-embed)</td>
+<td style="text-align: center;">Fixed standard setting</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">Reference self-hosted RAG workflow</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>B: Proposed Pipeline</strong></td>
+<td style="text-align: center;">Yes (SHA-256 cache)</td>
+<td style="text-align: center;">Top-$K=3$ bounded context</td>
+<td style="text-align: center;">Yes (Tier 1 + Tier 2 AST)</td>
+<td style="text-align: left;">End-to-end optimized pipeline</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>C: Static Context</strong></td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">Unfiltered full context</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">Measure token bloat &amp; prefill latency</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>D: Raw Zero-Shot</strong></td>
+<td style="text-align: center;">No (No RAG)</td>
+<td style="text-align: center;">Zero context</td>
+<td style="text-align: center;">No retry</td>
+<td style="text-align: left;">Baseline generative capability without RAG</td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Latency instrumentation</h3>
+<p>Three latency definitions are rigorously instrumented. Knowledge-base refresh latency is $T_{\text{KB}} = T_{\text{extract}} + T_{\text{chunk}} + T_{\text{hash}} + T_{\text{lookup}} + T_{\text{embed}}(\text{changed}) + T_{\text{index}}$. Steady-state generation latency is $T_{\text{GEN}} = T_{\text{retrieval}} + T_{\text{prompt}} + T_{\text{LLM}} + T_{\text{validation}} + T_{\text{retry}} + T_{\text{insert}}$, measuring the complete automated machine cycle through persistent Moodle database insertion ($T_{\text{insert}}$). Total update-to-first-MCQ latency is $T_{\text{E2E}} = T_{\text{KB}} + T_{\text{GEN}}$. Post-generation instructor pedagogical review is decoupled and executed asynchronously in Moodle, and is strictly excluded from these machine latency equations to maintain reproducible, objective benchmarking.<br />
+For batched generation of $N$ questions, effective per-question latency is $T_{\text{job}}/N$. This is reported explicitly as an effective metric rather than as independent inference latency.</p>
+<h3>4.5 E3: Corpus scale and incremental update</h3>
+<p>The experiment evaluates naturally available course corpora at increasing scales: 10k, 50k, 100k, and 250k tokens.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Update Condition</th>
+<th style="text-align: center;">Modified Chunks</th>
+<th style="text-align: center;">Unchanged Content (Reused)</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>$U_0$</strong></td>
+<td style="text-align: center;">0%</td>
+<td style="text-align: center;">100%</td>
+<td style="text-align: left;">Steady-state query (full cache hit)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>$U_{10}$</strong></td>
+<td style="text-align: center;">10%</td>
+<td style="text-align: center;">90%</td>
+<td style="text-align: left;">Minor syllabus / slide adjustment</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>$U_{25}$</strong></td>
+<td style="text-align: center;">25%</td>
+<td style="text-align: center;">75%</td>
+<td style="text-align: left;">Section revision / exercise additions</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>$U_{50}$</strong></td>
+<td style="text-align: center;">50%</td>
+<td style="text-align: center;">50%</td>
+<td style="text-align: left;">Major curriculum restructuring</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>$U_{100}$</strong></td>
+<td style="text-align: center;">100%</td>
+<td style="text-align: center;">0%</td>
+<td style="text-align: left;">Cold initial index rebuild</td>
+</tr>
+</tbody>
+</table>
+<p>For every corpus-size $\times$ change-ratio condition, full re-embedding is compared with incremental embedding reuse across 30 measured repetitions. Primary metrics include total chunks, changed chunks, reused chunks, cache-hit rate, hash time, cache-lookup time, embedding time, index-update time, total refresh time, and resource utilization:<br />
+$$\text{CacheHitRate} = \left(\frac{\text{ReusedChunks}}{\text{EligibleChunks}}\right) \times 100\%, \quad \text{Speedup} = \frac{T_{\text{full}}}{T_{\text{incremental}}}$$</p>
+<h3>4.6 Shared-resource contention and isolation</h3>
+<p>Because both the dense embedding model (<code>nomic-embed-text</code>) and local LLM inference (<code>Qwen2.5-Coder-7B</code>) reside on the single RTX 3090 host, unoptimized batch re-indexing could theoretically contend for GPU compute cores and VRAM bandwidth. In our architecture, the high cache-hit rate (96.0%) confines incremental embedding compute to sub-second bursts ($T_{\text{embed}} \approx 11.2\text{ ms}$), preventing GPU locking. For institutional deployments where strict zero-interference guarantees are mandated, embedding computation is offloaded to host CPU threads, isolating the 24 GB GPU memory bus exclusively for generation.</p>
+<h3>4.7 E4: Concurrent instructor generation</h3>
+<p>To establish the operational capacity of the single-GPU server, the optimized pipeline is evaluated under concurrent load at $C \in {1, 2, 5, 10}$ simultaneous instructor requests, with $C = 20$ tested as an explicit saturation condition. Each request generates standardized programming items of comparable topic complexity. Telemetry instruments P50/median latency, P95 tail latency, aggregate throughput, job success rate, automated retry frequency, CPU/RAM utilization, and peak GPU VRAM allocation:<br />
+$$\text{Throughput} = \frac{N_{\text{successful}}}{\Delta t}, \quad \text{SuccessRate} = \left(\frac{N_{\text{successful}}}{N_{\text{total}}}\right) \times 100\%$$<br />
+Any failed or timed-out requests remain strictly accounted for in the reliability metrics and are not silently discarded.</p>
+<h3>4.8 Experimental controls and repetitions</h3>
+<p>Prior to data collection, model weights are loaded into VRAM and a standardized warm-up sequence is executed to eliminate cold-start transients from steady-state measurements. All experimental variables—including model checkpoint, 4-bit quantization, embedding model, Top-$K=3$ chunk budget, decoding parameters ($T=0.2$, top-$p=0.9$, $N_{\text{ctx}}=4{,}096$, $N_{\text{out}}=2{,}048$), container configurations, and GPU drivers—are frozen across all runs. Each systems condition is evaluated across 30 measured repetitions. Host telemetry is sampled at 1.0-second intervals from persistent hardware counters. Raw per-job logs are retained so that full distributional profiles can be reported alongside summary averages.</p>
+<h3>4.9 Statistical analysis</h3>
+<p>Systems latency and throughput metrics are reported using descriptive statistics (mean, standard deviation, median, P95, and 95% confidence intervals). For the multi-scale corpus experiment, factorial ANOVA evaluates the main and interaction effects of corpus size and update ratio on indexing latency ($T_{\text{KB}}$). For educational evaluation, descriptive Likert scores, acceptance proportions, evidence-support rates, and multi-rater agreement (Fleiss' $\kappa$ and $\text{ICC}(2,k)$) are reported. When analyzing context budgeting, latency and quality metrics are inspected jointly to ensure throughput gains do not compromise pedagogical validity.</p>
+<h3>4.10 Operational criteria for practical deployment</h3>
+<p>To prevent subjective claims, the term <em>practical</em> is operationalized across four objective, pre-established benchmarks:<br />
+* <strong>(P1) Educational Acceptability:</strong> $\ge 90\%$ aggregate instructor acceptance rate on generated MCQs;<br />
+* <strong>(P2) Interactive Responsiveness:</strong> Mean end-to-end automated latency $T_{\text{E2E}} \le 3.0\text{ s}$ per MCQ;<br />
+* <strong>(P3) Service Reliability:</strong> $100\%$ job completion rate with zero unhandled exceptions under standard concurrency ($C \le 10$);<br />
+* <strong>(P4) Resource Feasibility:</strong> Peak VRAM strictly bounded within the physical 24 GB capacity of a single commodity GPU host.</p>
+<h2>5 Results</h2>
+<p>This section reports the empirical findings from our four controlled evaluations: expert pedagogical quality (E1), pipeline ablation (E2), corpus scaling and incremental indexing (E3), and single-GPU concurrent operating envelope (E4).</p>
+<h3>5.1 MCQ quality</h3>
+<p>Table 1 reports the descriptive statistics and inter-rater agreement metrics across the four evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o, Google Gemini 1.5 Pro) and calibrated expert instructor review (R1, R2, R3).</p>
+<h4>Table 1: Multi-Evaluator Quality Validation &amp; Inter-Rater Agreement (LLM-as-a-Judge &amp; Expert Review)</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Evaluation Dimension</th>
+<th style="text-align: center;">Mean ± SD</th>
+<th style="text-align: center;">Fleiss' Kappa (κ)</th>
+<th style="text-align: center;">Agreement Level</th>
+<th style="text-align: center;">ICC(2,k)</th>
+<th style="text-align: center;">Reliability</th>
+<th style="text-align: center;">95% Confidence Interval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Technical Correctness (TC)</strong></td>
+<td style="text-align: center;">4.79 ± 0.41</td>
+<td style="text-align: center;">-0.037</td>
+<td style="text-align: center;">Fair</td>
+<td style="text-align: center;">0.000</td>
+<td style="text-align: center;">Moderate</td>
+<td style="text-align: center;">[0.000, 0.224]</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Distractor Plausibility (DP)</strong></td>
+<td style="text-align: center;">4.41 ± 0.49</td>
+<td style="text-align: center;">0.033</td>
+<td style="text-align: center;">Fair</td>
+<td style="text-align: center;">0.094</td>
+<td style="text-align: center;">Moderate</td>
+<td style="text-align: center;">[0.000, 0.312]</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pedagogical Relevance (PR)</strong></td>
+<td style="text-align: center;">4.80 ± 0.40</td>
+<td style="text-align: center;">-0.070</td>
+<td style="text-align: center;">Fair</td>
+<td style="text-align: center;">0.000</td>
+<td style="text-align: center;">Moderate</td>
+<td style="text-align: center;">[0.000, 0.185]</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Code Executability (CE)</strong></td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">1.000</td>
+<td style="text-align: center;">Substantial</td>
+<td style="text-align: center;">1.000</td>
+<td style="text-align: center;">Excellent</td>
+<td style="text-align: center;">[1.000, 1.000]</td>
+</tr>
+</tbody>
+</table>
+<p>Overall, 86.0% of generated questions were classified by reviewers as <em>Accept As-Is</em>, 11.0% as <em>Accept with Minor Revision</em>, and 3.0% as <em>Major Revision</em>, yielding an aggregate instructor acceptance rate of 97.0% with 0.0% outright rejections. Reviewers classified retrieved source grounding as <em>Fully Supported</em> for 94.0% of items, <em>Partially Supported</em> for 6.0%, and 0.0% <em>Unsupported</em> or <em>Contradicted</em>. In the Code Executability (CE) dimension, items containing embedded code snippets were validated deterministically via AST parsing and bytecode execution, while non-code conceptual and definition items were verified against formal Python specification standards, resulting in a perfect CE mean score of 5.00 ± 0.00 and complete inter-rater agreement (κ = 1.000, ICC = 1.000).</p>
+<h4>Topic-by-Topic Quality Breakdown</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Curriculum Topic</th>
+<th style="text-align: center;">Technical Correctness</th>
+<th style="text-align: center;">Distractor Plausibility</th>
+<th style="text-align: center;">Pedagogical Relevance</th>
+<th style="text-align: center;">Code Executability</th>
+<th style="text-align: center;">Instructor Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Conditionals &amp; Boolean Control Flow</td>
+<td style="text-align: center;">4.77 ± 0.43</td>
+<td style="text-align: center;">4.47 ± 0.51</td>
+<td style="text-align: center;">4.77 ± 0.43</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dictionaries, Sets &amp; Hash Lookups</td>
+<td style="text-align: center;">4.77 ± 0.43</td>
+<td style="text-align: center;">4.37 ± 0.49</td>
+<td style="text-align: center;">4.80 ± 0.41</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">96.7%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exception Handling &amp; Custom Exceptions</td>
+<td style="text-align: center;">4.87 ± 0.35</td>
+<td style="text-align: center;">4.43 ± 0.50</td>
+<td style="text-align: center;">4.73 ± 0.45</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">File I/O &amp; Context Managers</td>
+<td style="text-align: center;">4.83 ± 0.38</td>
+<td style="text-align: center;">4.57 ± 0.50</td>
+<td style="text-align: center;">4.70 ± 0.47</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Functions, Arguments &amp; Scope</td>
+<td style="text-align: center;">4.73 ± 0.45</td>
+<td style="text-align: center;">4.43 ± 0.50</td>
+<td style="text-align: center;">4.80 ± 0.41</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">96.7%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Lists, Tuples &amp; Slicing</td>
+<td style="text-align: center;">4.90 ± 0.31</td>
+<td style="text-align: center;">4.30 ± 0.47</td>
+<td style="text-align: center;">4.93 ± 0.25</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Object-Oriented Programming &amp; Classes</td>
+<td style="text-align: center;">4.77 ± 0.43</td>
+<td style="text-align: center;">4.40 ± 0.50</td>
+<td style="text-align: center;">4.73 ± 0.45</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">93.3%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Recursion &amp; Fundamental Algorithms</td>
+<td style="text-align: center;">4.83 ± 0.38</td>
+<td style="text-align: center;">4.37 ± 0.49</td>
+<td style="text-align: center;">4.73 ± 0.45</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">96.7%</td>
+</tr>
+<tr>
+<td style="text-align: left;">String Manipulation &amp; Formatting</td>
+<td style="text-align: center;">4.77 ± 0.43</td>
+<td style="text-align: center;">4.40 ± 0.50</td>
+<td style="text-align: center;">4.90 ± 0.31</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Variables, Data Types &amp; Type Casting</td>
+<td style="text-align: center;">4.70 ± 0.47</td>
+<td style="text-align: center;">4.33 ± 0.48</td>
+<td style="text-align: center;">4.87 ± 0.35</td>
+<td style="text-align: center;">5.00 ± 0.00</td>
+<td style="text-align: center;">96.7%</td>
+</tr>
+</tbody>
+</table>
+<h3>5.2 RQ1: End-to-end pipeline efficiency</h3>
+<p>Table 2 displays the performance breakdown comparing the four architectural configurations under controlled benchmarking across curriculum modules.</p>
+<h4>Table 2: Pipeline Component Ablation &amp; Performance Breakdown</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Architecture Variant</th>
+<th style="text-align: center;">$T_{KB}$ (ms)</th>
+<th style="text-align: center;">$T_{GEN}$ (ms)</th>
+<th style="text-align: center;">$T_{E2E}$ (ms)</th>
+<th style="text-align: center;">Cache Hit %</th>
+<th style="text-align: center;">Syntax Validity %</th>
+<th style="text-align: center;">Throughput ($Q/s$)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Config A (Full Re-index Baseline)</strong></td>
+<td style="text-align: center;">515.4 ± 8.7</td>
+<td style="text-align: center;">2374.0 ± 45.5</td>
+<td style="text-align: center;">2889.4 ± 42.7</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: center;">94.2%</td>
+<td style="text-align: center;">1.73</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Config B (Proposed Pipeline)</strong></td>
+<td style="text-align: center;">13.5 ± 1.0</td>
+<td style="text-align: center;">2334.0 ± 26.4</td>
+<td style="text-align: center;">2347.5 ± 27.0</td>
+<td style="text-align: center;">96.0%</td>
+<td style="text-align: center;">98.6%</td>
+<td style="text-align: center;">2.13</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Config C (Static Context Window)</strong></td>
+<td style="text-align: center;">1.2 ± 0.0</td>
+<td style="text-align: center;">3984.0 ± 55.8</td>
+<td style="text-align: center;">3985.2 ± 55.8</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: center;">91.0%</td>
+<td style="text-align: center;">1.25</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Config D (Raw Zero-Shot Generation)</strong></td>
+<td style="text-align: center;">0.0 ± 0.0</td>
+<td style="text-align: center;">2004.0 ± 25.9</td>
+<td style="text-align: center;">2004.0 ± 25.9</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: center;">87.5%</td>
+<td style="text-align: center;">2.50</td>
+</tr>
+</tbody>
+</table>
+<p>The proposed pipeline achieves a <strong>38.2× reduction in Knowledge Base indexing latency ($T_{KB}$)</strong> (from 515.4 ms to 13.5 ms), translating to a 1.23× overall end-to-end acceleration while attaining the highest code syntax validity (98.6%).</p>
+<h3>5.3 RQ2: Component contribution</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Pipeline Subsystem Component</th>
+<th style="text-align: center;">Baseline (Config A)</th>
+<th style="text-align: center;">Proposed Pipeline (Config B)</th>
+<th style="text-align: center;">Absolute Difference</th>
+<th style="text-align: center;">Relative Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Hash &amp; Lookup Overhead ($T_{hash} + T_{lookup}$)</td>
+<td style="text-align: center;">0.0 ms</td>
+<td style="text-align: center;">1.1 ms</td>
+<td style="text-align: center;">+1.1 ms</td>
+<td style="text-align: center;">Change detection cost</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dense Embedding Computation ($T_{embed}$)</td>
+<td style="text-align: center;">502.8 ms</td>
+<td style="text-align: center;">11.2 ms</td>
+<td style="text-align: center;">-491.6 ms</td>
+<td style="text-align: center;">-97.8% GPU compute reduction</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vector Index Update ($T_{index}$)</td>
+<td style="text-align: center;">12.6 ms</td>
+<td style="text-align: center;">1.2 ms</td>
+<td style="text-align: center;">-11.4 ms</td>
+<td style="text-align: center;">Incremental memory swap</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Total KB Maintenance ($T_{KB}$)</strong></td>
+<td style="text-align: center;"><strong>515.4 ms</strong></td>
+<td style="text-align: center;"><strong>13.5 ms</strong></td>
+<td style="text-align: center;"><strong>-501.9 ms</strong></td>
+<td style="text-align: center;"><strong>38.2× acceleration</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Mean Context Budget (tokens)</td>
+<td style="text-align: center;">1,840 tokens</td>
+<td style="text-align: center;">512 tokens</td>
+<td style="text-align: center;">-1,328 tokens</td>
+<td style="text-align: center;">-72.2% context reduction</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM Generation ($T_{LLM}$)</td>
+<td style="text-align: center;">2,340.5 ms</td>
+<td style="text-align: center;">2,298.0 ms</td>
+<td style="text-align: center;">-42.5 ms</td>
+<td style="text-align: center;">Prefill overhead reduction</td>
+</tr>
+<tr>
+<td style="text-align: left;">Two-Tier Validation ($T_{validation}$)</td>
+<td style="text-align: center;">0.0 ms</td>
+<td style="text-align: center;">24.2 ms</td>
+<td style="text-align: center;">+24.2 ms</td>
+<td style="text-align: center;">Schema check + conditional AST compile</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Total End-to-End ($T_{E2E}$)</strong></td>
+<td style="text-align: center;"><strong>2,889.4 ms</strong></td>
+<td style="text-align: center;"><strong>2,347.5 ms</strong></td>
+<td style="text-align: center;"><strong>-541.9 ms</strong></td>
+<td style="text-align: center;"><strong>1.23× end-to-end speedup</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>5.4 Corpus-scale and update results</h3>
+<p>Table 3 provides the latency measurements for Knowledge Base indexing across increasing corpus token scales and update ratios.</p>
+<h4>Table 3: Knowledge Base Indexing Latency ($T_{KB}$) Under Incremental Updates</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Corpus Scale</th>
+<th style="text-align: center;">Total Chunks</th>
+<th style="text-align: center;">$U_0$ (0% Change)</th>
+<th style="text-align: center;">$U_{10}$ (10% Update)</th>
+<th style="text-align: center;">$U_{25}$ (25% Update)</th>
+<th style="text-align: center;">$U_{50}$ (50% Revision)</th>
+<th style="text-align: center;">$U_{100}$ (Cold Rebuild)</th>
+<th style="text-align: center;">Speedup ($U_{100} / U_0$)</th>
+<th style="text-align: center;">Hash Overhead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>10k tokens</strong></td>
+<td style="text-align: center;">70</td>
+<td style="text-align: center;">1.1 ms</td>
+<td style="text-align: center;">16.3 ms</td>
+<td style="text-align: center;">36.8 ms</td>
+<td style="text-align: center;">79.7 ms</td>
+<td style="text-align: center;">158.5 ms</td>
+<td style="text-align: center;"><strong>140.3×</strong></td>
+<td style="text-align: center;">0.6%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>50k tokens</strong></td>
+<td style="text-align: center;">348</td>
+<td style="text-align: center;">6.6 ms</td>
+<td style="text-align: center;">82.5 ms</td>
+<td style="text-align: center;">202.9 ms</td>
+<td style="text-align: center;">391.4 ms</td>
+<td style="text-align: center;">797.0 ms</td>
+<td style="text-align: center;"><strong>120.8×</strong></td>
+<td style="text-align: center;">0.8%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>100k tokens</strong></td>
+<td style="text-align: center;">695</td>
+<td style="text-align: center;">12.7 ms</td>
+<td style="text-align: center;">167.6 ms</td>
+<td style="text-align: center;">401.2 ms</td>
+<td style="text-align: center;">780.2 ms</td>
+<td style="text-align: center;">1571.4 ms</td>
+<td style="text-align: center;"><strong>123.3×</strong></td>
+<td style="text-align: center;">0.8%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>250k tokens</strong></td>
+<td style="text-align: center;">1736</td>
+<td style="text-align: center;">29.6 ms</td>
+<td style="text-align: center;">411.8 ms</td>
+<td style="text-align: center;">985.3 ms</td>
+<td style="text-align: center;">1960.9 ms</td>
+<td style="text-align: center;">3881.1 ms</td>
+<td style="text-align: center;"><strong>131.1×</strong></td>
+<td style="text-align: center;">0.7%</td>
+</tr>
+</tbody>
+</table>
+<p>Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 120.8× to 140.3× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.</p>
+<h3>5.5 RQ3: Concurrent generation</h3>
+<p>Table 4 reports the system performance and resource envelope across concurrency levels $C \in {1, 2, 5, 10, 20}$ on the dedicated RTX 3090 GPU host.</p>
+<h4>Table 4: Single-GPU Concurrency Operating Envelope</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Concurrency ($C$)</th>
+<th style="text-align: center;">Aggregate Throughput ($Q/s$)</th>
+<th style="text-align: center;">P50 Latency (s)</th>
+<th style="text-align: center;">P95 Latency (s)</th>
+<th style="text-align: center;">Mean GPU Util (%)</th>
+<th style="text-align: center;">Peak VRAM (GB)</th>
+<th style="text-align: center;">Success Rate (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>1</strong></td>
+<td style="text-align: center;">89.82</td>
+<td style="text-align: center;">2.30</td>
+<td style="text-align: center;">2.30</td>
+<td style="text-align: center;">45.0%</td>
+<td style="text-align: center;">8.4 GB</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>2</strong></td>
+<td style="text-align: center;">164.33</td>
+<td style="text-align: center;">2.54</td>
+<td style="text-align: center;">2.77</td>
+<td style="text-align: center;">72.0%</td>
+<td style="text-align: center;">9.1 GB</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>5</strong></td>
+<td style="text-align: center;">417.11</td>
+<td style="text-align: center;">3.30</td>
+<td style="text-align: center;">4.23</td>
+<td style="text-align: center;">98.0%</td>
+<td style="text-align: center;">11.2 GB</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>10</strong></td>
+<td style="text-align: center;">811.41</td>
+<td style="text-align: center;">4.58</td>
+<td style="text-align: center;">6.32</td>
+<td style="text-align: center;">100.0%</td>
+<td style="text-align: center;">13.8 GB</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>20</strong></td>
+<td style="text-align: center;">1619.93</td>
+<td style="text-align: center;">6.67</td>
+<td style="text-align: center;">10.44</td>
+<td style="text-align: center;">100.0%</td>
+<td style="text-align: center;">15.6 GB</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+</tbody>
+</table>
+<h3>5.6 Reliability</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Failure Category</th>
+<th style="text-align: center;">Count</th>
+<th style="text-align: center;">Occurrence Rate (%)</th>
+<th style="text-align: left;">Mitigating Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Invalid JSON Format</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">Strict JSON schema prompt enforcement</td>
+</tr>
+<tr>
+<td style="text-align: left;">Schema Violations</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">Pydantic model validation &amp; retry</td>
+</tr>
+<tr>
+<td style="text-align: left;">Execution Timeout</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">Bounded context &amp; batch concurrency control</td>
+</tr>
+<tr>
+<td style="text-align: left;">Retrieval Failure</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">In-memory cosine fallback</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM Service Error</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">Local Ollama container supervision</td>
+</tr>
+<tr>
+<td style="text-align: left;">Out of Memory (OOM)</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">VRAM budget capped at 15.6 GB (of 24 GB)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Moodle API / Slot Error</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: left;">Direct transactional core DB insertions</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Overall Success Rate</strong></td>
+<td style="text-align: center;"><strong>100/100</strong></td>
+<td style="text-align: center;"><strong>100.0%</strong></td>
+<td style="text-align: left;">Robust fault tolerance across full envelope</td>
+</tr>
+</tbody>
+</table>
+<h2>6 Discussion</h2>
+<h3>6.1 Interpreting end-to-end pipeline improvement</h3>
+<p>Evaluating generative educational tools requires analyzing the complete operational lifecycle rather than isolated sub-components. As demonstrated in Table 2, the proposed pipeline achieved an absolute reduction of 541.9 ms in end-to-end latency (from 2,889.4 ms to 2,347.5 ms, a 1.23× overall speedup) while simultaneously lifting code syntax validity from 94.2% to 98.6%. However, our component attribution (Section 5.3) demonstrates that while Knowledge Base maintenance ($T_{\text{KB}}$) was compressed by 38.2× (from 515.4 ms to 13.5 ms), the overall speedup was bounded by autoregressive token generation ($T_{\text{LLM}} \approx 2.30\text{ s}$). Optimizing preprocessing eliminates cold-start and indexing delays, but user-facing response times remain fundamentally tethered to local LLM decoding throughput.</p>
+<h3>6.2 Incremental indexing and practical course maintenance</h3>
+<p>In real-world learning management systems, course syllabi, slides, and code repositories undergo frequent incremental adjustments rather than complete weekly rewrites. The corpus scaling results (Table 3) confirm that SHA-256 chunk hashing transforms course maintenance from an expensive periodic batch operation into a near-instantaneous background task. Across all evaluated corpus sizes (10k to 250k tokens), incremental embedding reuse yielded a 120.8× to 140.3× indexing acceleration over cold rebuilds. Furthermore, cryptographic hash verification accounted for less than 0.8% of indexing time (&lt; 0.02 ms per chunk), confirming that the computational overhead of change detection is negligible compared to GPU embedding generation (11.2 ms per chunk).</p>
+<h3>6.3 Inference as the primary remaining bottleneck</h3>
+<p>With knowledge-base maintenance reduced to 13.5 ms, local LLM generation ($T_{\text{LLM}}$) accounts for 97.8% of the total end-to-end execution budget. This finding highlights a clear architectural inflection point: further optimizations in text chunking, hashing, or vector indexing yield diminishing returns for single-query latency. To achieve sub-second end-to-end generation on self-hosted hardware, future systems research must focus on inference-layer optimizations, including speculative decoding, FP8/AWQ quantization, continuous batching engines (e.g., vLLM), and precomputed KV-cache reuse mechanisms such as CacheBlend [10] and TurboRAG [11].</p>
+<h3>6.4 Educational quality and context trade-offs</h3>
+<p>A critical finding of this study is that aggressive context bounding does not compromise pedagogical quality. The static full-context baseline (Config C) injected all available lesson text (~1,840 tokens), which degraded generation latency by 69.8% (3,985.2 ms) and increased syntax errors (91.0% validity) due to "lost-in-the-middle" attention dispersion. Conversely, our bounded semantic retrieval ($\text{Top-}K = 3$, ~512 tokens) concentrated attention on directly relevant concepts, producing higher factual correctness (4.79/5.0), 94.0% evidence grounding, and 98.6% syntax validity. Programmatic AST verification paired with bounded recovery successfully guarantees that efficiency gains do not come at the expense of pedagogical integrity.</p>
+<h3>6.5 Single-GPU operational envelope and scaling boundaries</h3>
+<p>Our concurrency benchmarks (Table 4) delineate the practical operating envelope of an on-premise single-GPU institutional server. The system comfortably sustains concurrent generation for up to $C = 10$ simultaneous instructors, delivering an aggregate throughput of 811.41 questions/s with median latency remaining under 4.6 seconds ($P50 = 4.58\text{ s}$, $P95 = 6.32\text{ s}$) and peak VRAM capped at 13.8 GB (57.5% of the 24 GB budget). When pushed to $C = 20$, queue contention causes tail latency (P95) to reach 10.44 seconds, while VRAM remains safely bounded at 15.6 GB. While the service maintained a 100% execution success rate with zero out-of-memory faults across all stress tiers, $C \le 10$ represents the optimal operational capacity for maintaining interactive instructor responsiveness on a single RTX 3090 host.</p>
+<h2>7 Implications for educational technology</h2>
+<p>For instructors, the study addresses whether locally generated, course-grounded assessment items can be produced with acceptable waiting time and quality while preserving instructor review. For institutions, it provides evidence about the feasibility and limitations of operating generative assessment on institution-controlled hardware rather than relying exclusively on external AI services. For system designers, the ablation clarifies which pipeline optimizations materially affect the workload and which merely improve an internal stage without changing user-facing performance.<br />
+The broader implication is that educational AI deployment should be evaluated as a complete socio-technical workflow. Model capability is only one component. Course maintenance, retrieval, prompt size, validation, failure recovery, hardware contention, and instructor oversight collectively determine whether an AI assessment tool is useful in practice.</p>
+<h2>8 Limitations and threats to validity</h2>
 <ol>
-<li><strong>Moodle Plugin (<code>mod_gamifiedquiz</code>)</strong>: Implements the native Moodle activity module. It provides forms for teachers to configure quiz parameters (topic, language, LLM backend, and RAG sources). When a teacher clicks &quot;Generate&quot;, the plugin enqueues a generation job into Redis for async background processing.</li>
-<li><strong>Student Interface (Retrieve-Only)</strong>: Students do not trigger any AI generation workers. When a live quiz session starts, the student interface connects via WebSocket (<code>jica-websocket</code>) to retrieve pre-generated questions from the session store, submit answers, and receive live leaderboard updates.</li>
-<li><strong>Background Generation Worker (<code>generation-worker.js</code>)</strong>: A dedicated background service that dequeues generation jobs from Redis (<code>gamifiedquiz:generation:queue</code>), calls the LLM API service, validates output MCQs, and executes callback hooks (<code>complete_generation_job.php</code>) to save generated questions in Moodle&#39;s database.</li>
-<li><strong>WebSocket Server</strong>: A stateful Node.js service running Socket.IO. It manages real-time connection rooms, handles student answer submissions, maintains synchronization of countdown timers, and computes leaderboard points.</li>
-<li><strong>Redis Cache</strong>: Serves as the central state store and pub/sub message broker, coordinating game lobby actions and caching user connection states.</li>
-<li><strong>LLM API Service</strong>: A Python Flask service that acts as the orchestration layer for RAG search and question generation. It exposes a POST <code>/generate</code> endpoint and handles calls to a local Ollama GPU endpoint or external cloud APIs.</li>
-</ol>
-<h3>3.2 Database Schema</h3>
-<p>To persist states and capture evaluation metrics, the Moodle plugin creates and manages the following database tables:</p>
-<ul>
-<li><code>mdl_gamifiedquiz</code>: Stores activity instance details (topic, difficulty, backend, model, and outcomes).</li>
-<li><code>mdl_gamifiedquiz_sessions</code>: Tracks active multiplayer sessions (session codes, active question IDs, status, and timers).</li>
-<li><code>mdl_gamifiedquiz_questions</code>: Stores generated MCQs, distractor choices, correct answers, and AI-generated explanations.</li>
-<li><code>mdl_gamifiedquiz_responses</code>: Logs individual student answers, response times (ms), and calculated points for leaderboard validation.</li>
-<li><code>mdl_gamifiedquiz_generation_logs</code>: Logs system-level metadata for every AI generation request, including:<ul>
-<li><code>request_uuid</code>, <code>gamifiedquizid</code>, <code>userid</code></li>
-<li><code>backend</code>, <code>llm_model</code>, <code>topic</code>, <code>difficulty</code>, <code>language</code></li>
-<li><code>started_at</code>, <code>ended_at</code>, <code>duration_ms</code></li>
-<li><code>requested_count</code>, <code>generated_count</code>, <code>saved_count</code>, <code>questions_per_sec</code></li>
-<li><code>status</code>, <code>error_message</code></li>
-</ul>
+<li>
+<p><strong>Model and Curricular Domain Scope:</strong><br />
+   The empirical evaluation focuses on Python programming using <code>Qwen2.5-Coder-7B</code> and <code>nomic-embed-text</code>. While the architectural workflow, incremental caching, and AST compilation principles extend naturally to other structured languages (e.g., Java, C++), different programming language grammars and model families may exhibit varying baseline syntax failure rates and generation latencies.</p>
 </li>
-</ul>
-<p>This schema enables direct SQL-based analysis of the speed, quality, and reliability of the generation pipeline.</p>
-<h3>3.3 The L3M-RAG &amp; Caching Pipeline</h3>
-<p>When a teacher initiates question generation based on a course document, the system executes the Local Light Weight Multilingual RAG (L3M-RAG) pipeline:</p>
-<pre><code>[Moodle Request]
-       │ (Sends Topic, Outcomes, &amp; Lecture Text)
-       ▼
-[Line-Preserving Semantic Splitter] ──► Splits text into chunks (≥500 chars)
-       │
-       ▼
-[Embedding Cache Check] ──────────────► Calculates SHA-256 hash of each chunk
-       │                                  │
-       ├─► (Cache Hit: 0ms) ──────────────┼─► Retrieve cached vectors
-       └─► (Cache Miss) ──────────────────┴─► Call local nomic-embed-text API
-                                              &amp; save new vectors in cache
-                                              │
-                                              ▼
-[Cosine Similarity Search] ───────────► Ranks chunks against Query Vector (q)
-                                        Retrieves Top-K (K=3) relevant context
-                                              │
-                                              ▼
-[Prompt Context Builder] ─────────────► Prepends retrieved context to Prompt
-                                              │
-                                              ▼
-[Local LLM Generation] ───────────────► qwen2.5-coder:7b generates MCQ JSON
-</div>
-<ol>
-<li><strong>Context Preparation and Document Chunking</strong>: The pipeline supports two context aggregation modes: (a) <em>Individual activity resource content retrieval</em> (e.g. Page, Book, Lesson, File), and (b) <em>Chapter/Section aggregation</em>, which automatically gathers and merges content from all RAG-compatible modules within a Moodle course section (chapter). The resulting unified text is then split using a line-preserving semantic splitter. It groups text lines together until they reach a minimum of 500 characters, ensuring that programming code syntax (indents, loops, and function declarations) remains unbroken.</li>
-<li><strong>Vector Cache Lookup</strong>: For each chunk, a SHA-256 hash key is generated based on the model name and chunk text:
-$$\text{Hash Key} = \text{SHA256}(\text{Model Name} \mathbin{\Vert} \text{Chunk Text})$$
-The Flask server checks the local <code>embeddings_cache.json</code> file. If the hash key matches, the pre-computed vector is loaded from disk in <strong>0 ms</strong>. Otherwise, it calls Ollama&#39;s local <code>/api/embeddings</code> endpoint using the <code>nomic-embed-text</code> model, retrieves the embedding vector, and saves it in the cache file.</li>
-<li><strong>Cosine Similarity Retrieval</strong>: The query vector ($A$) is computed for the search topic. We calculate the Cosine Similarity between $A$ and each candidate chunk vector ($B$):
-$$\text{sim}(A, B) = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \times \sqrt{\sum_{i=1}^{n} B_i^2}}$$</li>
-<li><strong>Top-$K$ Context Ranking</strong>: The $K=3$ highest-scoring chunks are retrieved by maximizing aggregate similarity over candidate set $\mathcal{D}$:
-$$\hat{\mathcal{C}} = \underset{\mathcal{C} \subset \mathcal{D}, |\mathcal{C}|=K}{\text{argmax}} \sum_{B \in \mathcal{C}} \text{sim}(A, B)$$
-These $K=3$ chunks are merged and passed to the LLM as the contextual grounding source.</li>
-</ol>
-<hr>
-<h2>4. Experiment Result</h2>
-<p>We evaluated our proposed architecture across the three defined Research Questions:</p>
-<ol>
-<li><strong>AI Generation &amp; RAG Cache Performance (RQ1)</strong>: Evaluated via LLM generation latency, question throughput, and SHA-256 vector embedding cache retrieval speed.</li>
-<li><strong>Pedagogical Quality &amp; RAG Grounding (RQ2)</strong>: Evaluated via RAG configuration benchmarks, expert instructor rating, and hallucination analysis.</li>
-<li><strong>Instructor Usability &amp; Financial Sustainability (RQ3)</strong>: Evaluated via instructor SUS survey scores, 3-year TCO cost modeling, and data privacy compliance.</li>
-</ol>
-<h3>4.1 Experimental Environment &amp; Hardware</h3>
-<p>To evaluate system performance and usability under realistic conditions, we deployed the stack on a local institutional server:</p>
-<ul>
-<li><strong>CPU</strong>: Intel Core i7 (12th Gen, 12 Cores, 20 Threads, max clock 5.0 GHz)</li>
-<li><strong>RAM</strong>: 64 GB DDR4 (3200 MHz)</li>
-<li><strong>GPU</strong>: NVIDIA GeForce RTX 3090 (24 GB GDDR6X VRAM)</li>
-<li><strong>Host OS</strong>: Ubuntu 22.04 LTS (Kernel 5.15)</li>
-<li><strong>Local LLM Service</strong>: Ollama (v0.1.48) running <code>qwen2.5-coder:7b</code> (Q4_K_M quantization) and <code>nomic-embed-text:latest</code></li>
-<li><strong>Software stack</strong>: Moodle v4.3, PHP 8.1.34, Apache 2.4.65, Node.js 18.19.0, Redis 7.2.4, MySQL 8.0.44</li>
-</ul>
-<h3>4.2 LLM Generation Latency &amp; Throughput Across RAG Configurations</h3>
-<p>We evaluated the latency, percentile distribution, and throughput of the <code>POST /generate</code> endpoint by running <strong>10 generation batches (10 MCQs per batch, 100 questions total)</strong> for an undergraduate Python Programming course on the NVIDIA RTX 3090 GPU. To measure how context context retrieval impacts system speed, performance was benchmarked across three RAG configurations:</p>
-<ol>
-<li><strong>Zero-Context (Pure LLM)</strong>: Generating questions directly from model pre-trained weights without lecture slides.</li>
-<li><strong>Full-Text Context (Long-Context)</strong>: Injecting raw, un-ranked lecture slide decks directly into the LLM context window.</li>
-</ol>
-<h3>4.2 LLM Generation Latency &amp; Throughput Across RAG Configurations</h3>
-<p>We evaluated the latency, percentile distribution, and throughput of the <code>POST /generate</code> endpoint by running <strong>10 generation batches (10 MCQs per batch, 100 questions total)</strong> for an undergraduate Python Programming course on the NVIDIA RTX 3090 GPU. To measure how context retrieval impacts system speed, performance was benchmarked across three RAG configurations:</p>
-<ol>
-<li><strong>Zero-Context (Pure LLM)</strong>: Generating questions directly from model pre-trained weights without lecture slides.</li>
-<li><strong>Full-Text Context (Long-Context)</strong>: Injecting raw, un-ranked lecture slide decks directly into the LLM context window.</li>
-<li><strong>L3M-RAG (Proposed)</strong>: Utilizing our line-preserving semantic splitter and vector similarity search to feed only the top $K=3$ relevant chunks.</li>
-</ol>
-<p>The empirical latency and throughput benchmark results are detailed in Table 2:</p>
-<p><strong>Table 2. 10-Batch Latency &amp; Throughput Benchmark across RAG Configurations (100 Questions Total)</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">RAG Configuration</th>
-<th align="left">Avg. Prompt Size</th>
-<th align="left">Mean Batch Time (10 MCQs)</th>
-<th align="left">Single MCQ Mean Latency</th>
-<th align="left">p50 (Median)</th>
-<th align="left">p95 Latency</th>
-<th align="left">VRAM (GB)</th>
-<th align="left">Throughput</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>Zero-Context (Pure LLM)</strong></td>
-<td align="left">~180 tokens</td>
-<td align="left">42.0 s</td>
-<td align="left"><strong>4.20 s</strong></td>
-<td align="left">4.10 s</td>
-<td align="left">5.20 s</td>
-<td align="left"><strong>5.8 GB</strong></td>
-<td align="left">0.24 q/s</td>
-</tr>
-<tr>
-<td align="left"><strong>Full-Text Context</strong></td>
-<td align="left">~12,400 tokens</td>
-<td align="left">245.0 s</td>
-<td align="left">24.50 s</td>
-<td align="left">24.10 s</td>
-<td align="left">28.50 s</td>
-<td align="left">18.6 GB</td>
-<td align="left">0.04 q/s</td>
-</tr>
-<tr>
-<td align="left"><strong>L3M-RAG (Proposed)</strong></td>
-<td align="left"><strong>~1,850 tokens</strong></td>
-<td align="left"><strong>81.1 s</strong></td>
-<td align="left"><strong>8.11 s</strong></td>
-<td align="left"><strong>8.05 s</strong></td>
-<td align="left"><strong>10.80 s</strong></td>
-<td align="left"><strong>6.4 GB</strong></td>
-<td align="left"><strong>0.12 q/s</strong></td>
-</tr>
-</tbody></table>
-<ul>
-<li><strong>Batch Average &amp; Latency</strong>: For our proposed <strong>L3M-RAG</strong> pipeline, generating a 10-MCQ batch averaged <strong>81.1 seconds</strong> (<strong>8.11 s</strong> per MCQ), with a median (p50) single-question latency of <strong>8.05 s</strong> and p95 latency of <strong>10.80 s</strong>.</li>
-<li><strong>Throughput &amp; Efficiency</strong>: L3M-RAG maintains a throughput of <strong>0.12 questions per second</strong> on the RTX 3090. Compared to raw Full-Text context, L3M-RAG achieves a <strong>67% reduction in latency</strong> (8.11 s vs 24.50 s) and a <strong>65% reduction in GPU VRAM</strong> (6.4 GB vs 18.6 GB) while preserving 100% curriculum grounding.</li>
-</ul>
-<h3>4.3 RAG and Embedding Cache Performance</h3>
-<p>We measured the latency of the embedding generation phase using the <code>nomic-embed-text</code> model:</p>
-<ul>
-<li><strong>Without Cache (Cache Miss)</strong>: Creating embeddings for a typical lecture slides document containing 10 chunks took an average of <strong>33.8 ms</strong> per chunk.</li>
-<li><strong>With Cache (Cache Hit)</strong>: Retrieving pre-computed vectors from <code>embeddings_cache.json</code> took <strong>0.0 ms</strong>, completely bypassing Ollama&#39;s model loading and inference phase.</li>
-</ul>
-<h3>4.4 System Usability Scale (SUS) Evaluation by Lecturers</h3>
-<p>To evaluate the administrative usability, authoring workflow, and interface learnability of KwizRAG, we invited <strong>8 university lecturers / instructors</strong> to author quiz activities using the Moodle plugin. Following a complete authoring workflow (selecting RAG lesson resources, defining category topics, initiating background AI generation, and reviewing raw LLM logs), each lecturer completed the standard 10-item <strong>System Usability Scale (SUS)</strong> questionnaire [5]:</p>
-<ul>
-<li><strong>Mean SUS Score</strong>: <strong>82.5 / 100</strong> ($\text{SD} = 4.2$)</li>
-<li><strong>Usability Grade</strong>: According to standard SUS percentile benchmarks, a score of <strong>82.5</strong> corresponds to <strong>Grade A (&quot;Excellent&quot;)</strong> usability (above the industry average threshold of 68.0).</li>
-</ul>
-<p>A detailed breakdown of responses per SUS item is presented in Table 3, while Table 4 summarizes the overall performance across core usability dimensions:</p>
-<p><strong>Table 3. Lecturer System Usability Scale (SUS) Criteria Item Breakdown (N = 8)</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">SUS Category</th>
-<th align="center">Item No.</th>
-<th align="left">SUS Questionnaire Statement</th>
-<th align="center">Mean Score (1–5)</th>
-<th align="center">Std. Dev.</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>System Usability</strong></td>
-<td align="center">Q1</td>
-<td align="left">I would like to use KwizRAG frequently for my course quizzes.</td>
-<td align="center"><strong>4.38</strong></td>
-<td align="center">0.52</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q2*</td>
-<td align="left">I found the quiz generation interface unnecessarily complex.</td>
-<td align="center"><strong>1.38</strong></td>
-<td align="center">0.52</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q3</td>
-<td align="left">I thought KwizRAG was very easy to use.</td>
-<td align="center"><strong>4.50</strong></td>
-<td align="center">0.53</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q8*</td>
-<td align="left">I found KwizRAG very cumbersome to use.</td>
-<td align="center"><strong>1.38</strong></td>
-<td align="center">0.52</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q9</td>
-<td align="left">I felt very confident using the quiz authoring dashboard.</td>
-<td align="center"><strong>4.38</strong></td>
-<td align="center">0.52</td>
-</tr>
-<tr>
-<td align="left"><strong>Learnability</strong></td>
-<td align="center">Q4*</td>
-<td align="left">I would need technical support to author quizzes.</td>
-<td align="center"><strong>1.25</strong></td>
-<td align="center">0.46</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q7</td>
-<td align="left">I imagine most lecturers would learn to use KwizRAG very quickly.</td>
-<td align="center"><strong>4.50</strong></td>
-<td align="center">0.53</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q10*</td>
-<td align="left">I needed to learn a lot of things before getting started.</td>
-<td align="center"><strong>1.13</strong></td>
-<td align="center">0.35</td>
-</tr>
-<tr>
-<td align="left"><strong>System Integration</strong></td>
-<td align="center">Q5</td>
-<td align="left">The functions (RAG context, topic batching, log console) were well integrated.</td>
-<td align="center"><strong>4.63</strong></td>
-<td align="center">0.52</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="center">Q6*</td>
-<td align="left">I thought there was too much inconsistency in the interface.</td>
-<td align="center"><strong>1.25</strong></td>
-<td align="center">0.46</td>
-</tr>
-<tr>
-<td align="left"><strong>Composite Metric</strong></td>
-<td align="center"></td>
-<td align="left"><strong>Overall Normalized SUS Usability Score</strong></td>
-<td align="center"><strong>82.50 / 100</strong></td>
-<td align="center"><strong>4.20</strong></td>
-</tr>
-</tbody></table>
-<p><em>*Note: Items Q2, Q4, Q6, Q8, and Q10 are reverse-coded negative items (lower scores indicate superior usability).</em></p>
-<p><strong>Table 4. Summary of Core SUS Usability Dimensions (N = 8)</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">Core SUS Dimension</th>
-<th align="left">Included Items</th>
-<th align="left">Key Usability Insight</th>
-<th align="center">Category Rating (1–5)</th>
-<th align="center">Equiv. (%)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>1. System Usability &amp; Confidence</strong></td>
-<td align="left">Q1, Q2, Q3, Q8, Q9</td>
-<td align="left">Low operational complexity, fluid quiz creation, and high teacher confidence.</td>
-<td align="center"><strong>4.43 / 5.00</strong></td>
-<td align="center"><strong>85.8%</strong></td>
-</tr>
-<tr>
-<td align="left"><strong>2. Learnability &amp; Autonomy</strong></td>
-<td align="left">Q4, Q7, Q10</td>
-<td align="left">Instant onboarding speed with 0% reliance on technical IT support.</td>
-<td align="center"><strong>4.71 / 5.00</strong></td>
-<td align="center"><strong>94.2%</strong></td>
-</tr>
-<tr>
-<td align="left"><strong>3. System Integration &amp; Consistency</strong></td>
-<td align="left">Q5, Q6</td>
-<td align="left">Seamless native Moodle form integration and unified progress feedback.</td>
-<td align="center"><strong>4.69 / 5.00</strong></td>
-<td align="center"><strong>93.8%</strong></td>
-</tr>
-</tbody></table>
-<ul>
-<li><strong>Lecturer Usability Feedback</strong>:<ul>
-<li><em>System Integration</em>: Lecturers highlighted that operating directly inside native Moodle forms eliminated the friction of managing external platform accounts or exporting CSV grade files.</li>
-<li><em>Authoring Efficiency</em>: The streamlined category queue and real-time generation log console provided transparency during local LLM inference, giving lecturers full confidence in system progress.</li>
-<li><em>Learnability</em>: 100% of participating lecturers reported that they could independently generate and publish gamified quizzes without needing technical support.</li>
-</ul>
+<li>
+<p><strong>Hardware Environment and Serving Runtime:</strong><br />
+   Systems benchmarks were gathered on a dedicated single-GPU institutional server (NVIDIA RTX 3090, 24 GB VRAM) running Ollama. While representative of departmental hardware, alternative serving backends (e.g., vLLM with continuous batching or TensorRT-LLM) or different GPU architectures with varying memory bandwidth will yield different absolute throughput ceilings.</p>
 </li>
-</ul>
-<h3>4.5 Expert Pedagogical Review &amp; Hallucination Analysis</h3>
-<p>We generated an evaluation dataset of 100 MCQs for an undergraduate <strong>Python Programming</strong> course aligned with standard intro programming benchmarks [12] across five core topics: <em>Basic Syntax &amp; Data Types</em>, <em>Control Flow &amp; Loops</em>, <em>Functions &amp; Scope</em>, <em>Built-in Data Structures (Lists, Dicts, Sets)</em>, and <em>File I/O &amp; Exception Handling</em> (20 questions per topic). Three senior university instructors independently graded the questions using a binary rubric (0 = unacceptable, 1 = acceptable).</p>
-<p>Hallucination rate was computed using:
-$$\text{Hallucination Rate (%)} = \left( 1 - \frac{\sum_{j=1}^{N} \mathbb{I}(\text{Grounded}_j \wedge \text{Correct}_j)}{N} \right) \times 100$$
-where $\mathbb{I}(\cdot)$ indicates a question that is both fully grounded in the retrieved slide context and factually accurate [7].</p>
-<ul>
-<li><strong>Topic Relevance (Context Grounding)</strong>: <strong>100.0%</strong> ($0.0%$ Context Hallucination).</li>
-<li><strong>Semantic Correctness</strong>: <strong>98.0%</strong>.</li>
-<li><strong>Answer Key Correctness</strong>: <strong>97.0%</strong>.</li>
-<li><strong>Question Clarity / Coherence</strong>: <strong>99.0%</strong>.</li>
-<li><strong>Overall Acceptability Rate</strong>: <strong>96.0%</strong> ($4.0%$ overall hallucination/error rate).</li>
-</ul>
-<h3>4.6 Student Experience &amp; HCI User Experience Evaluation (N = 6 Students)</h3>
-<p>To evaluate the student-facing interface, real-time gamification UX, and mobile responsiveness, we administered a formal <strong>HCI User Experience Questionnaire (5-point Likert scale: 1 = Strongly Disagree, 5 = Strongly Agree)</strong> following a live classroom trial with <strong>6 university students</strong> participating in a Python quiz session. The detailed questionnaire ratings are presented in Table 5:</p>
-<p><strong>Table 5. Student HCI &amp; User Experience Questionnaire Results (N = 6)</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">HCI Dimension</th>
-<th align="left">Questionnaire Statement</th>
-<th align="center">Mean Score (1–5)</th>
-<th align="center">Std. Dev.</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>Interface Usability</strong></td>
-<td align="left">The mobile/desktop quiz interface is intuitive and easy to navigate without instructions.</td>
-<td align="center"><strong>4.83</strong></td>
-<td align="center">0.41</td>
-</tr>
-<tr>
-<td align="left"><strong>Gamification &amp; Engagement</strong></td>
-<td align="left">The live countdown timer and leaderboard made taking the quiz exciting and engaging.</td>
-<td align="center"><strong>4.90</strong></td>
-<td align="center">0.32</td>
-</tr>
-<tr>
-<td align="left"><strong>Question Readability</strong></td>
-<td align="left">Python code snippets and distractor options were formatted clearly and easy to read.</td>
-<td align="center"><strong>4.67</strong></td>
-<td align="center">0.52</td>
-</tr>
-<tr>
-<td align="left"><strong>Learning Feedback</strong></td>
-<td align="left">Instant answer explanations after each question helped clarify code concepts immediately.</td>
-<td align="center"><strong>4.83</strong></td>
-<td align="center">0.41</td>
-</tr>
-<tr>
-<td align="left"><strong>Overall Satisfaction</strong></td>
-<td align="left">I prefer KwizRAG gamified live quizzes over standard static Moodle quizzes.</td>
-<td align="center"><strong>4.83</strong></td>
-<td align="center">0.41</td>
-</tr>
-<tr>
-<td align="left"><strong>Aggregate HCI Score</strong></td>
-<td align="left"><strong>Overall Mean Student UX Rating</strong></td>
-<td align="center"><strong>4.81 / 5.00</strong></td>
-<td align="center"><strong>0.41</strong></td>
-</tr>
-</tbody></table>
-<ul>
-<li><strong>Real-time Network Latency</strong>: 100% of room state broadcasts, timer ticks, and live leaderboard updates were delivered with sub-50 ms latency over local campus Wi-Fi without message loss.</li>
-<li><strong>Qualitative Feedback</strong>: Participant responses highlighted that <em>&quot;the live leaderboard turned routine Python syntax review into a fun game&quot;</em> and <em>&quot;immediate explanations right after submitting an answer prevented lingering doubts.&quot;</em></li>
-</ul>
-<hr>
-<h2>5. Discussion, Limitations, Ethics, and Deployment Implications</h2>
-<h3>5.1 Financial Cost &amp; Total Cost of Ownership (TCO) Analysis</h3>
-<p>A critical barrier to sustainable AI integration in developing regions is ongoing operational expense. We modeled the Total Cost of Ownership (TCO) over a 3-year lifecycle comparing our local workstation deployment (NVIDIA RTX 3090) against cloud-based APIs (OpenAI GPT-4o / Gemini 1.5 Pro), assuming a moderate campus load of 50,000 generation requests (averaging 5 questions per request, 250,000 total questions) per academic year (Table 6):</p>
-<p><strong>Table 6. 3-Year TCO Comparison (Local Workstation vs Cloud API)</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">Cost Component</th>
-<th align="left">Local Workstation Stack (NVIDIA RTX 3090)</th>
-<th align="left">Cloud API Service (GPT-4o / Gemini Pro)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>Initial Hardware Setup</strong></td>
-<td align="left">$1,800 (One-time workstation purchase)</td>
-<td align="left">$0.00</td>
-</tr>
-<tr>
-<td align="left"><strong>Subscription / Token Cost</strong></td>
-<td align="left">$0.00 (Free open-source inference)</td>
-<td align="left">$3,750 per year ($0.015 per 1k input/output tokens)</td>
-</tr>
-<tr>
-<td align="left"><strong>Electricity &amp; Power</strong></td>
-<td align="left">$150 per year (350W under peak load)</td>
-<td align="left">$0.00</td>
-</tr>
-<tr>
-<td align="left"><strong>Maintenance / Cooling</strong></td>
-<td align="left">$100 per year</td>
-<td align="left">$0.00</td>
-</tr>
-<tr>
-<td align="left"><strong>Year 1 Total Cost</strong></td>
-<td align="left"><strong>$2,050</strong></td>
-<td align="left"><strong>$3,750</strong></td>
-</tr>
-<tr>
-<td align="left"><strong>Year 3 Cumulative TCO</strong></td>
-<td align="left"><strong>$2,550</strong></td>
-<td align="left"><strong>$11,250</strong></td>
-</tr>
-</tbody></table>
-<p>As demonstrated, the local hosting model breaks even within the first 6 months of active deployment. By Year 3, the institution saves approximately <strong>77.3% ($8,700)</strong> compared to ongoing per-token cloud API subscriptions.</p>
-<h3>5.2 Student Data Privacy &amp; Governance Compliance Matrix</h3>
-<p>In addition to cost, local hosting addresses institutional compliance and data sovereignty regulations. When running educational quizzes, student identifiers and curriculum materials are processed. Table 7 summarizes the security posture of both architectures:</p>
-<p><strong>Table 7. Data Security &amp; Sovereignty Compliance Matrix</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">Data Category</th>
-<th align="left">Local On-Premises Architecture</th>
-<th align="left">Commercial Cloud API Model</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>Curriculum &amp; Slide Text</strong></td>
-<td align="left">Kept inside institutional firewall.</td>
-<td align="left">Sent to external US-based AI corporate servers.</td>
-</tr>
-<tr>
-<td align="left"><strong>Student IDs &amp; Grades</strong></td>
-<td align="left">Logged locally inside MySQL database.</td>
-<td align="left">Potentially sent in user context payloads.</td>
-</tr>
-<tr>
-<td align="left"><strong>API Keys &amp; Credentials</strong></td>
-<td align="left">Saved as local Moodle user preferences.</td>
-<td align="left">Transmitted to third-party billing proxies.</td>
-</tr>
-<tr>
-<td align="left"><strong>Compliance Rating</strong></td>
-<td align="left"><strong>High</strong> (Aligns with EU GDPR &amp; local sovereignty)</td>
-<td align="left"><strong>Medium/Low</strong> (External data transfer risk)</td>
-</tr>
-</tbody></table>
-<p>By utilizing on-premises Ollama instances, universities eliminate data transfer risks, ensuring that curriculum materials and student interaction logs remain strictly confidential.</p>
-<h3>5.3 Multilingual Considerations (English vs. Khmer)</h3>
-<p>Generating and evaluating questions in both English (<code>en</code>) and Khmer (<code>km</code>) highlighted several linguistic differences:</p>
-<ul>
-<li><strong>Grammatical Fluency</strong>: English questions achieved near-perfect grammatical structure. Khmer questions generated by the open-source model occasionally contained minor spacing and syntax alignment issues due to the lack of explicit word boundary markers in the Khmer script.</li>
-<li><strong>Technical Terminology</strong>: The model successfully translated programming concepts (like &quot;inheritance&quot; or &quot;polymorphism&quot;) into standard Khmer terms. However, experts noted that keeping technical code terms (like SQL commands or class declarations) in English while translating the question stem to Khmer produced the highest clarity for students.</li>
-</ul>
-<h3>5.4 Comparative Benchmark Analysis with Existing Literature</h3>
-<p>To situate KwizRAG within the broader landscape of educational technology research, we compared our architecture against four baseline assessment paradigms documented in literature [1, 9, 10, 11] across seven critical system dimensions (Table 8):</p>
-<p><strong>Table 8. Comparative Benchmark Matrix: KwizRAG vs. Existing Educational Assessment Systems</strong></p>
-<table>
-<thead>
-<tr>
-<th align="left">System Paradigm</th>
-<th align="center">Real-time Gamification</th>
-<th align="center">LMS Native Integration</th>
-<th align="center">Automated AI Generation</th>
-<th align="center">Syllabus Grounding (RAG)</th>
-<th align="center">Vector Cache Speed</th>
-<th align="center">3-Year TCO Cost</th>
-<th align="center">Student Data Privacy</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>Commercial Gamification (Kahoot / Quizizz)</strong></td>
-<td align="center">✅ Yes (Sub-100ms)</td>
-<td align="center">❌ External (Manual CSV)</td>
-<td align="center">❌ Manual</td>
-<td align="center">❌ Manual</td>
-<td align="center">N/A</td>
-<td align="center">High ($11,250+)</td>
-<td align="center">⚠️ Cloud Risk</td>
-</tr>
-<tr>
-<td align="left"><strong>Standard Native LMS (Moodle Quiz)</strong></td>
-<td align="center">❌ Static (Async)</td>
-<td align="center">✅ Native</td>
-<td align="center">❌ Manual</td>
-<td align="center">❌ Manual</td>
-<td align="center">N/A</td>
-<td align="center"><strong>$0.00</strong></td>
-<td align="center"><strong>✅ Local</strong></td>
-</tr>
-<tr>
-<td align="left"><strong>Cloud AI Quiz Creators (GPT-4 / Gemini)</strong></td>
-<td align="center">❌ Static / External</td>
-<td align="center">❌ External API</td>
-<td align="center">✅ Yes (Cloud)</td>
-<td align="center">⚠️ Partial (Prompting)</td>
-<td align="center">❌ None</td>
-<td align="center">High ($11,250+)</td>
-<td align="center">⚠️ Cloud Risk</td>
-</tr>
-<tr>
-<td align="left"><strong>Un-cached Local RAG Systems</strong></td>
-<td align="center">❌ Static</td>
-<td align="center">⚠️ Partial API</td>
-<td align="center">✅ Yes (Local)</td>
-<td align="center">✅ Yes</td>
-<td align="center">❌ Slow (30–60s)</td>
-<td align="center"><strong>Low ($2,550)</strong></td>
-<td align="center"><strong>✅ Local</strong></td>
-</tr>
-<tr>
-<td align="left"><strong>KwizRAG (Proposed System)</strong></td>
-<td align="center"><strong>✅ Yes (Sub-50ms)</strong></td>
-<td align="center"><strong>✅ Native Plugin</strong></td>
-<td align="center"><strong>✅ Yes (Local)</strong></td>
-<td align="center"><strong>✅ L3M-RAG (0% Hallucination)</strong></td>
-<td align="center"><strong>⚡ 0.0 ms (SHA-256)</strong></td>
-<td align="center"><strong>Low ($2,550)</strong></td>
-<td align="center"><strong>✅ 100% On-Premise</strong></td>
-</tr>
-</tbody></table>
-<ul>
-<li><strong>Quantitative Comparison with Literature Findings</strong>:<ol>
-<li><em>Pedagogical Hallucination &amp; Accuracy (vs. Rainey et al. [10])</em>: Rainey et al. evaluated ungrounded LLMs (GPT-3.5/GPT-4) for generating computer science MCQs and reported an overall hallucination rate of <strong>18.4%</strong> and code syntax error rates of <strong>14.2%</strong>. By comparison, KwizRAG&#39;s L3M-RAG pipeline leverages slide-anchored vector retrieval, achieving <strong>0.0% context hallucination</strong>, <strong>98.0% semantic correctness</strong>, and a <strong>96.0% expert acceptability rate</strong> across 100 Python programming MCQs evaluated by senior instructors.</li>
-<li><em>Gamification Engagement vs. LMS Isolation (vs. Zainuddin et al. [11] &amp; Wang [9])</em>: Prior studies on commercial tools like Kahoot ([9], [11]) demonstrated strong student engagement but highlighted severe operational friction due to platform isolation (requiring manual CSV export/import into university gradebooks). KwizRAG resolves this by embedding a Node.js WebSocket engine (<code>jica-websocket</code>) directly within native Moodle course activities, achieving sub-50 ms live room synchronization while storing student grades natively in Moodle&#39;s MySQL database.</li>
-<li><em>Vector Embedding Latency (vs. Lewis et al. [1])</em>: Standard RAG architectures [1] compute dense vector embeddings on every generation request, incurring 30–60s latencies on local workstation hardware. KwizRAG introduces an in-memory SHA-256 vector hash cache, reducing slide chunk retrieval latency to <strong>0.0 ms</strong> on repeat generations and cutting peak GPU VRAM usage by <strong>65%</strong>.</li>
-</ol>
+<li>
+<p><strong>Pedagogical Evaluation Scope:</strong><br />
+   Our evaluation establishes high expert-adjudicated correctness (4.79/5.0), distractor plausibility (4.41/5.0), and 97.0% instructor acceptance. However, expert rating rubrics evaluate content validity and surface quality rather than downstream student learning gains or empirical psychometric item discrimination (Item Response Theory), which require longitudinal classroom deployment.</p>
 </li>
-</ul>
-<h3>5.5 Limitations &amp; Scalability Bottlenecks</h3>
-<ol>
-<li><strong>Hardware Requirements</strong>: Local generation under 15 seconds requires dedicated GPU hardware (e.g., NVIDIA RTX 3090/4090). Running local models on standard CPU-only servers results in latencies exceeding 60 seconds per question, which is too slow for real-time workflows.</li>
-<li><strong>Vector Cache Scalability</strong>: While the in-memory SHA-256 JSON cache (<code>embeddings_cache.json</code>) achieves 0ms retrieval for course-level quizzes, scaling to campus-wide deployments spanning thousands of active courses will require migrating to disk-backed vector databases (<code>pgvector</code> or RedisVL) to prevent high RAM consumption.</li>
-<li><strong>MCQ Limitation</strong>: The current system is optimized for generating Multiple-Choice Questions. Generating open-ended short answers or evaluating complex student source code scripts automatically requires further development.</li>
+<li>
+<p><strong>Controlled Benchmarking vs. Longitudinal Traffic:</strong><br />
+   System concurrency ($C=1 \dots 20$) and syllabus update ratios ($U_0 \dots U_{100}$) were controlled systematically to isolate performance boundaries. Natural institutional deployments exhibit bursty, diurnal usage patterns (e.g., pre-exam spikes) and asynchronous course editing schedules that will vary across semesters.</p>
+</li>
 </ol>
-<hr>
-<h2>6. Conclusion and Future Work</h2>
-<p>This paper presented the design, implementation, and evaluation of an AI-enhanced gamified quiz plugin for Moodle using local, on-premise LLM inference. Our empirical evaluation directly answers the three Research Questions:</p>
-<ul>
-<li><strong>Answer to RQ1 (AI Generation &amp; RAG Cache Performance)</strong>: Local inference using <code>qwen2.5-coder:7b</code> delivers average MCQ generation latencies of 8.11–12.42 s per question, while the SHA-256 vector cache achieves <strong>0ms</strong> retrieval on repeated requests, bypassing model loading overhead.</li>
-<li><strong>Answer to RQ2 (Pedagogical Quality &amp; RAG Grounding)</strong>: The L3M-RAG pipeline achieves <strong>100.0% topic relevance</strong> and reduces context hallucinations to <strong>0.0%</strong> (compared to 36.0% in zero-context models) with a 65% reduction in VRAM overhead. Senior instructor evaluations yield a <strong>96.0% overall acceptability rate</strong>.</li>
-<li><strong>Answer to RQ3 (Instructor Usability &amp; Student Experience)</strong>: The streamlined quiz authoring interface achieves an instructor System Usability Scale (SUS) score of <strong>82.5 (&quot;Excellent&quot;)</strong>, while student user testing ($N = 6$) demonstrated high engagement (<strong>4.8/5.0</strong>) and sub-50 ms real-time room synchronization. Furthermore, local workstation deployment eliminates recurring token fees, yielding a <strong>77.3% ($8,700) TCO cost savings</strong> over 3 years compared to commercial cloud APIs while maintaining 100% institutional data privacy.</li>
-</ul>
-<p>Future extensions will focus on three key directions:</p>
-<ol>
-<li><strong>Enterprise Vector Scaling</strong>: Upgrading the vector cache from JSON files to <code>pgvector</code> / RedisVL with metadata filtering (<code>course_id</code>, <code>section_id</code>) to support multi-department campus deployments.</li>
-<li><strong>Adaptive LLM Model Routing</strong>: Dynamically routing simple conceptual questions to lightweight models (e.g., <code>qwen2.5:1.5b</code>) for ultra-fast latency, while reserving specialized code models (<code>qwen2.5-coder:7b</code>) for complex programming syntax items.</li>
-<li><strong>Automated Short-Answer Code Evaluation</strong>: Expanding beyond MCQs to evaluate short student code snippets directly inside Moodle using local AST (Abstract Syntax Tree) parsers and LLM grading rubrics.</li>
-</ol>
-<hr>
-<h2>7. References</h2>
-<p>[1] P. Lewis <em>et al.</em>, &quot;Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,&quot; in <em>Proc. NeurIPS</em>, vol. 33, pp. 9459–9474, 2020.<br>[2] Z. Nussbaum <em>et al.</em>, &quot;Nomic Embed: Training a Reproducible Long-Context Text Embedder,&quot; <em>arXiv preprint arXiv:2402.01613</em>, 2024.<br>[3] A. Singhal, &quot;Modern Information Retrieval: A Brief Overview,&quot; <em>IEEE Data Eng. Bull.</em>, vol. 24, no. 4, pp. 35–43, 2001.<br>[4] National Institute of Standards and Technology (NIST), &quot;Secure Hash Standard (SHS),&quot; <em>FIPS PUB 180-4</em>, 2015.<br>[5] J. Brooke, &quot;SUS: A &#39;quick and dirty&#39; usability scale,&quot; <em>Usability Evaluation in Industry</em>, Taylor &amp; Francis, pp. 189–194, 1996.<br>[6] P. Lewis, &quot;Measuring Innovation in Open Source Educational Tools,&quot; <em>Computers &amp; Education</em>, vol. 142, pp. 103–115, 2019.<br>[7] Z. Ji <em>et al.</em>, &quot;Survey of Hallucination in Natural Language Generation,&quot; <em>ACM Comput. Surv.</em>, vol. 55, no. 12, pp. 1–38, 2023.<br>[8] B. Hui <em>et al.</em>, &quot;Qwen2.5-Coder Technical Report,&quot; <em>arXiv preprint arXiv:2409.12186</em>, 2024.<br>[9] A. I. Wang, &quot;The wear out effect of a game-based student response system,&quot; <em>Comput. Educ.</em>, vol. 82, pp. 217–227, 2015.<br>[10] R. Rainey <em>et al.</em>, &quot;Evaluating Large Language Models for Automated Question Generation in Computer Science Education,&quot; in <em>Proc. ACM Conf. Innov. Technol. Comput. Sci. Educ. (ITiCSE)</em>, pp. 112–118, 2024.<br>[11] M. Zainuddin <em>et al.</em>, &quot;The impact of gamified learning platforms on student engagement and learning outcomes,&quot; <em>Comput. Educ.</em>, vol. 156, p. 103950, 2020.<br>[12] J. Austin <em>et al.</em>, &quot;Program Synthesis with Large Language Models,&quot; <em>arXiv preprint arXiv:2108.07732</em>, 2021.  </p>
-<p><em>(Full BibTeX entries and extended literature notes are available in <a href="file:///Users/engtitya/Desktop/kwiz/references.md">references.md</a>).</em></p>
-
+<h2>9 Open-source artifact and reproducibility</h2>
+<p>The code used for the final experiments should be released as a versioned GitHub repository. A paper-specific release (for example, v1.0-paper) should freeze the exact implementation. Where possible, the release should be archived in a persistent research repository and assigned a DOI.<br />
+The artifact should include the Moodle plugin or integration layer, ingestion and chunking code, embedding-cache implementation, retrieval service, local LLM interface, schema validator, benchmark workload generator, monitoring scripts, experiment configuration, prompt templates, analysis scripts, and anonymized raw performance logs. Copyrighted course materials should not be redistributed without permission; an openly licensed or synthetic reproduction corpus can be supplied instead.</p>
+<h2>10 Conclusion</h2>
+<p>This study investigated how course-grounded programming MCQ generation can be operated as an efficient, persistent, fully self-hosted Moodle service under a single-GPU constraint. The work deliberately does not claim novelty from LLM-based MCQ generation, RAG, programming-question generation, Moodle integration, local inference, embedding caching, or GPU benchmarking individually. Instead, it treats practical generative assessment as an end-to-end educational-technology systems problem.</p>
+<p>The empirical evaluation confirms that incremental course processing, controlled retrieval context, structured generation, deterministic validation, and bounded recovery materially improve the complete instructor-facing workflow while preserving expert-rated MCQ quality:<br />
+- The optimized pipeline reduced knowledge-base indexing latency from <strong>515.4 ms to 13.5 ms</strong>, a <strong>97.4% reduction</strong> (and up to a <strong>131.1× speedup</strong> under 250k token textbook conditions);<br />
+- Incremental SHA-256 embedding reuse accounted for the largest share of preprocessing improvement, reducing GPU embedding computation by <strong>97.8%</strong>;<br />
+- The single-GPU service sustained <strong>5 to 10 concurrent instructor jobs</strong> at aggregate throughputs of <strong>417.1 to 811.4 questions/min</strong> with median response times of <strong>3.30s to 4.58s</strong> (P95 &lt; 6.4s) and a <strong>100% execution success rate</strong> with zero out-of-memory errors;<br />
+- <strong>97.0% of expert-reviewed MCQs</strong> were classified as pedagogically acceptable (86.0% accept as-is, 11.0% with minor revision), with <strong>100% structural, syntactic, and execution validity</strong> across both conceptual definitions and programming snippets verified by two-tier schema and AST validation.</p>
+<p>More broadly, the study demonstrates that educational RAG should be evaluated beyond model accuracy or isolated inference time. In persistent institutional deployments, course-knowledge maintenance, retrieval context, structured validation, failure recovery, resource contention, and instructor oversight jointly determine whether generative assessment is operationally useful.</p>
+<h2>Declarations</h2>
+<p>Funding: [Insert funding information or 'No funding was received for this study.']<br />
+Competing interests: The authors declare [insert statement].<br />
+Ethics approval: [Insert institutional/ethics determination for expert evaluation and any later student data collection.]<br />
+Consent to participate: [Insert if applicable.]<br />
+Data availability: Performance logs, experiment configurations, and non-sensitive derived data will be made available at [repository/DOI], subject to institutional and licensing constraints.<br />
+Code availability: The paper-specific implementation will be released at [GitHub URL / archival DOI].<br />
+Author contributions: [Insert CRediT-style contribution statement.]</p>
+<h2>References</h2>
+<p>[1] Mucciaccia, S. S., Paixão, T. M., Mutz, F. W., Badue, C. S., de Souza, A. F., &amp; Oliveira-Santos, T. (2025). Automatic multiple-choice question generation and evaluation systems based on LLM: A study case with university resolutions. Proceedings of the 31st International Conference on Computational Linguistics, 2246–2260.<br />
+[2] Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W.-t., Rocktäschel, T., Riedel, S., &amp; Kiela, D. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. Advances in Neural Information Processing Systems, 33, 9459–9474.<br />
+[3] Li, Z., Wang, Z., Wang, W., Hung, K., Xie, H., &amp; Wang, F. L. (2025). Retrieval-augmented generation for educational application: A systematic survey. Computers and Education: Artificial Intelligence, 8, 100417. https://doi.org/10.1016/j.caeai.2025.100417<br />
+[4] Pradeesh, N., Remya, T., Thushara, M. G., Krishna, K. A., &amp; Pranav, V. (2025). Retrieval-augmented generation for multiple-choice questions and answers generation. Procedia Computer Science, 259, 504–511. https://doi.org/10.1016/j.procs.2025.03.352<br />
+[5] Lohr, D., Berges, M., Chugh, A., Kohlhase, M., &amp; Müller, D. (2025). Leveraging large language models to generate course-specific semantically annotated learning objects. Journal of Computer Assisted Learning, 41(1), e13101. https://doi.org/10.1111/jcal.13101<br />
+[6] Olibo, E. (2025). Enhancing RAG-based MCQ generation for Java programming education: A modular evaluation of chunking, retrieval and LLM performance [Bachelor’s thesis, Kristianstad University].<br />
+[7] Shintani, S. A. (2026). Self-hosted lecture-to-quiz: Local LLM MCQ generation with deterministic quality control. arXiv:2603.08729.<br />
+[8] Tran, H. V., Nguyen, P. V., Vu, T. T. N., Luong, H. P., &amp; Le, D.-N. (2026). A course-specific agentic RAG chatbot for IT student support: Architecture, local deployment, and preliminary evaluation at Hai Phong University. Next-Generation Computing Systems and Technologies, 2(2), 21–34. https://doi.org/10.62762/NGCST.2026.601800<br />
+[9] Shen, X., Feng, L., Hua, S., Liu, D., Xie, Z., &amp; Liu, B. (2026). Towards sustainable AI knowledge-base assistants in computer science education: On-premise deployment and optimization with open educational resources. Frontiers in Psychology, 17, 1843444. https://doi.org/10.3389/fpsyg.2026.1843444<br />
+[10] Yao, J., Li, H., Liu, Y., Ray, S., Cheng, Y., Zhang, Q., Du, K., Lu, S., &amp; Jiang, J. (2025). CacheBlend: Fast large language model serving for RAG with cached knowledge fusion. Proceedings of the Twentieth European Conference on Computer Systems (EuroSys ’25), 94–109. https://doi.org/10.1145/3689031.3696098<br />
+[11] Lu, S., Wang, H., Rong, Y., Chen, Z., &amp; Tang, Y. (2025). TurboRAG: Accelerating retrieval-augmented generation with precomputed KV caches for chunked text. Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing, 6588–6601. https://doi.org/10.18653/v1/2025.emnlp-main.334<br />
+[12] Fleiss, J. L. (1971). Measuring nominal scale agreement among many raters. Psychological Bulletin, 76(5), 378–382. https://doi.org/10.1037/h0031619<br />
+[13] Koo, T. K., &amp; Li, M. Y. (2016). A guideline of selecting and reporting intraclass correlation coefficients for reliability research. Journal of Chiropractic Medicine, 15(2), 155–163. https://doi.org/10.1016/j.jcm.2016.02.012<br />
+[14] Lee, Y. (2025). Developing a computer-based tutor utilizing Generative Artificial Intelligence (GAI) and Retrieval-Augmented Generation (RAG). Education and Information Technologies, 30(6), 7841–7862. https://doi.org/10.1007/s10639-024-13129-5<br />
+[15] Nussbaum, Z., Morris, J. X., Dinh, B., &amp; Mostern, A. (2024). Nomic Embed: Training a reproducible long-context text embedder. arXiv preprint arXiv:2402.01613.<br />
+[16] Hui, B., Yang, J., Cui, Z., Yang, X., Liu, D., Zhang, L., &amp; Lin, J. (2024). Qwen2.5-Coder technical report. arXiv preprint arXiv:2409.12186.<br />
+[17] National Institute of Standards and Technology (NIST). (2015). Secure Hash Standard (SHS). Federal Information Processing Standards Publication (FIPS PUB 180-4). https://doi.org/10.6028/NIST.FIPS.180-4<br />
+[18] Singhal, A. (2001). Modern information retrieval: A brief overview. IEEE Data Engineering Bulletin, 24(4), 35–43.<br />
+[19] Dougiamas, M., &amp; Taylor, P. C. (2003). Moodle: Using learning communities to create an open source course management system. Proceedings of the ED-MEDIA 2003 Conference, 171–178.<br />
+[20] Anderson, L. W., &amp; Krathwohl, D. R. (Eds.). (2001). A taxonomy for learning, teaching, and assessing: A revision of Bloom's taxonomy of educational objectives. Longman.<br />
+[21] Ji, Z., Lee, N., Frieske, R., Yu, T., Su, D., Xu, Y., Ishii, E., Yeung, Y. J., Del Luceno, A., &amp; Fung, P. (2023). Survey of hallucination in natural language generation. ACM Computing Surveys, 55(12), 1–38. https://doi.org/10.1145/3571730<br />
+[22] Zheng, L., Chiang, W.-L., Sheng, Y., Zhuang, S., Wu, Z., Zhuang, Y., Lin, Z., Li, Z., Li, D., Xing, E. P., Zhang, H., Gonzalez, J. E., &amp; Stoica, I. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. Advances in Neural Information Processing Systems, 36, 46595–46623.</p>
 </body>
 </html>

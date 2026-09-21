@@ -475,6 +475,9 @@ function gamifiedquiz_generate_questions_request($topic, $level, $n_questions, $
         }
 
         if (isset($result['questions']) && is_array($result['questions'])) {
+            if (isset($result['metadata'])) {
+                $GLOBALS['LAST_LLM_METADATA'] = $result['metadata'];
+            }
             return $result['questions'];
         }
         if (isset($result['error'])) {
@@ -635,13 +638,45 @@ function gamifiedquiz_new_uuid() {
  * @param string $topic Generation topic/prompt
  * @return int Number saved
  */
-function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $categoryname, $sessionid, $difficulty, $topic = '') {
-    global $DB;
+function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $categoryname, $sessionid, $difficulty, $topic = '', $categoryid = 0, $standardquizid = 0, $newquizname = '') {
+    global $DB, $CFG;
+
+    $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $gamifiedquizid));
+    $courseid = $gamifiedquiz ? (int)$gamifiedquiz->course : 2;
+
+    // 1. Resolve / create category in Question Bank
+    if (!empty($categoryid) && (int)$categoryid > 0) {
+        $categoryid = (int)$categoryid;
+    } else {
+        $targetcatname = !empty($categoryname) ? $categoryname : ($gamifiedquiz ? $gamifiedquiz->name : 'AI Questions');
+        $categoryid = gamifiedquiz_get_or_create_question_category($courseid, $targetcatname);
+    }
+
+    // 2. Resolve / create standard mod_quiz instance in this course
+    $standardquiz = null;
+    if (!empty($standardquizid) && (int)$standardquizid > 0) {
+        $std_rec = $DB->get_record('quiz', array('id' => (int)$standardquizid));
+        if ($std_rec) {
+            $cm = get_coursemodule_from_instance('quiz', $std_rec->id, $courseid);
+            $std_rec->cmid = $cm ? $cm->id : 0;
+            $standardquiz = $std_rec;
+        }
+    } else if (!empty($newquizname)) {
+        $standardquiz = gamifiedquiz_create_standard_quiz_named($courseid, $newquizname);
+    } else if ($gamifiedquiz) {
+        try {
+            $standardquiz = gamifiedquiz_get_or_create_standard_quiz($gamifiedquiz);
+        } catch (Throwable $e) {
+            error_log("Gamified Quiz: could not get/create standard quiz: " . $e->getMessage());
+        }
+    }
 
     $saved = 0;
     foreach ($questions as $question) {
-        $questiontext = $question['question'] ?? $question['question_text'] ?? '';
-        $choices = $question['choices'] ?? array();
+        $questiontext = $question['question'] ?? $question['question_text'] ?? $question['prompt'] ?? '';
+        $choices = $question['choices'] ?? $question['options'] ?? array();
+        $explanation = $question['explanation'] ?? '';
+        $sourcechunks = $question['source_chunk_ids'] ?? $question['source'] ?? '';
 
         if (is_string($choices)) {
             $decoded = json_decode($choices, true);
@@ -667,9 +702,52 @@ function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $cat
             }
         }
 
-        $choicesjson = @json_encode($choices, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        // Format choices properly for question bank helper
+        $normalizedchoices = array();
+        foreach ($choices as $idx => $choice) {
+            if (is_string($choice)) {
+                $normalizedchoices[] = array('text' => $choice, 'is_correct' => ($idx == $correctindex));
+            } else if (is_array($choice)) {
+                $txt = $choice['text'] ?? $choice['answer'] ?? $choice['option'] ?? '';
+                $iscorr = isset($choice['is_correct']) ? !empty($choice['is_correct']) : ($idx == $correctindex);
+                $normalizedchoices[] = array('text' => $txt, 'is_correct' => $iscorr);
+            }
+        }
+
+        // 1. Create in native Moodle Question Bank
+        $qbank_qid = gamifiedquiz_create_question_bank_question(
+            $questiontext,
+            $normalizedchoices,
+            $categoryid,
+            $courseid,
+            $difficulty,
+            $explanation,
+            $sourcechunks
+        );
+
+        // 2. Add to Moodle's native mod_quiz
+        if ($standardquiz && $qbank_qid) {
+            try {
+                require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+                quiz_add_quiz_question($qbank_qid, $standardquiz);
+            } catch (Throwable $sqe) {
+                error_log("Gamified Quiz: Error linking question {$qbank_qid} to standard quiz: " . $sqe->getMessage());
+            }
+        }
+
+        // 3. Add to gamifiedquiz slots
+        if ($gamifiedquiz && $qbank_qid) {
+            try {
+                gamifiedquiz_add_quiz_question($qbank_qid, $gamifiedquiz);
+            } catch (Throwable $gqe) {
+                error_log("Gamified Quiz: Error linking question {$qbank_qid} to gamifiedquiz slots: " . $gqe->getMessage());
+            }
+        }
+
+        // 4. Save to gamifiedquiz_questions (backward compatibility)
+        $choicesjson = @json_encode($normalizedchoices, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
         if ($choicesjson === false) {
-            $choicesjson = json_encode($choices);
+            $choicesjson = json_encode($normalizedchoices);
         }
 
         $record = new stdClass();
@@ -687,6 +765,16 @@ function gamifiedquiz_save_generated_questions($gamifiedquizid, $questions, $cat
         $record->timecreated = time();
         $DB->insert_record('gamifiedquiz_questions', $record);
         $saved++;
+    }
+
+    // Recompute sumgrades so the quiz has a valid non-zero grade and can be attempted without cannotstartgradesmismatch!
+    if ($standardquiz) {
+        try {
+            require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+            \mod_quiz\quiz_settings::create($standardquiz->id)->get_grade_calculator()->recompute_quiz_sumgrades();
+        } catch (Throwable $rse) {
+            error_log("Gamified Quiz: Error recomputing quiz sumgrades: " . $rse->getMessage());
+        }
     }
 
     return $saved;
@@ -720,10 +808,14 @@ function gamifiedquiz_save_generation_preferences($gamifiedquizid, array $catego
  *
  * @param int $gamifiedquizid Quiz instance id
  * @param array $questions Question payloads from the editor
+ * @param int $targetcategoryid Target question category id
+ * @param string $targetcategoryname Target question category name
+ * @param int $targetquizid Target standard quiz id
+ * @param string $newquizname New standard quiz name to create
  * @return array Saved questions (with ids)
  */
-function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
-    global $DB;
+function gamifiedquiz_sync_questions($gamifiedquizid, $questions, $targetcategoryid = 0, $targetcategoryname = '', $targetquizid = 0, $newquizname = '') {
+    global $DB, $CFG;
 
     $transaction = $DB->start_delegated_transaction();
 
@@ -786,20 +878,21 @@ function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
         if (!empty($question['topic'])) {
             $record->topic = core_text::substr((string)$question['topic'], 0, 255);
         }
+        $record->timemodified = time();
 
-        $questionid = !empty($question['id']) ? (int) $question['id'] : 0;
-        if ($questionid && isset($existing[$questionid])) {
-            $record->id = $questionid;
-            $record->session_id = $existing[$questionid]->session_id ?: $defaultsession;
-            if (empty($record->category_name) && !empty($existing[$questionid]->category_name)) {
-                $record->category_name = $existing[$questionid]->category_name;
+        $qid = isset($question['id']) ? (int) $question['id'] : 0;
+        if ($qid > 0 && isset($existing[$qid])) {
+            $record->id = $qid;
+            $record->session_id = $existing[$qid]->session_id ?: $defaultsession;
+            if (empty($record->category_name) && !empty($existing[$qid]->category_name)) {
+                $record->category_name = $existing[$qid]->category_name;
             }
-            if (empty($record->topic) && !empty($existing[$questionid]->topic)) {
-                $record->topic = $existing[$questionid]->topic;
+            if (empty($record->topic) && !empty($existing[$qid]->topic)) {
+                $record->topic = $existing[$qid]->topic;
             }
             $DB->update_record('gamifiedquiz_questions', $record);
-            $keptids[] = $questionid;
-            $question['id'] = $questionid;
+            $keptids[] = $qid;
+            $question['id'] = $qid;
         } else {
             $record->session_id = $defaultsession;
             $record->timecreated = time();
@@ -822,6 +915,71 @@ function gamifiedquiz_sync_questions($gamifiedquizid, $questions) {
     $gq->questions_data = json_encode($savedforjson);
     $gq->timemodified = time();
     $DB->update_record('gamifiedquiz', $gq);
+
+    // Sync questions into Moodle native Question Bank and standard mod_quiz
+    $gq_record = $DB->get_record('gamifiedquiz', array('id' => $gamifiedquizid));
+    if ($gq_record) {
+        $courseid = (int)$gq_record->course;
+
+        // Resolve target standard quiz
+        $stdquiz = null;
+        if (!empty($targetquizid) && (int)$targetquizid > 0) {
+            $std_rec = $DB->get_record('quiz', array('id' => (int)$targetquizid));
+            if ($std_rec) {
+                $cm = get_coursemodule_from_instance('quiz', $std_rec->id, $courseid);
+                $std_rec->cmid = $cm ? $cm->id : 0;
+                $stdquiz = $std_rec;
+            }
+        } else if (!empty($newquizname)) {
+            $stdquiz = gamifiedquiz_create_standard_quiz_named($courseid, $newquizname);
+        } else {
+            $stdquiz = gamifiedquiz_get_or_create_standard_quiz($gq_record);
+        }
+
+        // Resolve target Question Bank category
+        if (!empty($targetcategoryid) && (int)$targetcategoryid > 0) {
+            $catid = (int)$targetcategoryid;
+        } else if (!empty($targetcategoryname)) {
+            $catid = gamifiedquiz_get_or_create_question_category($courseid, $targetcategoryname);
+        } else {
+            $catid = gamifiedquiz_get_or_create_question_category($courseid, $gq_record->name);
+        }
+
+        foreach ($savedforjson as $sq) {
+            $qtext = trim($sq['question'] ?? $sq['question_text'] ?? '');
+            $qchoices = $sq['choices'] ?? array();
+            $qdiff = $sq['difficulty'] ?? 'medium';
+            $qexpl = $sq['explanation'] ?? '';
+            $qsource = $sq['source_chunk_ids'] ?? '';
+            $qbank_qid = gamifiedquiz_create_question_bank_question(
+                $qtext,
+                $qchoices,
+                $catid,
+                $courseid,
+                $qdiff,
+                $qexpl,
+                $qsource
+            );
+            if ($stdquiz && $qbank_qid) {
+                try {
+                    require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+                    quiz_add_quiz_question($qbank_qid, $stdquiz);
+                } catch (Throwable $sqe) {
+                    error_log("Gamified Quiz: Error syncing question to quiz: " . $sqe->getMessage());
+                }
+            }
+        }
+
+        // Recompute sumgrades so the quiz has a valid non-zero grade and can be attempted without cannotstartgradesmismatch!
+        if ($stdquiz) {
+            try {
+                require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+                \mod_quiz\quiz_settings::create($stdquiz->id)->get_grade_calculator()->recompute_quiz_sumgrades();
+            } catch (Throwable $rse) {
+                error_log("Gamified Quiz: Error recomputing quiz sumgrades: " . $rse->getMessage());
+            }
+        }
+    }
 
     $transaction->allow_commit();
 
@@ -1141,131 +1299,320 @@ function gamifiedquiz_generation_status_label($status) {
 }
 
 /**
- * Create a question in Moodle's question bank
+ * Get or create question category in Moodle's core Question Bank for a course.
  *
- * @param string $questiontext Question text
- * @param array $choices Array of choices with text and is_correct
- * @param int $categoryid Question category ID
  * @param int $courseid Course ID
- * @param string $difficulty Difficulty level
- * @return int|false Question ID on success, false on failure
+ * @param string $categoryname Desired category name (optional)
+ * @return int Category ID
  */
+function gamifiedquiz_get_or_create_question_category($courseid, $categoryname = '') {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/question/editlib.php');
+
+    $context = context_course::instance($courseid);
+    $defaultcat = question_make_default_categories(array($context));
+
+    $categoryname = trim((string)$categoryname);
+    if (empty($categoryname) || $categoryname === 'Default') {
+        return (int)$defaultcat->id;
+    }
+
+    // Check if category already exists under this context
+    $existing = $DB->get_record('question_categories', array(
+        'contextid' => $context->id,
+        'name' => $categoryname
+    ));
+
+    if ($existing) {
+        return (int)$existing->id;
+    }
+
+    // Create subcategory under default category
+    $newcat = new stdClass();
+    $newcat->name = $categoryname;
+    $newcat->contextid = $context->id;
+    $newcat->info = 'Generated by AI Assessment System';
+    $newcat->infoformat = FORMAT_HTML;
+    $newcat->stamp = make_unique_id_code();
+    $newcat->parent = $defaultcat->id;
+    $newcat->sortorder = 999;
+    $newcat->idnumber = null;
+
+    return (int)$DB->insert_record('question_categories', $newcat);
+}
+
 /**
- * Create a question in Moodle's question bank using question_bank::create_question()
- * Similar to how quiz module creates questions
+ * Find or automatically create a standard Moodle Quiz (mod_quiz) in the course.
+ *
+ * @param stdClass $gamifiedquiz Gamified quiz instance
+ * @return stdClass Standard quiz record with ->cmid
+ */
+function gamifiedquiz_get_or_create_standard_quiz($gamifiedquiz) {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/mod/quiz/lib.php');
+    require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+    require_once($CFG->dirroot . '/course/lib.php');
+
+    $courseid = (int)$gamifiedquiz->course;
+    $quizname = trim((string)$gamifiedquiz->name);
+    if (empty($quizname)) {
+        $quizname = 'Quiz ' . $gamifiedquiz->id;
+    }
+
+    // Look for existing standard quiz in this course with the same name
+    $sql = "SELECT q.*, cm.id AS cmid 
+              FROM {quiz} q
+              JOIN {course_modules} cm ON cm.instance = q.id
+              JOIN {modules} m ON m.id = cm.module
+             WHERE m.name = 'quiz' AND q.course = ? AND q.name = ?";
+    $existing = $DB->get_record_sql($sql, array($courseid, $quizname));
+    if ($existing) {
+        return $existing;
+    }
+
+    // Create course module entry for mod_quiz
+    $module = $DB->get_record('modules', array('name' => 'quiz'), '*', MUST_EXIST);
+    $cm = new stdClass();
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->section = 1;
+    $cm->added = time();
+    $cmid = add_course_module($cm);
+
+    // Create standard mod_quiz instance
+    $quiz = new stdClass();
+    $quiz->course = $courseid;
+    $quiz->name = $quizname;
+    $quiz->intro = !empty($gamifiedquiz->intro) ? $gamifiedquiz->intro : ('<p>' . s($quizname) . '</p>');
+    $quiz->introformat = FORMAT_HTML;
+    $quiz->coursemodule = $cmid;
+    $quiz->timeopen = 0;
+    $quiz->timeclose = 0;
+    $quiz->timelimit = 0;
+    $quiz->overduehandling = 'autosubmit';
+    $quiz->graceperiod = 0;
+    $quiz->preferredbehaviour = 'deferredfeedback';
+    $quiz->canredoquestions = 0;
+    $quiz->attempts = 0;
+    $quiz->attemptonlast = 0;
+    $quiz->grademethod = 1;
+    $quiz->decimalpoints = 2;
+    $quiz->questiondecimalpoints = -1;
+    $quiz->reviewattempt = 69888;
+    $quiz->reviewcorrectness = 4352;
+    $quiz->reviewmarks = 4352;
+    $quiz->reviewspecificfeedback = 4352;
+    $quiz->reviewgeneralfeedback = 4352;
+    $quiz->reviewrightanswer = 4352;
+    $quiz->reviewoverallfeedback = 4352;
+    $quiz->questionsperpage = 1;
+    $quiz->navmethod = 'free';
+    $quiz->shuffleanswers = 1;
+    $quiz->sumgrades = 0;
+    $quiz->grade = 10.0;
+    $quiz->timecreated = time();
+    $quiz->timemodified = time();
+    $quiz->quizpassword = '';
+    $quiz->subnet = '';
+    $quiz->browsersecurity = '-';
+    $quiz->delay1 = 0;
+    $quiz->delay2 = 0;
+    $quiz->showuserpicture = 0;
+    $quiz->showblocks = 0;
+    $quiz->completionattemptsexhausted = 0;
+    $quiz->completionminattempts = 0;
+    $quiz->allowofflineattempts = 0;
+
+    $quizid = quiz_add_instance($quiz);
+    $DB->set_field('course_modules', 'instance', $quizid, array('id' => $cmid));
+    course_add_cm_to_section($courseid, $cmid, 1);
+    rebuild_course_cache($courseid, true);
+
+    $createdquiz = $DB->get_record('quiz', array('id' => $quizid));
+    $createdquiz->cmid = $cmid;
+    return $createdquiz;
+}
+
+/**
+ * Create or retrieve a named standard mod_quiz instance in a course.
+ *
+ * @param int $courseid Course ID
+ * @param string $quizname Quiz title
+ * @return stdClass Standard quiz record with cmid
+ */
+function gamifiedquiz_create_standard_quiz_named($courseid, $quizname) {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/mod/quiz/lib.php');
+    require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+    require_once($CFG->dirroot . '/course/lib.php');
+
+    $quizname = trim((string)$quizname);
+    if (empty($quizname)) {
+        $quizname = 'Quiz ' . date('Y-m-d H:i');
+    }
+
+    $sql = "SELECT q.*, cm.id AS cmid 
+              FROM {quiz} q
+              JOIN {course_modules} cm ON cm.instance = q.id
+              JOIN {modules} m ON m.id = cm.module
+             WHERE m.name = 'quiz' AND q.course = ? AND q.name = ?";
+    $existing = $DB->get_record_sql($sql, array($courseid, $quizname));
+    if ($existing) {
+        return $existing;
+    }
+
+    $module = $DB->get_record('modules', array('name' => 'quiz'), '*', MUST_EXIST);
+    $cm = new stdClass();
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->section = 1;
+    $cm->added = time();
+    $cmid = add_course_module($cm);
+
+    $quiz = new stdClass();
+    $quiz->course = $courseid;
+    $quiz->name = $quizname;
+    $quiz->intro = '<p>' . s($quizname) . '</p>';
+    $quiz->introformat = FORMAT_HTML;
+    $quiz->coursemodule = $cmid;
+    $quiz->timeopen = 0;
+    $quiz->timeclose = 0;
+    $quiz->timelimit = 0;
+    $quiz->overduehandling = 'autosubmit';
+    $quiz->graceperiod = 0;
+    $quiz->preferredbehaviour = 'deferredfeedback';
+    $quiz->canredoquestions = 0;
+    $quiz->attempts = 0;
+    $quiz->attemptonlast = 0;
+    $quiz->grademethod = 1;
+    $quiz->decimalpoints = 2;
+    $quiz->questiondecimalpoints = -1;
+    $quiz->reviewattempt = 69888;
+    $quiz->reviewcorrectness = 4352;
+    $quiz->reviewmarks = 4352;
+    $quiz->reviewspecificfeedback = 4352;
+    $quiz->reviewgeneralfeedback = 4352;
+    $quiz->reviewrightanswer = 4352;
+    $quiz->reviewoverallfeedback = 4352;
+    $quiz->questionsperpage = 1;
+    $quiz->navmethod = 'free';
+    $quiz->shuffleanswers = 1;
+    $quiz->sumgrades = 0;
+    $quiz->grade = 10.0;
+    $quiz->timecreated = time();
+    $quiz->timemodified = time();
+    $quiz->quizpassword = '';
+    $quiz->subnet = '';
+    $quiz->browsersecurity = '-';
+    $quiz->delay1 = 0;
+    $quiz->delay2 = 0;
+    $quiz->showuserpicture = 0;
+    $quiz->showblocks = 0;
+    $quiz->completionattemptsexhausted = 0;
+    $quiz->completionminattempts = 0;
+    $quiz->allowofflineattempts = 0;
+
+    $quizid = quiz_add_instance($quiz);
+    $DB->set_field('course_modules', 'instance', $quizid, array('id' => $cmid));
+    course_add_cm_to_section($courseid, $cmid, 1);
+    rebuild_course_cache($courseid, true);
+
+    $createdquiz = $DB->get_record('quiz', array('id' => $quizid));
+    $createdquiz->cmid = $cmid;
+    return $createdquiz;
+}
+
+/**
+ * Create a question in Moodle's native question bank (Moodle 4.0+ compliant).
+ * Inserts into {question}, {question_bank_entries}, {question_versions},
+ * {qtype_multichoice_options}, and {question_answers}.
  *
  * @param string $questiontext Question text
  * @param array $choices Array of choices with text and is_correct
  * @param int $categoryid Question category ID
  * @param int $courseid Course ID
  * @param string $difficulty Difficulty level
+ * @param string $explanation Optional answer explanation
+ * @param string $source_chunk_ids Optional source chunk reference
  * @return int|false Question ID on success, false on failure
  */
-function gamifiedquiz_create_question_bank_question($questiontext, $choices, $categoryid, $courseid, $difficulty = 'medium') {
+function gamifiedquiz_create_question_bank_question($questiontext, $choices, $categoryid, $courseid, $difficulty = 'medium', $explanation = '', $source_chunk_ids = '') {
     global $DB, $CFG, $USER;
-    
+
     require_once($CFG->dirroot . '/question/type/multichoice/questiontype.php');
     require_once($CFG->dirroot . '/question/engine/bank.php');
     require_once($CFG->dirroot . '/question/editlib.php');
-    
+
     try {
-        // Get or create question category
         if (empty($categoryid)) {
-            // Get default category for course
-            $context = context_course::instance($courseid);
-            $category = $DB->get_record_sql(
-                "SELECT * FROM {question_categories} 
-                 WHERE contextid = ? AND parent = 0 
-                 ORDER BY sortorder ASC 
-                 LIMIT 1",
-                array($context->id)
-            );
-            if (!$category) {
-                // Create default category if it doesn't exist
-                $category = new stdClass();
-                $category->name = 'Default';
-                $category->contextid = $context->id;
-                $category->info = '';
-                $category->infoformat = FORMAT_HTML;
-                $category->stamp = make_unique_id_code();
-                $category->parent = 0;
-                $category->sortorder = 999;
-                $category->idnumber = null;
-                $category->id = $DB->insert_record('question_categories', $category);
-            }
-            $categoryid = $category->id;
+            $categoryid = gamifiedquiz_get_or_create_question_category($courseid);
         }
-        
-        // Get category to ensure it exists
+
+        // Verify category exists
         $category = $DB->get_record('question_categories', array('id' => $categoryid), '*', MUST_EXIST);
-        
-        // Create question object (direct database insertion like Moodle question import)
+
+        $nameprefix = !empty($source_chunk_ids) ? ("[" . $source_chunk_ids . "] ") : "";
+        $qname = shorten_text($nameprefix . strip_tags($questiontext), 80);
+
+        // Check if question already exists in this category to prevent duplicate questions (Moodle 4.0+ schema)
+        $sql = "SELECT q.id 
+                  FROM {question} q
+                  JOIN {question_versions} qv ON qv.questionid = q.id
+                  JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+                 WHERE qbe.questioncategoryid = ? AND q.name = ?";
+        $existingid = $DB->get_field_sql($sql, array($categoryid, $qname));
+        if ($existingid) {
+            return (int)$existingid;
+        }
+
+        $userid = (!empty($USER) && !empty($USER->id)) ? $USER->id : 2; // Default to admin if CLI / webhook
+
+        // Create core question record (Moodle 4.0+ schema)
         $question = new stdClass();
-        $question->category = $categoryid;
         $question->parent = 0;
-        $question->name = shorten_text(strip_tags($questiontext), 80);
+        $question->name = $qname;
         $question->questiontext = $questiontext;
         $question->questiontextformat = FORMAT_HTML;
-        $question->generalfeedback = '';
+        $question->generalfeedback = !empty($explanation) ? $explanation : '';
         $question->generalfeedbackformat = FORMAT_HTML;
         $question->defaultmark = 1.0;
         $question->penalty = 0.3333333;
         $question->qtype = 'multichoice';
         $question->length = 1;
         $question->stamp = make_unique_id_code();
-        $question->version = make_unique_id_code();
-        $question->hidden = 0;
         $question->timecreated = time();
         $question->timemodified = $question->timecreated;
-        $question->createdby = $USER->id;
-        $question->modifiedby = $USER->id;
-        $question->idnumber = null;
-        
-        // Insert question
+        $question->createdby = $userid;
+        $question->modifiedby = $userid;
+
         $question->id = $DB->insert_record('question', $question);
-        
         if (!$question->id) {
             error_log("Gamified Quiz: Failed to insert question into question table");
             return false;
         }
-        
-        // Create question bank entry (Moodle 4.0+)
+
+        // Create question bank entry and version (Moodle 4.0+ architecture)
         $tablemanager = $DB->get_manager();
         if ($tablemanager->table_exists('question_bank_entries')) {
-            try {
-                // Check if entry already exists for this question
-                $existingversion = $DB->get_record('question_versions', array('questionid' => $question->id), '*');
-                if (!$existingversion) {
-                    $entry = new stdClass();
-                    $entry->questioncategoryid = $categoryid;
-                    $entry->idnumber = null;
-                    $entry->ownerid = $USER->id;
-                    $entry->id = $DB->insert_record('question_bank_entries', $entry);
-                    
-                    if ($entry->id) {
-                        // Link question to entry via question_versions
-                        $version = new stdClass();
-                        $version->questionbankentryid = $entry->id;
-                        $version->questionid = $question->id;
-                        $version->version = 1;
-                        $version->status = 'ready';
-                        $version->id = $DB->insert_record('question_versions', $version);
-                        
-                        error_log("Gamified Quiz: Created question bank entry {$entry->id} and version {$version->id} for question {$question->id}");
-                    } else {
-                        error_log("Gamified Quiz: Failed to create question bank entry for question {$question->id}");
-                    }
-                } else {
-                    error_log("Gamified Quiz: Question version already exists for question {$question->id}");
-                }
-            } catch (Exception $e) {
-                error_log("Gamified Quiz: Error creating question bank entry: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
-                // Continue anyway - question is still created
+            $entry = new stdClass();
+            $entry->questioncategoryid = $categoryid;
+            $entry->idnumber = null;
+            $entry->ownerid = $userid;
+            $entry->id = $DB->insert_record('question_bank_entries', $entry);
+
+            if ($entry->id) {
+                $version = new stdClass();
+                $version->questionbankentryid = $entry->id;
+                $version->questionid = $question->id;
+                $version->version = 1;
+                $version->status = 'ready';
+                $DB->insert_record('question_versions', $version);
             }
-        } else {
-            error_log("Gamified Quiz: question_bank_entries table does not exist (older Moodle version?)");
         }
-        
+
         // Create multichoice options
         $mc = new stdClass();
         $mc->questionid = $question->id;
@@ -1279,38 +1626,98 @@ function gamifiedquiz_create_question_bank_question($questiontext, $choices, $ca
         $mc->incorrectfeedback = get_string('incorrectansweris', 'qtype_multichoice');
         $mc->incorrectfeedbackformat = FORMAT_HTML;
         $mc->answernumbering = 'abc';
+        $mc->shownumcorrect = 0;
         $mc->showstandardinstruction = 0;
-        
         $DB->insert_record('qtype_multichoice_options', $mc);
-        
-        // Find correct answer index
+
+        // Determine correct answer index
         $correctindex = 0;
         foreach ($choices as $idx => $choice) {
-            if (is_array($choice) && isset($choice['is_correct']) && $choice['is_correct']) {
+            if (is_array($choice) && !empty($choice['is_correct'])) {
                 $correctindex = $idx;
                 break;
             }
         }
-        
-        // Create answer options
+
+        // Create answer options in {question_answers}
         foreach ($choices as $idx => $choice) {
             $answer = new stdClass();
             $answer->question = $question->id;
-            $answer->answer = is_array($choice) ? $choice['text'] : $choice;
+            $answer->answer = is_array($choice) ? ($choice['text'] ?? '') : $choice;
             $answer->answerformat = FORMAT_HTML;
-            $answer->fraction = ($idx == $correctindex) ? 1.0 : 0.0;
-            $answer->feedback = '';
+            $iscorrect = ($idx == $correctindex);
+            $answer->fraction = $iscorrect ? 1.0 : 0.0;
+            $answer->feedback = ($iscorrect && !empty($explanation)) ? $explanation : '';
             $answer->feedbackformat = FORMAT_HTML;
-            
+
             $DB->insert_record('question_answers', $answer);
         }
-        
-        return $question->id;
-        
+
+        return (int)$question->id;
+
     } catch (Exception $e) {
-        error_log("Gamified Quiz: Error creating question: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        $info = ($e instanceof dml_exception) ? (" | Debug: " . $e->debuginfo) : "";
+        error_log("Gamified Quiz: Error creating question in question bank: " . $e->getMessage() . $info . " in " . $e->getFile() . ":" . $e->getLine());
         return false;
     }
+}
+
+/**
+ * Batch migrate all legacy questions from gamifiedquiz_questions into Question Bank and standard mod_quiz.
+ *
+ * @return array Summary of migrated questions and quizzes
+ */
+function gamifiedquiz_migrate_legacy_questions() {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+
+    $allquestions = $DB->get_records('gamifiedquiz_questions', null, 'id ASC');
+    $migrated = 0;
+    $quizzes_updated = array();
+
+    foreach ($allquestions as $q) {
+        $gamifiedquiz = $DB->get_record('gamifiedquiz', array('id' => $q->gamifiedquizid));
+        $courseid = $gamifiedquiz ? (int)$gamifiedquiz->course : 2;
+
+        $catname = !empty($q->category_name) ? $q->category_name : ($gamifiedquiz ? $gamifiedquiz->name : 'General');
+        $catid = gamifiedquiz_get_or_create_question_category($courseid, $catname);
+
+        $choices = json_decode($q->choices, true);
+        if (!is_array($choices)) {
+            continue;
+        }
+
+        $qid = gamifiedquiz_create_question_bank_question(
+            $q->question_text,
+            $choices,
+            $catid,
+            $courseid,
+            $q->difficulty
+        );
+
+        if ($qid) {
+            $migrated++;
+            if ($gamifiedquiz) {
+                try {
+                    $stdquiz = gamifiedquiz_get_or_create_standard_quiz($gamifiedquiz);
+                    if ($stdquiz) {
+                        quiz_add_quiz_question($qid, $stdquiz);
+                        $quizzes_updated[$stdquiz->id] = $stdquiz->name;
+                    }
+                    gamifiedquiz_add_quiz_question($qid, $gamifiedquiz);
+                } catch (Throwable $e) {
+                    error_log("Migration error linking to quiz: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    return array(
+        'total' => count($allquestions),
+        'migrated' => $migrated,
+        'quizzes' => $quizzes_updated
+    );
 }
 
 /**

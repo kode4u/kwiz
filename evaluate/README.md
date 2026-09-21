@@ -1,42 +1,49 @@
-# Research evaluation suite
+# Research Evaluation Suite
 
-This folder contains **separate evaluation modules** for the paper: each subfolder has its own **README** (methodology, reporting) and **scripts** (where applicable) so you can **reproduce metrics** for publication.
-
-**Working directory:** run commands that start with `evaluate/...` from the **repository root** (`kwiz/`), not from inside `evaluate/websocket-latency/` or other subfolders — otherwise paths will not resolve.
-
-## Index
-
-| Folder | What it validates | Paper claim |
-|--------|-------------------|-------------|
-| [`llm-response-time/`](llm-response-time/) | LLM API end-to-end latency for `/generate` | ~2.5–4.0 s per question (report mean, min, max, percentiles) |
-| [`llm-evaluation/`](llm-evaluation/) | **File log** + 125-Q batch run + **expert workflow** (2 raters) | JSONL metrics, export CSV, quality % + κ |
-| [`quality-expert/`](quality-expert/) | Binary rubric (topic, semantics, answer key, clarity) | Expert1/2 CSVs, consensus, references |
-| [`websocket-latency/`](websocket-latency/) | RTT + **concurrent** Socket.IO clients | &lt; 150 ms; N users load test |
-| [`sus-usability/`](sus-usability/) | System Usability Scale (survey + score) | SUS score and interpretation |
-| [`load-testing-jmeter/`](load-testing-jmeter/) | Apache JMeter load & scalability | Up to ~200 concurrent users (your environment) |
-| [`classroom-deployment/`](classroom-deployment/) | Field study protocol & checklist | Real classroom deployment narrative |
-| [`sql/`](sql/) | SQL analytics over Moodle generation logs | DB-backed latency/throughput/error analysis for publication |
-| [`quality-expert/`](quality-expert/) | Expert rubric-based question quality assessment (EN/KM) | Human-evaluated quality and agreement by model/language |
-
-## Recommended order
-
-1. **LLM response time** — baseline AI performance (local Ollama vs cloud if compared).
-2. **WebSocket latency** — real-time layer.
-3. **Load testing** — controlled lab conditions.
-4. **SUS** — after stable prototype with representative users.
-5. **Classroom deployment** — qualitative + usage logs aligned with ethics approval.
-
-## Reporting for your manuscript
-
-For each module, copy **environment** (hardware, OS, Docker, model name, commit hash) into your **Experimental setup**. Export script outputs to CSV/plots and reference them in **Results**.
-
-## Prerequisites (global)
-
-- Services running as in project `README.md` / `docker-compose.yml` (or document host-only runs).
-- Python 3.8+ for Python scripts; Node.js 18+ for WebSocket script.
-
-**Abstract claims use different tools:** LLM **seconds** → `llm-response-time/`; WebSocket **&lt;150 ms** → `websocket-latency/`; JMeter **200 users** → `load-testing-jmeter/` (HTTP, e.g. `/health` — not the same as LLM generation time). See [`load-testing-jmeter/README.md`](load-testing-jmeter/README.md).
+This directory contains the reproducible evaluation suite for the paper:  
+**"Toward Efficient Course-Grounded Programming MCQ Generation: An End-to-End Self-Hosted RAG Pipeline for Moodle"** ([`../papers/paper.md`](../papers/paper.md)).
 
 ---
 
-**Main research narrative:** see [`../docs/RESEARCH_README.md`](../docs/RESEARCH_README.md).
+## Primary Paper Experiments (E1 – E4)
+
+These four experiments directly generate the primary data tables and figures in the publication:
+
+| Experiment | Directory | Validates | Manuscript Output |
+|:---|:---|:---|:---|
+| **E1: Expert Quality Validation** | [`e1_expert_validation/`](e1_expert_validation/) | 100 Python MCQs evaluated by 3 independent instructors across 4 dimensions (TC, DP, PR, CE) with Fleiss' $\kappa$ and ICC | **Table 1** (Quality & Agreement) |
+| **E2: Pipeline Component Ablation** | [`e2_pipeline_ablation/`](e2_pipeline_ablation/) | 4-way architectural comparison: Config A (Full Re-index), Config B (Proposed Pipeline), Config C (Static Context), Config D (Raw Generation) | **Table 2** (Ablation & Component Contribution) |
+| **E3: Corpus Scale & Updates** | [`e3_corpus_scale/`](e3_corpus_scale/) | Knowledge base refresh latency ($T_{KB}$) across 10k–250k token scales and 0%–100% update ratios | **Table 3** (Indexing Latency & Speedup) |
+| **E4: Concurrency Operating Envelope** | [`e4_concurrent_generation/`](e4_concurrent_generation/) | Single-GPU stress test under multi-instructor concurrency ($C \in \{1, 2, 5, 10, 20\}$) | **Table 4** (Throughput, P95, VRAM Envelope) |
+
+---
+
+## Running the Primary Experiments
+
+Run all evaluation scripts from the **repository root** (`kwiz/`):
+
+```bash
+# E1: Generate rating sheets and analyze expert ratings
+python3 evaluate/e1_expert_validation/rating_sheet_generator.py
+python3 evaluate/e1_expert_validation/analyze_expert_ratings.py
+
+# E2: Run architectural ablation
+python3 evaluate/e2_pipeline_ablation/run_ablation_experiment.py
+python3 evaluate/e2_pipeline_ablation/analyze_ablation_results.py
+
+# E3: Benchmark corpus scaling and incremental update speedup
+python3 evaluate/e3_corpus_scale/run_corpus_scale_benchmark.py
+python3 evaluate/e3_corpus_scale/analyze_corpus_scale_results.py
+
+# E4: Benchmark single-GPU multi-instructor concurrency
+python3 evaluate/e4_concurrent_generation/benchmark_concurrency_envelope.py
+python3 evaluate/e4_concurrent_generation/analyze_concurrency_results.py
+```
+
+---
+
+## Supplementary & Diagnostic Tools
+
+* [`sql/`](sql/): SQL analytics over Moodle generation telemetry logs (`mdl_gamifiedquiz_metrics`).
+* [`llm-response-time/`](llm-response-time/): Raw micro-benchmarks for Ollama `/api/generate` latency.
+* [`quality-expert/`](quality-expert/): Historical 2-rater evaluation archive.

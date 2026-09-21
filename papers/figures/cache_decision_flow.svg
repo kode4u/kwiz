@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="100%" height="100%" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 8 5 L 0 8 z" fill="#1e293b" />
+    </marker>
+  </defs>
+
+  <!-- Main Title -->
+  <text x="440" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a" letter-spacing="0.2">
+    Figure 2: Incremental Course Indexing and Embedding Reuse Decision Flow
+  </text>
+
+  <!-- ================= LEFT PANEL: FLOWCHART ================= -->
+  <rect x="20" y="38" width="490" height="268" fill="#ffffff" stroke="#334155" stroke-width="1"/>
+  <rect x="20" y="38" width="490" height="24" fill="#f8fafc" stroke="#334155" stroke-width="1"/>
+  <text x="35" y="54" font-size="9.5" font-weight="700" fill="#0f172a">Per-Chunk Ingestion Decision Logic</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="74" width="190" height="42" fill="#ffffff" stroke="#1e293b" stroke-width="0.9"/>
+  <text x="135" y="91" text-anchor="middle" font-size="9.5" font-weight="600" fill="#0f172a">1. Normalized Chunk (d_i)</text>
+  <text x="135" y="105" text-anchor="middle" font-size="8" fill="#475569">Course text / code segment</text>
+
+  <path d="M 135 116 L 135 136" fill="none" stroke="#1e293b" stroke-width="0.9" marker-end="url(#arr2)"/>
+
+  <!-- Step 2 -->
+  <rect x="40" y="138" width="190" height="42" fill="#ffffff" stroke="#1e293b" stroke-width="0.9"/>
+  <text x="135" y="155" text-anchor="middle" font-size="9.5" font-weight="600" fill="#0f172a">2. SHA-256 Hash Computation</text>
+  <text x="135" y="169" text-anchor="middle" font-size="8" fill="#475569">h_i = SHA256(model_tag : d_i)</text>
+
+  <path d="M 135 180 L 135 200" fill="none" stroke="#1e293b" stroke-width="0.9" marker-end="url(#arr2)"/>
+
+  <!-- Step 3: Decision Diamond -->
+  <polygon points="135,202 195,221 135,240 75,221" fill="#ffffff" stroke="#1e293b" stroke-width="0.9"/>
+  <text x="135" y="224" text-anchor="middle" font-size="8.5" font-weight="600" fill="#0f172a">In Cache?</text>
+
+  <!-- Hit Branch -->
+  <path d="M 195 221 L 258 221" fill="none" stroke="#1e293b" stroke-width="0.9" marker-end="url(#arr2)"/>
+  <text x="226" y="214" text-anchor="middle" font-size="8" font-weight="600" fill="#0f172a">Yes (Hit)</text>
+
+  <rect x="260" y="202" width="230" height="38" fill="#ffffff" stroke="#1e293b" stroke-width="0.9"/>
+  <text x="375" y="218" text-anchor="middle" font-size="9" font-weight="600" fill="#0f172a">Reuse Stored Embedding Vector</text>
+  <text x="375" y="231" text-anchor="middle" font-size="8" fill="#475569">T_embed = 0.00 ms (GPU Bypassed)</text>
+
+  <!-- Miss Branch -->
+  <path d="M 135 240 L 135 258" fill="none" stroke="#1e293b" stroke-width="0.9" marker-end="url(#arr2)"/>
+  <text x="142" y="250" font-size="7.5" font-weight="600" fill="#0f172a">No</text>
+
+  <rect x="40" y="260" width="190" height="38" fill="#ffffff" stroke="#1e293b" stroke-width="0.9"/>
+  <text x="135" y="275" text-anchor="middle" font-size="9" font-weight="600" fill="#0f172a">Invoke nomic-embed-text</text>
+  <text x="135" y="288" text-anchor="middle" font-size="8" fill="#475569">GPU compute: 11.2 ms</text>
+
+  <path d="M 230 279 L 258 279" fill="none" stroke="#1e293b" stroke-width="0.9" marker-end="url(#arr2)"/>
+
+  <rect x="260" y="260" width="230" height="38" fill="#ffffff" stroke="#1e293b" stroke-width="0.9"/>
+  <text x="375" y="275" text-anchor="middle" font-size="9" font-weight="600" fill="#0f172a">Store (h_i, v_i) in Index</text>
+  <text x="375" y="288" text-anchor="middle" font-size="8" fill="#475569">Update active vector space</text>
+
+
+  <!-- ================= RIGHT PANEL: LATENCY ATTRIBUTION ================= -->
+  <rect x="525" y="38" width="335" height="268" fill="#ffffff" stroke="#334155" stroke-width="1"/>
+  <rect x="525" y="38" width="335" height="24" fill="#f8fafc" stroke="#334155" stroke-width="1"/>
+  <text x="692" y="54" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f172a">Systems Latency Attribution (T_KB)</text>
+
+  <!-- Box A: Baseline -->
+  <rect x="540" y="74" width="305" height="38" fill="#ffffff" stroke="#64748b" stroke-width="0.8"/>
+  <text x="550" y="90" font-size="9" font-weight="600" fill="#0f172a">Baseline: Full Re-indexing (Config A)</text>
+  <text x="550" y="103" font-size="8" fill="#475569">T_KB = 515.4 ms (all chunks embedded on GPU)</text>
+
+  <!-- Box B: Proposed -->
+  <rect x="540" y="120" width="305" height="38" fill="#ffffff" stroke="#1e293b" stroke-width="1"/>
+  <text x="550" y="136" font-size="9" font-weight="700" fill="#0f172a">Proposed: Incremental Cache (Config B)</text>
+  <text x="550" y="149" font-size="8" fill="#0f172a">T_KB = 13.5 ms (<tspan font-weight="700">38.2x speedup</tspan>, 97.8% GPU reduction)</text>
+
+  <!-- Divider -->
+  <line x1="540" y1="168" x2="845" y2="168" stroke="#cbd5e1" stroke-width="0.8"/>
+
+  <!-- Scaling Table -->
+  <text x="540" y="184" font-size="8.5" font-weight="700" fill="#0f172a">Corpus Scaling Acceleration (U_100 / U_0):</text>
+
+  <text x="550" y="201" font-size="8" fill="#334155">• 10k tokens (70 chunks):</text>
+  <text x="840" y="201" text-anchor="end" font-size="8" font-weight="700" fill="#0f172a">140.3x</text>
+
+  <text x="550" y="217" font-size="8" fill="#334155">• 50k tokens (348 chunks):</text>
+  <text x="840" y="217" text-anchor="end" font-size="8" font-weight="700" fill="#0f172a">120.8x</text>
+
+  <text x="550" y="233" font-size="8" fill="#334155">• 100k tokens (695 chunks):</text>
+  <text x="840" y="233" text-anchor="end" font-size="8" font-weight="700" fill="#0f172a">123.3x</text>
+
+  <text x="550" y="249" font-size="8" fill="#334155">• 250k tokens (1736 chunks):</text>
+  <text x="840" y="249" text-anchor="end" font-size="8" font-weight="700" fill="#0f172a">131.1x</text>
+
+  <rect x="540" y="260" width="305" height="36" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+  <text x="692" y="275" text-anchor="middle" font-size="7.5" fill="#475569">Cryptographic hash overhead &lt; 0.8% across all corpus scales</text>
+  <text x="692" y="287" text-anchor="middle" font-size="7.5" fill="#475569">T_KB = T_extract + T_chunk + T_hash + T_lookup + T_embed + T_index</text>
+
+</svg>

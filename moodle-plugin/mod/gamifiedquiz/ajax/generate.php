@@ -117,6 +117,9 @@ $learning_outcomes = optional_param('learning_outcomes', '', PARAM_TEXT);
 $rag_source = optional_param('rag_source', '', PARAM_TEXT);
 $rag_topic_id = optional_param('rag_topic_id', 0, PARAM_INT);
 $rag_subitem_id = optional_param('rag_subitem_id', 0, PARAM_INT);
+$category_id = optional_param('category_id', 0, PARAM_INT);
+$standard_quiz_id = optional_param('standard_quiz_id', 0, PARAM_INT);
+$new_quiz_name = optional_param('new_quiz_name', '', PARAM_TEXT);
 
 // Must match llmapi MAX_QUESTIONS (docker-compose / .env).
 $maxquestionsperrequest = 20;
@@ -329,8 +332,26 @@ try {
         $category_name,
         $session_id,
         $level,
-        $topic
+        $topic,
+        $category_id,
+        $standard_quiz_id,
+        $new_quiz_name
     );
+
+    // Resolve quiz instance for client links
+    $stdquiz = null;
+    if ($standard_quiz_id > 0) {
+        $stdquiz = $DB->get_record('quiz', array('id' => $standard_quiz_id));
+    } else if (!empty($new_quiz_name)) {
+        $stdquiz = $DB->get_record('quiz', array('name' => $new_quiz_name, 'course' => $course->id));
+    } else {
+        $stdquiz = gamifiedquiz_get_or_create_standard_quiz($gamifiedquiz);
+    }
+    $stdquiz_cmid = 0;
+    if ($stdquiz) {
+        $cm_rec = get_coursemodule_from_instance('quiz', $stdquiz->id, $course->id);
+        $stdquiz_cmid = $cm_rec ? $cm_rec->id : 0;
+    }
 
     $generatedcount = count($questions);
     $durationms = (int)round((microtime(true) - $requeststart) * 1000);
@@ -352,14 +373,25 @@ try {
         $DB->update_record('gamifiedquiz_generation_logs', $updatelog);
     }
     
+    $last_meta = isset($GLOBALS['LAST_LLM_METADATA']) ? $GLOBALS['LAST_LLM_METADATA'] : array();
+    $iter_num = isset($last_meta['iteration_number']) ? (int)$last_meta['iteration_number'] : 0;
+    $iter_id = isset($last_meta['iteration_id']) ? $last_meta['iteration_id'] : '';
+    $timing_metrics = isset($last_meta['timing_metrics']) ? $last_meta['timing_metrics'] : null;
+
     echo json_encode(array(
         'success' => true,
         'questions' => $questions,
         'session_id' => $session_id,
         'count' => $saved_count,
         'category_name' => $category_name,
+        'quiz_id' => $stdquiz ? (int)$stdquiz->id : 0,
+        'quiz_cmid' => (int)$stdquiz_cmid,
+        'quiz_url' => $stdquiz_cmid ? (new moodle_url('/mod/quiz/view.php', array('id' => $stdquiz_cmid)))->out(false) : '',
         'message' => 'Generated ' . $saved_count . ' questions for category: ' . ($category_name ?: 'Default'),
         'request_uuid' => $requestuuid,
+        'iteration_number' => $iter_num,
+        'iteration_id' => $iter_id,
+        'timing_metrics' => $timing_metrics,
         'metrics' => array(
             'duration_ms' => $durationms,
             'generated_count' => $generatedcount,

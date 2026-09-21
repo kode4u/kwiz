@@ -174,6 +174,36 @@ if (class_exists('grade_outcome')) {
 
 $course_outcomes_options = array_merge($course_labels, $course_outcomes);
 
+// Resolve standard mod_quiz and Question Bank category
+$standard_quiz = gamifiedquiz_get_or_create_standard_quiz($gamifiedquiz);
+$coursecontext = context_course::instance($course->id);
+$default_qbank_catid = gamifiedquiz_get_or_create_question_category($course->id, $gamifiedquiz->name);
+$std_quiz_url = new moodle_url('/mod/quiz/view.php', array('id' => $standard_quiz->cmid));
+$std_quiz_edit_url = new moodle_url('/mod/quiz/edit.php', array('cmid' => $standard_quiz->cmid));
+$qbank_url = new moodle_url('/question/edit.php', array('courseid' => $course->id, 'cat' => $default_qbank_catid . ',' . $coursecontext->id));
+
+// Fetch all course question categories for selection
+$course_categories = $DB->get_records_sql(
+    "SELECT qc.id, qc.name, COUNT(qbe.id) AS qcount
+       FROM {question_categories} qc
+  LEFT JOIN {question_bank_entries} qbe ON qbe.questioncategoryid = qc.id
+      WHERE qc.contextid = :contextid AND qc.name != :top
+   GROUP BY qc.id, qc.name
+   ORDER BY qc.name ASC",
+    array('contextid' => $coursecontext->id, 'top' => 'top')
+);
+
+// Fetch all standard quizzes in course for selection
+$course_standard_quizzes = $DB->get_records_sql(
+    "SELECT q.id, q.name, cm.id AS cmid, q.sumgrades
+       FROM {quiz} q
+       JOIN {course_modules} cm ON cm.instance = q.id
+       JOIN {modules} m ON m.id = cm.module
+      WHERE m.name = :modname AND q.course = :courseid
+   ORDER BY q.name ASC",
+    array('modname' => 'quiz', 'courseid' => $course->id)
+);
+
 // Set config before loading JS - use inline script to ensure it's available
 echo '<script>
 window.GAMIFIED_QUIZ_CONFIG = {
@@ -184,8 +214,15 @@ window.GAMIFIED_QUIZ_CONFIG = {
     userId: ' . $USER->id . ',
     userName: ' . json_encode($USER->username) . ',
     fullName: ' . json_encode($user_fullname) . ',
+    courseId: ' . (int)$course->id . ',
     quizId: ' . $gamifiedquiz->id . ',
     cmId: ' . $cm->id . ',
+    defaultCategoryId: ' . (int)$default_qbank_catid . ',
+    standardQuizId: ' . (int)$standard_quiz->id . ',
+    standardQuizCmId: ' . (int)$standard_quiz->cmid . ',
+    standardQuizUrl: ' . json_encode($std_quiz_url->out(false)) . ',
+    standardQuizEditUrl: ' . json_encode($std_quiz_edit_url->out(false)) . ',
+    questionBankUrl: ' . json_encode($qbank_url->out(false)) . ',
     topic: ' . json_encode($gamifiedquiz->topic) . ',
     learningOutcomes: ' . json_encode(isset($gamifiedquiz->learning_outcomes) ? $gamifiedquiz->learning_outcomes : '') . ',
     difficulty: ' . json_encode($gamifiedquiz->difficulty) . ',
@@ -210,69 +247,296 @@ window.GAMIFIED_QUIZ_CONFIG = {
 // #page-content > #region-main-box > #region-main
 // No need to create duplicate wrappers
 
-
-// Display quiz info
-echo '<div class="quiz-info">';
-echo '<strong>' . get_string('topic', 'mod_gamifiedquiz') . ':</strong> ' . s($gamifiedquiz->topic) . ' | ';
-echo '<strong>' . get_string('difficulty', 'mod_gamifiedquiz') . ':</strong> ' . ucfirst($gamifiedquiz->difficulty) . ' | ';
-echo '<strong>' . get_string('language', 'mod_gamifiedquiz') . ':</strong> ' . strtoupper($gamifiedquiz->language);
-echo '</div>';
-
 if ($is_teacher) {
-    // Teacher view
+    // Teacher view - AI Assessment & Generation Studio
     echo '<div class="' . $container_class . '">';
     echo '<div class="gamifiedquiz-teacher">';
-    echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
-    echo '<div class="controls">';
-    echo '<button id="generate-questions-btn" class="btn btn-primary gq-btn gq-btn-primary" style="margin-left: 10px;">' . get_string('generate_questions', 'mod_gamifiedquiz') . '</button>';
-    echo '<button id="edit-questions-btn" class="btn btn-info gq-btn gq-btn-info" style="margin-left: 10px;">Edit Questions</button>';
-    echo '<button id="start-session-btn" class="btn btn-success gq-btn gq-btn-success" style="margin-left: 10px;" disabled>' . get_string('start_session', 'mod_gamifiedquiz') . '</button>';
-    echo '<button id="next-question-btn" class="btn btn-secondary gq-btn gq-btn-secondary" style="margin-left: 10px;" disabled>Next Question</button>';
+
+    // Studio Card with unified sleek Top Appbar
+    echo '<div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; border: 1px solid #e2e8f0; overflow: visible;">';
+    echo '  <div class="card-header py-3 px-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; border-top-left-radius: 12px; border-top-right-radius: 12px; position: relative;">';
+    echo '    <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px;">';
+    echo '      <div>';
+    echo '        <h4 style="margin: 0; color: #ffffff; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">';
+    echo '          <span style="color: #f59e0b;">⚡</span> AI Question Generation Studio';
+    echo '        </h4>';
+    echo '        <div style="color: #94a3b8; font-size: 0.82rem; margin-top: 3px;">';
+    echo '          Self-Hosted RAG Pipeline &bull; Python AST Verification &bull; Native Question Bank &amp; Standard Quiz Integration';
+    echo '        </div>';
+    echo '      </div>';
+    echo '      <div style="position: relative;">';
+    echo '        <button type="button" id="studio-appbar-settings-btn" title="Settings &amp; Tools" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; border-radius: 8px; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.25rem; cursor: pointer; transition: all 0.2s ease; outline: none;">';
+    echo '          ⚙️';
+    echo '        </button>';
+    echo '        <div id="studio-appbar-dropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 8px); background: #ffffff; min-width: 320px; border-radius: 10px; box-shadow: 0 12px 28px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 1050; padding: 12px; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">';
+    echo '          <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px;">Course Quiz &amp; Question Bank</div>';
+    echo '          <a id="header-open-quiz-btn" href="' . $std_quiz_url->out() . '" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: #1e293b; font-weight: 600; font-size: 0.88rem; transition: background 0.15s;" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'transparent\'">';
+    echo '            <span style="font-size: 1.1rem;">📝</span> Open Standard Quiz';
+    echo '          </a>';
+    echo '          <a id="header-manage-quiz-btn" href="' . $std_quiz_edit_url->out() . '" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: #1e293b; font-size: 0.88rem; transition: background 0.15s;" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'transparent\'">';
+    echo '            <span style="font-size: 1.1rem;">⚙️</span> Manage Quiz Questions &amp; Slots';
+    echo '          </a>';
+    echo '          <a id="header-qbank-btn" href="' . $qbank_url->out() . '" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: #1e293b; font-size: 0.88rem; transition: background 0.15s;" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'transparent\'">';
+    echo '            <span style="font-size: 1.1rem;">📚</span> Browse Question Bank';
+    echo '          </a>';
+    echo '          <div style="height: 1px; background: #e2e8f0; margin: 10px 0;"></div>';
+    echo '          <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px;">Telemetry &amp; Evaluation</div>';
+    echo '          <a href="http://localhost:5001/dashboard" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: #0284c7; font-weight: 600; font-size: 0.88rem; background: #f0f9ff; transition: background 0.15s;" onmouseover="this.style.background=\'#e0f2fe\'" onmouseout="this.style.background=\'#f0f9ff\'">';
+    echo '            <span style="font-size: 1.1rem;">📊</span> Evaluation Dashboard';
+    echo '          </a>';
+    echo '          <div style="height: 1px; background: #e2e8f0; margin: 10px 0;"></div>';
+    echo '          <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 6px;">Quiz Parameters &amp; Engine</div>';
+    echo '          <div style="font-size: 0.82rem; color: #475569; padding: 2px 10px;"><strong>Topic:</strong> ' . s($gamifiedquiz->topic) . '</div>';
+    echo '          <div style="font-size: 0.82rem; color: #475569; padding: 2px 10px;"><strong>Difficulty:</strong> ' . ucfirst($gamifiedquiz->difficulty) . ' &bull; <strong>Lang:</strong> ' . strtoupper($gamifiedquiz->language) . '</div>';
+    echo '          <div style="font-size: 0.82rem; color: #475569; padding: 2px 10px;"><strong>Model:</strong> Qwen2.5-Coder-7B (Local)</div>';
+    echo '          <div style="font-size: 0.82rem; color: #16a34a; padding: 2px 10px; font-weight: 600;">✓ AST Code Verified</div>';
+    echo '        </div>';
+    echo '      </div>';
+    echo '    </div>';
+    echo '  </div>';
+    echo '<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var sBtn = document.getElementById("studio-appbar-settings-btn");
+        var sMenu = document.getElementById("studio-appbar-dropdown");
+        if (sBtn && sMenu) {
+            sBtn.addEventListener("click", function(e) {
+                e.stopPropagation();
+                sMenu.style.display = (sMenu.style.display === "block") ? "none" : "block";
+            });
+            document.addEventListener("click", function(e) {
+                if (!sMenu.contains(e.target) && e.target !== sBtn) {
+                    sMenu.style.display = "none";
+                }
+            });
+        }
+    });
+    </script>';
+
+    echo '  <div class="card-body p-4" style="background: #ffffff;">';
+
+    // Step 1: Target Destination (Category & Quiz)
+    echo '    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin-bottom: 22px;">';
+    echo '      <h6 style="color: #475569; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 14px;">';
+    echo '        📍 1. Target Destination in Moodle';
+    echo '      </h6>';
+    echo '      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">';
+
+    // Category dropdown
+    echo '        <div>';
+    echo '          <label for="studio-category-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Question Bank Category:</label>';
+    echo '          <select id="studio-category-select" class="form-select form-control" style="width: 100%; border-radius: 8px; font-size: 0.95rem; padding: 8px 12px;">';
+    foreach ($course_categories as $cat) {
+        $sel = ($cat->id == $default_qbank_catid) ? ' selected' : '';
+        echo '            <option value="' . (int)$cat->id . '"' . $sel . '>📁 ' . s($cat->name) . ' (' . (int)$cat->qcount . ' questions)</option>';
+    }
+    echo '            <option value="__new__">➕ [Create New Category...]</option>';
+    echo '          </select>';
+    echo '          <div id="studio-new-category-wrapper" style="display: none; margin-top: 8px;">';
+    echo '            <input type="text" id="studio-new-category-name" class="form-control" placeholder="Enter new category name (e.g., Python Control Flow)..." style="width: 100%; border-radius: 8px; padding: 8px 12px; border: 1px solid #4f46e5;">';
+    echo '          </div>';
+    echo '          <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Saved questions are placed in this Moodle Question Bank category.</small>';
+    echo '        </div>';
+
+    // Standard Quiz dropdown
+    echo '        <div>';
+    echo '          <label for="studio-quiz-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Target Standard Quiz (mod_quiz):</label>';
+    echo '          <select id="studio-quiz-select" class="form-select form-control" style="width: 100%; border-radius: 8px; font-size: 0.95rem; padding: 8px 12px;">';
+    foreach ($course_standard_quizzes as $q) {
+        $sel = ($q->id == $standard_quiz->id) ? ' selected' : '';
+        echo '            <option value="' . (int)$q->id . '" data-cmid="' . (int)$q->cmid . '"' . $sel . '>📝 ' . s($q->name) . ' (sumgrades: ' . (float)$q->sumgrades . ')</option>';
+    }
+    echo '            <option value="__new__">➕ [Create New Standard Quiz...]</option>';
+    echo '          </select>';
+    echo '          <div id="studio-new-quiz-wrapper" style="display: none; margin-top: 8px;">';
+    echo '            <input type="text" id="studio-new-quiz-name" class="form-control" placeholder="Enter new quiz name (e.g., Midterm Python Quiz)..." style="width: 100%; border-radius: 8px; padding: 8px 12px; border: 1px solid #4f46e5;">';
+    echo '          </div>';
+    echo '          <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Questions are added as active slots with automatic sumgrades calculation.</small>';
+    echo '        </div>';
+
+    echo '      </div>';
+    echo '    </div>';
+
+    // Step 2: Generation Setup
+    echo '    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin-bottom: 22px;">';
+    echo '      <h6 style="color: #475569; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 14px;">';
+    echo '        ⚙️ 2. Generation Parameters';
+    echo '      </h6>';
+
+    // RAG source
+    echo '      <div style="margin-bottom: 14px;">';
+    echo '        <label for="studio-rag-source" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Course Context (RAG Grounding):</label>';
+    echo '        <select id="studio-rag-source" class="form-select form-control" style="width: 100%; border-radius: 8px; font-size: 0.95rem; padding: 8px 12px;">';
+    echo '          <option value="">-- No RAG (Generate from topic / learning outcomes only) --</option>';
+    echo '          <option value="auto">Auto-detect (Current / Preceding Course Activity)</option>';
+    if (!empty($rag_sections)) {
+        echo '          <optgroup label="Course Chapters / Sections">';
+        foreach ($rag_sections as $sec) {
+            echo '            <option value="section_' . (int)$sec['number'] . '">Full Chapter: ' . s($sec['name']) . '</option>';
+        }
+        echo '          </optgroup>';
+    }
+    if (!empty($rag_sources)) {
+        echo '          <optgroup label="Individual Course Activities / Files">';
+        foreach ($rag_sources as $src) {
+            $type_label = ucfirst($src['type']);
+            echo '            <option value="cmid_' . (int)$src['id'] . '">' . s($src['name']) . ' (' . $type_label . ')</option>';
+        }
+        echo '          </optgroup>';
+    }
+    echo '        </select>';
+    echo '      </div>';
+
+    // Topic input
+    echo '      <div style="margin-bottom: 14px;">';
+    echo '        <label for="studio-topic-input" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Programming Topic / Target Concepts:</label>';
+    echo '        <input type="text" id="studio-topic-input" class="form-control" style="width: 100%; border-radius: 8px; font-size: 0.95rem; padding: 8px 12px;" value="' . s($gamifiedquiz->topic) . '" placeholder="e.g. Python Loops, While, Range, Break/Continue">';
+    echo '      </div>';
+
+    // Row: Count, Difficulty, Language
+    echo '      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 14px;">';
+    echo '        <div>';
+    echo '          <label for="studio-count-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Number of Questions:</label>';
+    echo '          <select id="studio-count-select" class="form-select form-control" style="width: 100%; border-radius: 8px; padding: 8px 12px;">';
+    echo '            <option value="1">1 Question (Quick test)</option>';
+    echo '            <option value="3">3 Questions</option>';
+    echo '            <option value="5" selected>5 Questions</option>';
+    echo '            <option value="10">10 Questions</option>';
+    echo '            <option value="15">15 Questions</option>';
+    echo '            <option value="20">20 Questions</option>';
+    echo '          </select>';
+    echo '        </div>';
+    echo '        <div>';
+    echo '          <label for="studio-difficulty-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Difficulty Level:</label>';
+    echo '          <select id="studio-difficulty-select" class="form-select form-control" style="width: 100%; border-radius: 8px; padding: 8px 12px;">';
+    echo '            <option value="easy"' . ($gamifiedquiz->difficulty === 'easy' ? ' selected' : '') . '>Easy (Knowledge & Syntax)</option>';
+    echo '            <option value="medium"' . ($gamifiedquiz->difficulty === 'medium' ? ' selected' : '') . '>Medium (Tracing & Output)</option>';
+    echo '            <option value="hard"' . ($gamifiedquiz->difficulty === 'hard' ? ' selected' : '') . '>Hard (Edge Cases & Reasoning)</option>';
+    echo '          </select>';
+    echo '        </div>';
+    echo '        <div>';
+    echo '          <label for="studio-language-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Language:</label>';
+    echo '          <select id="studio-language-select" class="form-select form-control" style="width: 100%; border-radius: 8px; padding: 8px 12px;">';
+    echo '            <option value="en"' . ($gamifiedquiz->language === 'en' ? ' selected' : '') . '>English</option>';
+    echo '            <option value="km"' . ($gamifiedquiz->language === 'km' ? ' selected' : '') . '>Khmer (ភាសាខ្មែរ)</option>';
+    echo '          </select>';
+    echo '        </div>';
+    echo '      </div>';
+
+    // Collapsible custom snippet
+    echo '      <div style="margin-top: 10px;">';
+    echo '        <button type="button" id="studio-toggle-custom-content" class="btn btn-link btn-sm" style="padding: 0; color: #4f46e5; text-decoration: none; font-weight: 600; font-size: 0.88rem;">';
+    echo '          ▶ Add Custom Code Snippet or Syllabus Notes (Optional)';
+    echo '        </button>';
+    echo '        <div id="studio-custom-content-wrapper" style="display: none; margin-top: 8px;">';
+    echo '          <textarea id="studio-custom-content" class="form-control" rows="4" placeholder="Paste custom Python code snippet, syllabus notes, or specific problem requirements..." style="font-family: monospace; font-size: 0.88rem; border-radius: 8px; padding: 10px;"></textarea>';
+    echo '        </div>';
+    echo '      </div>';
+
+    // Action Button
+    echo '      <div style="text-align: center; margin-top: 22px;">';
+    echo '        <button id="studio-generate-btn" type="button" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none; font-weight: 600; padding: 14px 38px; border-radius: 8px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); font-size: 1.05rem; cursor: pointer;">';
+    echo '          ✨ Generate Questions';
+    echo '        </button>';
+    echo '      </div>';
+    echo '    </div>';
+
+    // Progress box
+    echo '    <div id="studio-progress-box" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 22px;">';
+    echo '      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">';
+    echo '        <div class="spinner" style="border: 4px solid #dcfce7; border-top: 4px solid #16a34a; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; flex-shrink: 0;"></div>';
+    echo '        <div style="flex-grow: 1;">';
+    echo '          <h5 id="studio-progress-title" style="margin: 0; color: #166534; font-weight: 700; font-size: 1.1rem;">Generating Course-Grounded Questions...</h5>';
+    echo '          <span id="studio-progress-timer" style="font-size: 0.85rem; color: #15803d;">Elapsed: 00:00</span>';
+    echo '        </div>';
+    echo '        <span id="studio-progress-percent" style="font-size: 1.1rem; font-weight: 700; color: #166534;">0%</span>';
+    echo '      </div>';
+    echo '      <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-bottom: 8px;">';
+    echo '        <div id="studio-progress-bar" style="width: 10%; height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); transition: width 0.4s ease; border-radius: 5px;"></div>';
+    echo '      </div>';
+    echo '      <div style="display: flex; justify-content: space-between; align-items: center;">';
+    echo '        <span id="studio-progress-status" style="font-size: 0.85rem; color: #475569;">Extracting course materials and querying local LLM (Qwen2.5-Coder-7B)...</span>';
+    echo '        <button type="button" id="studio-toggle-log-btn" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;">Show Logs</button>';
+    echo '      </div>';
+    echo '      <div id="studio-log-console" style="display: none; margin-top: 12px; height: 130px; overflow-y: auto; background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.78rem; padding: 10px 12px; border-radius: 6px; white-space: pre-wrap; line-height: 1.4;"></div>';
+    echo '    </div>';
+
+    // Preview & AST validation section
+    echo '    <div id="studio-preview-section" style="display: none; margin-bottom: 22px;">';
+    echo '      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0;">';
+    echo '        <div>';
+    echo '          <div style="display: flex; align-items: center; gap: 8px;">';
+    echo '            <h5 style="margin: 0; color: #1e293b; font-weight: 700; font-size: 1.15rem;">📋 Generated Questions Review (<span id="studio-preview-count">0</span>)</h5>';
+    echo '            <span id="studio-iteration-badge" class="badge" style="background: #4338ca; color: #fff; font-size: 0.82rem; padding: 4px 8px; border-radius: 6px; display: none;">Iteration #0</span>';
+    echo '            <a id="studio-iteration-dashboard-btn" href="http://localhost:5001/dashboard" target="_blank" class="btn btn-sm btn-outline-primary" style="display: none; padding: 3px 8px; font-size: 0.78rem; border-radius: 6px; text-decoration: none;">📊 View Dashboard</a>';
+    echo '          </div>';
+    echo '          <div style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">Inspect questions, verified by Python AST validation. Click below to push directly into Moodle Question Bank &amp; Quiz.</div>';
+    echo '        </div>';
+    echo '        <div style="display: flex; gap: 8px;">';
+    echo '          <button type="button" id="studio-push-btn" class="btn btn-success" style="font-weight: 600; padding: 9px 22px; border-radius: 8px; background: #16a34a; border-color: #15803d;">🚀 Save &amp; Push to Question Bank &amp; Quiz</button>';
+    echo '          <button type="button" id="studio-discard-btn" class="btn btn-outline-secondary" style="border-radius: 8px;">Discard</button>';
+    echo '        </div>';
+    echo '      </div>';
+    echo '      <div id="studio-questions-list"></div>';
+    echo '      <div style="text-align: right; margin-top: 18px;">';
+    echo '        <button type="button" id="studio-push-btn-bottom" class="btn btn-success btn-lg" style="font-weight: 600; padding: 12px 32px; border-radius: 8px; background: #16a34a; border-color: #15803d;">🚀 Save &amp; Push to Question Bank &amp; Quiz</button>';
+    echo '      </div>';
+    echo '    </div>';
+
+    // Success confirmation box
+    echo '    <div id="studio-success-box" style="display: none; background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 22px; margin-bottom: 22px;">';
+    echo '      <div style="display: flex; align-items: flex-start; gap: 16px;">';
+    echo '        <div style="font-size: 2.2rem; line-height: 1;">🎉</div>';
+    echo '        <div style="flex-grow: 1;">';
+    echo '          <h5 style="color: #15803d; font-weight: 700; margin: 0 0 6px 0; font-size: 1.2rem;">Questions Successfully Saved &amp; Linked!</h5>';
+    echo '          <p id="studio-success-message" style="margin: 0 0 16px 0; color: #334155; font-size: 0.95rem; line-height: 1.5;">';
+    echo '            The questions have been permanently stored in Moodle\'s Question Bank and added as active slots in your Quiz module. All question grades and sumgrades were recomputed automatically.';
+    echo '          </p>';
+    echo '          <div style="display: flex; gap: 10px; flex-wrap: wrap;">';
+    echo '            <a id="studio-success-quiz-link" href="' . $std_quiz_url->out() . '" class="btn btn-primary" style="background-color: #4f46e5; border-color: #4338ca; font-weight: 600; border-radius: 8px; padding: 8px 18px;">📝 Open &amp; Attempt Quiz</a>';
+    echo '            <a id="studio-success-edit-link" href="' . $std_quiz_edit_url->out() . '" class="btn btn-outline-primary" style="color: #4f46e5; border-color: #4f46e5; font-weight: 600; border-radius: 8px; padding: 8px 18px;">⚙️ Manage Quiz Questions</a>';
+    echo '            <a id="studio-success-qbank-link" href="' . $qbank_url->out() . '" class="btn btn-outline-secondary" style="font-weight: 600; border-radius: 8px; padding: 8px 18px;">📚 View in Question Bank</a>';
+    echo '            <a id="studio-success-dashboard-link" href="http://localhost:5001/dashboard" target="_blank" class="btn btn-outline-info" style="font-weight: 600; border-radius: 8px; padding: 8px 18px;">📊 View Iteration Logs in Dashboard</a>';
+    echo '          </div>';
+    echo '        </div>';
+    echo '      </div>';
+    echo '    </div>';
+
+    echo '  </div>'; // .card-body
+    echo '</div>'; // .card
+
+    // Hidden legacy controls so any existing scripts do not break
+    echo '<div style="display: none;">';
+    echo '<button id="generate-questions-btn">Generate</button>';
+    echo '<button id="edit-questions-btn">Edit</button>';
+    echo '<button id="start-session-btn">Start</button>';
+    echo '<button id="next-question-btn">Next</button>';
+    echo '<div id="session-status"></div>';
+    echo '<div id="questions-container"></div>';
+    echo '<div id="active-question-display"></div>';
+    echo '<div id="question-results-display"></div>';
+    echo '<div id="question-ranking-display"></div>';
+    echo '<div id="leaderboard-container"></div>';
+    echo '<div id="final-leaderboard-container"></div>';
     echo '</div>';
-    echo '<div id="session-status" class="session-status" style="display:none;"></div>';
-    echo '<div id="questions-container" class="questions-container" style="display:none;"></div>';
-    echo '<div id="active-question-display" class="gq-container-lg gq-question-screen" style="display:none; min-height: 400px; position: relative;">';
-    echo '<button type="button" id="active-question-fullscreen-btn" class="gq-fullscreen-btn" title="Full screen" aria-label="Full screen" style="position: absolute; top: 10px; right: 10px; z-index: 10; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 18px;">⛶</button>';
-    echo '<div id="active-question-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">';
-    echo '<div id="active-question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
-    echo '<div id="active-question-timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
-    echo '</div>';
-    echo '<div id="active-question-image" style="text-align: center; margin-bottom: 15px;"></div>';
-    echo '<div id="active-question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
-    echo '<div id="active-question-choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
-    echo '</div>';
-    echo '<div id="question-results-display" class="gq-container gq-teacher-secondary" style="display:none;"></div>';
-    echo '<div id="question-ranking-display" class="gq-container-lg gq-teacher-secondary" style="display:none; margin-top: 20px;">
-        <h3 style="text-align: center; margin-bottom: 20px; font-size: 32px;">Current Rankings</h3>
-        <div id="ranking-table-container"></div>
-    </div>';
-    echo '<div id="leaderboard-container" class="leaderboard-container gq-teacher-secondary" style="display:none;"></div>';
-    echo '<div id="final-leaderboard-container" class="gq-container-lg gq-teacher-secondary" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"></div>';
     echo '</div>';
     echo '</div>';
 } else {
-    // Student view
+    // Student view - direct assessment access (no gamification lobby)
     echo '<div class="' . $container_class . '">';
     echo '<div class="gamifiedquiz-student">';
     echo '<h2>' . s($gamifiedquiz->name) . '</h2>';
-    echo '<div id="waiting-message" class="waiting">Waiting for teacher to start quiz session...</div>';
-    echo '<div id="question-container" class="question-container gq-container-lg gq-question-screen" style="display:none; min-height: 400px; position: relative;">';
-    echo '<button type="button" id="question-fullscreen-btn" class="gq-fullscreen-btn" title="Full screen" aria-label="Full screen" style="position: absolute; top: 10px; right: 10px; z-index: 10; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 18px;">⛶</button>';
-    echo '<div id="question-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">';
-    echo '<div id="question-number" style="font-size: 18px; color: #666; font-weight: bold;"></div>';
-    echo '<div id="timer" class="timer" style="font-size: 24px; font-weight: bold; color: #007bff; background: #e7f3ff; padding: 10px 20px; border-radius: 8px;"></div>';
+    echo '<div class="card p-4 my-4 text-center" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; max-width: 620px; margin: 20px auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07);">';
+    echo '  <div style="font-size: 3.5rem; margin-bottom: 15px;">📝</div>';
+    echo '  <h3 style="color: #1e293b; font-weight: 700; margin-bottom: 12px;">Standard Course Quiz</h3>';
+    echo '  <p style="color: #64748b; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px;">';
+    echo '    This assessment is configured as a standard Moodle Quiz module. You can start or resume your assessment attempt directly below.';
+    echo '  </p>';
+    echo '  <div>';
+    echo '    <a href="' . $std_quiz_url->out() . '" class="btn btn-primary btn-lg" style="padding: 12px 36px; font-size: 1.15rem; font-weight: 600; border-radius: 8px; background: #4f46e5; border-color: #4338ca; text-decoration: none; display: inline-block;">';
+    echo '      Attempt Quiz Now ➜';
+    echo '    </a>';
+    echo '  </div>';
     echo '</div>';
-    echo '<div id="question-image-container" style="text-align: center; margin-bottom: 15px;"></div>';
-    echo '<div id="question-text" class="question-text" style="font-size: 32px; margin-bottom: 40px; text-align: center; line-height: 1.4;"></div>';
-    echo '<div id="choices" class="choices" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;"></div>';
-    echo '</div>';
-    echo '<div id="result-container" class="result-container" style="display:none;"></div>';
-    echo '<div id="student-answer-results-container" class="gq-container" style="display:none;"></div>';
-    echo '<div id="question-comparison-container" class="gq-container" style="display:none;"></div>';
-    // Leaderboard container for students (shown after timeout)
-    echo '<div id="student-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-top: 20px;"></div>';
-    // Final leaderboard container for students
-    echo '<div id="student-final-leaderboard-container" class="gq-container-lg" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-top: 20px;"></div>';
     echo '</div>';
     echo '</div>';
 }

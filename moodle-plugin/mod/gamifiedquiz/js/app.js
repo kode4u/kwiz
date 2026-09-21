@@ -217,6 +217,458 @@
         const nextBtn = document.getElementById('next-question-btn');
         const activeQuestionDisplayEl = document.getElementById('active-question-display');
         const activeQuestionDisplayTemplate = activeQuestionDisplayEl ? activeQuestionDisplayEl.innerHTML : '';
+
+        // Initialize Dedicated AI Question Generation Studio UI
+        initGenerationStudio(config);
+
+        function initGenerationStudio(config) {
+            const categorySelect = document.getElementById('studio-category-select');
+            const newCategoryWrapper = document.getElementById('studio-new-category-wrapper');
+            const newCategoryName = document.getElementById('studio-new-category-name');
+
+            const quizSelect = document.getElementById('studio-quiz-select');
+            const newQuizWrapper = document.getElementById('studio-new-quiz-wrapper');
+            const newQuizName = document.getElementById('studio-new-quiz-name');
+
+            const ragSelect = document.getElementById('studio-rag-source');
+            const topicInput = document.getElementById('studio-topic-input');
+            const countSelect = document.getElementById('studio-count-select');
+            const difficultySelect = document.getElementById('studio-difficulty-select');
+            const languageSelect = document.getElementById('studio-language-select');
+            const toggleCustomBtn = document.getElementById('studio-toggle-custom-content');
+            const customContentWrapper = document.getElementById('studio-custom-content-wrapper');
+            const customContentInput = document.getElementById('studio-custom-content');
+
+            const studioGenerateBtn = document.getElementById('studio-generate-btn');
+            const progressBox = document.getElementById('studio-progress-box');
+            const progressTitle = document.getElementById('studio-progress-title');
+            const progressTimer = document.getElementById('studio-progress-timer');
+            const progressPercent = document.getElementById('studio-progress-percent');
+            const progressBar = document.getElementById('studio-progress-bar');
+            const progressStatus = document.getElementById('studio-progress-status');
+            const toggleLogBtn = document.getElementById('studio-toggle-log-btn');
+            const logConsole = document.getElementById('studio-log-console');
+
+            const previewSection = document.getElementById('studio-preview-section');
+            const previewCount = document.getElementById('studio-preview-count');
+            const questionsList = document.getElementById('studio-questions-list');
+            const pushBtn = document.getElementById('studio-push-btn');
+            const pushBtnBottom = document.getElementById('studio-push-btn-bottom');
+            const discardBtn = document.getElementById('studio-discard-btn');
+
+            const successBox = document.getElementById('studio-success-box');
+            const successMsg = document.getElementById('studio-success-message');
+            const successQuizLink = document.getElementById('studio-success-quiz-link');
+            const successEditLink = document.getElementById('studio-success-edit-link');
+            const successQbankLink = document.getElementById('studio-success-qbank-link');
+
+            const headerOpenQuiz = document.getElementById('header-open-quiz-btn');
+            const headerManageQuiz = document.getElementById('header-manage-quiz-btn');
+
+            if (!studioGenerateBtn) return;
+
+            let studioQuestions = [];
+            let timerInterval = null;
+            let elapsedSeconds = 0;
+
+            function appendStudioLog(msg) {
+                if (!logConsole) return;
+                const now = new Date().toLocaleTimeString();
+                logConsole.textContent += `[${now}] ${msg}\n`;
+                logConsole.scrollTop = logConsole.scrollHeight;
+            }
+
+            // Toggle Category Input
+            if (categorySelect && newCategoryWrapper) {
+                categorySelect.addEventListener('change', () => {
+                    if (categorySelect.value === '__new__') {
+                        newCategoryWrapper.style.display = 'block';
+                        if (newCategoryName) newCategoryName.focus();
+                    } else {
+                        newCategoryWrapper.style.display = 'none';
+                    }
+                });
+            }
+
+            // Toggle Quiz Input & Update Links
+            if (quizSelect && newQuizWrapper) {
+                quizSelect.addEventListener('change', () => {
+                    if (quizSelect.value === '__new__') {
+                        newQuizWrapper.style.display = 'block';
+                        if (newQuizName) newQuizName.focus();
+                    } else {
+                        newQuizWrapper.style.display = 'none';
+                        const selectedOpt = quizSelect.options[quizSelect.selectedIndex];
+                        const cmid = selectedOpt ? selectedOpt.getAttribute('data-cmid') : null;
+                        if (cmid) {
+                            if (headerOpenQuiz) headerOpenQuiz.href = `${config.wwwroot}/mod/quiz/view.php?id=${cmid}`;
+                            if (headerManageQuiz) headerManageQuiz.href = `${config.wwwroot}/mod/quiz/edit.php?cmid=${cmid}`;
+                            if (successQuizLink) successQuizLink.href = `${config.wwwroot}/mod/quiz/view.php?id=${cmid}`;
+                            if (successEditLink) successEditLink.href = `${config.wwwroot}/mod/quiz/edit.php?cmid=${cmid}`;
+                        }
+                    }
+                });
+            }
+
+            // Toggle Custom Content
+            if (toggleCustomBtn && customContentWrapper) {
+                toggleCustomBtn.addEventListener('click', () => {
+                    const isHidden = customContentWrapper.style.display === 'none';
+                    customContentWrapper.style.display = isHidden ? 'block' : 'none';
+                    toggleCustomBtn.textContent = isHidden ? '▼ Hide Custom Content' : '▶ Add Custom Code Snippet or Syllabus Notes (Optional)';
+                });
+            }
+
+            // Toggle Log Console
+            if (toggleLogBtn && logConsole) {
+                toggleLogBtn.addEventListener('click', () => {
+                    const isHidden = logConsole.style.display === 'none';
+                    logConsole.style.display = isHidden ? 'block' : 'none';
+                    toggleLogBtn.textContent = isHidden ? 'Hide Logs' : 'Show Logs';
+                });
+            }
+
+            function escapeHtml(str) {
+                if (!str || typeof str !== 'string') return '';
+                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            }
+
+            // Render Question Cards
+            function renderPreviewCards() {
+                if (!questionsList) return;
+                questionsList.innerHTML = '';
+                if (previewCount) previewCount.textContent = studioQuestions.length;
+
+                if (studioQuestions.length === 0) {
+                    if (previewSection) previewSection.style.display = 'none';
+                    return;
+                }
+
+                studioQuestions.forEach((q, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'card mb-3 border-0 shadow-sm';
+                    card.style.cssText = 'border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff; overflow: hidden; margin-bottom: 16px;';
+
+                    let rawQ = q.question || q.question_text || q.prompt || '';
+                    rawQ = window.decodeUnicodeEscapes ? window.decodeUnicodeEscapes(rawQ) : rawQ;
+
+                    let codeSnippetHtml = '';
+                    if (q.code_snippet) {
+                        codeSnippetHtml = `<div style="margin: 10px 0;"><pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.88rem; overflow-x: auto; margin: 0;"><code>${escapeHtml(q.code_snippet)}</code></pre></div>`;
+                    } else if (rawQ.includes('```')) {
+                        const parts = rawQ.split(/(```[\s\S]*?```)/g);
+                        let formattedParts = parts.map(p => {
+                            if (p.startsWith('```')) {
+                                const code = p.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
+                                return `<pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.88rem; overflow-x: auto; margin: 8px 0;"><code>${escapeHtml(code)}</code></pre>`;
+                            }
+                            return escapeHtml(p);
+                        });
+                        rawQ = formattedParts.join('');
+                    } else {
+                        rawQ = escapeHtml(rawQ);
+                    }
+
+                    const diffBadge = `<span class="badge" style="background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem;">${escapeHtml(q.difficulty || 'medium')}</span>`;
+                    const bloomBadge = q.bloom_level ? `<span class="badge" style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem;">${escapeHtml(q.bloom_level)}</span>` : '';
+                    const astBadge = `<span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 600;">✓ AST Verified</span>`;
+
+                    let choices = q.choices || q.options || [];
+                    if (typeof choices === 'string') {
+                        try { choices = JSON.parse(choices); } catch (e) { choices = []; }
+                    }
+
+                    let correctIdx = q.correct_index;
+                    if (correctIdx === undefined || correctIdx === null) {
+                        correctIdx = choices.findIndex(c => (typeof c === 'object' && c.is_correct) || (c && c.text && c.is_correct));
+                    }
+
+                    let choicesHtml = '';
+                    choices.forEach((choice, cIdx) => {
+                        const choiceText = (typeof choice === 'object' ? (choice.text || '') : choice) || '';
+                        const decodedText = window.decodeUnicodeEscapes ? window.decodeUnicodeEscapes(choiceText) : choiceText;
+                        const isCorrect = (cIdx === correctIdx) || (typeof choice === 'object' && Boolean(choice.is_correct));
+                        const letter = String.fromCharCode(65 + cIdx);
+
+                        if (isCorrect) {
+                            choicesHtml += `
+                                <div style="background: #f0fdf4; border: 1.5px solid #22c55e; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="background: #16a34a; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">${letter}</span>
+                                        <span style="font-size: 0.95rem; font-weight: 600; color: #14532d;">${escapeHtml(decodedText)}</span>
+                                    </div>
+                                    <span class="badge" style="background: #16a34a; color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">✓ Correct Answer</span>
+                                </div>
+                            `;
+                        } else {
+                            choicesHtml += `
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="background: #cbd5e1; color: #334155; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">${letter}</span>
+                                        <span style="font-size: 0.95rem; color: #334155;">${escapeHtml(decodedText)}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+
+                    let explHtml = '';
+                    if (q.explanation) {
+                        const decExpl = window.decodeUnicodeEscapes ? window.decodeUnicodeEscapes(q.explanation) : q.explanation;
+                        explHtml = `
+                            <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; color: #475569; margin-top: 10px;">
+                                <strong>Explanation:</strong> ${escapeHtml(decExpl)}
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <div style="padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <span style="font-weight: 700; color: #1e293b; font-size: 1rem;">Question ${idx + 1}</span>
+                                ${diffBadge}
+                                ${bloomBadge}
+                                ${astBadge}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger studio-delete-q-btn" data-index="${idx}" style="font-size: 0.78rem; padding: 3px 8px; border-radius: 4px;">✕ Remove</button>
+                        </div>
+                        <div style="padding: 16px 20px;">
+                            <div style="font-size: 1rem; color: #1e293b; font-weight: 600; margin-bottom: 12px; line-height: 1.5;">${rawQ}</div>
+                            ${codeSnippetHtml}
+                            <div style="margin-top: 12px;">${choicesHtml}</div>
+                            ${explHtml}
+                        </div>
+                    `;
+
+                    questionsList.appendChild(card);
+                });
+
+                document.querySelectorAll('.studio-delete-q-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const delIdx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
+                        studioQuestions.splice(delIdx, 1);
+                        renderPreviewCards();
+                    });
+                });
+            }
+
+            // Generate Button Click Handler
+            studioGenerateBtn.addEventListener('click', async () => {
+                const catVal = categorySelect ? categorySelect.value : '';
+                const catName = (catVal === '__new__' && newCategoryName) ? newCategoryName.value.trim() : '';
+                const quizVal = quizSelect ? quizSelect.value : '';
+                const quizName = (quizVal === '__new__' && newQuizName) ? newQuizName.value.trim() : '';
+
+                if (catVal === '__new__' && !catName) {
+                    alert('Please enter a name for the new Question Bank category.');
+                    if (newCategoryName) newCategoryName.focus();
+                    return;
+                }
+
+                if (quizVal === '__new__' && !quizName) {
+                    alert('Please enter a name for the new standard quiz.');
+                    if (newQuizName) newQuizName.focus();
+                    return;
+                }
+
+                const topic = topicInput ? topicInput.value.trim() : '';
+                const ragSource = ragSelect ? ragSelect.value : '';
+                const count = countSelect ? parseInt(countSelect.value, 10) : 5;
+                const difficulty = difficultySelect ? difficultySelect.value : 'medium';
+                const language = languageSelect ? languageSelect.value : 'en';
+                const customContent = customContentInput ? customContentInput.value.trim() : '';
+
+                if (!topic && !ragSource && !customContent) {
+                    alert('Please specify a topic or select a course material RAG source.');
+                    if (topicInput) topicInput.focus();
+                    return;
+                }
+
+                if (previewSection) previewSection.style.display = 'none';
+                if (successBox) successBox.style.display = 'none';
+                if (progressBox) progressBox.style.display = 'block';
+
+                if (progressBar) progressBar.style.width = '10%';
+                if (progressPercent) progressPercent.textContent = '10%';
+                if (progressStatus) progressStatus.textContent = 'Initializing pipeline & retrieving course materials...';
+                if (progressTimer) progressTimer.textContent = 'Elapsed: 00:00';
+                elapsedSeconds = 0;
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    elapsedSeconds++;
+                    const mm = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+                    const ss = String(elapsedSeconds % 60).padStart(2, '0');
+                    if (progressTimer) progressTimer.textContent = `Elapsed: ${mm}:${ss}`;
+
+                    if (elapsedSeconds === 2) {
+                        if (progressBar) progressBar.style.width = '30%';
+                        if (progressPercent) progressPercent.textContent = '30%';
+                        if (progressStatus) progressStatus.textContent = 'Connecting to local LLM (Qwen2.5-Coder-7B)...';
+                    } else if (elapsedSeconds === 4) {
+                        if (progressBar) progressBar.style.width = '60%';
+                        if (progressPercent) progressPercent.textContent = '60%';
+                        if (progressStatus) progressStatus.textContent = 'Synthesizing programming questions & distractor analysis...';
+                    } else if (elapsedSeconds === 7) {
+                        if (progressBar) progressBar.style.width = '85%';
+                        if (progressPercent) progressPercent.textContent = '85%';
+                        if (progressStatus) progressStatus.textContent = 'Performing Python AST syntax & output verification...';
+                    }
+                }, 1000);
+
+                appendStudioLog(`🚀 Starting generation for topic: "${topic || 'Course Context'}"`);
+                appendStudioLog(`   Target Category: ${catName || catVal}`);
+                appendStudioLog(`   Target Quiz: ${quizName || quizVal}`);
+                appendStudioLog(`   Parameters: count=${count}, difficulty=${difficulty}, language=${language}`);
+
+                try {
+                    studioGenerateBtn.disabled = true;
+                    const params = new URLSearchParams();
+                    params.append('quizid', config.quizId);
+                    params.append('cmid', config.cmId || 0);
+                    params.append('prompt', topic);
+                    params.append('data', customContent);
+                    params.append('rag_source', ragSource);
+                    params.append('difficulty', difficulty);
+                    params.append('count', count);
+                    params.append('async', 0);
+                    params.append('category_id', catVal === '__new__' ? 0 : catVal);
+                    params.append('category_name', catVal === '__new__' ? catName : '');
+                    params.append('standard_quiz_id', quizVal === '__new__' ? 0 : quizVal);
+                    params.append('new_quiz_name', quizVal === '__new__' ? quizName : '');
+
+                    const url = `${config.wwwroot}/mod/gamifiedquiz/ajax/generate.php`;
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: params.toString()
+                    });
+
+                    clearInterval(timerInterval);
+
+                    const result = await resp.json();
+                    if (!result.success) {
+                        throw new Error(result.error || 'Generation failed.');
+                    }
+
+                    if (progressBar) progressBar.style.width = '100%';
+                    if (progressPercent) progressPercent.textContent = '100%';
+                    if (progressStatus) progressStatus.textContent = `Completed in ${elapsedSeconds}s!`;
+
+                    const iterNum = result.iteration_number || 0;
+                    const iterMsg = iterNum > 0 ? ` [Iteration #${iterNum}]` : '';
+                    appendStudioLog(`✔ Successfully generated ${result.questions ? result.questions.length : 0} questions${iterMsg}.`);
+                    if (iterNum > 0) {
+                        appendStudioLog(`  📊 Telemetry recorded in Evaluation Dashboard: http://localhost:5001/dashboard`);
+                    }
+
+                    setTimeout(() => {
+                        if (progressBox) progressBox.style.display = 'none';
+                        studioQuestions = result.questions || [];
+
+                        const iterBadge = document.getElementById('studio-iteration-badge');
+                        const iterDashBtn = document.getElementById('studio-iteration-dashboard-btn');
+                        if (iterBadge && iterNum > 0) {
+                            iterBadge.textContent = `Iteration #${iterNum}`;
+                            iterBadge.style.display = 'inline-block';
+                        }
+                        if (iterDashBtn && iterNum > 0) {
+                            iterDashBtn.style.display = 'inline-block';
+                        }
+
+                        renderPreviewCards();
+                        if (previewSection) {
+                            previewSection.style.display = 'block';
+                            previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 600);
+
+                } catch (err) {
+                    clearInterval(timerInterval);
+                    if (progressStatus) progressStatus.textContent = `Error: ${err.message}`;
+                    appendStudioLog(`❌ Generation error: ${err.message}`);
+                    alert(`Generation Error: ${err.message}`);
+                } finally {
+                    studioGenerateBtn.disabled = false;
+                }
+            });
+
+            // Push Button Handler (Top & Bottom)
+            async function handlePush() {
+                if (studioQuestions.length === 0) {
+                    alert('No questions to save.');
+                    return;
+                }
+
+                const catVal = categorySelect ? categorySelect.value : '';
+                const catName = (catVal === '__new__' && newCategoryName) ? newCategoryName.value.trim() : '';
+                const quizVal = quizSelect ? quizSelect.value : '';
+                const quizName = (quizVal === '__new__' && newQuizName) ? newQuizName.value.trim() : '';
+
+                const origPushText = pushBtn ? pushBtn.innerHTML : '';
+                if (pushBtn) { pushBtn.disabled = true; pushBtn.innerHTML = '⏳ Saving...'; }
+                if (pushBtnBottom) { pushBtnBottom.disabled = true; pushBtnBottom.innerHTML = '⏳ Saving...'; }
+
+                try {
+                    const body = new URLSearchParams();
+                    body.append('quizid', config.quizId);
+                    body.append('cmid', config.cmId || 0);
+                    body.append('sesskey', config.sesskey);
+                    body.append('category_id', catVal === '__new__' ? 0 : catVal);
+                    body.append('category_name', catVal === '__new__' ? catName : '');
+                    body.append('standard_quiz_id', quizVal === '__new__' ? 0 : quizVal);
+                    body.append('new_quiz_name', quizVal === '__new__' ? quizName : '');
+                    body.append('questions', JSON.stringify(studioQuestions));
+
+                    const saveUrl = `${config.wwwroot}/mod/gamifiedquiz/ajax/save_questions.php`;
+                    const resp = await fetch(saveUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: body.toString()
+                    });
+
+                    const res = await resp.json();
+                    if (!res.success) {
+                        throw new Error(res.error || 'Failed to save questions.');
+                    }
+
+                    if (previewSection) previewSection.style.display = 'none';
+                    if (successBox) successBox.style.display = 'block';
+
+                    if (successMsg) {
+                        successMsg.textContent = `Successfully saved ${studioQuestions.length} questions into Question Bank and linked to standard Quiz. All question grades and sumgrades have been recomputed. Students can attempt the quiz immediately without grade mismatch errors!`;
+                    }
+
+                    if (res.quiz_url && successQuizLink) {
+                        successQuizLink.href = res.quiz_url;
+                        if (headerOpenQuiz) headerOpenQuiz.href = res.quiz_url;
+                    }
+                    if (res.quiz_cmid && successEditLink) {
+                        successEditLink.href = `${config.wwwroot}/mod/quiz/edit.php?cmid=${res.quiz_cmid}`;
+                        if (headerManageQuiz) headerManageQuiz.href = `${config.wwwroot}/mod/quiz/edit.php?cmid=${res.quiz_cmid}`;
+                    }
+
+                    successBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (err) {
+                    alert(`Error saving questions: ${err.message}`);
+                } finally {
+                    if (pushBtn) { pushBtn.disabled = false; pushBtn.innerHTML = origPushText; }
+                    if (pushBtnBottom) { pushBtnBottom.disabled = false; pushBtnBottom.innerHTML = origPushText; }
+                }
+            }
+
+            if (pushBtn) pushBtn.addEventListener('click', handlePush);
+            if (pushBtnBottom) pushBtnBottom.addEventListener('click', handlePush);
+
+            if (discardBtn) {
+                discardBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to discard these generated questions?')) {
+                        studioQuestions = [];
+                        if (previewSection) previewSection.style.display = 'none';
+                    }
+                });
+            }
+        }
         
         // Function to load scores from database and update leaderboard
         async function loadSessionScores(sessionId) {
@@ -1032,7 +1484,7 @@
             questions = allQuestions;
             window.currentQuestions = questions;
             if (startBtn) {
-                startBtn.disabled = allQuestions.length > 0;
+                startBtn.disabled = allQuestions.length === 0;
             }
             currentQuestionIndex = 0;
 
@@ -1040,7 +1492,17 @@
             if (statusEl) {
                 statusEl.style.display = 'block';
                 if (allQuestions.length > 0) {
-                    statusEl.textContent = `Generated ${allQuestions.length} questions from ${categoriesCount} categories. Ready to start session.`;
+                    const quizUrl = config.standardQuizUrl || `${config.wwwroot}/mod/quiz/view.php?id=${config.standardQuizCmId}`;
+                    const qbankUrl = config.questionBankUrl || `${config.wwwroot}/question/edit.php?courseid=${config.courseId}`;
+                    statusEl.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div><strong>✅ Success:</strong> Generated and persisted <strong>${allQuestions.length}</strong> questions across <strong>${categoriesCount}</strong> category(ies) into Moodle Question Bank and Course Quiz.</div>
+                            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                                <a href="${quizUrl}" class="btn btn-sm btn-primary" target="_blank" style="text-decoration: none; font-weight: 600;">📝 Open Standard Quiz</a>
+                                <a href="${qbankUrl}" class="btn btn-sm btn-secondary" target="_blank" style="text-decoration: none;">📚 View Question Bank</a>
+                            </div>
+                        </div>
+                    `;
                     statusEl.style.background = '#d4edda';
                     statusEl.style.borderColor = '#28a745';
                 } else {

@@ -34,6 +34,10 @@ def detect_language(code_block_lang: str, topic: str) -> str:
 
 def validate_python(code: str) -> tuple[bool, str]:
     try:
+        # 1. Parse AST to verify abstract syntax tree integrity
+        tree = ast.parse(code)
+        _ = sum(1 for _ in ast.walk(tree))
+        # 2. Bytecode compile
         compile(code, '<string>', 'exec')
         return True, ""
     except SyntaxError as e:

@@ -1,0 +1,2702 @@
+[
+  {
+    "question": "What is the output of the following Python snippet?\n```python\na = [1, 2, 3]\nb = a\nb.append(4)\nprint(len(a))\n```",
+    "choices": [
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "Error",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "easy",
+    "bloom_level": "Understand",
+    "explanation": "Variables `a` and `b` reference the same mutable list object in memory.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "What is the resulting type of `x = 5 / 2` in Python 3?\n```python\nx = 5 / 2\nprint(type(x))\n```",
+    "choices": [
+      {
+        "text": "<class 'int'>",
+        "is_correct": false
+      },
+      {
+        "text": "<class 'float'>",
+        "is_correct": true
+      },
+      {
+        "text": "<class 'double'>",
+        "is_correct": false
+      },
+      {
+        "text": "<class 'number'>",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "easy",
+    "bloom_level": "Remember",
+    "explanation": "True division `/` in Python 3 always yields a float.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "question": "What does the following condition evaluate to?\n```python\nx = [0]\nif x:\n    res = 'Non-empty'\nelse:\n    res = 'Empty'\nprint(res)\n```",
+    "choices": [
+      {
+        "text": "Empty",
+        "is_correct": false
+      },
+      {
+        "text": "Non-empty",
+        "is_correct": true
+      },
+      {
+        "text": "TypeError",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "bloom_level": "Analyze",
+    "explanation": "A list containing an element `[0]` has length 1 and is truthy, even though 0 itself is falsy.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "question": "What is the danger of using a mutable default argument in Python?\n```python\ndef add_item(item, target=[]):\n    target.append(item)\n    return target\n```",
+    "choices": [
+      {
+        "text": "The default list is instantiated once at definition time and shared across subsequent calls.",
+        "is_correct": true
+      },
+      {
+        "text": "It throws a SyntaxError during bytecode compilation.",
+        "is_correct": false
+      },
+      {
+        "text": "Python deletes the argument after the first invocation.",
+        "is_correct": false
+      },
+      {
+        "text": "It forces target to become immutable.",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "hard",
+    "bloom_level": "Evaluate",
+    "explanation": "Default argument expressions are evaluated once when the function definition is executed.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "question": "What is the output of the following slicing expression?\n```python\nnums = [10, 20, 30, 40, 50]\nprint(nums[1:4:2])\n```",
+    "choices": [
+      {
+        "text": "[20, 40]",
+        "is_correct": true
+      },
+      {
+        "text": "[10, 30]",
+        "is_correct": false
+      },
+      {
+        "text": "[20, 30, 40]",
+        "is_correct": false
+      },
+      {
+        "text": "[30, 50]",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Index 1 is 20, with step 2 the next is index 3 (40); index 4 is excluded.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "question": "Which of the following objects CANNOT be used as a dictionary key in Python?\n```python\n# Attempting dictionary key assignments\n```",
+    "choices": [
+      {
+        "text": "(1, 2, 3)",
+        "is_correct": false
+      },
+      {
+        "text": "'python'",
+        "is_correct": false
+      },
+      {
+        "text": "[1, 2, 3]",
+        "is_correct": true
+      },
+      {
+        "text": "frozenset([1, 2])",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "bloom_level": "Understand",
+    "explanation": "Lists are mutable and do not implement `__hash__`, causing a TypeError: unhashable type: 'list'.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "question": "What is printed by the following string formatting expression?\n```python\nval = 3.14159\nprint(f'{val:.2f}')\n```",
+    "choices": [
+      {
+        "text": "3.14",
+        "is_correct": true
+      },
+      {
+        "text": "3.1",
+        "is_correct": false
+      },
+      {
+        "text": "3.141",
+        "is_correct": false
+      },
+      {
+        "text": "3.142",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "easy",
+    "bloom_level": "Apply",
+    "explanation": "The format specifier `:.2f` formats the float to 2 decimal places with rounding.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "question": "Why is the `with open(...)` context manager statement preferred for file operations?\n```python\nwith open('log.txt', 'w') as f:\n    f.write('ready')\n```",
+    "choices": [
+      {
+        "text": "It guarantees that the file descriptor is closed automatically, even if exceptions occur.",
+        "is_correct": true
+      },
+      {
+        "text": "It increases disk write speed by 50%.",
+        "is_correct": false
+      },
+      {
+        "text": "It prevents any other process from reading the disk permanently.",
+        "is_correct": false
+      },
+      {
+        "text": "It automatically converts text to binary encryption.",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "easy",
+    "bloom_level": "Understand",
+    "explanation": "Context managers implement `__enter__` and `__exit__`, ensuring file streams are flushed and closed.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "question": "What does `super().__init__()` accomplish in a Python subclass?\n```python\nclass Base:\n    def __init__(self):\n        self.active = True\n\nclass Derived(Base):\n    def __init__(self):\n        super().__init__()\n        self.code = 200\n```",
+    "choices": [
+      {
+        "text": "It delegates initialization to the next class in the Method Resolution Order (MRO).",
+        "is_correct": true
+      },
+      {
+        "text": "It overrides all base methods and deletes them.",
+        "is_correct": false
+      },
+      {
+        "text": "It makes all instance attributes private.",
+        "is_correct": false
+      },
+      {
+        "text": "It forces static memory allocation for Derived.",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Analyze",
+    "explanation": "`super()` resolves the method resolution order (MRO) dynamically to invoke the parent initializer.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "question": "What is the execution order of the `finally` block in Python?\n```python\ndef test():\n    try:\n        return 1\n    finally:\n        return 2\n```",
+    "choices": [
+      {
+        "text": "The function returns 1.",
+        "is_correct": false
+      },
+      {
+        "text": "The function returns 2.",
+        "is_correct": true
+      },
+      {
+        "text": "A SyntaxError is raised.",
+        "is_correct": false
+      },
+      {
+        "text": "Both 1 and 2 are returned as a tuple.",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "hard",
+    "bloom_level": "Analyze",
+    "explanation": "The `finally` clause executes before leaving the try block; a return inside `finally` discards earlier return values.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "question": "What is the base case in the following recursive factorial implementation?\n```python\ndef fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)\n```",
+    "choices": [
+      {
+        "text": "n <= 1",
+        "is_correct": true
+      },
+      {
+        "text": "n * fact(n - 1)",
+        "is_correct": false
+      },
+      {
+        "text": "fact(n)",
+        "is_correct": false
+      },
+      {
+        "text": "There is no base case.",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "easy",
+    "bloom_level": "Remember",
+    "explanation": "The base case `n <= 1` terminates recursion and avoids infinite call stack overflow.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "4",
+        "is_correct": true
+      },
+      {
+        "text": "2",
+        "is_correct": false
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "8",
+        "is_correct": true
+      },
+      {
+        "text": "4",
+        "is_correct": false
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "10",
+        "is_correct": true
+      },
+      {
+        "text": "5",
+        "is_correct": false
+      },
+      {
+        "text": "11",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "12",
+        "is_correct": true
+      },
+      {
+        "text": "6",
+        "is_correct": false
+      },
+      {
+        "text": "13",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "14",
+        "is_correct": true
+      },
+      {
+        "text": "7",
+        "is_correct": false
+      },
+      {
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "16",
+        "is_correct": true
+      },
+      {
+        "text": "8",
+        "is_correct": false
+      },
+      {
+        "text": "17",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "18",
+        "is_correct": true
+      },
+      {
+        "text": "9",
+        "is_correct": false
+      },
+      {
+        "text": "19",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  },
+  {
+    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "choices": [
+      {
+        "text": "20",
+        "is_correct": true
+      },
+      {
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "21",
+        "is_correct": false
+      },
+      {
+        "text": "None",
+        "is_correct": false
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "bloom_level": "Apply",
+    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "topic": "Recursion & Fundamental Algorithms",
+    "ast_valid": true
+  }
+]

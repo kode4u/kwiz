@@ -65,6 +65,7 @@ services:
       EVAL_OS: ${EVAL_OS:-}
     volumes:
       - ./logs:/logs
+      - ./llmapi:/app
     ports:
       - "${LLM_API_PORT:-5001}:5001"
     networks:
