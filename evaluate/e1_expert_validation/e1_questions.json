@@ -1,2701 +1,2701 @@
 [
   {
-    "question": "What is the output of the following Python snippet?\n```python\na = [1, 2, 3]\nb = a\nb.append(4)\nprint(len(a))\n```",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "3",
-        "is_correct": false
+        "is_correct": false,
+        "text": "int"
       },
       {
-        "text": "4",
-        "is_correct": true
+        "is_correct": false,
+        "text": "float"
       },
       {
-        "text": "Error",
-        "is_correct": false
+        "is_correct": true,
+        "text": "str"
       },
       {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 1,
-    "difficulty": "easy",
-    "bloom_level": "Understand",
-    "explanation": "Variables `a` and `b` reference the same mutable list object in memory.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "What is the resulting type of `x = 5 / 2` in Python 3?\n```python\nx = 5 / 2\nprint(type(x))\n```",
-    "choices": [
-      {
-        "text": "<class 'int'>",
-        "is_correct": false
-      },
-      {
-        "text": "<class 'float'>",
-        "is_correct": true
-      },
-      {
-        "text": "<class 'double'>",
-        "is_correct": false
-      },
-      {
-        "text": "<class 'number'>",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 1,
-    "difficulty": "easy",
-    "bloom_level": "Remember",
-    "explanation": "True division `/` in Python 3 always yields a float.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Variables, Data Types & Type Casting, consider the following snippet:\n```python\n# Topic: Variables, Data Types & Type Casting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Variables, Data Types & Type Casting.",
-    "topic": "Variables, Data Types & Type Casting",
-    "ast_valid": true
-  },
-  {
-    "question": "What does the following condition evaluate to?\n```python\nx = [0]\nif x:\n    res = 'Non-empty'\nelse:\n    res = 'Empty'\nprint(res)\n```",
-    "choices": [
-      {
-        "text": "Empty",
-        "is_correct": false
-      },
-      {
-        "text": "Non-empty",
-        "is_correct": true
-      },
-      {
-        "text": "TypeError",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 1,
-    "difficulty": "medium",
-    "bloom_level": "Analyze",
-    "explanation": "A list containing an element `[0]` has length 1 and is truthy, even though 0 itself is falsy.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "4",
-        "is_correct": true
-      },
-      {
-        "text": "2",
-        "is_correct": false
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Conditionals & Boolean Control Flow, consider the following snippet:\n```python\n# Topic: Conditionals & Boolean Control Flow\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Conditionals & Boolean Control Flow.",
-    "topic": "Conditionals & Boolean Control Flow",
-    "ast_valid": true
-  },
-  {
-    "question": "What is the danger of using a mutable default argument in Python?\n```python\ndef add_item(item, target=[]):\n    target.append(item)\n    return target\n```",
-    "choices": [
-      {
-        "text": "The default list is instantiated once at definition time and shared across subsequent calls.",
-        "is_correct": true
-      },
-      {
-        "text": "It throws a SyntaxError during bytecode compilation.",
-        "is_correct": false
-      },
-      {
-        "text": "Python deletes the argument after the first invocation.",
-        "is_correct": false
-      },
-      {
-        "text": "It forces target to become immutable.",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "hard",
-    "bloom_level": "Evaluate",
-    "explanation": "Default argument expressions are evaluated once when the function definition is executed.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "4",
-        "is_correct": true
-      },
-      {
-        "text": "2",
-        "is_correct": false
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Functions, Arguments & Variable Scope, consider the following snippet:\n```python\n# Topic: Functions, Arguments & Variable Scope\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Functions, Arguments & Variable Scope.",
-    "topic": "Functions, Arguments & Variable Scope",
-    "ast_valid": true
-  },
-  {
-    "question": "What is the output of the following slicing expression?\n```python\nnums = [10, 20, 30, 40, 50]\nprint(nums[1:4:2])\n```",
-    "choices": [
-      {
-        "text": "[20, 40]",
-        "is_correct": true
-      },
-      {
-        "text": "[10, 30]",
-        "is_correct": false
-      },
-      {
-        "text": "[20, 30, 40]",
-        "is_correct": false
-      },
-      {
-        "text": "[30, 50]",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Index 1 is 20, with step 2 the next is index 3 (40); index 4 is excluded.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "4",
-        "is_correct": true
-      },
-      {
-        "text": "2",
-        "is_correct": false
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Lists, Tuples & Sequence Slicing, consider the following snippet:\n```python\n# Topic: Lists, Tuples & Sequence Slicing\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Lists, Tuples & Sequence Slicing.",
-    "topic": "Lists, Tuples & Sequence Slicing",
-    "ast_valid": true
-  },
-  {
-    "question": "Which of the following objects CANNOT be used as a dictionary key in Python?\n```python\n# Attempting dictionary key assignments\n```",
-    "choices": [
-      {
-        "text": "(1, 2, 3)",
-        "is_correct": false
-      },
-      {
-        "text": "'python'",
-        "is_correct": false
-      },
-      {
-        "text": "[1, 2, 3]",
-        "is_correct": true
-      },
-      {
-        "text": "frozenset([1, 2])",
-        "is_correct": false
+        "is_correct": false,
+        "text": "bool"
       }
     ],
     "correct_index": 2,
     "difficulty": "medium",
-    "bloom_level": "Understand",
-    "explanation": "Lists are mutable and do not implement `__hash__`, causing a TypeError: unhashable type: 'list'.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
+    "explanation": "The str data type is used to represent a sequence of characters in Python.",
+    "question": "Which data type is used to represent a sequence of characters in Python?",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "4",
-        "is_correct": true
+        "is_correct": true,
+        "text": "TypeError"
       },
       {
-        "text": "2",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Concatenated String"
       },
       {
-        "text": "5",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Sum of Numbers"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "RuntimeError"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
+    "explanation": "In Python, attempting to add an integer and a string directly will raise a TypeError.",
+    "question": "What will the output be if you try to add an integer and a string directly in Python?",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "6",
-        "is_correct": true
+        "is_correct": true,
+        "text": "int()"
       },
       {
-        "text": "3",
-        "is_correct": false
+        "is_correct": false,
+        "text": "str()"
       },
       {
-        "text": "7",
-        "is_correct": false
+        "is_correct": false,
+        "text": "float()"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "bool()"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
+    "explanation": "The int() function can be used to convert a float to an integer in Python.",
+    "question": "Which method can be used to convert a float to an integer in Python?",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "8",
-        "is_correct": true
+        "is_correct": true,
+        "text": "15"
       },
       {
-        "text": "4",
-        "is_correct": false
+        "is_correct": false,
+        "text": "20"
       },
       {
-        "text": "9",
-        "is_correct": false
+        "is_correct": false,
+        "text": "10"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "error"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
+    "explanation": "The code converts the string '10' to an integer and adds it to 5, resulting in 15.",
+    "question": "What is the output of the following Python code?\n```python\nx = 5\ny = \"10\"\nz = x + int(y)\nprint(z)\n```",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "10",
-        "is_correct": true
+        "is_correct": false,
+        "text": "Python does not support type casting"
       },
       {
-        "text": "5",
-        "is_correct": false
+        "is_correct": false,
+        "text": "All variables must be explicitly declared with a data type"
       },
       {
-        "text": "11",
-        "is_correct": false
+        "is_correct": true,
+        "text": "Integer, float, and string are built-in data types in Python"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Python automatically removes unused variables"
       }
     ],
-    "correct_index": 0,
+    "correct_index": 2,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
+    "explanation": "In Python, data types are dynamically inferred and type casting is supported.",
+    "question": "Which of the following statements about data types is true?",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "12",
-        "is_correct": true
+        "is_correct": false,
+        "text": "The string will be converted to an integer"
       },
       {
-        "text": "6",
-        "is_correct": false
+        "is_correct": true,
+        "text": "An error will occur because the data types are incompatible"
       },
       {
-        "text": "13",
-        "is_correct": false
+        "is_correct": false,
+        "text": "The integer will be converted to a string"
       },
       {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Dictionaries, Sets & Hash Lookups, consider the following snippet:\n```python\n# Topic: Dictionaries, Sets & Hash Lookups\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Dictionaries, Sets & Hash Lookups.",
-    "topic": "Dictionaries, Sets & Hash Lookups",
-    "ast_valid": true
-  },
-  {
-    "question": "What is printed by the following string formatting expression?\n```python\nval = 3.14159\nprint(f'{val:.2f}')\n```",
-    "choices": [
-      {
-        "text": "3.14",
-        "is_correct": true
-      },
-      {
-        "text": "3.1",
-        "is_correct": false
-      },
-      {
-        "text": "3.141",
-        "is_correct": false
-      },
-      {
-        "text": "3.142",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "easy",
-    "bloom_level": "Apply",
-    "explanation": "The format specifier `:.2f` formats the float to 2 decimal places with rounding.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "4",
-        "is_correct": true
-      },
-      {
-        "text": "2",
-        "is_correct": false
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding String Manipulation & Formatting, consider the following snippet:\n```python\n# Topic: String Manipulation & Formatting\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of String Manipulation & Formatting.",
-    "topic": "String Manipulation & Formatting",
-    "ast_valid": true
-  },
-  {
-    "question": "Why is the `with open(...)` context manager statement preferred for file operations?\n```python\nwith open('log.txt', 'w') as f:\n    f.write('ready')\n```",
-    "choices": [
-      {
-        "text": "It guarantees that the file descriptor is closed automatically, even if exceptions occur.",
-        "is_correct": true
-      },
-      {
-        "text": "It increases disk write speed by 50%.",
-        "is_correct": false
-      },
-      {
-        "text": "It prevents any other process from reading the disk permanently.",
-        "is_correct": false
-      },
-      {
-        "text": "It automatically converts text to binary encryption.",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "easy",
-    "bloom_level": "Understand",
-    "explanation": "Context managers implement `__enter__` and `__exit__`, ensuring file streams are flushed and closed.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "4",
-        "is_correct": true
-      },
-      {
-        "text": "2",
-        "is_correct": false
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding File I/O & Context Managers, consider the following snippet:\n```python\n# Topic: File I/O & Context Managers\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of File I/O & Context Managers.",
-    "topic": "File I/O & Context Managers",
-    "ast_valid": true
-  },
-  {
-    "question": "What does `super().__init__()` accomplish in a Python subclass?\n```python\nclass Base:\n    def __init__(self):\n        self.active = True\n\nclass Derived(Base):\n    def __init__(self):\n        super().__init__()\n        self.code = 200\n```",
-    "choices": [
-      {
-        "text": "It delegates initialization to the next class in the Method Resolution Order (MRO).",
-        "is_correct": true
-      },
-      {
-        "text": "It overrides all base methods and deletes them.",
-        "is_correct": false
-      },
-      {
-        "text": "It makes all instance attributes private.",
-        "is_correct": false
-      },
-      {
-        "text": "It forces static memory allocation for Derived.",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Analyze",
-    "explanation": "`super()` resolves the method resolution order (MRO) dynamically to invoke the parent initializer.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "4",
-        "is_correct": true
-      },
-      {
-        "text": "2",
-        "is_correct": false
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "6",
-        "is_correct": true
-      },
-      {
-        "text": "3",
-        "is_correct": false
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "8",
-        "is_correct": true
-      },
-      {
-        "text": "4",
-        "is_correct": false
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "10",
-        "is_correct": true
-      },
-      {
-        "text": "5",
-        "is_correct": false
-      },
-      {
-        "text": "11",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "12",
-        "is_correct": true
-      },
-      {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "13",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "14",
-        "is_correct": true
-      },
-      {
-        "text": "7",
-        "is_correct": false
-      },
-      {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "16",
-        "is_correct": true
-      },
-      {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "17",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "18",
-        "is_correct": true
-      },
-      {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "19",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "In Python programming regarding Object-Oriented Programming & Inheritance, consider the following snippet:\n```python\n# Topic: Object-Oriented Programming & Inheritance\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
-    "choices": [
-      {
-        "text": "20",
-        "is_correct": true
-      },
-      {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "21",
-        "is_correct": false
-      },
-      {
-        "text": "None",
-        "is_correct": false
-      }
-    ],
-    "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Object-Oriented Programming & Inheritance.",
-    "topic": "Object-Oriented Programming & Inheritance",
-    "ast_valid": true
-  },
-  {
-    "question": "What is the execution order of the `finally` block in Python?\n```python\ndef test():\n    try:\n        return 1\n    finally:\n        return 2\n```",
-    "choices": [
-      {
-        "text": "The function returns 1.",
-        "is_correct": false
-      },
-      {
-        "text": "The function returns 2.",
-        "is_correct": true
-      },
-      {
-        "text": "A SyntaxError is raised.",
-        "is_correct": false
-      },
-      {
-        "text": "Both 1 and 2 are returned as a tuple.",
-        "is_correct": false
+        "is_correct": false,
+        "text": "The result will be their concatenation as strings"
       }
     ],
     "correct_index": 1,
-    "difficulty": "hard",
-    "bloom_level": "Analyze",
-    "explanation": "The `finally` clause executes before leaving the try block; a return inside `finally` discards earlier return values.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "difficulty": "medium",
+    "explanation": "In Python, you cannot add an integer and a string directly; it results in a TypeError.",
+    "question": "What will happen if you try to add an integer and a string in Python?",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "4",
-        "is_correct": true
+        "is_correct": false,
+        "text": "List"
       },
       {
-        "text": "2",
-        "is_correct": false
+        "is_correct": true,
+        "text": "Tuple"
       },
       {
-        "text": "5",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Dictionary"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Set"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Tuple is an immutable data type in Python.",
+    "question": "Which of the following data types is NOT a mutable type in Python?",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "int()"
+      },
+      {
+        "is_correct": false,
+        "text": "str()"
+      },
+      {
+        "is_correct": false,
+        "text": "float()"
+      },
+      {
+        "is_correct": false,
+        "text": "round()"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "int() is the method used to cast a string to an integer.",
+    "question": "Which method is used to cast a string to an integer in Python?",
+    "topic": "Variables, Data Types & Type Casting",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "6",
-        "is_correct": true
+        "is_correct": false,
+        "text": "5.72"
       },
       {
-        "text": "3",
-        "is_correct": false
+        "is_correct": true,
+        "text": "'5.72'"
       },
       {
-        "text": "7",
-        "is_correct": false
+        "is_correct": false,
+        "text": "TypeError"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "SyntaxError"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "When you add a string and an integer in Python, the integer is implicitly converted to a string.",
+    "question": "What will be the output of the expression `str(5.7) + '2'` in Python?",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Python does not support type casting."
+      },
+      {
+        "is_correct": false,
+        "text": "All variables in Python are statically typed."
+      },
+      {
+        "is_correct": true,
+        "text": "Python supports dynamic typing, allowing variable reassignment to different data types."
+      },
+      {
+        "is_correct": false,
+        "text": "Type casting in Python can only be done using built-in functions like int() and str()."
+      }
+    ],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "explanation": "Python is dynamically typed, meaning variables do not need to declare a type and can be reassigned to different types.",
+    "question": "Which of the following statements about data types in Python is true?",
+    "topic": "Variables, Data Types & Type Casting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "'5' == 5"
+      },
+      {
+        "is_correct": false,
+        "text": "5 != 3"
+      },
+      {
+        "is_correct": false,
+        "text": "not True"
+      },
+      {
+        "is_correct": false,
+        "text": "10 > 5"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "The string '5' is not equal to the integer 5.",
+    "question": "Which of the following conditions will evaluate to False in Python?",
+    "topic": "Conditionals & Boolean Control Flow",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "8",
-        "is_correct": true
+        "is_correct": true,
+        "text": "Condition met"
       },
       {
-        "text": "4",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Condition not met"
       },
       {
-        "text": "9",
-        "is_correct": false
+        "is_correct": false,
+        "text": "x > 10"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "y < 20"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "Both conditions in the if statement are met.",
+    "question": "What will be the output of the following code snippet? \n\n if x > 10 and y < 20:\n     print('Condition met')\n else:\n     print('Condition not met')\n\nGiven that x = 15 and y = 18.",
+    "topic": "Conditionals & Boolean Control Flow",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "10",
-        "is_correct": true
+        "is_correct": false,
+        "text": "and"
       },
       {
-        "text": "5",
-        "is_correct": false
+        "is_correct": true,
+        "text": "or"
       },
       {
-        "text": "11",
-        "is_correct": false
+        "is_correct": false,
+        "text": "not"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "xor"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The 'or' operator returns True if at least one of the operands is True.",
+    "question": "Which logical operator will result in True if at least one of two boolean expressions is True?",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "if a != b:"
+      },
+      {
+        "is_correct": false,
+        "text": "if a <> b:"
+      },
+      {
+        "is_correct": false,
+        "text": "if a is not b:"
+      },
+      {
+        "is_correct": false,
+        "text": "if a !== b:"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "In Python, the '!=' operator is used to check if two values are not equal.",
+    "question": "Which of the following is a correct way to check if two variables `a` and `b` are not equal in Python?",
+    "topic": "Conditionals & Boolean Control Flow",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "12",
-        "is_correct": true
+        "is_correct": false,
+        "text": "if"
       },
       {
-        "text": "6",
-        "is_correct": false
+        "is_correct": false,
+        "text": "elif"
       },
       {
-        "text": "13",
-        "is_correct": false
+        "is_correct": false,
+        "text": "else"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": true,
+        "text": "and"
+      }
+    ],
+    "correct_index": 3,
+    "difficulty": "medium",
+    "explanation": "The 'and' operator in Python is used within a conditional statement to ensure all conditions are met.",
+    "question": "Which conditional statement can be used in Python to execute a block of code only if all statements in the condition are true?",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "if x > 10 and < 20:"
+      },
+      {
+        "is_correct": false,
+        "text": "if (x > 10) or (x < 20):"
+      },
+      {
+        "is_correct": true,
+        "text": "if x > 10 and x < 20:"
+      },
+      {
+        "is_correct": false,
+        "text": "if x > 10 || x < 20:"
+      }
+    ],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "explanation": "In Python, the 'and' operator is used to check multiple conditions simultaneously.",
+    "question": "How can you check if the variable `x` is greater than 10 and less than 20 in Python?",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "1 == 1"
+      },
+      {
+        "is_correct": true,
+        "text": "0 == False"
+      },
+      {
+        "is_correct": false,
+        "text": "[] == []"
+      },
+      {
+        "is_correct": false,
+        "text": "'hello' != 'world'"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "0 is considered False in Python, and it can be compared directly.",
+    "question": "Which of the following conditions would evaluate to False in Python?",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Prints 'Greater than 5' if x is greater than 5, otherwise prints nothing"
+      },
+      {
+        "is_correct": true,
+        "text": "Prints 'Greater than 5' if x is greater than 5, otherwise prints '5 or less'"
+      },
+      {
+        "is_correct": false,
+        "text": "Always prints '5 or less'"
+      },
+      {
+        "is_correct": false,
+        "text": "Always prints 'Greater than 5'"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The code checks if x is greater than 5 and prints accordingly.",
+    "question": "What does the following code do?\n```python\nif x > 5:\n    print('Greater than 5')\nelse:\n    print('5 or less')\n```",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "True and False"
+      },
+      {
+        "is_correct": true,
+        "text": "not (1 == 2)"
+      },
+      {
+        "is_correct": false,
+        "text": "False or False"
+      },
+      {
+        "is_correct": false,
+        "text": "5 > 3 and 3 < 1"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The expression 'not (1 == 2)' evaluates to True.",
+    "question": "Which of the following boolean expressions evaluates to True?",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "'x is less than y'"
+      },
+      {
+        "is_correct": true,
+        "text": "'x is greater than y'"
+      },
+      {
+        "is_correct": false,
+        "text": "'x equals y'"
+      },
+      {
+        "is_correct": false,
+        "text": "None of the above"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The code checks if `x` is less than `y`. Since `x` (5) is not greater than `y` (10), the correct branch of the conditionals is executed, printing 'x is greater than y'.",
+    "question": "What will be the output of the following Python code snippet if `x` is 5 and `y` is 10?\n\n```python\nif x < y:\n    print('x is less than y')\nelif x > y:\n    print('x is greater than y')\nelse:\n    print('x equals y')\n```",
+    "topic": "Conditionals & Boolean Control Flow",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Variables defined inside a function are accessible outside the function."
+      },
+      {
+        "is_correct": true,
+        "text": "Variables defined outside any function are global and can be accessed anywhere in the code."
+      },
+      {
+        "is_correct": false,
+        "text": "Global variables cannot be modified within functions."
+      },
+      {
+        "is_correct": false,
+        "text": "Local variables from a function can be accessed by other functions."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "A variable declared outside all functions is global and accessible in every part of the code.",
+    "question": "Which of the following is true regarding variable scope in Python?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "It returns the value 8."
+      },
+      {
+        "is_correct": false,
+        "text": "It raises an error because the arguments are not integers."
+      },
+      {
+        "is_correct": false,
+        "text": "It adds the number at index 5 and 3 in a list."
+      },
+      {
+        "is_correct": false,
+        "text": "It multiplies the numbers 5 and 3."
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "The function call invokes `add_numbers` with arguments 5 and 3, expecting a return value of their sum.",
+    "question": "What does the following Python function call do? `result = add_numbers(5, 3)`",
+    "topic": "Functions, Arguments & Variable Scope",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "14",
-        "is_correct": true
+        "is_correct": false,
+        "text": "var"
       },
       {
-        "text": "7",
-        "is_correct": false
+        "is_correct": false,
+        "text": "let"
       },
       {
-        "text": "15",
-        "is_correct": false
+        "is_correct": false,
+        "text": "int"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": true,
+        "text": "def"
+      }
+    ],
+    "correct_index": 3,
+    "difficulty": "medium",
+    "explanation": "The keyword `def` is used to define a function, but to declare a local variable inside a function, you simply assign a value without any special keyword.",
+    "question": "Which keyword is used to define a new local variable inside a function?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Variables defined inside a function are accessible outside the function."
+      },
+      {
+        "is_correct": false,
+        "text": "Variables defined outside a function can be accessed inside any function."
+      },
+      {
+        "is_correct": true,
+        "text": "Variables defined inside a function have local scope and are not accessible outside the function."
+      },
+      {
+        "is_correct": false,
+        "text": "Variable scope is determined by the type of variable (e.g., global or local)."
+      }
+    ],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "explanation": "Local variables are only accessible within their defining function.",
+    "question": "Which of the following statements is true about variable scope in Python?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "20"
+      },
+      {
+        "is_correct": true,
+        "text": "15"
+      },
+      {
+        "is_correct": false,
+        "text": "10"
+      },
+      {
+        "is_correct": false,
+        "text": "Error"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The variable 'x' is defined inside the function and its value is modified, so the output is 15.",
+    "question": "What will be the output of the following Python code snippet?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Defining a function with two parameters and calling it with only one argument."
+      },
+      {
+        "is_correct": true,
+        "text": "Using default arguments to handle cases where not all arguments are provided."
+      },
+      {
+        "is_correct": false,
+        "text": "Passing mutable objects as arguments, which can change their value outside the function."
+      },
+      {
+        "is_correct": false,
+        "text": "Defining a variable inside the function and using it as an argument outside the function."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Using default arguments allows for flexibility in function calls.",
+    "question": "Which of the following scenarios demonstrates proper use of arguments in a Python function?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Arguments in functions must be passed by value"
+      },
+      {
+        "is_correct": true,
+        "text": "Default arguments can have default values that are evaluated each time the function is called"
+      },
+      {
+        "is_correct": false,
+        "text": "Keyword arguments cannot be used without a corresponding parameter name"
+      },
+      {
+        "is_correct": false,
+        "text": "Positional arguments must always follow keyword arguments in function calls"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "In Python, default arguments are evaluated once when the function is defined, not each time it's called. Keyword arguments can be used without corresponding parameter names if they are specified by name in the call.",
+    "question": "Which of the following statements is true regarding Python function arguments?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "The local variable is ignored, and the global variable is accessed"
+      },
+      {
+        "is_correct": false,
+        "text": "A new global variable is created with the same name"
+      },
+      {
+        "is_correct": true,
+        "text": "The local variable shadows the global variable"
+      },
+      {
+        "is_correct": false,
+        "text": "The function raises an error because it cannot access both variables simultaneously"
+      }
+    ],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "explanation": "In Python, if a local variable and a global variable have the same name within a function, the local variable shadows (or masks) the global one.",
+    "question": "What happens to a variable inside a function if it has the same name as a global variable?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Variables defined inside the outer function are accessible within all nested functions"
+      },
+      {
+        "is_correct": false,
+        "text": "Each nested function has its own separate namespace for variables"
+      },
+      {
+        "is_correct": false,
+        "text": "Variables defined outside all functions are globally accessible in any function"
+      },
+      {
+        "is_correct": false,
+        "text": "Only variables explicitly passed as arguments to a function are accessible within that function"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "In Python, variables defined in the outer function (enclosing scope) are accessible by all nested functions unless they have been redefined locally.",
+    "question": "Which of the following best describes the scope of a variable in a nested function?",
+    "topic": "Functions, Arguments & Variable Scope",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "16",
-        "is_correct": true
+        "is_correct": false,
+        "text": "Variables declared inside a function are accessible outside the function."
       },
       {
-        "text": "8",
-        "is_correct": false
+        "is_correct": true,
+        "text": "Variables declared inside a function are only accessible within that function."
       },
       {
-        "text": "17",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Variables can be accessed both inside and outside any function."
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "The scope of variables depends on the type of data they store."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Variable scope refers to where a variable is accessible in your code. In Python, variables declared inside a function are local and only accessible within that function.",
+    "question": "Which of the following statements is true regarding variable scope in Python functions?",
+    "topic": "Functions, Arguments & Variable Scope",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Tuples are mutable."
+      },
+      {
+        "is_correct": true,
+        "text": "Tuples can be used as dictionary keys."
+      },
+      {
+        "is_correct": false,
+        "text": "Tuples support item assignment."
+      },
+      {
+        "is_correct": false,
+        "text": "Tuples cannot contain elements of different types."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Tuples are immutable and can be used as dictionary keys.",
+    "question": "Which of the following statements about tuples in Python is correct?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "[1, 2, 3]"
+      },
+      {
+        "is_correct": false,
+        "text": "[2, 3, 4]"
+      },
+      {
+        "is_correct": false,
+        "text": "[1, 2, 3, 4]"
+      },
+      {
+        "is_correct": false,
+        "text": "[0, 1, 2, 3]"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "The slice my_list[1:4] returns elements from index 1 to 3.",
+    "question": "What will be the output of the following Python code snippet?\nmy_list = [1, 2, 3, 4, 5]\nprint(my_list[1:4])",
+    "topic": "Lists, Tuples & Sequence Slicing",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "18",
-        "is_correct": true
+        "is_correct": true,
+        "text": "my_string = \"hello world\"; print(my_string[-6:-1])"
       },
       {
-        "text": "9",
-        "is_correct": false
+        "is_correct": false,
+        "text": "my_string = \"hello world\"; print(my_string[7:])"
       },
       {
-        "text": "19",
-        "is_correct": false
+        "is_correct": false,
+        "text": "my_string = \"hello world\"; print(my_string[:5])"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "my_string = \"hello world\"; print(my_string[6:-1])"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
-    "topic": "Exception Handling & Custom Exceptions",
+    "explanation": "The slice my_string[-6:-1] extracts 'world' from the string.",
+    "question": "Which of the following slicing operations on a string will return 'world'?",
+    "topic": "Lists, Tuples & Sequence Slicing",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Exception Handling & Custom Exceptions, consider the following snippet:\n```python\n# Topic: Exception Handling & Custom Exceptions\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "20",
-        "is_correct": true
+        "is_correct": true,
+        "text": "(1, 2, 3)"
       },
       {
-        "text": "10",
-        "is_correct": false
+        "is_correct": false,
+        "text": "[1, 2, 3]"
       },
       {
-        "text": "21",
-        "is_correct": false
+        "is_correct": false,
+        "text": "{1, 2, 3}"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "<1, 2, 3>"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Exception Handling & Custom Exceptions.",
+    "explanation": "A tuple in Python is created using parentheses.",
+    "question": "Which of the following statements correctly creates a tuple in Python?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "[20, 30]"
+      },
+      {
+        "is_correct": false,
+        "text": "(20, 30)"
+      },
+      {
+        "is_correct": false,
+        "text": "{20, 30}"
+      },
+      {
+        "is_correct": false,
+        "text": "<20, 30>"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Slicing a list returns another list containing the elements from the start index (inclusive) to the end index (exclusive).",
+    "question": "What will be the output of `print(my_list[1:3])` if `my_list = [10, 20, 30, 40, 50]`?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "my_list[10:20]"
+      },
+      {
+        "is_correct": false,
+        "text": "my_tuple[:5]"
+      },
+      {
+        "is_correct": true,
+        "text": "my_string[::-3]"
+      },
+      {
+        "is_correct": false,
+        "text": "my_dict['a':'b']"
+      }
+    ],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "explanation": "Slicing with a step of -3 in a string will result in an empty sequence if the range is out of bounds.",
+    "question": "Which of the following slicing operations would return an empty sequence?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "tuple[0]"
+      },
+      {
+        "is_correct": false,
+        "text": "tuple(1)"
+      },
+      {
+        "is_correct": false,
+        "text": "tuple.get(0)"
+      },
+      {
+        "is_correct": false,
+        "text": "tuple.at(0)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "In Python, tuples use zero-based indexing, and elements can be accessed using the syntax tuple[index].",
+    "question": "Which of the following is a valid way to access the first element of a tuple in Python?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "All elements except the last two"
+      },
+      {
+        "is_correct": true,
+        "text": "The first three elements"
+      },
+      {
+        "is_correct": false,
+        "text": "The last three elements"
+      },
+      {
+        "is_correct": false,
+        "text": "An error"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Slicing from -3 to 2 includes elements at indices -3, -2, and -1 (and up to but not including index 2).",
+    "question": "What will slicing a list from index -3 to index 2 return?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "[::2]"
+      },
+      {
+        "is_correct": false,
+        "text": "[1::2]"
+      },
+      {
+        "is_correct": false,
+        "text": "[::-2]"
+      },
+      {
+        "is_correct": false,
+        "text": "[2::2]"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The slice [::2] means start at the beginning, go to the end, and step by 2 characters.",
+    "question": "Which slicing operation on a string will return every other character starting from the first?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Tuples can be sliced using both positive and negative indices."
+      },
+      {
+        "is_correct": true,
+        "text": "Slicing a tuple with start index greater than end index results in an empty tuple."
+      },
+      {
+        "is_correct": false,
+        "text": "You cannot slice tuples using step parameters."
+      },
+      {
+        "is_correct": false,
+        "text": "Tuples are mutable and can be sliced like lists."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Tuples in Python are immutable, so slicing them can still be done using start, end, and step parameters. However, if the start index is greater than the end index, an empty tuple is returned.",
+    "question": "Which of the following statements is true regarding slicing tuples in Python?",
+    "topic": "Lists, Tuples & Sequence Slicing",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Dictionaries store elements in a fixed order."
+      },
+      {
+        "is_correct": true,
+        "text": "Dictionaries are indexed by keys, not by integers."
+      },
+      {
+        "is_correct": true,
+        "text": "Dictionaries can be created using curly braces with colons separating keys and values."
+      },
+      {
+        "is_correct": true,
+        "text": "Dictionaries cannot contain duplicate keys."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Dictionaries in Python are indexed by unique keys, not integers.",
+    "question": "Which of the following statements about dictionaries in Python is true?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "O(1)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(n)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(log n)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(n^2)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Adding an element to a set in Python has an average time complexity of O(1).",
+    "question": "What is the time complexity for adding an element to a set in Python?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "get(key)"
+      },
+      {
+        "is_correct": false,
+        "text": "find(key)"
+      },
+      {
+        "is_correct": false,
+        "text": "search(key)"
+      },
+      {
+        "is_correct": false,
+        "text": "index(key)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The `get(key)` method is used to find if a key exists in a dictionary.",
+    "question": "Which of the following methods is used to find if a key exists in a dictionary?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "remove()"
+      },
+      {
+        "is_correct": false,
+        "text": "pop()"
+      },
+      {
+        "is_correct": false,
+        "text": "discard()"
+      },
+      {
+        "is_correct": false,
+        "text": "delete()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "remove() is the correct method to remove an item from a set in Python.",
+    "question": "Which of the following methods is used to remove an item from a set in Python?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "dictionary1.issubset(dictionary2)"
+      },
+      {
+        "is_correct": false,
+        "text": "dictionary1.issuperset(dictionary2)"
+      },
+      {
+        "is_correct": false,
+        "text": "dictionary1.isdisjoint(dictionary2)"
+      },
+      {
+        "is_correct": false,
+        "text": "dictionary1 == dictionary2"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "issubset() checks if all elements of one dictionary are present in another.",
+    "question": "In Python, which of the following operations checks if all elements of one dictionary are present in another?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "O(1)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(n)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(log n)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(n log n)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The average time complexity for inserting an item into a set in Python is O(1).",
+    "question": "What is the time complexity for inserting an item into a set in Python?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Sets allow for faster membership checking due to hash lookups"
+      },
+      {
+        "is_correct": false,
+        "text": "Sets maintain the insertion order of elements"
+      },
+      {
+        "is_correct": false,
+        "text": "Sets can be easily sorted"
+      },
+      {
+        "is_correct": false,
+        "text": "Sets are more memory-efficient than lists"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Sets use hash tables for storing elements, which allows for average O(1) time complexity for membership checks.",
+    "question": "Which of the following is an advantage of using sets over lists in Python?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "0"
+      },
+      {
+        "is_correct": false,
+        "text": "None"
+      },
+      {
+        "is_correct": false,
+        "text": "KeyError"
+      },
+      {
+        "is_correct": false,
+        "text": "1"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The `get` method returns the value for the specified key if it exists, otherwise, it returns the default value (0 in this case).",
+    "question": "Consider the following code snippet: \n\n`my_dict = {\"a\": 1, \"b\": 2}\nvalue = my_dict.get(\"c\", 0)`\nWhat will be the value of `value` after executing this code?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "O(1)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(n)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(log n)"
+      },
+      {
+        "is_correct": false,
+        "text": "O(n log n)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Adding an element to a set involves computing the hash of the element and inserting it into the appropriate bucket, which takes constant time on average.",
+    "question": "What is the time complexity of adding an element to a set in Python?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Looking up a value by key in a dictionary"
+      },
+      {
+        "is_correct": false,
+        "text": "Adding an element to a set"
+      },
+      {
+        "is_correct": false,
+        "text": "Removing an element from a list"
+      },
+      {
+        "is_correct": false,
+        "text": "Checking if an element exists in a tuple"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "A hash lookup in Python is performed using dictionary keys, where the key's hash value determines its position in memory for quick access.",
+    "question": "Which of the following is an example of a hash lookup in Python?",
+    "topic": "Dictionaries, Sets & Hash Lookups",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "format()"
+      },
+      {
+        "is_correct": false,
+        "text": "join()"
+      },
+      {
+        "is_correct": false,
+        "text": "replace()"
+      },
+      {
+        "is_correct": false,
+        "text": "split()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The format() method allows embedding expressions inside string literals, using curly braces {} as placeholders.",
+    "question": "Which method in Python is used to format a string and can include expressions inside curly braces?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "str.center(20)"
+      },
+      {
+        "is_correct": false,
+        "text": "str.ljust(20)"
+      },
+      {
+        "is_correct": false,
+        "text": "str.rjust(20)"
+      },
+      {
+        "is_correct": false,
+        "text": "str.zfill(20)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The center() method returns a centered string of length width.",
+    "question": "How do you center-align a string to a total width of 20 characters in Python?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "str.upper()"
+      },
+      {
+        "is_correct": false,
+        "text": "str.lower()"
+      },
+      {
+        "is_correct": false,
+        "text": "str.capitalize()"
+      },
+      {
+        "is_correct": false,
+        "text": "str.title()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The upper() method converts all lowercase letters in a string to uppercase.",
+    "question": "Which Python method converts all lowercase letters in a string to uppercase?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "format()"
+      },
+      {
+        "is_correct": false,
+        "text": "append()"
+      },
+      {
+        "is_correct": false,
+        "text": "extend()"
+      },
+      {
+        "is_correct": false,
+        "text": "insert()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "format() is the correct method for inserting variables into a string.",
+    "question": "Which Python function can be used to format a string by inserting variables into it?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "join()"
+      },
+      {
+        "is_correct": false,
+        "text": "split()"
+      },
+      {
+        "is_correct": false,
+        "text": "extend()"
+      },
+      {
+        "is_correct": false,
+        "text": "insert()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "join() is the correct method to concatenate a list of strings into a single string with spaces.",
+    "question": "How can you convert a Python list of strings into a single, space-separated string?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "It concatenates two strings."
+      },
+      {
+        "is_correct": true,
+        "text": "It formats a string with variables."
+      },
+      {
+        "is_correct": false,
+        "text": "It splits a string into a list."
+      },
+      {
+        "is_correct": false,
+        "text": "It inserts elements into a list."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The format() method is used to replace the placeholders with the provided variables.",
+    "question": "What does the following code snippet do: \"Hello, {}! Welcome to {}.\".format('Alice', 'Wonderland')?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "format()"
+      },
+      {
+        "is_correct": false,
+        "text": "concatenate() "
+      },
+      {
+        "is_correct": false,
+        "text": "join()"
+      },
+      {
+        "is_correct": false,
+        "text": "replace()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "format() is the method used to format a string with multiple variables in Python.",
+    "question": "Which method is used to format a string with multiple variables in Python?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Format strings easily"
+      },
+      {
+        "is_correct": false,
+        "text": "Read files directly"
+      },
+      {
+        "is_correct": false,
+        "text": "Sort lists "
+      },
+      {
+        "is_correct": false,
+        "text": "Import modules"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "f-strings allow you to embed expressions inside string literals, using curly braces {}.",
+    "question": "What does the 'f-string' feature in Python allow you to do?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "capitalize()"
+      },
+      {
+        "is_correct": false,
+        "text": "upper() "
+      },
+      {
+        "is_correct": false,
+        "text": "lower()"
+      },
+      {
+        "is_correct": false,
+        "text": "swapcase()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The 'capitalize()' method in Python capitalizes the first letter of a string.",
+    "question": "Which method can be used to capitalize the first letter of a string in Python?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "format()"
+      },
+      {
+        "is_correct": false,
+        "text": "replace()"
+      },
+      {
+        "is_correct": false,
+        "text": "join()"
+      },
+      {
+        "is_correct": false,
+        "text": "split()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The 'format()' method is used to format strings by replacing placeholders with values.",
+    "question": "Which method in Python is used to format a string by replacing placeholders with values?",
+    "topic": "String Manipulation & Formatting",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "with open('file.txt', 'r') as file: content = file.read()"
+      },
+      {
+        "is_correct": false,
+        "text": "open('file.txt', 'r').read() as content"
+      },
+      {
+        "is_correct": false,
+        "text": "file.open('file.txt', 'r') as content"
+      },
+      {
+        "is_correct": false,
+        "text": "with file.open('file.txt', 'r') as content: read_file = content.read()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Using the `with` statement correctly ensures that the file is properly closed after its suite finishes, even if an exception is raised on the way.",
+    "question": "Which of the following is a correct way to open and read a file using a context manager in Python?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "It allows you to write to and read from files without worrying about closing them manually"
+      },
+      {
+        "is_correct": false,
+        "text": "It automatically writes changes to the disk when the file is closed"
+      },
+      {
+        "is_correct": false,
+        "text": "It helps in managing memory usage by freeing it up after the file operations are done"
+      },
+      {
+        "is_correct": false,
+        "text": "It ensures that all data is deleted from the file system"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Context managers handle resource management, especially with files, ensuring they are properly closed after their suite finishes.",
+    "question": "What does using a context manager with a file do?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "It guarantees that all data written to a file is immediately visible on disk"
+      },
+      {
+        "is_correct": true,
+        "text": "It automatically handles file closing, even if exceptions are raised within the block"
+      },
+      {
+        "is_correct": false,
+        "text": "It speeds up file operations by keeping them open for extended periods"
+      },
+      {
+        "is_correct": false,
+        "text": "It reduces the need to manually handle file permissions"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Context managers automatically manage the opening and closing of files, ensuring proper resource management and preventing potential resource leaks.",
+    "question": "Which of the following is an advantage of using context managers in file operations?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "with open('file.txt', 'r') as f:"
+      },
+      {
+        "is_correct": false,
+        "text": "open('file.txt', 'r') as f:"
+      },
+      {
+        "is_correct": false,
+        "text": "f = open('file.txt', 'r'); with f:"
+      },
+      {
+        "is_correct": false,
+        "text": "with f = open('file.txt', 'r')"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The correct way to use a context manager for file I/O is by using the 'with' statement followed by the open function.",
+    "question": "Which of the following is the correct way to open a file in read mode using a context manager?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "The program will crash."
+      },
+      {
+        "is_correct": true,
+        "text": "The file descriptor may be leaked."
+      },
+      {
+        "is_correct": false,
+        "text": "The content of the file will be lost."
+      },
+      {
+        "is_correct": false,
+        "text": "All resources associated with the file will be freed immediately."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Not closing a file after reading its contents can lead to resource leaks, which might cause performance issues or even crashes in the long run.",
+    "question": "What will happen if you do not explicitly close a file after reading its contents?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "read()"
+      },
+      {
+        "is_correct": false,
+        "text": "readline()"
+      },
+      {
+        "is_correct": false,
+        "text": "write()"
+      },
+      {
+        "is_correct": false,
+        "text": "append()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The read() method of a file object is used to read the entire content of the file at once.",
+    "question": "Which method of a file object is used to read the entire content of a file?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "with open()"
+      },
+      {
+        "is_correct": false,
+        "text": "open()"
+      },
+      {
+        "is_correct": false,
+        "text": "try-finally"
+      },
+      {
+        "is_correct": false,
+        "text": "while loop"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The 'with open()' statement is a context manager that handles file operations and ensures the file is closed after the block of code is executed.",
+    "question": "Which Python context manager is used to handle file operations and ensures that files are properly closed after their suite finishes?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Reads and prints the content of 'example.txt'"
+      },
+      {
+        "is_correct": false,
+        "text": "Writes 'content' to a new file"
+      },
+      {
+        "is_correct": false,
+        "text": "Deletes 'example.txt'"
+      },
+      {
+        "is_correct": false,
+        "text": "Checks if 'example.txt' exists"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The code reads the content of 'example.txt' and prints it. The 'with' statement ensures that the file is closed after reading.",
+    "question": "What does the following code snippet achieve?\nwith open('example.txt', 'r') as file:\n    content = file.read()\nprint(content)",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "write()"
+      },
+      {
+        "is_correct": false,
+        "text": "read()"
+      },
+      {
+        "is_correct": false,
+        "text": "append()"
+      },
+      {
+        "is_correct": false,
+        "text": "delete()"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The 'write()' method is used to write data to a file when using context managers with the 'open()' function in write mode ('w').",
+    "question": "Which method is used to write data to a file in Python using context managers?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "with open('file.txt', 'r') as f: content = f.read()"
+      },
+      {
+        "is_correct": false,
+        "text": "f = open('file.txt', 'r'); content = f.read(); f.close()"
+      },
+      {
+        "is_correct": false,
+        "text": "try: with open('file.txt', 'r') as f: content = f.read() except IOError: print('Error reading file')"
+      },
+      {
+        "is_correct": false,
+        "text": "with open('file.txt', 'w') as f: f.write(content)"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "A context manager automatically handles the opening and closing of a file, ensuring that resources are properly managed.",
+    "question": "Which of the following statements correctly demonstrates the use of a context manager to open and read from a file?",
+    "topic": "File I/O & Context Managers",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Inheritance allows a class to inherit methods and properties from another class."
+      },
+      {
+        "is_correct": false,
+        "text": "Inheritance enables a class to share its methods but not its properties."
+      },
+      {
+        "is_correct": false,
+        "text": "Inheritance is used for code duplication."
+      },
+      {
+        "is_correct": false,
+        "text": "Inheritance creates a parent-child relationship between two unrelated classes."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Inheritance in Python is a mechanism where one class can inherit attributes and methods from another, forming a parent-child relationship.",
+    "question": "Which of the following statements correctly describes inheritance in Python?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "'Parent'"
+      },
+      {
+        "is_correct": false,
+        "text": "'Child'"
+      },
+      {
+        "is_correct": false,
+        "text": "'Error: method not defined'"
+      },
+      {
+        "is_correct": false,
+        "text": "Nothing will be printed"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Since Child inherits from Parent, calling `child_instance.display()` will execute the method defined in the Parent class.",
+    "question": "Consider the following code snippet. What will be the output of calling `child_instance.display()`?\n\n```python\nclass Parent:\n    def display(self):\n        print('Parent')\nclass Child(Parent):\n    pass\nchild_instance = Child()\n```",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "The ability of an object to take on many forms."
+      },
+      {
+        "is_correct": false,
+        "text": "The ability of a single object to change its behavior."
+      },
+      {
+        "is_correct": false,
+        "text": "The mechanism of reusing code by creating new classes."
+      },
+      {
+        "is_correct": false,
+        "text": "The process of defining the same method in different classes with no relation between them."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Polymorphism allows objects to be treated as instances of their parent class, enabling method calls to exhibit different behaviors based on the object's actual type.",
+    "question": "Which of the following best describes polymorphism in object-oriented programming?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "A way to create a new class from an existing one, inheriting its attributes and methods."
+      },
+      {
+        "is_correct": false,
+        "text": "A way to copy code between different parts of a program."
+      },
+      {
+        "is_correct": false,
+        "text": "A way to remove code from an existing class."
+      },
+      {
+        "is_correct": false,
+        "text": "A way to change the behavior of an existing class without modifying its source code."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Inheritance allows a new class (derived or child class) to inherit attributes and methods from an existing class (base or parent class).",
+    "question": "Which of the following best describes inheritance in object-oriented programming?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Error: 'B' object has no attribute 'x'"
+      },
+      {
+        "is_correct": true,
+        "text": "10"
+      },
+      {
+        "is_correct": false,
+        "text": "20"
+      },
+      {
+        "is_correct": false,
+        "text": "30"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "The method call `obj.x()` first attempts to access the attribute 'x' in class 'B'. Since it's not found there, Python looks up the inheritance chain and finds 'x' in class 'A', returning its value 10.",
+    "question": "What will be the output of the following Python code if executed?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "extends"
+      },
+      {
+        "is_correct": false,
+        "text": "inherits"
+      },
+      {
+        "is_correct": false,
+        "text": "super"
+      },
+      {
+        "is_correct": true,
+        "text": "class"
+      }
+    ],
+    "correct_index": 3,
+    "difficulty": "medium",
+    "explanation": "In Python, the keyword 'class' followed by the class name and parentheses containing the base class name is used to create a new class that inherits from an existing class.",
+    "question": "Which keyword is used in Python to indicate that a class should inherit from another class?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Inheritance allows a class to inherit attributes and methods from another class."
+      },
+      {
+        "is_correct": false,
+        "text": "A class can only inherit from one parent class in Python."
+      },
+      {
+        "is_correct": false,
+        "text": "Python does not support multiple inheritance."
+      },
+      {
+        "is_correct": false,
+        "text": "Inheritance is used to create new classes based on existing ones, but it cannot be reversed."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Python supports inheritance, allowing a class to inherit attributes and methods from another class.",
+    "question": "Which of the following statements is true about inheritance in Python?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "To call a method from the parent class that has been overridden."
+      },
+      {
+        "is_correct": false,
+        "text": "To create a new instance of the parent class."
+      },
+      {
+        "is_correct": false,
+        "text": "To initialize the attributes of the current class only."
+      },
+      {
+        "is_correct": false,
+        "text": "To check if an object is an instance of a particular class."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "The `super()` function is used to call a method from the parent class that has been overridden.",
+    "question": "What is the purpose of using the `super()` function in Python's inheritance?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "Defining a new attribute in a subclass."
+      },
+      {
+        "is_correct": true,
+        "text": "Implementing a method in a subclass that already exists in its parent class with different functionality."
+      },
+      {
+        "is_correct": false,
+        "text": "Calling a method from the superclass without any changes."
+      },
+      {
+        "is_correct": false,
+        "text": "Defining a new method in a subclass that has the same name as a method in the superclass but does not use it."
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "Method overriding is when a method in a subclass has the same name as a method in its parent class but provides a different implementation.",
+    "question": "Which of the following is an example of method overriding in Python?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Inheritance allows a class to inherit methods and properties from another class."
+      },
+      {
+        "is_correct": false,
+        "text": "A class can only inherit from one parent class in Python."
+      },
+      {
+        "is_correct": false,
+        "text": "Inheritance creates a deeper connection between two classes than composition."
+      },
+      {
+        "is_correct": false,
+        "text": "Python does not support inheritance."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Inheritance is a key concept in object-oriented programming where a class can inherit methods and properties from another class.",
+    "question": "Which statement is true about inheritance in object-oriented programming?",
+    "topic": "Object-Oriented Programming & Inheritance",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "raise MyException('Error message')"
+      },
+      {
+        "is_correct": false,
+        "text": "MyException('Error message').raise()"
+      },
+      {
+        "is_correct": false,
+        "text": "raise MyException('Error message') as e; raise e"
+      },
+      {
+        "is_correct": false,
+        "text": "throw new Exception('Error message')"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "In Python, custom exceptions are created by subclassing the built-in Exception class or any of its subclasses. The 'raise' keyword is used to raise these exceptions.",
+    "question": "Which of the following is a valid way to create and raise a custom exception in Python?",
     "topic": "Exception Handling & Custom Exceptions",
     "ast_valid": true
   },
   {
-    "question": "What is the base case in the following recursive factorial implementation?\n```python\ndef fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)\n```",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "n <= 1",
-        "is_correct": true
+        "is_correct": true,
+        "text": "To prevent the program from crashing due to runtime errors"
       },
       {
-        "text": "n * fact(n - 1)",
-        "is_correct": false
+        "is_correct": false,
+        "text": "To improve the readability of the code"
       },
       {
-        "text": "fact(n)",
-        "is_correct": false
+        "is_correct": false,
+        "text": "To increase the execution speed of the program"
       },
       {
-        "text": "There is no base case.",
-        "is_correct": false
+        "is_correct": false,
+        "text": "To store data in a database"
       }
     ],
     "correct_index": 0,
-    "difficulty": "easy",
-    "bloom_level": "Remember",
-    "explanation": "The base case `n <= 1` terminates recursion and avoids infinite call stack overflow.",
+    "difficulty": "medium",
+    "explanation": "Exception handling using try-except blocks allows the program to continue running even if an error occurs, thus preventing it from crashing.",
+    "question": "What is the primary purpose of handling exceptions using try-except blocks in Python?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "ValueError"
+      },
+      {
+        "is_correct": false,
+        "text": "SyntaxError"
+      },
+      {
+        "is_correct": false,
+        "text": "IndexError"
+      },
+      {
+        "is_correct": true,
+        "text": "MyCustomException"
+      }
+    ],
+    "correct_index": 3,
+    "difficulty": "medium",
+    "explanation": "While you can create custom exceptions by subclassing Exception, Python's built-in exceptions are predefined classes like ValueError and SyntaxError. 'MyCustomException' is not a standard exception class.",
+    "question": "Which of the following is NOT a standard exception class in Python's built-in exceptions?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Custom exceptions are subclasses of Exception or its subclasses."
+      },
+      {
+        "is_correct": false,
+        "text": "You can raise a custom exception using the raise keyword with an error message."
+      },
+      {
+        "is_correct": false,
+        "text": "All exceptions in Python must be subclasses of ValueError."
+      },
+      {
+        "is_correct": false,
+        "text": "Custom exceptions cannot have any attributes."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Custom exceptions are used to define new exception types that can be raised and caught in a program.",
+    "question": "Which of the following statements is true regarding custom exceptions in Python?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "MyError"
+      },
+      {
+        "is_correct": false,
+        "text": "myerror"
+      },
+      {
+        "is_correct": false,
+        "text": "123Error"
+      },
+      {
+        "is_correct": false,
+        "text": "My-Error"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Custom exception names should start with an uppercase letter and can contain letters, numbers, or underscores.",
+    "question": "In Python, which of the following is an example of a valid custom exception?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "To create more complex error handling mechanisms."
+      },
+      {
+        "is_correct": false,
+        "text": "To increase the performance of Python programs."
+      },
+      {
+        "is_correct": false,
+        "text": "To replace built-in exceptions with user-defined ones."
+      },
+      {
+        "is_correct": false,
+        "text": "To define new data types."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Custom exceptions help in making error handling more meaningful and easier to manage.",
+    "question": "What is the purpose of using custom exceptions in Python?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "raise MyException(\"Error message\")"
+      },
+      {
+        "is_correct": false,
+        "text": "MyException(\"Error message\").raise()"
+      },
+      {
+        "is_correct": false,
+        "text": "throw Exception(\"Error message\")"
+      },
+      {
+        "is_correct": false,
+        "text": "raise \"Error message\""
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "In Python, a custom exception is raised using the 'raise' keyword followed by an instance of the exception class.",
+    "question": "Which of the following is the correct way to raise a custom exception in Python?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "The program continues running"
+      },
+      {
+        "is_correct": true,
+        "text": "The program crashes and terminates"
+      },
+      {
+        "is_correct": false,
+        "text": "An unhandled exception object is created"
+      },
+      {
+        "is_correct": false,
+        "text": "A new exception is raised with the same message"
+      }
+    ],
+    "correct_index": 1,
+    "difficulty": "medium",
+    "explanation": "If an exception is caught but not handled, it will still propagate up the call stack until it is either caught or the program terminates.",
+    "question": "What happens when you catch an exception without handling it further?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": false,
+        "text": "class"
+      },
+      {
+        "is_correct": false,
+        "text": "def"
+      },
+      {
+        "is_correct": false,
+        "text": "exception"
+      },
+      {
+        "is_correct": true,
+        "text": "extend"
+      }
+    ],
+    "correct_index": 3,
+    "difficulty": "medium",
+    "explanation": "In Python, custom exception classes are created by extending the built-in Exception class using the 'class' keyword.",
+    "question": "Which keyword is used to create a custom exception class in Python?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Custom exceptions must inherit from the built-in Exception class."
+      },
+      {
+        "is_correct": false,
+        "text": "Custom exceptions can be created by defining a new class that does not inherit from any class."
+      },
+      {
+        "is_correct": false,
+        "text": "Custom exceptions are used to handle errors that occur during runtime."
+      },
+      {
+        "is_correct": false,
+        "text": "Custom exceptions are only useful for logging error messages."
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Custom exceptions in Python must inherit from the built-in Exception class or one of its subclasses to be recognized as exceptions.",
+    "question": "Which of the following statements is true regarding Python custom exceptions?",
+    "topic": "Exception Handling & Custom Exceptions",
+    "ast_valid": true
+  },
+  {
+    "bloom_level": "comprehension",
+    "choices": [
+      {
+        "is_correct": true,
+        "text": "Sorting algorithms"
+      },
+      {
+        "is_correct": false,
+        "text": "Parallel processing"
+      },
+      {
+        "is_correct": false,
+        "text": "File system navigation"
+      },
+      {
+        "is_correct": false,
+        "text": "Database management"
+      }
+    ],
+    "correct_index": 0,
+    "difficulty": "medium",
+    "explanation": "Recursion is commonly used in sorting algorithms like quicksort and mergesort.",
+    "question": "Which of the following is a common use case for recursion in Python?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(2)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "4",
-        "is_correct": true
+        "is_correct": true,
+        "text": "To stop the recursion"
       },
       {
-        "text": "2",
-        "is_correct": false
+        "is_correct": false,
+        "text": "To initialize the recursion"
       },
       {
-        "text": "5",
-        "is_correct": false
+        "is_correct": false,
+        "text": "To perform the final computation"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "To handle errors during recursion"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "A base case is used to stop the recursion and return a value.",
+    "question": "What is the purpose of a base case in a recursive function?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(3)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "6",
-        "is_correct": true
+        "is_correct": true,
+        "text": "Fibonacci sequence calculation"
       },
       {
-        "text": "3",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Linear search"
       },
       {
-        "text": "7",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Bubble sort"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Insertion sort"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "The Fibonacci sequence is a classic example of a problem solved using recursion.",
+    "question": "Which of these algorithms demonstrates the use of recursion effectively?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(4)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "8",
-        "is_correct": true
+        "is_correct": true,
+        "text": "Sorting an array"
       },
       {
-        "text": "4",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Adding two numbers"
       },
       {
-        "text": "9",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Printing 'Hello, World!'"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Reading a file line by line"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "Recursion is often used to solve problems that can be broken down into smaller, similar subproblems.",
+    "question": "Which of the following is an example of a common algorithmic problem that can be solved using recursion?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(5)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "10",
-        "is_correct": true
+        "is_correct": true,
+        "text": "It determines when to stop the recursion"
       },
       {
-        "text": "5",
-        "is_correct": false
+        "is_correct": false,
+        "text": "It executes the recursive call"
       },
       {
-        "text": "11",
-        "is_correct": false
+        "is_correct": false,
+        "text": "It provides the initial value for the recursion"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "It defines the problem to be solved"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "The base case is crucial for stopping the recursion to prevent infinite loops.",
+    "question": "What does the base case in a recursive function serve?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(6)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "12",
-        "is_correct": true
+        "is_correct": false,
+        "text": "def factorial(n): return n * factorial(n-1) if n > 0 else None"
       },
       {
-        "text": "6",
-        "is_correct": false
+        "is_correct": true,
+        "text": "def factorial(n): return n * factorial(n+1) if n > 0 else None"
       },
       {
-        "text": "13",
-        "is_correct": false
+        "is_correct": false,
+        "text": "def factorial(n): return n * factorial(n-1) if n < 0 else None"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "def factorial(n): return n * factorial(n-1) if n != 0 else None"
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "The correct recursive function for factorial decreases the input by 1 each time, and stops when n reaches 0.",
+    "question": "Which of these functions correctly implements a recursive function to calculate the factorial of a number?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(7)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "14",
-        "is_correct": true
+        "is_correct": true,
+        "text": "def factorial(n): return n * factorial(n-1) if n > 0 else 1"
       },
       {
-        "text": "7",
-        "is_correct": false
+        "is_correct": false,
+        "text": "def factorial(n): return n * factorial(n+1) if n > 0 else 1"
       },
       {
-        "text": "15",
-        "is_correct": false
+        "is_correct": false,
+        "text": "def factorial(n): return n + factorial(n-1) if n > 0 else 1"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "def factorial(n): return n - factorial(n-1) if n > 0 else 1"
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "A recursive function that calculates the factorial of a number should call itself with a decremented value until it reaches the base case.",
+    "question": "Which of the following is an example of a recursive function in Python that calculates the factorial of a number?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(8)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "16",
-        "is_correct": true
+        "is_correct": false,
+        "text": "Bubble Sort"
       },
       {
-        "text": "8",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Merge Sort"
       },
       {
-        "text": "17",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Quick Sort"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": true,
+        "text": "Exponential Search"
       }
     ],
-    "correct_index": 0,
+    "correct_index": 3,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "Exponential search is an algorithm that uses recursion to find the correct position of a target value in a sorted array. Its worst-case time complexity is O(2^n).",
+    "question": "Which algorithm is often implemented using recursion and has a time complexity of O(2^n)?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(9)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "18",
-        "is_correct": true
+        "is_correct": false,
+        "text": "Calculates the sum of numbers from 1 to n"
       },
       {
-        "text": "9",
-        "is_correct": false
+        "is_correct": true,
+        "text": "Reverses a string"
       },
       {
-        "text": "19",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Finds the maximum element in an array"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Sorts an array using quicksort"
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "The function provided is a classic example of a recursive approach to reversing a string. Each call reverses the substring and appends the first character to it.",
+    "question": "What does the following recursive function do?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   },
   {
-    "question": "In Python programming regarding Recursion & Fundamental Algorithms, consider the following snippet:\n```python\n# Topic: Recursion & Fundamental Algorithms\ndef process_sample(val):\n    return val * 2\nresult = process_sample(10)\nprint(result)\n```\nWhat is the expected execution output?",
+    "bloom_level": "comprehension",
     "choices": [
       {
-        "text": "20",
-        "is_correct": true
+        "is_correct": false,
+        "text": "Bubble Sort"
       },
       {
-        "text": "10",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Quick Sort"
       },
       {
-        "text": "21",
-        "is_correct": false
+        "is_correct": true,
+        "text": "Merge Sort"
       },
       {
-        "text": "None",
-        "is_correct": false
+        "is_correct": false,
+        "text": "Insertion Sort"
       }
     ],
-    "correct_index": 0,
+    "correct_index": 2,
     "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "Evaluates core execution semantics of Recursion & Fundamental Algorithms.",
+    "explanation": "Merge Sort is a fundamental algorithm that uses the divide-and-conquer approach, which involves recursion.",
+    "question": "Which of the following is an example of a fundamental algorithm that uses recursion?",
     "topic": "Recursion & Fundamental Algorithms",
     "ast_valid": true
   }

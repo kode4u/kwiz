@@ -22,8 +22,8 @@
 - 1: Irrelevant to course goals.
 
 ## Dimension 4: Code Executability & Syntax (CE)
-- 5: Flawless syntax, valid AST, executes cleanly and deterministically. For non-code conceptual/definition items, terminology, keywords, and semantic definitions strictly adhere to the Python language specification.
-- 4: Valid syntax with minor stylistic/PEP8 deviations; definition is accurate with minor non-critical phrasing variance.
-- 3: Requires minor fix to run (e.g., missing print statement wrapper) or minor ambiguity in conceptual rule description.
-- 2: Multiple runtime errors, syntax errors, or inaccurate conceptual rule description.
-- 1: Completely invalid code, hallucinated syntax, or factually corrupted definition.
+- 5: Flawless syntax, valid AST, executes cleanly and deterministically.
+- 4: Valid syntax with minor stylistic/PEP8 deviations.
+- 3: Requires minor fix to run (e.g., missing print statement wrapper).
+- 2: Multiple runtime errors or syntax errors.
+- 1: Completely invalid code or hallucinated syntax.
