@@ -87,17 +87,17 @@ Table 3 provides the latency measurements for Knowledge Base indexing across inc
 
 Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 120.8× to 140.3× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.
 
-### 5.5 RQ3: Concurrent generation
-Table 4 reports the system performance and resource envelope across concurrency levels $C \in \{1, 2, 5, 10, 20\}$ on the dedicated RTX 3090 GPU host.
+### 5.5 RQ3: Concurrent instructor generation
+Table 4 reports the system performance and resource envelope across concurrency levels $C \in \{1, 2, 5, 10, 20\}$ simultaneous instructor requests on the dedicated RTX 3090 GPU host.
 
 #### Table 4: Single-GPU Concurrency Operating Envelope
-| Concurrency ($C$) | Aggregate Throughput ($Q/s$) | P50 Latency (s) | P95 Latency (s) | Mean GPU Util (%) | Peak VRAM (GB) | Success Rate (%) |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **1** | 89.82 | 2.30 | 2.30 | 45.0% | 8.4 GB | 100.0% |
-| **2** | 164.33 | 2.54 | 2.77 | 72.0% | 9.1 GB | 100.0% |
-| **5** | 417.11 | 3.30 | 4.23 | 98.0% | 11.2 GB | 100.0% |
-| **10** | 811.41 | 4.58 | 6.32 | 100.0% | 13.8 GB | 100.0% |
-| **20** | 1619.93 | 6.67 | 10.44 | 100.0% | 15.6 GB | 100.0% |
+| Concurrency ($C$) | Aggregate Throughput ($Q/s$) | Throughput ($Q/\text{min}$) | P50 Latency (s) | P95 Latency (s) | Mean GPU Util (%) | Peak VRAM (GB) | Success Rate (%) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1** | 0.80 | 48.0 | 6.28 | 6.28 | 45.0% | 8.4 GB | 100.0% |
+| **2** | 0.82 | 49.2 | 10.98 | 12.02 | 72.0% | 9.1 GB | 100.0% |
+| **5** | 0.83 | 49.8 | 25.51 | 29.74 | 98.0% | 11.2 GB | 100.0% |
+| **10** | 0.81 | 48.6 | 50.63 | 60.89 | 100.0% | 13.8 GB | 100.0% |
+| **20** | 0.82 | 49.2 | 97.68 | 119.26 | 100.0% | 15.6 GB | 100.0% |
 
 ### 5.6 Reliability
 | Failure Category | Count | Occurrence Rate (%) | Mitigating Mechanism |
@@ -119,8 +119,8 @@ This study investigated how course-grounded programming MCQ generation can be op
 The empirical evaluation confirms that incremental course processing, controlled retrieval context, structured generation, deterministic validation, and bounded recovery materially improve the complete instructor-facing workflow while preserving expert-rated MCQ quality:
 - The optimized pipeline reduced knowledge-base indexing latency from **515.4 ms to 13.5 ms**, a **97.4% reduction** (and up to a **131.1× speedup** under 250k token textbook conditions);
 - Incremental SHA-256 embedding reuse accounted for the largest share of preprocessing improvement, reducing GPU embedding computation by **97.8%**;
-- The single-GPU service sustained **5 to 10 concurrent instructor jobs** at aggregate throughputs of **417.1 to 811.4 questions/min** with median response times of **3.30s to 4.58s** (P95 < 6.4s) and a **100% execution success rate** with zero out-of-memory errors;
-- **97.0% of expert-reviewed MCQs** were classified as pedagogically acceptable (86.0% accept as-is, 11.0% with minor revision), with **100% syntactically valid and executable Python code** verified by AST parsing and compilation.
+- The single-GPU service sustained steady aggregate throughput of **48.0 to 49.8 questions/min (0.80–0.83 Q/s)** across concurrent workloads up to $C = 20$ simultaneous requests (5-question batches), delivering median response times of **6.28s ($C=1$) to 25.51s ($C=5$)** with a **100% execution success rate** and peak VRAM safely contained at **15.6 GB** (out of 24 GB);
+- **86.0% of generated MCQs** were classified by the multi-judge panel as pedagogically acceptable (78.0% accept as-is, 8.0% with minor revision; 4.45/5.0 technical correctness, 4.83/5.0 pedagogical relevance, and 4.82/5.0 code executability), with frontier LLM judges exhibiting discriminative sensitivity to nuanced logic traps while deterministic AST compilation verified code syntax.
 
 More broadly, the study demonstrates that educational RAG should be evaluated beyond model accuracy or isolated inference time. In persistent institutional deployments, course-knowledge maintenance, retrieval context, structured validation, failure recovery, resource contention, and instructor oversight jointly determine whether generative assessment is operationally useful."""
 

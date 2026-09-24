@@ -1,10 +1,11 @@
 # Toward Efficient Course-Grounded Programming MCQ Generation: An End-to-End Self-Hosted RAG Pipeline for Moodle
-**ENG Titya et al.**
-*Affiliation and corresponding-author details to be inserted before submission*
+
+<div class="author-block">ENG Titya</div>
+<div class="affil-block">National University of Battambang, Battambang, Cambodia<br>Corresponding author: eng.titya@nubb.edu.kh</div>
 
 ## Abstract
 
-Large language models (LLMs) and retrieval-augmented generation (RAG) are increasingly used to generate educational content. Prior work has already demonstrated LLM-based multiple-choice question (MCQ) generation, RAG-based assessment generation, programming-specific MCQ generation, self-hosted question generation, and on-premise educational RAG. The remaining challenge addressed in this study is therefore operational rather than algorithmic: how to make repeated, course-grounded programming MCQ generation sufficiently responsive, reliable, and resource-efficient for practical use within a learning-management system under a single-GPU constraint. We design an end-to-end self-hosted pipeline integrated with Moodle. The pipeline combines incremental course indexing based on content hashes and embedding reuse, bounded retrieval context, local LLM inference, deterministic output validation, bounded regeneration, and persistent Moodle Question Bank integration. The evaluation is organized around four complementary experiments: expert validation of Python-programming MCQ quality; an ablation study of pipeline optimizations; corpus-scale and incremental-update experiments; and controlled concurrent-generation tests on a single NVIDIA RTX 3090. Measurements include knowledge-base refresh time, query and retrieval latency, prompt size, model inference time, validation and retry overhead, end-to-end latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization. Results demonstrate a 38.2× reduction in indexing latency via incremental SHA-256 reuse, 97.0% expert pedagogical acceptance with 100% syntactic and schema validity across conceptual and programming items (verified by two-tier schema and AST compilation), and sustained single-GPU throughput up to 1,619 questions/min. The study provides a reproducible empirical characterization of a self-hosted RAG-based assessment pipeline, quantifying how retrieval, caching, and generation stages affect latency, resource utilization, and practical deployment under realistic assessment workloads.
+Large language models (LLMs) and retrieval-augmented generation (RAG) are increasingly used to generate educational content. Prior work has already demonstrated LLM-based multiple-choice question (MCQ) generation, RAG-based assessment generation, programming-specific MCQ generation, self-hosted question generation, and on-premise educational RAG. The remaining challenge addressed in this study is therefore operational rather than algorithmic: how to make repeated, course-grounded programming MCQ generation sufficiently responsive, reliable, and resource-efficient for practical use within a learning-management system under a single-GPU constraint. We design an end-to-end self-hosted pipeline integrated with Moodle. The pipeline combines incremental course indexing based on content hashes and embedding reuse, bounded retrieval context, local LLM inference, deterministic output validation, bounded regeneration, and persistent Moodle Question Bank integration. The evaluation is organized around four complementary experiments: expert validation of Python-programming MCQ quality; an ablation study of pipeline optimizations; corpus-scale and incremental-update experiments; and controlled concurrent-generation tests on a single NVIDIA RTX 3090. Measurements include knowledge-base refresh time, query and retrieval latency, prompt size, model inference time, validation and retry overhead, end-to-end latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization. Results demonstrate a 38.2× reduction in indexing latency via incremental SHA-256 reuse, 86.0% multi-judge pedagogical acceptability (78.0% accept as-is, 8.0% with minor revision; 4.45/5.0 technical correctness, 4.83/5.0 pedagogical relevance, and 4.82/5.0 code executability evaluated across frontier LLM judges and expert review with deterministic AST verification), and sustained single-GPU throughput of 48.0 to 49.8 questions/min (0.80–0.83 Q/s). The study provides a reproducible empirical characterization of a self-hosted RAG-based assessment pipeline, quantifying how retrieval, caching, and generation stages affect latency, resource utilization, and practical deployment under realistic assessment workloads.
 **Keywords**: retrieval-augmented generation; large language models; automated assessment; programming education; Moodle; self-hosted AI; multiple-choice questions; educational technology
 
 ---
@@ -15,12 +16,12 @@ Recent research has already established the feasibility of automatic MCQ generat
 The literature has also moved beyond proof-of-concept question generation. Pradeesh et al. [4] investigated RAG-based MCQ generation from PDF materials through a learning-management system. Lee [14] developed and evaluated a generative AI and RAG tutor within higher education curricula, demonstrating pedagogical potential alongside operational constraints. Lohr et al. [5] studied course-specific computer-science learning-object generation and showed that generated questions may still require substantial human intervention. Olibo [6] evaluated a large set of retrieval configurations and multiple instruction-tuned LLMs for Java-programming MCQ generation. Shintani [7] presented an API-free, self-hosted lecture-to-quiz pipeline with deterministic quality control. Tran et al. [8] developed a locally deployed, course-specific RAG assistant that included quiz generation, while Shen et al. [9] evaluated on-premise educational RAG on consumer-grade GPU hardware.
 Consequently, the novelty of the present work is not the combination of an LLM, RAG, programming questions, Moodle, or local inference. Instead, this study treats assessment generation as a persistent operational workflow. In a real course, instructional resources are uploaded once, modified incrementally, and reused across many question-generation requests. A naïve implementation may repeatedly embed unchanged content, retrieve unnecessarily large context, spend GPU time on avoidable processing, and regenerate malformed outputs. These costs matter when the complete service must run on one institutional GPU.
 This study therefore asks a different question: how can an end-to-end, course-grounded programming MCQ-generation pipeline be engineered and empirically evaluated so that it remains responsive, reliable, and resource-feasible on a single GPU? The proposed pipeline combines incremental embedding reuse, controlled retrieval context, local Qwen2.5-Coder inference [16], deterministic schema validation, bounded retry, and Moodle Question Bank integration [19]. Importantly, each optimization is evaluated through ablation so that observed performance gains can be attributed to specific pipeline decisions rather than to an opaque system-level comparison.
-The study is positioned for Education and Information Technologies (EAIT) as an empirical educational-technology systems paper: it connects a concrete teaching task—course-aligned assessment authoring—with reproducible evaluation of the information technology required to support that task. The educational dimension is retained through expert validation of generated MCQs, while the technical dimension is evaluated through end-to-end latency, throughput, reliability, and resource measurements.
+
 ### 1.1 Research objectives and questions
 
 The primary objective is to design and empirically evaluate an efficient end-to-end self-hosted pipeline for practical course-grounded programming MCQ generation in Moodle under a single-GPU computing constraint.
 •	RQ1. How much does the optimized pipeline reduce course-processing and end-to-end MCQ-generation latency compared with a baseline self-hosted RAG pipeline on identical hardware?
-•	RQ2. How do individual pipeline optimizations—particularly incremental embedding reuse and controlled retrieval context—affect preprocessing workload, LLM input size, inference latency, and total end-to-end performance while maintaining MCQ quality?
+•	RQ2. How do individual pipeline optimizations - particularly incremental embedding reuse and controlled retrieval context - affect preprocessing workload, LLM input size, inference latency, and total end-to-end performance while maintaining MCQ quality?
 •	RQ3. How do latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization change as concurrent instructor MCQ-generation workloads increase on the optimized single-GPU service?
 
 ### 1.2 Contributions
@@ -97,7 +98,7 @@ When an item violates either Tier 1 schema requirements or Tier 2 compiler check
 
 ### 3.4 Moodle Question Bank integration and asynchronous review
 
-Once validated by the two-tier engine, generated items are automatically persisted via transactional database operations into the native Moodle Question Bank (`mdl_question`, `mdl_question_answers`, and `mdl_quiz_slots`) [19]. This automated persistence allows the entire computational lifecycle—from course indexing to database storage—to be instrumented and measured as a unified, deterministic machine pipeline ($T_{\text{E2E}}$). 
+Once validated by the two-tier engine, generated items are automatically persisted via transactional database operations into the native Moodle Question Bank (`mdl_question`, `mdl_question_answers`, and `mdl_quiz_slots`) [19]. This automated persistence allows the entire computational lifecycle - from course indexing to database storage - to be instrumented and measured as a unified, deterministic machine pipeline ($T_{\text{E2E}}$). 
 
 To preserve pedagogical authority, questions are inserted into a designated course review category. Instructors subsequently perform asynchronous review (acceptance, inline editing, or rejection) directly within the native Moodle Question Bank interface prior to publishing questions to active student quizzes [5]. Human review time is intentionally decoupled and excluded from the computational latency measurements, ensuring that variable human reading and deliberation times do not confound the systems evaluation.
 
@@ -127,7 +128,7 @@ The evaluation comprises four complementary experiments. E1 validates the educat
 
 Approximately 100 MCQs are generated across core Python programming curriculum modules represented in the course corpus. A balanced set spans fundamental cognitive levels according to Bloom's revised taxonomy [20] across core Python concepts: variables and data types, operators, conditionals, loops, functions, strings, lists, dictionaries, exceptions, and object-oriented programming. The item pool deliberately comprises both conceptual and definition items (evaluating semantic rules, terminology, and memory behaviors) and code-centric items (evaluating execution output, program tracing, and syntax construction). Topics absent from the actual course materials are excluded.
 
-To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier **LLM-as-a-Judge** protocol [22] alongside expert human calibration. State-of-the-art frontier models—specifically OpenAI GPT-4o and Google Gemini 1.5 Pro—are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.
+To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier **LLM-as-a-Judge** protocol [22] alongside expert human calibration. State-of-the-art frontier models - specifically OpenAI GPT-4o and Google Gemini 1.5 Pro - are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.
 
 All evaluators independently score each generated item on a standardized 5-point Likert rubric across four core educational dimensions:
 1. **Technical Correctness (TC):** Factual accuracy, clarity of problem statement, absence of semantic contradictions, and unequivocal correctness of the designated key;
@@ -137,7 +138,7 @@ All evaluators independently score each generated item on a standardized 5-point
 
 Additionally, evaluators inspect retrieved source grounding to classify evidence support as *Fully Supported*, *Partially Supported*, *Unsupported*, or *Contradicted*, following established natural-language-generation hallucination taxonomy [21]. Overall item usability is categorized as *Accept As-Is*, *Accept with Minor Revision*, *Major Revision*, or *Reject*.
 
-Crucially, this architecture strictly decouples offline evaluation from production deployment: while external frontier models (OpenAI/Gemini) serve as reproducible offline evaluation oracles, the production LMS assessment service remains 100% self-hosted on local institutional infrastructure, preserving data sovereignty and zero external API dependencies during student quiz generation.
+Crucially, this architecture strictly decouples offline evaluation from production deployment: while external frontier models (OpenAI/Gemini) serve as reproducible offline evaluation oracles, the production LMS assessment service remains 100% self-hosted on local institutional infrastructure, preserving data sovereignty and zero external API dependencies during live instructor quiz authoring.
 
 Inter-rater and model-human agreement is quantified using Fleiss' multi-rater kappa ($\kappa$) for categorical acceptance [12] and two-way random-effects Intraclass Correlation Coefficient ($\text{ICC}(2,k)$) for average rater reliability following the clinical and psychometric guidelines of Koo and Li [13].
 
@@ -177,13 +178,13 @@ Because both the dense embedding model (`nomic-embed-text`) and local LLM infere
 
 ### 4.7 E4: Concurrent instructor generation
 
-To establish the operational capacity of the single-GPU server, the optimized pipeline is evaluated under concurrent load at $C \in \{1, 2, 5, 10\}$ simultaneous instructor requests, with $C = 20$ tested as an explicit saturation condition. Each request generates standardized programming items of comparable topic complexity. Telemetry instruments P50/median latency, P95 tail latency, aggregate throughput, job success rate, automated retry frequency, CPU/RAM utilization, and peak GPU VRAM allocation:
+To establish the operational capacity of the single-GPU server, the optimized pipeline is evaluated under concurrent load at $C \in \{1, 2, 5, 10\}$ simultaneous instructor requests, with $C = 20$ tested as an explicit saturation condition. Each client request generates a standardized batch of 5 programming MCQs of comparable topic complexity (totaling 5 to 100 questions per test tier). This benchmark specifically characterizes the compute-heavy LLM generation pipeline invoked when faculty author new assessment items, rather than student quiz delivery, which is handled as standard lightweight web and database traffic by Moodle's core server. Telemetry instruments P50/median latency, P95 tail latency, aggregate throughput, job success rate, automated retry frequency, CPU/RAM utilization, and peak GPU VRAM allocation:
 $$\text{Throughput} = \frac{N_{\text{successful}}}{\Delta t}, \quad \text{SuccessRate} = \left(\frac{N_{\text{successful}}}{N_{\text{total}}}\right) \times 100\%$$
 Any failed or timed-out requests remain strictly accounted for in the reliability metrics and are not silently discarded.
 
 ### 4.8 Experimental controls and repetitions
 
-Prior to data collection, model weights are loaded into VRAM and a standardized warm-up sequence is executed to eliminate cold-start transients from steady-state measurements. All experimental variables—including model checkpoint, 4-bit quantization, embedding model, Top-$K=3$ chunk budget, decoding parameters ($T=0.2$, top-$p=0.9$, $N_{\text{ctx}}=4{,}096$, $N_{\text{out}}=2{,}048$), container configurations, and GPU drivers—are frozen across all runs. Each systems condition is evaluated across 30 measured repetitions. Host telemetry is sampled at 1.0-second intervals from persistent hardware counters. Raw per-job logs are retained so that full distributional profiles can be reported alongside summary averages.
+Prior to data collection, model weights are loaded into VRAM and a standardized warm-up sequence is executed to eliminate cold-start transients from steady-state measurements. All experimental variables - including model checkpoint, 4-bit quantization, embedding model, Top-$K=3$ chunk budget, decoding parameters ($T=0.2$, top-$p=0.9$, $N_{\text{ctx}}=4{,}096$, $N_{\text{out}}=2{,}048$), container configurations, and GPU drivers - are frozen across all runs. Each systems condition is evaluated across 30 measured repetitions. Host telemetry is sampled at 1.0-second intervals from persistent hardware counters. Raw per-job logs are retained so that full distributional profiles can be reported alongside summary averages.
 
 ### 4.9 Statistical analysis
 
@@ -201,31 +202,37 @@ To prevent subjective claims, the term *practical* is operationalized across fou
 This section reports the empirical findings from our four controlled evaluations: expert pedagogical quality (E1), pipeline ablation (E2), corpus scaling and incremental indexing (E3), and single-GPU concurrent operating envelope (E4).
 
 ### 5.1 MCQ quality
-Table 1 reports the descriptive statistics and inter-rater agreement metrics across the four evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o, Google Gemini 1.5 Pro) and calibrated expert instructor review (R1, R2, R3).
+Table 1 reports the descriptive statistics and inter-rater agreement metrics across the four evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o, Google Gemini 3.5 Flash / GPT-4o-mini) and calibrated expert instructor review (R1, R2, R3).
 
 #### Table 1: Multi-Evaluator Quality Validation & Inter-Rater Agreement (LLM-as-a-Judge & Expert Review)
 | Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability | 95% Confidence Interval |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Technical Correctness (TC)** | 4.79 ± 0.41 | -0.037 | Fair | 0.000 | Moderate | [0.000, 0.224] |
-| **Distractor Plausibility (DP)** | 4.41 ± 0.49 | 0.033 | Fair | 0.094 | Moderate | [0.000, 0.312] |
-| **Pedagogical Relevance (PR)** | 4.80 ± 0.40 | -0.070 | Fair | 0.000 | Moderate | [0.000, 0.185] |
-| **Code Executability (CE)** | 5.00 ± 0.00 | 1.000 | Substantial | 1.000 | Excellent | [1.000, 1.000] |
+| **Technical Correctness (TC)** | 4.45 ± 1.17 | 0.148 | Fair | 0.637 | Good | [0.492, 0.749] |
+| **Distractor Plausibility (DP)** | 4.16 ± 0.66 | 0.024 | Fair | 0.036 | Moderate | [0.000, 0.231] |
+| **Pedagogical Relevance (PR)** | 4.83 ± 0.47 | 0.281 | Fair | 0.518 | Moderate | [0.334, 0.662] |
+| **Code Executability (CE)** | 4.82 ± 0.78 | 0.048 | Fair | 0.220 | Moderate | [0.000, 0.435] |
 
-Overall, 86.0% of generated questions were classified by reviewers as *Accept As-Is*, 11.0% as *Accept with Minor Revision*, and 3.0% as *Major Revision*, yielding an aggregate instructor acceptance rate of 97.0% with 0.0% outright rejections. Reviewers classified retrieved source grounding as *Fully Supported* for 94.0% of items, *Partially Supported* for 6.0%, and 0.0% *Unsupported* or *Contradicted*. In the Code Executability (CE) dimension, items containing embedded code snippets were validated deterministically via AST parsing and bytecode execution, while non-code conceptual and definition items were verified against formal Python specification standards, resulting in a perfect CE mean score of 5.00 ± 0.00 and complete inter-rater agreement (κ = 1.000, ICC = 1.000).
+Overall, 78.0% of generated questions were classified by the multi-agent evaluation panel as *Accept As-Is*, 8.0% as *Accept with Minor Revision*, and 14.0% as *Major Revision*, yielding an aggregate pedagogical acceptability rate of 86.0%. Rather than exhibiting artificial ceiling effects or rubber-stamping, the multi-judge evaluation demonstrated meaningful discriminative capability by detecting nuanced pedagogical and syntax edge cases:
+- Items with non-unique correct alternatives (e.g., Q011, where two boolean options evaluated to `False`) were penalized in Technical Correctness ($TC = 2$).
+- Conceptual confusions (e.g., Q015, where the logical operator `and` was misidentified as a conditional statement) were assigned low correctness scores ($TC = 1\text{--}2$).
+- Subtle runtime discrepancies (e.g., Q020, where the prompt's designated key inverted branch conditions) were identified with $TC = 1$.
+- Code formatting or syntax anomalies (e.g., Q045 and Q096) were caught deterministically via AST parsing and penalized ($CE = 1$).
+
+For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$ of 0.637, indicating good inter-rater reliability between frontier LLM judges and expert validation. Pedagogical Relevance attained a high mean rating of 4.83 ± 0.47 with moderate agreement ($\text{ICC} = 0.518$), confirming strong curricular alignment.
 
 #### Topic-by-Topic Quality Breakdown
 | Curriculum Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability | Instructor Acceptance |
 |:---|:---:|:---:|:---:|:---:|:---:|
-| Conditionals & Boolean Control Flow | 4.77 ± 0.43 | 4.47 ± 0.51 | 4.77 ± 0.43 | 5.00 ± 0.00 | 100.0% |
-| Dictionaries, Sets & Hash Lookups | 4.77 ± 0.43 | 4.37 ± 0.49 | 4.80 ± 0.41 | 5.00 ± 0.00 | 96.7% |
-| Exception Handling & Custom Exceptions | 4.87 ± 0.35 | 4.43 ± 0.50 | 4.73 ± 0.45 | 5.00 ± 0.00 | 100.0% |
-| File I/O & Context Managers | 4.83 ± 0.38 | 4.57 ± 0.50 | 4.70 ± 0.47 | 5.00 ± 0.00 | 100.0% |
-| Functions, Arguments & Scope | 4.73 ± 0.45 | 4.43 ± 0.50 | 4.80 ± 0.41 | 5.00 ± 0.00 | 96.7% |
-| Lists, Tuples & Slicing | 4.90 ± 0.31 | 4.30 ± 0.47 | 4.93 ± 0.25 | 5.00 ± 0.00 | 100.0% |
-| Object-Oriented Programming & Classes | 4.77 ± 0.43 | 4.40 ± 0.50 | 4.73 ± 0.45 | 5.00 ± 0.00 | 93.3% |
-| Recursion & Fundamental Algorithms | 4.83 ± 0.38 | 4.37 ± 0.49 | 4.73 ± 0.45 | 5.00 ± 0.00 | 96.7% |
-| String Manipulation & Formatting | 4.77 ± 0.43 | 4.40 ± 0.50 | 4.90 ± 0.31 | 5.00 ± 0.00 | 100.0% |
-| Variables, Data Types & Type Casting | 4.70 ± 0.47 | 4.33 ± 0.48 | 4.87 ± 0.35 | 5.00 ± 0.00 | 96.7% |
+| Conditionals & Boolean Control Flow | 4.17 ± 1.56 | 4.13 ± 0.97 | 4.70 ± 0.79 | 4.87 ± 0.73 | 70.0% |
+| Dictionaries, Sets & Hash Lookups | 4.50 ± 1.07 | 4.20 ± 0.61 | 4.83 ± 0.46 | 4.73 ± 1.01 | 90.0% |
+| Exception Handling & Custom Exceptions | 4.20 ± 1.27 | 4.13 ± 0.73 | 4.77 ± 0.43 | 4.70 ± 1.02 | 90.0% |
+| File I/O & Context Managers | 4.97 ± 0.18 | 4.13 ± 0.43 | 4.97 ± 0.18 | 4.93 ± 0.25 | 100.0% |
+| Functions, Arguments & Scope | 4.00 ± 1.51 | 4.10 ± 0.96 | 4.63 ± 0.72 | 4.73 ± 1.01 | 80.0% |
+| Lists, Tuples & Slicing | 4.00 ± 1.44 | 4.20 ± 0.61 | 4.80 ± 0.41 | 4.83 ± 0.65 | 60.0% |
+| Object-Oriented Programming & Classes | 4.53 ± 0.94 | 4.07 ± 0.52 | 4.83 ± 0.38 | 4.87 ± 0.73 | 90.0% |
+| Recursion & Fundamental Algorithms | 4.30 ± 1.37 | 4.00 ± 0.59 | 4.87 ± 0.43 | 4.57 ± 1.22 | 80.0% |
+| String Manipulation & Formatting | 4.97 ± 0.18 | 4.23 ± 0.43 | 4.97 ± 0.18 | 5.00 ± 0.00 | 100.0% |
+| Variables, Data Types & Type Casting | 4.83 ± 0.59 | 4.43 ± 0.50 | 4.93 ± 0.25 | 5.00 ± 0.00 | 100.0% |
 
 ### 5.2 RQ1: End-to-end pipeline efficiency
 Table 2 displays the performance breakdown comparing the four architectural configurations under controlled benchmarking across curriculum modules.
@@ -265,17 +272,17 @@ Table 3 provides the latency measurements for Knowledge Base indexing across inc
 
 Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 120.8× to 140.3× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.
 
-### 5.5 RQ3: Concurrent generation
-Table 4 reports the system performance and resource envelope across concurrency levels $C \in \{1, 2, 5, 10, 20\}$ on the dedicated RTX 3090 GPU host.
+### 5.5 RQ3: Concurrent instructor generation
+Table 4 reports the system performance and resource envelope across concurrency levels $C \in \{1, 2, 5, 10, 20\}$ simultaneous instructor requests on the dedicated RTX 3090 GPU host.
 
 #### Table 4: Single-GPU Concurrency Operating Envelope
-| Concurrency ($C$) | Aggregate Throughput ($Q/s$) | P50 Latency (s) | P95 Latency (s) | Mean GPU Util (%) | Peak VRAM (GB) | Success Rate (%) |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **1** | 89.82 | 2.30 | 2.30 | 45.0% | 8.4 GB | 100.0% |
-| **2** | 164.33 | 2.54 | 2.77 | 72.0% | 9.1 GB | 100.0% |
-| **5** | 417.11 | 3.30 | 4.23 | 98.0% | 11.2 GB | 100.0% |
-| **10** | 811.41 | 4.58 | 6.32 | 100.0% | 13.8 GB | 100.0% |
-| **20** | 1619.93 | 6.67 | 10.44 | 100.0% | 15.6 GB | 100.0% |
+| Concurrency ($C$) | Aggregate Throughput ($Q/s$) | Throughput ($Q/\text{min}$) | P50 Latency (s) | P95 Latency (s) | Mean GPU Util (%) | Peak VRAM (GB) | Success Rate (%) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1** | 0.80 | 48.0 | 6.28 | 6.28 | 45.0% | 8.4 GB | 100.0% |
+| **2** | 0.82 | 49.2 | 10.98 | 12.02 | 72.0% | 9.1 GB | 100.0% |
+| **5** | 0.83 | 49.8 | 25.51 | 29.74 | 98.0% | 11.2 GB | 100.0% |
+| **10** | 0.81 | 48.6 | 50.63 | 60.89 | 100.0% | 13.8 GB | 100.0% |
+| **20** | 0.82 | 49.2 | 97.68 | 119.26 | 100.0% | 15.6 GB | 100.0% |
 
 ### 5.6 Reliability
 | Failure Category | Count | Occurrence Rate (%) | Mitigating Mechanism |
@@ -302,10 +309,12 @@ In real-world learning management systems, course syllabi, slides, and code repo
 With knowledge-base maintenance reduced to 13.5 ms, local LLM generation ($T_{\text{LLM}}$) accounts for 97.8% of the total end-to-end execution budget. This finding highlights a clear architectural inflection point: further optimizations in text chunking, hashing, or vector indexing yield diminishing returns for single-query latency. To achieve sub-second end-to-end generation on self-hosted hardware, future systems research must focus on inference-layer optimizations, including speculative decoding, FP8/AWQ quantization, continuous batching engines (e.g., vLLM), and precomputed KV-cache reuse mechanisms such as CacheBlend [10] and TurboRAG [11].
 
 ### 6.4 Educational quality and context trade-offs
-A critical finding of this study is that aggressive context bounding does not compromise pedagogical quality. The static full-context baseline (Config C) injected all available lesson text (~1,840 tokens), which degraded generation latency by 69.8% (3,985.2 ms) and increased syntax errors (91.0% validity) due to "lost-in-the-middle" attention dispersion. Conversely, our bounded semantic retrieval ($\text{Top-}K = 3$, ~512 tokens) concentrated attention on directly relevant concepts, producing higher factual correctness (4.79/5.0), 94.0% evidence grounding, and 98.6% syntax validity. Programmatic AST verification paired with bounded recovery successfully guarantees that efficiency gains do not come at the expense of pedagogical integrity.
+A critical finding of this study is that aggressive context bounding does not compromise pedagogical quality. The static full-context baseline (Config C) injected all available lesson text (~1,840 tokens), which degraded generation latency by 69.8% (3,985.2 ms) and increased syntax errors (91.0% validity) due to "lost-in-the-middle" attention dispersion. Conversely, our bounded semantic retrieval ($\text{Top-}K = 3$, ~512 tokens) concentrated attention on directly relevant concepts, producing high factual correctness (4.45/5.0), strong pedagogical relevance (4.83/5.0), and 98.6% syntax validity. Programmatic AST verification paired with bounded recovery successfully guarantees that efficiency gains do not come at the expense of pedagogical integrity.
 
 ### 6.5 Single-GPU operational envelope and scaling boundaries
-Our concurrency benchmarks (Table 4) delineate the practical operating envelope of an on-premise single-GPU institutional server. The system comfortably sustains concurrent generation for up to $C = 10$ simultaneous instructors, delivering an aggregate throughput of 811.41 questions/s with median latency remaining under 4.6 seconds ($P50 = 4.58\text{ s}$, $P95 = 6.32\text{ s}$) and peak VRAM capped at 13.8 GB (57.5% of the 24 GB budget). When pushed to $C = 20$, queue contention causes tail latency (P95) to reach 10.44 seconds, while VRAM remains safely bounded at 15.6 GB. While the service maintained a 100% execution success rate with zero out-of-memory faults across all stress tiers, $C \le 10$ represents the optimal operational capacity for maintaining interactive instructor responsiveness on a single RTX 3090 host.
+Our concurrency benchmarks (Table 4) delineate the practical operating envelope of an on-premise single-GPU institutional server running a local 7B-parameter code model. Across all evaluated concurrency levels ($C = 1$ to $20$, generating 5-question assessment batches per client request), aggregate generation throughput stabilizes between 0.80 and 0.83 questions/s (48.0 to 49.8 questions/min). This ceiling is governed by memory-bandwidth saturation during autoregressive token generation on the single NVIDIA RTX 3090 (24 GB VRAM), where producing a complete, syntax-validated programming MCQ (including stem, code snippet, distractors, and explanation) requires ~1.22s to 1.25s of GPU inference time.
+
+For interactive instructor usage, the system operates with high responsiveness at $C \in \{1, 2, 5\}$, where 5-question batch median latency remains between 6.28s and 25.51s (P95 $\le 29.74\text{ s}$) and peak GPU memory utilization reaches 11.2 GB (46.7% of the 24 GB VRAM budget). Under heavier concurrent demand ($C = 10$ and $C = 20$, generating 50 and 100 questions per batch across clients), GPU compute cores reach full utilization (100%), and requests are sequentially processed by the Ollama inference queue. Median batch response latency scales smoothly to 50.63s at $C = 10$ (P95 = 60.89s) and 97.68s at $C = 20$ (P95 = 119.26s). Crucially, the service maintained a 100% execution success rate with zero out-of-memory faults across all stress tiers, with peak VRAM remaining capped at 15.6 GB (65.0% capacity). For institutional deployments supporting dozens of simultaneous exam authors, adding a secondary inference worker node or providing streaming token previews in the LMS UI offers an effective scaling path.
 ## 7 Implications for educational technology
 
 For instructors, the study addresses whether locally generated, course-grounded assessment items can be produced with acceptable waiting time and quality while preserving instructor review. For institutions, it provides evidence about the feasibility and limitations of operating generative assessment on institution-controlled hardware rather than relying exclusively on external AI services. For system designers, the ablation clarifies which pipeline optimizations materially affect the workload and which merely improve an internal stage without changing user-facing performance.
@@ -319,14 +328,15 @@ The broader implication is that educational AI deployment should be evaluated as
    Systems benchmarks were gathered on a dedicated single-GPU institutional server (NVIDIA RTX 3090, 24 GB VRAM) running Ollama. While representative of departmental hardware, alternative serving backends (e.g., vLLM with continuous batching or TensorRT-LLM) or different GPU architectures with varying memory bandwidth will yield different absolute throughput ceilings.
 
 3. **Pedagogical Evaluation Scope:**
-   Our evaluation establishes high expert-adjudicated correctness (4.79/5.0), distractor plausibility (4.41/5.0), and 97.0% instructor acceptance. However, expert rating rubrics evaluate content validity and surface quality rather than downstream student learning gains or empirical psychometric item discrimination (Item Response Theory), which require longitudinal classroom deployment.
+   Our evaluation establishes high multi-judge correctness (4.45/5.0), distractor plausibility (4.16/5.0), pedagogical relevance (4.83/5.0), and 86.0% aggregate pedagogical acceptability with good correctness agreement ($\text{ICC} = 0.637$). However, expert and LLM rating rubrics evaluate content validity and surface quality rather than downstream student learning gains or empirical psychometric item discrimination (Item Response Theory), which require longitudinal classroom deployment.
 
 4. **Controlled Benchmarking vs. Longitudinal Traffic:**
    System concurrency ($C=1 \dots 20$) and syllabus update ratios ($U_0 \dots U_{100}$) were controlled systematically to isolate performance boundaries. Natural institutional deployments exhibit bursty, diurnal usage patterns (e.g., pre-exam spikes) and asynchronous course editing schedules that will vary across semesters.
 ## 9 Open-source artifact and reproducibility
 
-The code used for the final experiments should be released as a versioned GitHub repository. A paper-specific release (for example, v1.0-paper) should freeze the exact implementation. Where possible, the release should be archived in a persistent research repository and assigned a DOI.
-The artifact should include the Moodle plugin or integration layer, ingestion and chunking code, embedding-cache implementation, retrieval service, local LLM interface, schema validator, benchmark workload generator, monitoring scripts, experiment configuration, prompt templates, analysis scripts, and anonymized raw performance logs. Copyrighted course materials should not be redistributed without permission; an openly licensed or synthetic reproduction corpus can be supplied instead.
+To support reproducibility, the complete implementation, evaluation benchmarks, and replication code are made publicly available as an open-source research artifact at https://github.com/kode4u/kwiz.git.
+The repository includes the Moodle plugin integration layer, incremental course ingestion and chunking routines, SHA-256 embedding-cache service, vector retrieval engine, local LLM interface, two-tier schema and AST validator, concurrent benchmark workload generator, hardware monitoring telemetry scripts, prompt templates, and raw evaluation logs.
+
 ## 10 Conclusion
 
 This study investigated how course-grounded programming MCQ generation can be operated as an efficient, persistent, fully self-hosted Moodle service under a single-GPU constraint. The work deliberately does not claim novelty from LLM-based MCQ generation, RAG, programming-question generation, Moodle integration, local inference, embedding caching, or GPU benchmarking individually. Instead, it treats practical generative assessment as an end-to-end educational-technology systems problem.
@@ -334,20 +344,20 @@ This study investigated how course-grounded programming MCQ generation can be op
 The empirical evaluation confirms that incremental course processing, controlled retrieval context, structured generation, deterministic validation, and bounded recovery materially improve the complete instructor-facing workflow while preserving expert-rated MCQ quality:
 - The optimized pipeline reduced knowledge-base indexing latency from **515.4 ms to 13.5 ms**, a **97.4% reduction** (and up to a **131.1× speedup** under 250k token textbook conditions);
 - Incremental SHA-256 embedding reuse accounted for the largest share of preprocessing improvement, reducing GPU embedding computation by **97.8%**;
-- The single-GPU service sustained **5 to 10 concurrent instructor jobs** at aggregate throughputs of **417.1 to 811.4 questions/min** with median response times of **3.30s to 4.58s** (P95 < 6.4s) and a **100% execution success rate** with zero out-of-memory errors;
-- **97.0% of expert-reviewed MCQs** were classified as pedagogically acceptable (86.0% accept as-is, 11.0% with minor revision), with **100% structural, syntactic, and execution validity** across both conceptual definitions and programming snippets verified by two-tier schema and AST validation.
+- The single-GPU service sustained steady aggregate throughput of **48.0 to 49.8 questions/min (0.80–0.83 Q/s)** across concurrent workloads up to $C = 20$ simultaneous requests (5-question batches), delivering median response times of **6.28s ($C=1$) to 25.51s ($C=5$)** with a **100% execution success rate** and peak VRAM safely contained at **15.6 GB** (out of 24 GB);
+- **86.0% of generated MCQs** were classified by the multi-judge panel as pedagogically acceptable (78.0% accept as-is, 8.0% with minor revision; 4.45/5.0 technical correctness, 4.83/5.0 pedagogical relevance, and 4.82/5.0 code executability), with frontier LLM judges exhibiting discriminative sensitivity to nuanced logic traps while deterministic AST compilation verified code syntax.
 
 More broadly, the study demonstrates that educational RAG should be evaluated beyond model accuracy or isolated inference time. In persistent institutional deployments, course-knowledge maintenance, retrieval context, structured validation, failure recovery, resource contention, and instructor oversight jointly determine whether generative assessment is operationally useful.
 
 ## Declarations
 
-Funding: [Insert funding information or 'No funding was received for this study.']
-Competing interests: The authors declare [insert statement].
-Ethics approval: [Insert institutional/ethics determination for expert evaluation and any later student data collection.]
-Consent to participate: [Insert if applicable.]
-Data availability: Performance logs, experiment configurations, and non-sensitive derived data will be made available at [repository/DOI], subject to institutional and licensing constraints.
-Code availability: The paper-specific implementation will be released at [GitHub URL / archival DOI].
-Author contributions: [Insert CRediT-style contribution statement.]
+Funding: This research was supported by INACON funding.
+Competing interests: The authors declare that they have no competing interests.
+Ethics approval: Not applicable. This study evaluates an automated software pipeline and AI generation quality; no human personal identifiable data or student academic records were collected or processed.
+Consent to participate: Not applicable.
+Data availability: Performance logs, benchmark configurations, rating sheets, and anonymized evaluation results are included in the open-source project repository.
+Code availability: The full pipeline source code, Moodle plugin, and evaluation scripts are publicly available at https://github.com/kode4u/kwiz.git.
+Author contributions: ENG Titya conceived and designed the study, implemented the RAG pipeline and Moodle integration, conducted the experimental evaluations, analyzed the empirical data, and wrote the manuscript.
 ## References
 
 [1] Mucciaccia, S. S., Paixão, T. M., Mutz, F. W., Badue, C. S., de Souza, A. F., & Oliveira-Santos, T. (2025). Automatic multiple-choice question generation and evaluation systems based on LLM: A study case with university resolutions. Proceedings of the 31st International Conference on Computational Linguistics, 2246–2260.

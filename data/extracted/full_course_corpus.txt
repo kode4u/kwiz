@@ -1,0 +1,1787 @@
+======================================================================
+COURSE MODULE: 1 Python Installation and VS Code Setup on Windows
+======================================================================
+
+--- Page 1 ---
+Python Installation and VS Code Setup on 
+Windows
+A comprehensive guide to get started with Python development
+Windows Python VS Code
+1/16
+
+--- Page 2 ---
+Introduction and Overview
+This guide provides a comprehensive overview of installing Python on Windows and setting up Visual Studio Code as an 
+Studio Code as an integrated development environment.
+Python Installation
+• Download Python from the official website
+• Install Python with proper PATH configuration
+• Verify installation through command line
+VS Code Setup
+• Install Visual Studio Code editor
+• Install Python extension for VS Code
+• Select appropriate Python interpreter
+Why this matters: Setting up Python with VS Code provides a powerful integrated development environment for writing, running, and debugging Python 
+code.
+Python Installation and VS Code Setup on Windows 2 / 16
+
+--- Page 3 ---
+Downloading Python for Windows
+1 Visit the Official Website
+Navigate to python.org/downloads
+2 Select Your Version
+Choose the latest Python 3 release
+3 Choose Installer
+Select "Windows installer (64-bit)"
+Pro Tip: Always download from the official Python 
+website to ensure security.
+https://www.python.org/downloads/
+Python Releases
+Latest stable release: Python 3.13.0
+Windows Installer
+Windows executable installer
+Download
+64-bit version recommended for modern systems
+Python Installation and VS Code Setup 3 / 16
+
+--- Page 4 ---
+Python Installation Process
+Installation Steps
+Run the Installer
+Double-click the downloaded .exe file to start the 
+Python installer
+Add Python to PATH
+Check "Add Python.exe to PATH" on the first screen of 
+the installer
+Complete Installation
+Follow the on-screen prompts and click "Close" when 
+finished
+Installation Options
+"Install Now" (Default)
+• Performs a default installation into your user directory
+• Includes standard library, test suite, launcher, and pip
+• Typically does not require administrator privileges
+• Recommended for most users
+"Customize Installation"
+• Select specific features to install
+• Change the installation location
+• Perform an all-users installation (requires admin)
+• Install into Program Files directory
+Python Installation and VS Code Setup on Windows 4 / 16
+
+--- Page 5 ---
+Verifying Python Installation
+Verification Steps
+1 Open Command Prompt
+Press Win + R, type "cmd", and press Enter
+2 Check Python Version
+Type python --version or py -3 --version
+3 Check Pip Installation
+Type pip --version
+Command Prompt Output
+C:\Users\Example> python --version
+Python 3.13.0
+C:\Users\Example> pip --version
+pip 23.3.1 from C:\Python313\Lib\site-packages\pip (python 
+3.13)
+Expected Output: If installation was successful, the command prompt will display the 
+installed Python version (e.g., Python 3.13.0) and pip version.
+Python Installation and VS Code Setup on Windows 5 / 16
+
+--- Page 6 ---
+Installing Visual Studio Code
+Visual Studio Code is a free, open-source code editor developed by Microsoft for building applications.
+1 Download VS Code
+Visit code.visualstudio.com and download the Windows installer.
+2 Run the Installer
+Double-click the downloaded installer and follow the setup wizard.
+3 Choose Components
+Select components to install. The standard installation includes the core 
+editor and Git version control.
+4 Complete Installation
+Finish the installation and launch VS Code.
+Pro Tip: You can install VS Code for Windows, macOS, and Linux from the same website.
+Python Installation and VS Code Setup on Windows 6 / 16
+
+--- Page 7 ---
+Installing Python Extension in VS Code
+1 Open Extensions View
+Click the square icon in the Activity Bar on the side, or press 
+2 Search for Python
+Type "Python" in the search bar at the top of the Extensions view
+3 Install the Extension
+Locate the official "Python" extension by Microsoft and click "Install"
+Did you know? The Python extension often automatically bundles 
+other useful extensions such as Pylance (for language server features) 
+and Jupyter (for notebook support).
+Visual Studio Code
+Python
+by Microsoft
+Install
+Essential Python support including IntelliSense, linting, 
+debugging, and unit testing
+Bundled Extensions:
+Pylance Jupyter
+Python Installation and VS Code Setup on Windows 7 / 16
+
+--- Page 8 ---
+Selecting Python Interpreter
+Why Select an Interpreter?
+Selecting the correct Python interpreter ensures VS Code uses the desired version and packages for running, debugging, and providing IntelliSense.
+How to Select an Interpreter
+1 Open Command Palette: Press 
+2 Search for: Type "Python: Select Interpreter"
+3 Choose interpreter: Select your Python installation from the list
+Command Palette
+Python: Select Interpreter
+Select Python Interpreter
+Python 3.12.x 64-bit
+Python 3.11.x 64-bit
+Python 3.10.x 64-bit
+Python Installation and VS Code Setup on Windows 8 / 16
+
+--- Page 9 ---
+Creating Virtual Environment
+Use a project-specific virtual environment to isolate dependencies and prevent conflicts between different projects.
+1 Open Command Palette
+Press  to open the Command Palette
+2 Search for Command
+Type "Python: Create Environment"
+3 Select Environment Type
+Choose  from the list of environment types
+4 Select Python Interpreter
+Choose the Python installation you made earlier
+Command Palette Output
+$ Python: Create Environment
+Venv
+VirtualEnv
+CondaEnv
+# Select Venv for this tutorial
+Why Use Virtual Environments?
+• Isolate project dependencies
+• Prevent conflicts between projects
+• Ensure consistent development environment
+A  folder will appear in your workspace after creation.
+Python Installation and VS Code Setup on Windows 9 / 16
+
+--- Page 10 ---
+Writing and Running Python Code
+1 Create Python File
+In File Explorer, select "New File" button and name it with .py 
+extension (e.g., hello.py)
+2 Write Code
+Enter Python code with IntelliSense auto-completion support
+3 Save File
+Press Ctrl+S to save your changes
+4 Run Code
+Click "Run Python File" play button or right-click and select "Run 
+Python File in T erminal"
+msg = "Hello, World!"
+print(msg)
+# As you type, IntelliSense provides auto-completion
+Run Python File or Press Ctrl+F5
+Hello, World!
+Pro Tip: IntelliSense provides auto-completion options for Python modules and methods as you type.
+Python Installation and VS Code Setup on Windows 10 / 16
+
+--- Page 11 ---
+Debugging Python Code
+Setting Up Debugging
+• Set breakpoints by clicking in the editor's left gutter or pressing F9
+• Start debugging with F5 (or Run Python File in T erminal)
+• Select Python File when prompted
+Debug Console
+Interact with your program in the Debug Console:
+> msg.capitalize()
+'Hello, World!'
+Debug Toolbar Controls
+msg = "Hello, World!"
+print(msg)
+# Breakpoint here
+Continue Step Over Step Into
+Pro Tip: Use Step Over (F10) to execute lines without entering function 
+function calls. Use Step Into (F11) to debug inside functions.
+Python Installation and VS Code Setup on Windows 11 / 16
+
+--- Page 12 ---
+Debug Features and Tools
+VS Code provides powerful debugging tools for Python development, enabling comprehensive code inspection and troubleshooting.
+troubleshooting.
+Variables Window
+• Displays local variables during debugging
+• Shows variable names and values
+• Allows inspection of data during program 
+execution
+Debug Console
+• Interact with your program during debugging
+• Type expressions at the > prompt
+• Evaluate variables and functions
+Debug Toolbar
+• Continue (F5): Resume program execution
+• Step Over (F10): Execute current line
+• Step Into (F11): Enter function calls
+• Restart (Ctrl+Shift+F5): Restart debugging
+Pro Tip: Use the Variables window to inspect your program's state and the Debug Console to test expressions while debugging.
+Python Installation and VS Code Setup on Windows 12 / 16
+
+--- Page 13 ---
+Installing Python Packages
+Python Packages
+Python's ecosystem thrives on packages from PyPI (Python 
+Package Index) that extend its functionality.
+Key Point: Always install packages into your virtual 
+environment to isolate project dependencies.
+Installing Packages: Step-by-Step
+1 Modify your script to use the desired package:
+# hello.py
+import numpy as np
+msg = "Roll a dice!"
+print(msg)
+print(np.random.randint(1,9))
+2 Open integrated terminalin VS Code:
+Terminal → Create New Terminal
+3 Install the package using pip:
+>_ pip install numpy
+4 Verify installation by running your script:
+>_ python hello.py
+Python Installation and VS Code Setup on Windows 13 / 16
+
+--- Page 14 ---
+Managing Dependencies
+Recording Dependencies
+Python projects rely on external packages from PyPI. It's 
+important to record these dependencies to ensure consistent 
+consistent environments across machines.
+• Use pip freeze to list all installed packages
+• Redirect output to requirements.txt
+• Commit this file to version control
+Best Practice: Update requirements.txt regularly as you install 
+new packages.
+Creating requirements.txt
+# Create requirements.txt file
+pip freeze > requirements.txt
+# Contents of requirements.txt
+numpy==1.21.0
+pandas==1.3.0
+matplotlib==3.4.2
+Installing from requirements.txt
+# Install all dependencies
+pip install -r requirements.txt
+Python Installation and VS Code Setup on Windows 14 / 16
+
+--- Page 15 ---
+Best Practices Summary
+Key recommendations for effective Python development workflow:
+Virtual Environments
+• Use project-specific virtual environments
+• Isolate dependencies to prevent conflicts
+Interpreter Selection
+• Select correct Python interpreter
+• Verify interpreter in Status Bar
+Debugging Techniques
+• Use breakpoints effectively
+• Utilize debug toolbar options
+Package Management
+• Install packages in virtual environment
+• Use requirements.txt for dependencies
+Code Organization
+• Create clear project structure
+• Use meaningful variable names
+Extension Usage
+• Use Python extension for IntelliSense
+• Enable linting for code quality
+Key Takeaway:Following these practices ensures efficient Python development.
+Python Installation and VS Code Setup on Windows 15 / 16
+
+--- Page 16 ---
+Next Steps and Resources
+Continue your Python journey with these resources and next steps:
+Official Documentation
+• Python Documentation
+• VS Code Documentation
+Web Frameworks
+• Django Tutorial
+• Flask Documentation
+Advanced Features
+• Advanced debugging techniques
+• T esting functionalities
+Community Resources
+• Python Community
+• Stack Overflow
+Your journey continues:You're now ready to explore advanced Python development with VS Code.
+Python Installation and VS Code Setup on Windows 16 / 16
+
+======================================================================
+COURSE MODULE: 2 Python Programming Introduction
+======================================================================
+
+--- Page 1 ---
+{ }
+{ }
+{ }
+{ }
+Python
+Python Programming Introduction
+Learn the fundamentals of Python programming
+Syntax Variables Data Types Numbers Casting Operators
+
+--- Page 2 ---
+Python Syntax Fundamentals
+Indentation
+• Indentation defines code blocks
+• 4 spaces is the standard convention
+• Incorrect indentation raises IndentationError
+if True:
+print("Correct indentation")
+Comments
+• Single-line comments start with #
+• Multi-line comments use triple quotes
+• Comments are ignored by the interpreter
+# This is a single-line comment
+'''This is a multi-line comment.'''
+Statements & Lines
+• Statements typically end with a new line
+• Use backslash for explicit line continuation
+• Implicit continuation with parentheses/brackets
+total = 1 + 2 + \
+3 + 4
+numbers = [1, 2, 3,
+4, 5, 6]
+Best Practices
+• Avoid multiple statements on one line
+• Use meaningful names for variables/functions
+• Follow PEP 8 style guide
+Python Programming Introduction Page 2 of 9
+
+--- Page 3 ---
+Variables and Naming Rules
+Variable Declaration
+• Variables are created when assigned a value
+• No explicit declaration required
+• Values determine variable type
+age = 30 # Integer
+name = "Alice" # String
+is_student = True # Boolean
+Dynamic Typing
+• Python infers type from assigned value
+• Same variable can hold different types
+• Types checked at runtime
+x = 42 # x is an integer
+x = "Hello" # x is now a string
+x = False # x is now a boolean
+Naming Rules
+• Start with letter or underscore
+• Contain letters, numbers, underscores
+• Case-sensitive (age ≠ Age)
+• No Python keywords
+Valid Names:
+my_var _private var123 CamelCase snake_case
+Python Programming Introduction Page 3 of 9
+
+--- Page 4 ---
+Built-in Data Types Overview
+Text Type
+str
+Represents textual data enclosed in quotes.
+text = "Hello, Python!"
+type(text) # <class 'str'>
+Numeric Types
+int float complex
+Numbers, including integers, floats, and 
+complex numbers.
+integer = 42
+float = 3.14
+complex = 2 + 3j
+type(integer) # <class 'int'>
+Sequence Types
+list tuple range
+Ordered collections that can be indexed and 
+iterated.
+list_example = [1, 2, 3]
+tuple_example = (1, 2, 3)
+type(list_example) # <class 'list'>
+Mapping Type
+dict
+Unordered collections of key-value pairs.
+person = {"name": "Alice", "age": 30}
+type(person) # <class 'dict'>
+Boolean Type
+True False
+Represents truth values, result of logical 
+comparisons.
+is_active = True
+type(is_active) # <class 'bool'>
+Set Types
+set
+Unordered collections of unique elements.
+unique_numbers = {1, 2, 3, 3}
+type(unique_numbers) # <class 'set'>
+Python Programming Introduction Page 4 of 9
+
+--- Page 5 ---
+Numeric Types in Detail
+Integers (int)
+• Represent whole numbers without fractions
+• Unlimited precision (limited by memory)
+• Supports arbitrary precision arithmetic
+my_integer = 100
+print(type(my_integer)) # <class 'int'>
+Floats (float)
+• Represent real numbers with a decimal point
+• Can be specified using scientific notation
+• Typically double precision in Python
+my_float = 20.5
+scientific = 2.5e2 # 2.5 * 10^2 = 250.0
+print(type(my_float)) # <class 'float'>
+Numeric Operations Example
+int_a = 10
+int_b = 3
+# Integer division
+print(int_a // int_b) # 3
+float_a = 10.0
+float_b = 3.0
+# Float division
+print(float_a / float_b) # 3.3333333333333335
+Python Programming Introduction Page 5 of 9
+
+--- Page 6 ---
+Type Casting and Conversion
+int()
+Converts to integer (truncates decimal part)
+float_num = 10.7
+int_from_float = int(float_num)
+# Result: 10 (decimal part truncated)
+str_int = "45"
+int_from_str = int(str_int)
+# Result: 45
+float()
+Converts to floating-point number
+int_num = 5
+float_from_int = float(int_num)
+# Result: 5.0
+str_float = "67.89"
+float_from_str = float(str_float)
+# Result: 67.89
+str()
+Converts to string representation
+num_to_string = 123
+string_from_int = str(num_to_string)
+# Result: "123"
+bool_val = True
+str_from_bool = str(bool_val)
+# Result: "True"
+Error Handling
+Converting non-numeric strings raises ValueError:
+try:
+invalid_str_int = int("hello")
+except ValueError ase:
+print(e)
+Output:
+invalid literal for int() with base 10: 'hello'
+Python Programming Introduction Page 6 of 9
+
+--- Page 7 ---
+Arithmetic Operators
+Addition
++ Adds two operands
+Example: 5 + 2 = 7
+Subtraction
+- Subtracts second operand 
+from first
+Example: 4 - 2 = 2
+Multiplication
+* Multiplies two operands
+Example: 2 * 3 = 6
+Division
+/ Divides first operand by 
+second
+Example: 4 / 2 = 2.0
+Floor Division
+// Divides and floors result
+Example: 10 // 3 = 3
+Modulo
+% Returns remainder of 
+division
+Example: 5 % 2 = 1
+Code Example
+# Arithmetic Operators Example
+a = 10
+b = 3
+print("Addition:", a + b)
+print("Subtraction:", a - b)
+print("Multiplication:", a * b)
+print("Division:", a / b)
+print("Floor Division:", a // b)
+print("Modulo:", a % b)
+print("Exponentiation:", a ** b)
+Output:
+Addition: 13
+Subtraction: 7
+Multiplication: 30
+Division: 3.3333333333333335
+Floor Division: 3
+Modulo: 1
+Exponentiation: 1000
+Python Programming Introduction Page 7 of 9
+
+--- Page 8 ---
+Assignment and Comparison Operators
+Assignment Operators
+Operators used to assign values to variables. Can be used with other 
+operators for shorthand operations.
+Operator Example Meaning
+= a = 7 Basic assignment
++= a += 1 a = a + 1
+-= a -= 3 a = a - 3
+*= a *= 4 a = a * 4
+x = 5
+print("Initial x:", x)
+x += 3 # Equivalent to x = x + 3
+print("x after x += 3:", x)
+x -= 2 # Equivalent to x = x - 2
+Comparison Operators
+Operators that compare two values and return a Boolean result (True or 
+False).
+Operator Meaning Example Result
+== Equal to 3 == 5 False
+!= Not equal to 3 != 5 True
+> Greater than 3 > 5 False
+< Less than 3 < 5 True
+a = 7
+b = 5
+print("a == b is", a == b)
+print("a != b is", a != b)
+print("a > b is", a > b)
+print("a < b is", a < b)
+Python Programming Introduction Page 8 of 9
+
+--- Page 9 ---
+Logical Operators
+Boolean Logic Operations
+and
+Both conditions must be 
+True
+or
+At least one condition 
+must be True
+not
+Reverses the boolean 
+value
+Truth Tables
+AND Operator
+x y x and y
+True True True
+True False False
+False True False
+False False False
+OR Operator
+x y x or y
+True True True
+True False True
+False True True
+False False False
+Code Examples
+and Operator
+x = True
+y = False
+print(x and y) # Output: False
+or Operator
+x = True
+y = False
+print(x or y) # Output: True
+Best Practices
+• Use parentheses to clarify complex expressions
+• Short-circuit evaluation: and stops at first False
+# Clear and readable
+if (age >= 18 and has_license) or can_drive:
+print("Eligible to drive")
+
+======================================================================
+COURSE MODULE: 3_Python_Data_Structures_Lists,_Tuples,_Sets_&_Dictionaries
+======================================================================
+
+--- Page 1 ---
+Python Data Structures
+Lists, Tuples, Sets & Dictionaries
+[ ]
+Lists
+Mutable, ordered 
+collections
+( )
+Tuples
+Immutable, ordered 
+collections
+{ }
+Sets
+Mutable collections of 
+unique elements
+{:}
+Dictionaries
+Key-value pairs, fast 
+lookups
+
+--- Page 2 ---
+Introduction to Python Data Structures
+In Python, data structures are fundamental tools for 
+tools for organizing and storing data efficiently.
+efficiently.
+They provide a structured way to manage collections 
+collections of information, making it easier to access, 
+access, modify, and process data within your 
+programs.
+Key Benefits:
+• Efficient data organization
+• Optimized data retrieval
+• Simplified data manipulation
+• Improved program readability
+Lists
+Dynamic arrays that are ordered and 
+mutable
+Tuples
+Immutable sequences of elements
+Sets
+Collections of unique elements
+Dictionaries
+Key-value pairs for fast lookups
+Page 2 of 14
+[ ] ( )
+{ } {:}
+
+--- Page 3 ---
+Lists: The Dynamic Array
+Definition
+A versatile, built-in data structure that functions as an 
+ordered, mutable collection of items.
+Example
+my_list = [10, "hello", 3.14, True, 10]
+print(my_list)
+Output: [10, 'hello', 3.14, True, 10]
+Key Characteristics
+Ordered
+Elements maintain their insertion order, 
+with fixed index starting from 0.
+Mutable
+Elements can be added, removed, or 
+modified after creation.
+Allows Duplicates
+Lists can contain multiple occurrences of the 
+of the same element.
+Dynamic Sizing
+Lists can grow or shrink in size as needed, 
+without predefined size.
+Heterogeneous
+A single list can hold a mix of different data types (e.g., integers, strings, floats).
+Page 3 of 14
+
+--- Page 4 ---
+List Creation and Access Methods
+Creating Lists
+Lists are created using square brackets [ ].
+# Creating a list
+my_list = [10, "hello", 3.14, True, 10]
+print(f"Original list: {my_list}")
+Accessing Elements by Index
+Elements can be accessed using positive (0-indexed) or negative indices (-1-indexed).
+# Accessing elements
+print(f"First element: {my_list[0]}")
+print(f"Last element: {my_list[-1]}")
+# Output:
+# First element: 10
+# Last element: 10
+Slicing Lists
+Slicing accesses a range of elements using [start:end], where end is exclusive.
+exclusive.
+# Slicing a list
+print(f"Elements from index 1 to 3: {my_list[1:4]}")
+print(f"Elements from beginning to index 2: {my_list[:2]}")
+# Output:
+# Elements from index 1 to 3: ['hello', 3.14, True]
+# Elements from beginning to index 2: [10, 'hello']
+Visual Index Reference
+Page 4 of 14
+
+--- Page 5 ---
+Essential List Methods
+append(item)
+Adds an item to the end of the list.
+my_list = [1, 2, 3]
+my_list.append(4)
+print(my_list)  # Output: [1, 2, 3, 4]
+insert(index, item)
+Inserts an item at a specified position.
+my_list = [1, 2, 4]
+my_list.insert(2, 3)
+print(my_list)  # Output: [1, 2, 3, 4]
+remove(item)
+Removes the first occurrence of a specified item.
+my_list = [1, 2, 3, 2]
+my_list.remove(2)
+print(my_list)  # Output: [1, 3, 2]
+pop([index])
+Removes and returns the item at the given position.
+position.
+my_list = [1, 2, 3]
+popped = my_list.pop()
+print(popped)  # Output: 3
+print(my_list)  # Output: [1, 2]
+sort(key=None, reverse=False)
+Sorts the items of the list in place.
+my_list = [3, 1, 4, 1, 5]
+my_list.sort()
+print(my_list)  # Output: [1, 1, 3, 4, 5]
+len(list)
+Returns the number of items in a list.
+my_list = [1, 2, 3]
+length = len(my_list)
+print(length)  # Output: 3
+Page 5 of 14
+
+--- Page 6 ---
+Tuples: The Immutable Sequence
+A tuple in Python is an ordered collection of 
+elements that is immutable (cannot be changed 
+after creation).
+Key Characteristics:
+• Ordered - Elements maintain insertion order
+• Immutable - Cannot be modified after creation
+• Allows Duplicates - Can contain duplicate elements
+• Heterogeneous - Can contain different data types
+types
+Why use tuples? Their immutability makes them ideal 
+for fixed collections of related data, ensuring data 
+integrity and allowing use as dictionary keys.
+( index 0
+10
+index 1
+"hello"
+index 2
+3.14
+)
+Creating Tuples
+my_tuple = (1, "hello", 3.14)
+another_tuple = 10, 20, "Python"
+single_element = ("item",)
+Accessing Elements
+my_tuple[0] # Returns 10
+my_tuple[-1] # Returns 3.14
+my_tuple[1:3] # Returns ("hello", 
+3.14)
+Immutability
+my_tuple = (1, 2, 3)
+# my_tuple[0] = 5 # TypeError!
+Page 6 of 14
+
+--- Page 7 ---
+Tuple Creation and When to Use
+Tuple Creation
+Tuples are created using parentheses ( ):
+my_tuple = (1, "hello", 3.14, True)
+Single-element tuple requires trailing comma:
+single_element_tuple = ("item",)
+Accessing Elements
+my_tuple = (10, 20, 30, 40, 50)
+print(my_tuple[0]) # First element: 10
+print(my_tuple[-1]) # Last element: 50
+print(my_tuple[1:4]) # Slicing: (20, 30, 40)
+Tuples support indexing and slicing like lists, but cannot be modified.
+When to Use Tuples
+Dictionary Keys
+coordinates_data = {
+(40.7128, -74.0060): "New York City",
+(34.0522, -118.2437): "Los Angeles"
+}
+Performance
+Tuples are more memory-efficient and faster than lists for 
+lists for fixed collections.
+Function Returns
+def get_user_info():
+return "Alice", 30, "Engineer"
+name, age, profession = get_user_info()
+Page 7 of 14
+
+--- Page 8 ---
+Sets: The Unique Collection
+A Python set is an unordered, mutable collection of 
+unique elements.
+Sets automatically eliminate duplicate values.
+Unordered
+Elements have no defined 
+order
+Unique Elements
+Discards duplicate values
+Mutable
+Elements can be 
+added/removed
+Non-indexable
+Cannot be accessed by index
+Set Creation & Properties
+my_set = {1, 2, 3, 2, 4}
+# Output: {1, 2, 3, 4}
+fruits = {"apple", "banana", "cherry", "apple"}
+Visual Representation:
+Original: [1, 2, 3, 2, 4] Duplicates removed: {1, 2, 3, 4}
+Note: To create an empty set, use set(), not {}.
+Page 8 of 14
+
+--- Page 9 ---
+Set Operations and Methods
+Creating Sets
+Using curly braces:
+my_set = {1, 2, 3, 2, 4}
+print(my_set) # Output: {1, 2, 3, 4}
+Using set() constructor:
+empty_set = set()
+list_to_set = set([1, 2, 1, 3])
+Adding & Removing Elements
+Adding elements:
+fruits = {"apple", "banana"}
+fruits.add("cherry")
+print(fruits) # Output: {"apple", "banana", 
+"cherry"}
+Note: Removing non-existent element raises KeyError.
+Set Operations
+Union
+All elements from both sets
+set_a | set_b
+# or
+set_a.union(set_b)
+{1, 2, 3} | {3, 4, 5} = {1, 2, 3, 4, 5}
+Intersection
+Common elements in both sets
+set_a & set_b
+# or
+set_a.intersection(set_b)
+{1, 2, 3} & {3, 4, 5} = {3}
+Difference
+Elements in first set but not second
+set_a - set_b
+# or
+set_a.difference(set_b)
+{1, 2, 3} - {3, 4, 5} = {1, 2}
+Symmetric Difference
+Elements in either set, not both
+set_a ^ set_b
+# or
+set_a.symmetric_difference(set_
+b)
+{1, 2, 3} ^ {3, 4, 5} = {1, 2, 4, 5}
+Tip: Use the in operator to check element existence.
+Page 9 of 14
+
+--- Page 10 ---
+Dictionaries: The Key-Value Store
+Definition
+A dictionary in Python is a mutable collection of key-value 
+pairs where each unique key maps to a specific value.
+Key Characteristics
+• Mutability: Can be modified after creation
+• Unique keys: Each key can appear only once
+• Insertion order: Maintains order since Python 3.7+
+• Efficient retrieval: Fast access to values via keys
+Dictionary Structure
+# Creating a dictionary
+student = {"name": "Alice", "age": 20, "major": "Computer 
+Science"}
+Keys
+Unique identifiers
+Values
+Associated data
+Common Operations
+# Accessing values
+student["name"] # "Alice"
+# Adding/modifying
+student["gpa"] = 3.8
+# Removing items
+del student["major"]
+# Checking keys
+"name" in student # True
+Page 10 of 14
+
+--- Page 11 ---
+Dictionary Methods and Iteration
+Safe Value Access with .get()
+The .g et()m etho d retrieves a value fo r a g iven key, p reventing  
+K eyErro rif the key d oesn't exist.
+# Using .get() for an existing key
+student = {"name": "Bob", "id": 101}
+print(student.get("name")) # Output: Bob
+# Using .get() for a non-existent key
+print(student.get("email")) # Output: None
+# Using .get() with a default value
+print(student.get("phone", "N/A")) # Output: N/A
+Dictionary Iteration
+.keys()
+Iterates through keys
+.values()
+Iterates through values
+.items()
+Iterates through key-
+value pairs
+# Iterating through keys
+grades = {"math": 90, "science": 85}
+for subject in grades.keys():
+print(subject)
+# Iterating through key-value pairs
+for subject, score in grades.items():
+print(f"{subject}: {score}")
+Page 11 of 14
+
+--- Page 12 ---
+Data Structure Comparison
+Python offers four core data structures with distinct characteristics. Here's a comparison of their key features:
+Feature List Tuple Set Dictionary
+Mutability Mutable (changeable) Immutable (unchangeable) Mutable (elements can be 
+added/removed)
+Mutable (values can be changed, 
+keys are immutable)
+Ordering Ordered (maintains insertion order) Ordered (maintains insertion order) Unordered (no guaranteed order) Ordered (Python 3.7+ maintains 
+insertion order)
+Duplicates Allows duplicate elements Allows duplicate elements Does not allow duplicate elements Keys must be unique; values can be 
+duplicated
+Syntax
+[item1, item2]
+
+--- Page 13 ---
+Choosing the Right Data Structure
+Selecting the appropriate data structure is crucial for efficient Python code. Consider these guidelines based on your needs:
+Use Lists When:
+You need an ordered collection that can be modified after creation
+Implementing dynamic collections, stacks, or queues
+Order of elements matters for your algorithm
+Use Tuples When:
+You need an ordered collection that should not be changed
+Representing fixed collections of related data (coordinates)
+Using as dictionary keys (if all elements are immutable)
+Use Sets When:
+You need a collection of unique items
+Order of elements is not important
+Performing mathematical set operations or membership testing
+Use Dictionaries When:
+Storing data as key-value pairs for fast lookups
+Representing structured data (similar to JSON objects)
+Creating lookup tables or counting frequency of items
+Page 13 of 14
+
+--- Page 14 ---
+Practice Exercises
+Exercise 1: List Manipulation
+Remove element at index 4 from the list, then insert it at the 2nd position and add it to 
+the end.
+my_list = [54, 44, 27, 79, 91, 41]
+Expected Output: [54, 44, 91, 27, 79, 41, 91]
+Exercise 2: Set Operations
+Find the common elements between two sets and remove them from the first set.
+set_a = {23, 42, 65, 57, 78, 83, 29}
+Expected Output: Intersection {57, 83, 29}, First Set after removal {65, 42, 78, 23}
+Exercise 3: Dictionary Value Extraction
+Given a dictionary, extract all unique values and store them in a list.
+data_speed = {'jan': 47, 'feb': 52, 'march': 47, 'April': 44, 'May': 52, 'June': 53, 'july': 54, 'Aug': 44, 'Sept': 54}
+Expected Output: Unique values: [47, 52, 44, 53, 54]
+Exercise 4: List to Tuple Conversion
+Remove duplicates from a list, convert to a tuple, and find the min and max values.
+numbers_list = [87, 45, 41, 65, 94, 41, 99, 94]
+Expected Output: Unique items: [87, 45, 41, 65, 99], Tuple: (87, 45, 41, 65, 99), Min: 41, Max: 99
+Page 14 of 14
+
+======================================================================
+COURSE MODULE: 4 Python Conditional Statements for Beginners
+======================================================================
+
+--- Page 1 ---
+if else
+== !=><
+Python Conditional Statements
+for Beginners
+Learn how to make your programs think and decide what to do next
+
+--- Page 2 ---
+What Are Conditional Statements?
+Decision Making in Code
+Conditional statements are fundamental tools that allow your code to 
+code to make decisions based on whether certain conditions are true or 
+are true or false.
+They enable programs to execute different blocks of code based on 
+based on specific conditions.
+This ability to control the flow of a program is crucial for creating 
+creating dynamic and responsive applications.
+Real-World Analogy
+"If it is raining, I will take an umbrella."
+This simple thought process is exactly what conditional statements 
+statements enable computers to do.
+How Conditional Statements Work
+if condition:
+print("Do this")
+else:
+print("Do that")
+True → Execute ﬁrst block
+False → Execute else block
+
+--- Page 3 ---
+Understanding Conditions and Operators
+Comparison Operators
+Comparison operators compare two values and return a Boolean result (True
+result (True or False).
+== Equal to
+5 == 5 → True
+!= Not equal to
+5 != 10 → True
+> Greater than
+10 > 5 → True
+< Less than
+5 < 10 → True
+# Example in Python
+if x > y:
+print("x is greater than y")
+Logical Operators
+Logical operators combine multiple conditional statements to form more 
+complex conditions.
+and Both conditions must be True
+True and True → True
+True and False → False
+or At least one condition must be True
+True or False → True
+False or False → False
+not Reverses the Boolean value
+not True → False
+not False → True
+
+--- Page 4 ---
+The Basic if Statement
+How if Statements Work
+The if statement executes a block of code only if a given condition is true.
+Think of it as saying, "IF this is true, THEN do this."
+Syntax:
+if condition:
+# Code to execute if condition is True
+Important: The colon (:) is required!
+Examples
+Example 1:
+number = 10
+if number > 0:
+print("The number is positive.")
+print("This statement always executes.")
+Output:
+The number is positive.
+This statement always executes.
+
+--- Page 5 ---
+The if-else Statement
+Two-way Decision Making
+The `if-else` statement chooses between two actions based on a condition.
+condition.
+If condition is True, execute code after `if`.
+If condition is False, execute code after `else`.
+Exactly one code block will be executed.
+Syntax
+if condition:
+# Code to execute if True
+pass
+else:
+# Code to execute if False
+pass
+Example: Even or Odd
+number = 7
+if number % 2 == 0:
+print(f"{number} is even.")
+else:
+print(f"{number} is odd.")
+Output: "7 is odd."
+
+--- Page 6 ---
+The if-elif-else Statement
+Handling Multiple Conditions
+The if-elif-else statement allows you to check multiple 
+multiple conditions in a clear way.
+Python checks each condition one by one, from top to 
+top to bottom.
+As soon as it finds a condition that is True, it executes 
+executes the code block.
+If none are true, the else block (if present) is executed.
+executed.
+Visual Example
+score = 85
+if score >= 90:
+print("Grade: A")
+elif score >= 80:
+print("Grade: B")
+elif score >= 70:
+elif score >= 60:
+else:
+print("Grade: F")
+85 >= 90
+False
+85 >= 80
+True
+85 >= 70
+Skipped
+85 >= 60
+Skipped
+Output: "Grade: B"
+
+--- Page 7 ---
+Advanced Conditional Structures
+Nested if Statements
+An if statement placed inside another if statement.
+Refined control flow for complex decisions
+Multiple conditions evaluated sequentially
+if outer_condition:
+if inner_condition:
+execute_inner_block
+else:
+execute_outer_else
+else:
+execute_final_else
+Remember: Only executes innermost block when all outer conditions are True.
+Ternary Operator
+A concise way to write simple if-else statements in a single line.
+Compact syntax for simple conditions
+Readable code for straightforward assignments
+if age >= 18:
+status = "Adult"
+else:
+status = "Minor"
+status = "Adult" if age >= 
+18 else "Minor"
+Caution: Avoid overuse or nesting too many ternary operators as it can reduce 
+readability.
+When to Use Each Structure
+Nested if: Complex logic with multiple dependencies Ternary: Simple assignments that can be expressed concisely
+
+--- Page 8 ---
+Practice and Summary
+Key Takeaways
+Conditional statements allow programs to make decisions
+Basic if statement executes code when a condition is true
+if-else provides two paths for true and false conditions
+if-elif-else handles multiple conditions sequentially
+Comparison and logical operators form the foundation
+Practice Resources
+W3Schools
+Beginner-friendly exercises on conditional statements
+Programiz
+Practical examples with interactive code editor
+GeeksforGeeks
+Challenging problems to test your understanding
+Remember the Syntax
+if condition:
+print("True")
+if condition:
+print("True")
+else:
+print("False")
+if condition1:
+print("1")
+elif condition2:
+print("2")
+else:
+print("3")
+
+======================================================================
+COURSE MODULE: 5 Python For and While Loops
+======================================================================
+
+--- Page 1 ---
+Python For and While Loops
+A Beginner's Guide to Repetition in Programming
+# Simple for loop example
+for i in range(5):
+print("Hello, World!")
+# While loop example
+while i > 0:
+print(i)
+i -= 1
+
+--- Page 2 ---
+What Are Loops?
+Loops are fundamental structures in 
+programming that allow you to:
+Automate repetitive tasks
+Repeat actions multiple times
+Execute code blocks until conditions are met
+Process collections of data efficiently
+Stirring a 
+mixture
+until it 
+thickens
+| Brushing 
+teeth
+every 
+morning
+| Adding numbers
+until sum reaches 
+target
+
+--- Page 3 ---
+The For Loop Basics
+What is a For Loop?
+A for loop is used to iterate over a sequence (like a 
+list, tuple, string, or range) and execute a block of 
+code for each item.
+Best used when you know how many times to repeat
+Automatically handles iteration over collections
+Basic Syntax
+# Basic syntax
+for item in sequence:
+# Code to execute for each item
+print(item)
+Examples
+Iterating over a List
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+print(fruit)
+apple banana cherry
+Iterating over a String
+word = "Python"
+for char in word:
+print(char)
+P y t h o n
+For loops are perfect when you need to process each item in a collection!
+
+--- Page 4 ---
+Using Range() with For Loops
+The range() function generates sequences of numbers for for loops.
+range(stop)
+Starts from 0, goes up to (but not 
+including) stop
+# range(5)
+for i in range(5):
+print(i)
+0 1 2 3 4
+range(start, stop)
+Starts from start, goes up to (but not 
+including) stop
+# range(2, 6)
+for i in range(2, 6):
+print(i)
+2 3 4 5
+range(start, stop, step)
+Starts from start, goes up to stop, 
+incrementing by step
+# range(0, 10, 2)
+for i in range(0, 10, 2):
+print(i)
+0 2 4 6 8
+Key Points
+• The stop parameter is exclusive - it's not included in the sequence
+• Range generates numbers on-demand, not storing all values in memory at once
+• Range works with negative steps for decreasing sequences
+4/8
+
+--- Page 5 ---
+The While Loop Fundamentals
+What is a While Loop?
+A while loop repeats execution as long as 
+a condition remains true. It's ideal when 
+you don't know how many iterations 
+you'll need.
+Basic Syntax
+# Basic Structure
+while condition:
+# Code to execute
+# Until condition becomes false
+Key Characteristics
+Continues until condition becomes false
+Useful for unknown iteration counts
+Requires condition update to avoid 
+infinite loops
+Example
+# Count down from 5 to 1
+count = 5
+while count > 0:
+print(count)
+count -= 1
+# Output: 5, 4, 3, 2, 1
+
+--- Page 6 ---
+Avoiding Infinite Loops
+What is an Infinite Loop?
+A loop that runs continuously without stopping 
+because its condition never becomes False.
+Common Causes
+Condition variable not updated within loop
+Logic error in condition expression
+Unintended side effects modifying loop condition
+Prevention Strategies
+Always update loop control variables
+Ensure loop condition will become false
+Test with simple cases first
+Problematic Example
+# This creates an infinite loop!
+age = 32
+while age > 18:
+print('You can vote')
+# age never updated
+Fixed Example
+# Properly updated condition
+count = 1
+while count <= 5:
+print(count)
+count = count + 1
+# count updated, loop will end
+Infinite
+→
+Controlled
+
+--- Page 7 ---
+Loop Control with Break and Continue
+The break Statement
+Exits the loop immediately
+Terminates the entire loop
+Program continues after the loop
+# Example with for loop
+fruits = ["apple", "banana", "cherry", "orange"]
+for fruit in fruits:
+if fruit == "cherry":
+# Exit the loop when cherry is found
+break
+print(fruit)
+apple banana cherry orange Stops at cherry
+The continue Statement
+Skips the rest of the current iteration
+Continues to the next iteration
+Does not exit the loop entirely
+# Example with for loop
+numbers = [1, 2, 3, 4, 5, 6]
+for num in numbers:
+if num % 2 == 0: # If even
+# Skip printing for even numbers
+continue
+print(num)
+1 2 3 Skips even numbers
+Both statements control loop execution based on conditionsUse break to exit early, continue to skip items
+
+--- Page 8 ---
+Choosing the Right Loop Type
+For Loops
+Use when you know the number of iterations in advance
+Ideal for sequences (lists, strings, tuples)
+Automatically handles iteration variables
+While Loops
+Use when the number of iterations is unknown
+Continue until a condition becomes false
+Better for user input validation and event handling
+For Loop Example
+# Processing a list of items
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+print(fruit)
+Best choice: We know exactly how many items are in the list
+While Loop Example
+# Getting user input
+user_input = ""
+while user_input != "quit":
+user_input = input("Enter command: ")
+print(user_input)
+Best choice: We don't know how many inputs the user will provide
+Pro Tip: Start with a for loop. If you don't know the number of iterations, use a while loop.
+
+======================================================================
+COURSE MODULE: 6 Python Functions
+======================================================================
+
+--- Page 1 ---
+Python Functions
+Mastering Code Reusability and Organization
+def greet(name) :
+# A simple function example
+print(f"Hello, {name}!" )
+Built-in User-defined Lambda
+Report Date: 2025-12-23
+
+--- Page 2 ---
+What is a Function?
+Definition
+A named, self-contained block of code designed to perform a 
+specific task
+Only runs when it is called
+Can optionally return data as a result
+# A simple function definition
+def greet():
+print("Hello from a function!")
+# Calling the function
+greet() # Output: "Hello from a function!"
+Types of Functions
+Built-in Functions
+print() len()
+type() int()
+User-defined Functions
+Created by developers to address specific needs
+def calculate_area(length, width):
+return length * width
+2/13
+
+--- Page 3 ---
+Why Use Functions?
+Functions offer several key benefits for writing organized and efficient Python code:
+Code Reusability
+Write code once and execute it multiple times, 
+adhering to the "Don't Repeat Yourself" (DRY) 
+principle. Changes only need to be made in 
+one place.
+Modularity
+Break down complex programs into smaller, 
+manageable, and independent units, each 
+performing a specific task.
+Abstraction
+Manage complexity by providing a simplified 
+interface. Users only need to know the 
+function name and expected inputs.
+Maintainability
+Code structured with functions is easier to 
+understand, correct, enhance, and adapt over 
+time. Changes can be isolated to specific 
+functions.
+Testability
+Functions with clear arguments and explicit 
+return values are easier to test, ensuring they 
+behave as expected.
+Functions are the building blocks of well-
+structured programs
+3/13
+
+--- Page 4 ---
+Basic Function Syntax
+Function Definition
+Use the def keyword to define a function:
+def function_name(parameter1, 
+parameter2):
+# Function body
+pass
+• Function name should be descriptive
+• Parameters are placeholders
+• Use meaningful parameter names
+Function Calling
+To execute a function, call it by name:
+# Calling a function
+function_name(argument1, argument2)
+• Use function name followed by parentheses
+• Provide arguments matching parameters
+• Function executes when called
+Parameters vs Arguments
+Parameters
+Placeholders in 
+function definition
+def 
+greet(name)
+:
+Arguments
+Actual values when 
+calling
+greet("Alice")
+Example:
+def greet(name):
+print(f"Hello, {name}!")
+greet("Alice") # Output: Hello, 
+Alice!
+4/13
+
+--- Page 5 ---
+The Return Statement
+Purpose
+The return statement serves two 
+primary purposes:
+Sends a value back to the caller
+Immediately terminates 
+function execution
+def add(a, b):
+result = a + b
+return result
+sum_result = add(3, 5)
+Single Value
+Functions can return any data 
+type:
+Numbers
+Strings
+Lists, dictionaries, etc.
+def square(number):
+return number * number
+result = square(5)
+# Returns 25
+Multiple Values
+Functions can return multiple 
+values:
+Values are packed into a tuple
+Can be unpacked during 
+assignment
+def get_coordinates():
+x = 10
+y = 20
+return x, y
+coords = get_coordinates()
+# Returns (10, 20)
+Implicit None
+If no return statement is provided:
+Function implicitly returns 
+None
+Equivalent to return None
+def do_nothing():
+pass
+result = do_nothing()
+# Returns None
+5/13
+
+--- Page 6 ---
+Function Arguments Types
+Feature Positional Arguments Keyword Arguments
+Order Strict order matching parameters Order does not matter; arguments are 
+named
+Readability Can be less readable with many args Enhances readability by naming 
+parameters
+Flexibility Less flexible; changing order causes errors More flexible; order can be arbitrary
+Requirement Required unless default value provided Can be optional with default value
+# Function definition
+def calculate_cost(item, quantity, 
+price):
+print(f"{quantity} {item} cost 
+${quantity * price:.2f}")
+Positional Arguments
+# Order matters
+# calculate_cost("bananas", 6, 
+0.74)
+# Output: 6 bananas cost $4.44
+Error: Changing order causes bugs
+Keyword Arguments
+# Order does not matter
+# calculate_cost(price=0.74, 
+quantity=6, item="bananas")
+# Output: 6 bananas cost $4.44
+Best practice: Improves readability
+6/13
+
+--- Page 7 ---
+Default Arguments
+Using Default Arguments
+Parameters with predefined values if no argument is provided
+Makes parameters optional in function calls
+# Function with default parameters
+def greet(name="World", message="Hello"):
+print(f"{message}, {name}!")
+greet() # Output: "Hello, World!"
+greet("Alice") # Output: "Hello, Alice!"
+greet("Bob", "Hi") # Output: "Hi, Bob!"
+Best Practices
+Mutable Default Arguments
+Avoid using mutable objects (lists, dictionaries) as default values:
+# DON'T DO THIS
+def add_item(item, items=[]): # Risky!
+items.append(item)
+return items
+Recommended Approach
+Use N o neas default and initialize inside function:
+# DO THIS INSTEAD
+def add_item(item, items=None):
+if items is None :
+items = []
+items.append(item)
+return items
+7/13
+
+--- Page 8 ---
+Arbitrary Arguments
+*args
+Allows a function to accept an arbitrary number of positional 
+arguments
+Arguments are collected into a tuple
+The * operator is the unpacking operator
+def sum_all(*numbers):
+return sum (numbers)
+result = sum_all(1, 2, 3, 4, 5)
+Output: 15
+**kwargs
+Allows a function to accept an arbitrary number of keyword 
+arguments
+Arguments are collected into a dictionary
+The ** operator unpacks keyword arguments
+def display_info(**details):
+for key, value in details.items():
+print(f"{key}: {value}")
+display_info(name="Alice", age=30)
+Output:
+name: Alice
+age: 30
+8/13
+
+--- Page 9 ---
+Lambda Functions
+Definition & Syntax
+Small, anonymous functions defined with the lambda keyword
+Can take any number of arguments
+Can only have one expression
+Expression is automatically returned, no need for return
+statement
+# Lambda syntax
+lambda arguments: expression
+# Example: Multiply three numbers
+x = lambda a, b, c : a * b * c
+print(x(5, 4, 3)) # Output: 60
+Comparison & Use Cases
+# Equivalent regular function
+def multiply(a, b, c):
+return a * b * c
+print(multiply(5, 4, 3)) # Output: 60
+Common Use Cases
+filter()
+Filter elements based 
+on a condition
+map()
+Apply a function to 
+each element
+sorted()
+Sort using custom key 
+function
+# Lambda with map() to square numbers
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = list(map(lambda x: x ** 2, numbers))
+print(squared_numbers) # Output: [1, 4, 9, 16, 25]
+9/13
+
+--- Page 10 ---
+Decorators
+What are Decorators?
+Powerful feature that modifies function behavior without altering 
+original code
+"Wrap" another function, adding functionality before/after 
+execution
+Applied using @ syntax above function definition
+# Original function
+def my_function():
+pass
+# Decorator
+@my_decorator
+def my_function():
+Example: Logging Decorator
+# Decorator definition
+def log_function_call (func):
+def wrapper(*args, **kwargs):
+# Before function call
+print(f"Calling function: {func.__name__}")
+result = func(*args, **kwargs)
+# After function call
+print(f"Function {func.__name__} finished. Result: 
+{result}")
+return result
+return wrapper
+# Function with decorator
+@log_function_call
+def add(a, b):
+return a + b
+@log_function_call is syntactic sugar for add = log_function_call(add)
+10/13
+
+--- Page 11 ---
+Generators
+What are Generators?
+Special type of iterable that produces values one at a time
+Highly memory-efficient for large datasets
+Function execution pauses at yield and resumes on next call
+Defined like regular functions but use yield instead of return
+Memory Efficiency
+Generator Example
+# Generator function
+def count_up_to(max_num):
+count = 1
+while count <= max_num:
+yield count
+count += 1
+# Using the generator
+counter = count_up_to(5)
+# Generator is lazy - no execution yet!
+for number in counter:
+print(number)
+# Output:
+# 1
+# 2
+# 3
+# 4
+# 5
+11/13
+
+--- Page 12 ---
+Documentation Best Practices
+Docstrings
+String literals as the first statement in a function
+Concise summary of purpose, arguments, and return values
+Accessed via __d o c__attribute or help() function
+"""Calculate the average of a list of numbers.
+Parameters
+----------
+numbers : list[float]
+A list of numeric values.
+Returns
+-------
+float
+The arithmetic mean of the provided numbers.
+"""
+Type Annotations
+Optional specification of expected types (Python 3.5+)
+Improves code clarity and enables static type checkers
+Added with colons (:) for parameters and arrows (->) for return 
+values
+def calculate_average(numbers: list[float]) -> float:
+# Function implementation
+return sum(numbers) / len(numbers)
+Best Practice: Combine docstrings and type annotations
+12/13
+
+--- Page 13 ---
+Real-World Applications
+Data Analysis
+Functions clean, transform, and analyze datasets
+def calculate_stats(data):
+return sum(data)/len(data)
+Web Development
+Functions process requests and return responses
+def handle_request():
+return render_template('index.html')
+Automation
+Functions automate repetitive tasks
+def rename_files(pattern):
+for file in os.listdir():
+os.rename(file, file.replace(pattern, 
+''))
+Machine Learning
+Functions define models and implement training loops
+def train_model(data):
+model = create_model()
+for epoch in range(100):
+model.fit(data)
+Software Development
+Functions create modular components for software systems
+def create_gui():
+button = create_button('Click me')
+window.add_component(button)
+Python functions are the building blocks of efficient and maintainable code across diverse domains
+13/13
+
+======================================================================
+COURSE MODULE: file
+======================================================================
+
+--- Slide 1 ---
+Read Write and Create File
+Read
+Write
+Create
+
+--- Slide 2 ---
+Read File
+Use built-in open() function.
+
+--- Slide 3 ---
+Read File
+Use built-in open() function.Using the with keyword
+
+--- Slide 4 ---
+Read File
+Use built-in open() function.Read Only Parts of the File
+
+--- Slide 5 ---
+Read File
+Use built-in open() function.By looping through the lines of the file
+
+--- Slide 6 ---
+Write File
+To write to an existing file, you must add a parameter to the open() function:
+"a" - Append - will append to the end of the file
+
+"w" - Write - will overwrite any existing content

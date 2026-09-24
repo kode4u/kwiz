@@ -1480,6 +1480,17 @@ def evaluation_dashboard():
     return render_template('dashboard.html')
 
 
+@app.route('/evaluation')
+@app.route('/evaluate')
+def research_evaluation_dashboard():
+    """Render the comprehensive research evaluation dashboard (E1-E4)."""
+    eval_html_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'evaluate', 'dashboard.html')
+    if os.path.exists(eval_html_path):
+        with open(eval_html_path, 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return "Evaluation dashboard not generated yet. Run scripts/build_evaluation_dashboard.py", 404
+
+
 @app.route('/api/dashboard/stats', methods=['GET'])
 def api_dashboard_stats():
     """Global aggregate stats across all recorded iterations."""

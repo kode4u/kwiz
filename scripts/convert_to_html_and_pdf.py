@@ -77,13 +77,19 @@ html_template = f"""<!DOCTYPE html>
             margin-bottom: 6px;
             color: #1a4a72;
         }}
+        h1, h2, h3, h4 {{
+            page-break-after: avoid;
+            break-after: avoid;
+        }}
         h4 {{
             font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 10pt;
             font-weight: bold;
-            margin-top: 12px;
-            margin-bottom: 4px;
+            margin-top: 14px;
+            margin-bottom: 6px;
             color: #2c3e50;
+            page-break-after: avoid;
+            break-after: avoid;
         }}
         p {{
             text-align: justify;

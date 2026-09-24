@@ -1,0 +1,51 @@
+[
+  {
+    "source_file": "1 Python Installation and VS Code Setup on Windows.pdf",
+    "extracted_txt": "1_python_installation_and_vs_code_setup_on_windows.txt",
+    "characters": 10426,
+    "words": 1564,
+    "approx_tokens": 2606
+  },
+  {
+    "source_file": "2 Python Programming Introduction.pdf",
+    "extracted_txt": "2_python_programming_introduction.txt",
+    "characters": 6459,
+    "words": 1106,
+    "approx_tokens": 1614
+  },
+  {
+    "source_file": "3_Python_Data_Structures_Lists,_Tuples,_Sets_&_Dictionaries.pdf",
+    "extracted_txt": "3_python_data_structures_lists_tuples_sets_&_dictionaries.txt",
+    "characters": 10844,
+    "words": 1715,
+    "approx_tokens": 2711
+  },
+  {
+    "source_file": "4 Python Conditional Statements for Beginners.pdf",
+    "extracted_txt": "4_python_conditional_statements_for_beginners.txt",
+    "characters": 4774,
+    "words": 770,
+    "approx_tokens": 1193
+  },
+  {
+    "source_file": "5 Python For and While Loops.pdf",
+    "extracted_txt": "5_python_for_and_while_loops.txt",
+    "characters": 4808,
+    "words": 833,
+    "approx_tokens": 1202
+  },
+  {
+    "source_file": "6 Python Functions.pdf",
+    "extracted_txt": "6_python_functions.txt",
+    "characters": 9256,
+    "words": 1324,
+    "approx_tokens": 2314
+  },
+  {
+    "source_file": "file.pptx",
+    "extracted_txt": "file.txt",
+    "characters": 588,
+    "words": 112,
+    "approx_tokens": 147
+  }
+]

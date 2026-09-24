@@ -194,7 +194,7 @@ def main():
     for t in topics:
         qids_t = [qid for qid in data if data[qid]["topic"] == t]
         for dim_key, _ in DIMENSIONS:
-            t_vals = [data[qid]["raters"][r].get(dim_key, 5.0) for qid in qids_t for r in rater_names]
+            t_vals = [data[qid]["raters"].get(r, {}).get(dim_key, 5.0) for qid in qids_t for r in rater_names]
             m, s = compute_mean_std(t_vals)
             topic_results[t][dim_key] = f"{m:.2f} ± {s:.2f}"
 

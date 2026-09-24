@@ -1,121 +1,76 @@
 #!/usr/bin/env python3
 """
-Experiment 3 (E3): Generate Multi-Scale Curricular Corpora.
-Generates synthetic/modular programming course materials across 4 token sizes:
-- 10k tokens (~40,000 characters)
-- 50k tokens (~200,000 characters)
-- 100k tokens (~400,000 characters)
-- 250k tokens (~1,000,000 characters)
-Each corpus contains distinct modules, chapters, code examples, and theoretical discussions.
+Experiment 3 (E3): Build Curriculum Progression Scales from 100% Authentic Course Materials.
+ZERO looping, ZERO duplication, ZERO synthetic text.
+Constructs 4 authentic curricular scales representing progressive course stages:
+- Scale 1: Single Module (Module 1: Setup & Environment) ~2.6k tokens
+- Scale 2: Fundamentals (Modules 1-3: Setup, Syntax, Data Structures) ~6.9k tokens
+- Scale 3: Control Flow (Modules 1-5: Adding Conditionals & Loops) ~9.3k tokens
+- Scale 4: Full Course (All 7 Lecture Modules) ~12.1k tokens
 """
 
 import os
 import sys
-import argparse
 
-MODULE_TEMPLATES = [
-    ("Module {m}: Control Flow and Logic in Python", """
-    In this module, we examine structured programming constructs including conditional branching,
-    iteration protocols, and loop optimizations. Python employs the 'if-elif-else' hierarchy for multi-way
-    decision logic. The interpreter evaluates expressions lazily through boolean short-circuit mechanics:
-    in 'A and B', if A is falsy, B is never evaluated; in 'A or B', if A is truthy, B is skipped.
-    
-    ```python
-    def evaluate_flow(val):
-        if val > 100:
-            return 'high'
-        elif val > 50:
-            return 'medium'
-        else:
-            return 'low'
-    ```
-    Iterators adhere to the protocol requiring '__iter__()' returning an iterator and '__next__()' raising StopIteration.
-    """),
-    ("Module {m}: Data Structures and Computational Complexity", """
-    This chapter explores abstract data types (ADTs) and their concrete implementations in CPython.
-    Lists are implemented as dynamically resizing arrays of pointers (compact flat arrays of object pointers).
-    Amortized complexity for append is O(1), whereas arbitrary insertions at index 0 require O(n) memory shifts.
-    
-    ```python
-    def collect_squares(limit):
-        return [i * i for i in range(limit) if i % 2 == 0]
-    ```
-    Dictionaries and sets are implemented as open-addressing hash tables utilizing perturb-based probing.
-    Lookups average O(1) time complexity provided key hash distributions minimize collision frequency.
-    """),
-    ("Module {m}: Object-Oriented Software Design and Encapsulation", """
-    Object-oriented paradigms model domain entities via classes containing state and behavior.
-    Encapsulation is achieved by scoping conventions. While languages like C++ and Java enforce access control
-    via private/protected specifiers at compilation, Python relies on name mangling for leading double-underscore attributes.
-    
-    ```python
-    class BankAccount:
-        def __init__(self, owner, balance=0.0):
-            self.owner = owner
-            self._balance = balance
-            
-        def deposit(self, amount):
-            if amount > 0:
-                self._balance += amount
-                return True
-            return False
-    ```
-    Multiple inheritance resolves method ambiguity through C3 Linearization, accessible via the '__mro__' attribute.
-    """),
-    ("Module {m}: Concurrency, Asynchronous I/O, and the Global Interpreter Lock", """
-    CPython execution is constrained by the Global Interpreter Lock (GIL), a mutual exclusion lock
-    preventing multiple native threads from executing Python bytecodes concurrently within a single process.
-    CPU-bound multi-threading does not yield linear parallel speedups; instead, multiprocessing or C-extension offloading is mandated.
-    
-    ```python
-    import asyncio
-
-    async def fetch_coroutine(cid):
-        await asyncio.sleep(0.01)
-        return f'item_{cid}'
-    ```
-    For I/O-bound operations, asynchronous coroutines cooperatively yield control via an event loop.
-    """)
+ORDERED_MODULES = [
+    ("1_python_installation_and_vs_code_setup_on_windows.txt", "Module 1: Python Installation & VS Code Setup"),
+    ("2_python_programming_introduction.txt", "Module 2: Python Programming Introduction"),
+    ("3_python_data_structures_lists_tuples_sets_&_dictionaries.txt", "Module 3: Python Data Structures"),
+    ("4_python_conditional_statements_for_beginners.txt", "Module 4: Conditional Statements"),
+    ("5_python_for_and_while_loops.txt", "Module 5: For and While Loops"),
+    ("6_python_functions.txt", "Module 6: Python Functions"),
+    ("file.txt", "Module 7: Course Summary & Review")
 ]
 
-def generate_corpus_file(target_tokens: int, output_path: str):
-    # Approximate ratio: 1 token ~= 4 characters / 0.75 words
-    target_chars = target_tokens * 4
-    content = [f"# COURSE SYLLABUS AND COMPREHENSIVE TEXTBOOK ({target_tokens // 1000}k Tokens)\n"]
-    
-    module_idx = 1
-    current_len = sum(len(c) for c in content)
-    
-    while current_len < target_chars:
-        title_tpl, body_tpl = MODULE_TEMPLATES[(module_idx - 1) % len(MODULE_TEMPLATES)]
-        title = title_tpl.replace("{m}", str(module_idx))
-        body = body_tpl.replace("{m}", str(module_idx))
-        block = f"\n## {title}\n{body}\n"
-        content.append(block)
-        current_len += len(block)
-        module_idx += 1
-
-    final_text = "".join(content)
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(final_text)
-
-    actual_tokens = len(final_text) // 4
-    print(f"[OK] Generated {output_path}: {len(final_text):,} chars (~{actual_tokens:,} tokens, {module_idx} sections)")
+SCALES = [
+    ("scale_1_module1", "Single Module (Week 1 Quiz)", 1),
+    ("scale_2_modules1_3", "Course Fundamentals (Unit Quiz)", 3),
+    ("scale_3_modules1_5", "Control Flow Sequence (Midterm Scope)", 5),
+    ("scale_4_full_course", "Complete Course Curriculum (Final Assessment)", 7)
+]
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Corpora for E3 Corpus Scaling")
-    parser.add_argument("--output-dir", default="corpora", help="Output directory for generated corpora")
-    args = parser.parse_args()
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    extracted_dir = os.path.join(base_dir, "data", "extracted")
+    corpora_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "corpora")
+    os.makedirs(corpora_dir, exist_ok=True)
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    out_dir = os.path.join(base_dir, args.output_dir)
-    os.makedirs(out_dir, exist_ok=True)
+    # Clean old corpora files
+    for old_f in os.listdir(corpora_dir):
+        if old_f.endswith(".txt"):
+            try:
+                os.remove(os.path.join(corpora_dir, old_f))
+            except Exception:
+                pass
 
-    token_sizes = [10_000, 50_000, 100_000, 250_000]
-    for size in token_sizes:
-        label = f"{size // 1000}k"
-        fpath = os.path.join(out_dir, f"corpus_{label}.txt")
-        generate_corpus_file(size, fpath)
+    print("=== Generating Authentic Curriculum Progression Scales (Zero Duplication) ===")
+
+    for scale_id, label, count in SCALES:
+        modules_slice = ORDERED_MODULES[:count]
+        combined = []
+        header = f"# NUBB AUTHENTIC COURSE CURRICULUM: {label.upper()}\n"
+        header += f"# Contains {count} authentic lecture modules. Zero synthetic text.\n\n"
+        combined.append(header)
+
+        for fname, mod_title in modules_slice:
+            fpath = os.path.join(extracted_dir, fname)
+            if not os.path.isfile(fpath):
+                raise FileNotFoundError(f"Missing authentic module file: {fpath}")
+            with open(fpath, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+            section = f"\n\n{'='*70}\n{mod_title.upper()}\n{'='*70}\n\n{content}\n"
+            combined.append(section)
+
+        full_scale_text = "".join(combined)
+        out_path = os.path.join(corpora_dir, f"{scale_id}.txt")
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write(full_scale_text)
+
+        chars = len(full_scale_text)
+        approx_tokens = chars // 4
+        print(f"[BUILT] {scale_id}.txt ({label}): {chars:,} chars (~{approx_tokens:,} authentic tokens, {count} modules)")
+
+    print("\n[SUCCESS] All authentic progression scales generated cleanly.")
 
 if __name__ == "__main__":
     main()

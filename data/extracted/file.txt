@@ -1,0 +1,28 @@
+--- Slide 1 ---
+Read Write and Create File
+Read
+Write
+Create
+
+--- Slide 2 ---
+Read File
+Use built-in open() function.
+
+--- Slide 3 ---
+Read File
+Use built-in open() function.Using the with keyword
+
+--- Slide 4 ---
+Read File
+Use built-in open() function.Read Only Parts of the File
+
+--- Slide 5 ---
+Read File
+Use built-in open() function.By looping through the lines of the file
+
+--- Slide 6 ---
+Write File
+To write to an existing file, you must add a parameter to the open() function:
+"a" - Append - will append to the end of the file
+
+"w" - Write - will overwrite any existing content

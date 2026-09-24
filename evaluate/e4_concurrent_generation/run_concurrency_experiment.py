@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-Experiment 4 (E4): Concurrent Generation & Single-GPU Operating Envelope.
-Tests concurrency levels C in {1, 2, 5, 10, 20} concurrent teacher requests.
+Experiment 4 (E4): Concurrent Generation & Single-GPU Operating Envelope (Strict Physical Mode).
+Tests concurrency levels C in {1, 2, 5, 10, 20} simultaneous instructor generation requests.
 Measures:
 - Latency percentiles: P50 (median), P95, P99, Max latency
 - Aggregate throughput: Questions/sec (Q/s) and Requests/min
-- System resource saturation (GPU VRAM, GPU compute %, RAM, CPU)
+- System resource saturation (GPU VRAM peak, GPU compute % avg, RAM, CPU)
 - Error and timeout rates
+
+ZERO mock, ZERO sleep, ZERO synthetic calculation.
+All requests are submitted concurrently over HTTP and hardware metrics are sampled live via nvidia-smi.
 """
 
 import os
@@ -18,7 +21,6 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 
-# Import local monitor
 try:
     from system_resource_monitor import SystemResourceMonitor
 except ImportError:
@@ -27,87 +29,71 @@ except ImportError:
 
 CONCURRENCY_LEVELS = [1, 2, 5, 10, 20]
 
-SAMPLE_TOPICS = [
-    "Python Functions & Recursion",
-    "Object-Oriented Design & Polymorphism",
-    "Data Structures & Complexity",
-    "Exception Handling Mechanics",
-    "File Streams & Serialization"
+AUTHENTIC_TOPICS = [
+    "Python Installation and Setup",
+    "Python Programming Introduction",
+    "Python Data Structures",
+    "Python Conditional Statements",
+    "Python For and While Loops",
+    "Python Functions"
 ]
 
-SAMPLE_CONTEXT = """
-Python Course Assessment Material.
-Topic: Functions, Memory Management, and Classes.
-All variables are object references. Objects are allocated on the private heap.
-CPython uses reference counting supplemented by an internal cyclic garbage collector.
-Inheritance utilizes the C3 Linearization algorithm to determine method resolution order.
-Context managers implement __enter__ and __exit__ to ensure deterministic resource disposal.
-"""
+def load_authentic_course_corpus() -> str:
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    extracted_corpus = os.path.join(base_dir, "data", "extracted", "full_course_corpus.txt")
+    if not os.path.isfile(extracted_corpus):
+        raise FileNotFoundError(f"Authentic course corpus not found at {extracted_corpus}. Run data/extract_courses.py first.")
+    with open(extracted_corpus, "r", encoding="utf-8") as f:
+        return f.read()
 
-def execute_single_request(client_id: int, topic: str, api_url: str, backend: str, questions_count: int = 5) -> dict:
+def execute_single_request(client_id: int, topic: str, api_url: str, backend: str, course_text: str, questions_count: int = 1) -> dict:
     t_start = time.perf_counter()
-    
-    if api_url and backend != "mock":
-        try:
-            resp = requests.post(
-                f"{api_url}/generate",
-                json={
-                    "topic": topic,
-                    "level": "medium",
-                    "n_questions": questions_count,
-                    "backend": backend,
-                    "context": SAMPLE_CONTEXT,
-                    "top_k": 3
-                },
-                timeout=300
-            )
-            elapsed = time.perf_counter() - t_start
-            if resp.status_code == 200:
-                data = resp.json()
-                qs = data.get("questions", [])
-                return {
-                    "client_id": client_id,
-                    "latency_sec": elapsed,
-                    "questions_count": len(qs),
-                    "status": "success",
-                    "error": None
-                }
-            else:
-                return {
-                    "client_id": client_id,
-                    "latency_sec": elapsed,
-                    "questions_count": 0,
-                    "status": "error",
-                    "error": f"HTTP {resp.status_code}"
-                }
-        except Exception as e:
-            elapsed = time.perf_counter() - t_start
+    payload = {
+        "topic": topic,
+        "level": "medium",
+        "n_questions": questions_count,
+        "backend": backend,
+        "context": course_text,
+        "pipeline_mode": "INACON",
+        "enable_incremental_cache": True,
+        "top_k": 3
+    }
+
+    try:
+        resp = requests.post(
+            f"{api_url}/generate",
+            json=payload,
+            timeout=600
+        )
+        elapsed = time.perf_counter() - t_start
+
+        if resp.status_code == 200:
+            data = resp.json()
+            qs = data.get("questions", [])
             return {
                 "client_id": client_id,
-                "latency_sec": elapsed,
+                "latency_sec": round(elapsed, 3),
+                "questions_count": len(qs),
+                "status": "success",
+                "error": None
+            }
+        else:
+            return {
+                "client_id": client_id,
+                "latency_sec": round(elapsed, 3),
                 "questions_count": 0,
                 "status": "error",
-                "error": str(e)
+                "error": f"HTTP {resp.status_code}: {resp.text[:150]}"
             }
-
-    # High-fidelity empirical simulation of single-GPU batch queuing (Ollama / vLLM on RTX 4090 / L4 / A10G)
-    # At C=1: ~2.3s
-    # At C=2: ~2.5s (minor batching overhead)
-    # At C=5: ~3.8s (batch pipeline saturates compute)
-    # At C=10: ~7.2s (queueing begins)
-    # At C=20: ~14.5s (linear queueing delay)
-    base_latency = 2.3
-    concurrency_penalty = (client_id * 0.45)
-    simulated_sec = base_latency + (hash(topic + str(client_id)) % 30) / 100.0 + concurrency_penalty
-    time.sleep(0.05) # Emulate network dispatch
-
-    return {
-        "client_id": client_id,
-        "latency_sec": simulated_sec,
-        "questions_count": questions_count,
-        "status": "success",
-        "error": None
-    }
+    except Exception as exc:
+        elapsed = time.perf_counter() - t_start
+        return {
+            "client_id": client_id,
+            "latency_sec": round(elapsed, 3),
+            "questions_count": 0,
+            "status": "error",
+            "error": str(exc)
+        }
 
 def calculate_percentiles(values: list[float]) -> dict:
     if not values:
@@ -133,23 +119,41 @@ def calculate_percentiles(values: list[float]) -> dict:
         "mean": round(sum(sorted_vals) / n, 2)
     }
 
-def run_concurrency_batch(c: int, api_url: str, backend: str, questions_per_req: int = 5) -> dict:
-    print(f"\n--- Testing Concurrency C = {c} Concurrent Requests ---")
+def run_concurrency_batch(
+    c: int,
+    api_url: str,
+    backend: str,
+    course_text: str,
+    monitor: SystemResourceMonitor,
+    questions_per_req: int = 1
+) -> dict:
+    print(f"\n=================== Concurrency C = {c} Concurrent Clients ===================")
+    t_start_epoch = time.time()
     batch_start = time.perf_counter()
 
     results = []
     with ThreadPoolExecutor(max_workers=c) as executor:
         futures = []
         for i in range(c):
-            topic = SAMPLE_TOPICS[i % len(SAMPLE_TOPICS)]
-            f = executor.submit(execute_single_request, i, topic, api_url, backend, questions_per_req)
+            topic = AUTHENTIC_TOPICS[i % len(AUTHENTIC_TOPICS)]
+            f = executor.submit(
+                execute_single_request,
+                i,
+                topic,
+                api_url,
+                backend,
+                course_text,
+                questions_per_req
+            )
             futures.append(f)
 
         for f in as_completed(futures):
             res = f.result()
             results.append(res)
+            print(f"  [Client {res['client_id']:2d}] Finished in {res['latency_sec']:6.2f}s ({res['status']})")
 
     batch_duration = time.perf_counter() - batch_start
+    t_end_epoch = time.time()
 
     successful = [r for r in results if r["status"] == "success"]
     failed = [r for r in results if r["status"] != "success"]
@@ -160,15 +164,8 @@ def run_concurrency_batch(c: int, api_url: str, backend: str, questions_per_req:
     throughput_qps = total_questions / batch_duration if batch_duration > 0 else 0.0
     throughput_rpm = (len(successful) / batch_duration) * 60.0 if batch_duration > 0 else 0.0
 
-    # Resource metrics at this concurrency level
-    # Single-GPU empirical profile:
-    # C=1: GPU 45%, VRAM 8.4 GB
-    # C=2: GPU 72%, VRAM 9.1 GB
-    # C=5: GPU 98%, VRAM 11.2 GB (Optimal operating saturation)
-    # C=10: GPU 100%, VRAM 13.8 GB (Full saturation)
-    # C=20: GPU 100%, VRAM 15.6 GB (High queue latency)
-    gpu_util_map = {1: 45.0, 2: 72.0, 5: 98.0, 10: 100.0, 20: 100.0}
-    vram_map = {1: 8.4, 2: 9.1, 5: 11.2, 10: 13.8, 20: 15.6}
+    # Retrieve live telemetry measured by nvidia-smi & psutil during this batch
+    telemetry = monitor.get_interval_metrics(t_start_epoch, t_end_epoch)
 
     summary = {
         "concurrency": c,
@@ -184,43 +181,58 @@ def run_concurrency_batch(c: int, api_url: str, backend: str, questions_per_req:
         "latency_p99_sec": pcts["p99"],
         "latency_max_sec": pcts["max"],
         "latency_mean_sec": pcts["mean"],
-        "gpu_util_percent": gpu_util_map.get(c, 95.0),
-        "vram_used_gb": vram_map.get(c, 12.0),
+        "gpu_util_percent": telemetry["gpu_util_avg"],
+        "vram_used_gb": telemetry["vram_used_peak_gb"],
+        "cpu_util_percent": telemetry["cpu_util_avg"],
+        "ram_used_gb": telemetry["ram_used_avg_gb"],
         "individual_results": results
     }
 
-    print(f"C={c:<2} -> Throughput: {throughput_qps:5.2f} Q/s | P50: {pcts['p50']:5.2f}s | P95: {pcts['p95']:5.2f}s | Success: {summary['success_rate_percent']}% | GPU: {summary['gpu_util_percent']}%")
+    print(f"\n[SUMMARY C={c}] Duration: {batch_duration:.1f}s | Throughput: {throughput_qps:.2f} Q/s | P50: {pcts['p50']}s | P95: {pcts['p95']}s | GPU: {telemetry['gpu_util_avg']}% | VRAM: {telemetry['vram_used_peak_gb']} GB")
     return summary
 
 def main():
-    parser = argparse.ArgumentParser(description="Run Experiment 4 (E4) Concurrency & Operating Envelope")
+    parser = argparse.ArgumentParser(description="Run Strict Physical E4 Concurrency Experiment")
     parser.add_argument("--api-url", default="http://localhost:5001", help="LLM API base URL")
-    parser.add_argument("--backend", default="mock", help="Backend (mock, local, openai)")
+    parser.add_argument("--backend", default="local", help="Backend (must be 'local' for physical GPU run)")
+    parser.add_argument("--questions-per-req", type=int, default=1, help="Questions per request (default: 1)")
     parser.add_argument("--output", default="concurrency_envelope_results.jsonl", help="Output JSONL path")
     args = parser.parse_args()
+
+    course_text = load_authentic_course_corpus()
+    print(f"[DATA] Loaded authentic course corpus ({len(course_text):,} chars).")
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
     out_file = os.path.join(base_dir, args.output)
     resource_csv = os.path.join(base_dir, "system_resources.csv")
 
-    monitor = SystemResourceMonitor(output_csv=resource_csv, interval_sec=0.5)
+    monitor = SystemResourceMonitor(output_csv=resource_csv, interval_sec=1.0)
     monitor.start()
 
-    print("=== Running Experiment 4: Concurrent Generation & Single-GPU Operating Envelope ===")
-    summaries = []
+    print("=== Running Strict Physical Experiment 4: Concurrent Generation Operating Envelope ===")
+    print(f"Target: {args.api_url} | Backend: {args.backend} | Concurrency Tiers: {CONCURRENCY_LEVELS}")
 
+    summaries = []
     try:
         with open(out_file, "w", encoding="utf-8") as f:
             for c in CONCURRENCY_LEVELS:
-                summary = run_concurrency_batch(c, args.api_url, args.backend)
+                summary = run_concurrency_batch(
+                    c,
+                    args.api_url,
+                    args.backend,
+                    course_text,
+                    monitor,
+                    questions_per_req=args.questions_per_req
+                )
                 summaries.append(summary)
                 f.write(json.dumps(summary, ensure_ascii=False) + "\n")
                 f.flush()
-                time.sleep(1.0) # Rest interval between concurrency tiers
     finally:
         monitor.stop()
 
-    print(f"\n[OK] Concurrency experiment completed. Stored results in: {out_file}")
+    print(f"\n[OK] Physical concurrency benchmark completed.")
+    print(f"Envelope results written to: {out_file}")
+    print(f"Continuous physical telemetry written to: {resource_csv}")
 
 if __name__ == "__main__":
     main()
