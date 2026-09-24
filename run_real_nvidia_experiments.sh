@@ -104,6 +104,7 @@ $PYTHON_BIN evaluate/e3_corpus_scale/generate_corpora.py
 # Step 3: Run Experiment 2 - Pipeline Ablation (Physical Runs)
 echo ""
 echo "[Step 3/5] Executing Experiment 2: Physical Pipeline Ablation (Table 2)..."
+rm -f llmapi/embeddings_cache.json
 $PYTHON_BIN evaluate/e2_pipeline_ablation/run_ablation_experiment.py \
     --api-url http://localhost:5001 \
     --backend local \
