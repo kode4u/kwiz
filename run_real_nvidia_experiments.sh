@@ -11,7 +11,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 PYTHON_BIN="python3"
-if [ -f "llmapi/venv/bin/python3" ]; then
+if [ -f "venv/bin/python3" ]; then
+    PYTHON_BIN="venv/bin/python3"
+elif [ -f "llmapi/venv/bin/python3" ]; then
     PYTHON_BIN="llmapi/venv/bin/python3"
 fi
 
@@ -42,13 +44,20 @@ fi
 # Check required models in Ollama
 echo "[OLLAMA] Verifying required models..."
 MODELS=$(curl -s http://localhost:11434/api/tags)
+OLLAMA_CMD="ollama"
+if ! command -v ollama &> /dev/null; then
+    if docker ps | grep -q qwen-ollama; then
+        OLLAMA_CMD="docker exec qwen-ollama ollama"
+    fi
+fi
+
 if [[ $MODELS != *"qwen2.5-coder:7b"* ]]; then
     echo "[OLLAMA] Pulling qwen2.5-coder:7b..."
-    ollama pull qwen2.5-coder:7b
+    $OLLAMA_CMD pull qwen2.5-coder:7b
 fi
 if [[ $MODELS != *"nomic-embed-text"* ]]; then
     echo "[OLLAMA] Pulling nomic-embed-text..."
-    ollama pull nomic-embed-text
+    $OLLAMA_CMD pull nomic-embed-text
 fi
 echo "[OLLAMA] All required models are ready."
 
