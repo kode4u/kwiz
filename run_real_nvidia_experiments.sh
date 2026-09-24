@@ -10,13 +10,38 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-if [ ! -d "llmapi/venv" ]; then
-    echo "[SETUP] Creating python virtual environment in llmapi/venv..."
-    python3 -m venv llmapi/venv
+# Check for active virtualenv or create one
+if [ -n "$VIRTUAL_ENV" ]; then
+    PYTHON_BIN="python3"
+    echo "[SETUP] Using active virtual environment: $VIRTUAL_ENV"
+elif [ -f "llmapi/venv/bin/python3" ]; then
+    PYTHON_BIN="llmapi/venv/bin/python3"
+else
+    echo "[SETUP] Setting up Python virtual environment in llmapi/venv..."
+    if python3 -m venv llmapi/venv 2>/dev/null; then
+        PYTHON_BIN="llmapi/venv/bin/python3"
+    else
+        echo "[WARN] 'python3 -m venv' failed. Falling back to system python3."
+        PYTHON_BIN="python3"
+    fi
 fi
-PYTHON_BIN="llmapi/venv/bin/python3"
+
+# Ensure pip is working
+if ! $PYTHON_BIN -m pip --version &>/dev/null; then
+    echo ""
+    echo "========================================================================"
+    echo " [ERROR] 'pip' is not installed for $($PYTHON_BIN --version)!"
+    echo " On Ubuntu / Debian Linux, please run:"
+    echo ""
+    echo "     sudo apt update && sudo apt install -y python3-pip python3-venv"
+    echo ""
+    echo " Then rerun: ./run_real_nvidia_experiments.sh"
+    echo "========================================================================"
+    exit 1
+fi
 
 echo "[SETUP] Verifying Python dependencies..."
+$PYTHON_BIN -m pip install --quiet --upgrade pip 2>/dev/null || true
 $PYTHON_BIN -m pip install --quiet requests flask psutil pydantic pypdf python-docx python-pptx
 
 echo "========================================================================"
