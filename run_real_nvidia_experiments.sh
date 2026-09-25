@@ -146,6 +146,8 @@ if [ "$RUN_E1" = true ]; then
     $PYTHON_BIN evaluate/e1_expert_validation/evaluate_with_llm_judges.py \
         --questions evaluate/e1_expert_validation/e1_questions.json \
         --ollama-url http://localhost:11434 \
+        --openai-key "${OPENAI_API_KEY:-}" \
+        --gemini-key "${GEMINI_API_KEY:-}" \
         --r1-backend "${R1_BACKEND:-auto}" \
         --r2-backend "${R2_BACKEND:-auto}" \
         --r3-backend "${R3_BACKEND:-auto}"

@@ -373,32 +373,6 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
 
     print(f"\n[SUCCESS] Completed {judge_id} evaluation for {len(results)} items -> {output_csv}")
 
-def main():
-    parser = argparse.ArgumentParser(description="Automated LLM-as-a-Judge Evaluation for E1")
-    parser.add_argument("--questions", default=DEFAULT_QUESTIONS_PATH, help="Path to e1_questions.json")
-    parser.add_argument("--openai-key", default=os.getenv("OPENAI_API_KEY", ""), help="OpenAI API Key")
-    parser.add_argument("--gemini-key", default=os.getenv("GEMINI_API_KEY", ""), help="Google Gemini API Key")
-    parser.add_argument("--ollama-url", default=os.getenv("LOCAL_LLM_URL", "http://localhost:11434"), help="Ollama Base URL")
-    parser.add_argument("--r1-backend", default="auto", choices=["auto", "openai", "ollama", "skip"], help="Rater 1 backend (default: auto)")
-    parser.add_argument("--r2-backend", default="auto", choices=["auto", "gemini", "ollama", "skip"], help="Rater 2 backend (default: auto)")
-    parser.add_argument("--r3-backend", default="auto", choices=["auto", "ollama", "calibrated", "skip"], help="Rater 3 backend (default: auto)")
-    parser.add_argument("--limit", type=int, default=0, help="Limit evaluation to first N questions (default: 0 for all)")
-    args = parser.parse_args()
-
-    if not os.path.exists(args.questions):
-        print(f"[ERROR] Questions file not found at: {args.questions}")
-        sys.exit(1)
-
-    with open(args.questions, "r", encoding="utf-8") as f:
-        questions = json.load(f)
-
-    if args.limit > 0:
-        questions = questions[:args.limit]
-        print(f"[INFO] Limited to first {len(questions)} questions.")
-
-    print(f"Loaded {len(questions)} questions from: {args.questions}")
-    os.makedirs(RATING_SHEETS_DIR, exist_ok=True)
-
 def is_sheet_complete(csv_path: str, questions: list) -> bool:
     if not os.path.exists(csv_path):
         return False

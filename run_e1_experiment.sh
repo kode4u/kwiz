@@ -84,16 +84,23 @@ $PYTHON_BIN evaluate/e1_expert_validation/generate_e1_questions.py \
 
 # Step 3: Run Expert LLM-as-a-Judge Evaluation across 5 Dimensions
 echo ""
-echo "[Step 3/4] Running Expert Evaluation across 5 pedagogical dimensions..."
-echo "  1. Technical Correctness (TC)"
-echo "  2. Distractor Plausibility (DP)"
-echo "  3. Pedagogical Relevance (PR)"
-echo "  4. Code Executability & Syntax (CE)"
-echo "  5. Context Groundedness & Evidence Support (CG)"
+echo "[Step 3/4] Running Multi-Judge Evaluation across 5 pedagogical dimensions..."
+echo "  Evaluator Panel:"
+echo "    - R1: OpenAI GPT-4o (api: gpt-4o)"
+echo "    - R2: Google Gemini 2.5 Flash (api: gemini-2.5-flash)"
+echo "    - R3: Calibrated Senior CS Instructor"
+echo "  Evaluation Dimensions:"
+echo "    1. Technical Correctness (TC)"
+echo "    2. Distractor Plausibility (DP)"
+echo "    3. Pedagogical Relevance (PR)"
+echo "    4. Code Executability & Syntax (CE)"
+echo "    5. Context Groundedness & Evidence Support (CG)"
 
 $PYTHON_BIN evaluate/e1_expert_validation/evaluate_with_llm_judges.py \
     --questions evaluate/e1_expert_validation/e1_questions.json \
     --ollama-url "$OLLAMA_URL" \
+    --openai-key "${OPENAI_API_KEY:-}" \
+    --gemini-key "${GEMINI_API_KEY:-}" \
     --r1-backend "${R1_BACKEND:-auto}" \
     --r2-backend "${R2_BACKEND:-auto}" \
     --r3-backend "${R3_BACKEND:-auto}"
