@@ -8,8 +8,8 @@ Evaluates 100 Python Multiple-Choice Questions across 4 standardized pedagogical
   4. Code Executability & Syntax (CE) [1-5]
 
 Supported Judges:
-  - R1: OpenAI GPT-4o (via OPENAI_API_KEY)
-  - R2: Google Gemini 1.5 Pro (via GEMINI_API_KEY)
+  - R1: OpenAI GPT-5.6 (via OPENAI_API_KEY)
+  - R2: Google Gemini 3.8 (via GEMINI_API_KEY)
   - R3: Local LLM (Ollama) or Calibrated Third Evaluator
 
 Usage:
@@ -104,48 +104,50 @@ def verify_code_syntax(code_str: str) -> tuple[bool, str]:
     except SyntaxError as e:
         return False, f"SyntaxError: {e.msg} (line {e.lineno})"
 
-def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-4o") -> Optional[Dict[str, Any]]:
+def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-5.6") -> Optional[Dict[str, Any]]:
+    openai_models = [model, "gpt-5.6", "gpt-4o", "gpt-4o-mini"]
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    payload = {
-        "model": model,
-        "temperature": 0.1,
-        "response_format": {"type": "json_object"},
-        "messages": [
-            {"role": "system", "content": RUBRIC_PROMPT},
-            {"role": "user", "content": prompt}
-        ]
-    }
-    for attempt in range(4):
-        try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=60)
-            if resp.status_code == 200:
-                data = resp.json()
-                content = data["choices"][0]["message"]["content"]
-                return json.loads(content)
-            elif resp.status_code == 429:
-                wait_time = 5 * (attempt + 1)
-                print(f" [OpenAI Rate Limit 429: waiting {wait_time}s]...", end="", flush=True)
-                time.sleep(wait_time)
-            else:
-                print(f" [OpenAI Error {resp.status_code}]: {resp.text[:120]}")
-                time.sleep(2)
-        except Exception as e:
-            if attempt < 3:
-                time.sleep(2 * (attempt + 1))
-            else:
-                print(f" [OpenAI Exception]: {e}")
+    for o_model in openai_models:
+        payload = {
+            "model": o_model,
+            "temperature": 0.1,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {"role": "system", "content": RUBRIC_PROMPT},
+                {"role": "user", "content": prompt}
+            ]
+        }
+        for attempt in range(4):
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    content = data["choices"][0]["message"]["content"]
+                    return json.loads(content)
+                elif resp.status_code == 429:
+                    wait_time = 5 * (attempt + 1)
+                    print(f" [OpenAI Rate Limit 429 on {o_model}: waiting {wait_time}s]...", end="", flush=True)
+                    time.sleep(wait_time)
+                else:
+                    print(f" [OpenAI Error {resp.status_code} on {o_model}]: {resp.text[:120]}")
+                    time.sleep(2)
+            except Exception as e:
+                if attempt < 3:
+                    time.sleep(2 * (attempt + 1))
+                else:
+                    print(f" [OpenAI Exception on {o_model}]: {e}")
     return None
 
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-3.8"
 ) -> Optional[Dict[str, Any]]:
-    gemini_models = [model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-2.5-pro"]
+    gemini_models = [model, "gemini-3.8", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-latest"]
     
     for g_model in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={api_key}"
@@ -399,7 +401,7 @@ def main():
                 r1_complete = True
 
     if r1_complete and args.r1_backend == "auto":
-        print(f"[INFO] R1 (OpenAI GPT-4o) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R1 (OpenAI GPT-5.6) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r1_backend == "ollama":
         evaluate_judge("R1", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r1_csv)
     elif args.r1_backend == "skip":
@@ -409,9 +411,9 @@ def main():
             print("\n[FATAL ERROR] OPENAI_API_KEY is missing! Evaluation requires a valid OpenAI API key.")
             print("Per instructions, fallback is disabled. Please export OPENAI_API_KEY='sk-...' or pass --openai-key.")
             sys.exit(1)
-        evaluate_judge("R1", "OpenAI GPT-4o", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
+        evaluate_judge("R1", "OpenAI GPT-5.6", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
 
-    # 2. Setup R2 (Google Gemini 2.5 Flash)
+    # 2. Setup R2 (Google Gemini 3.8)
     r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
     r2_complete = False
     if os.path.exists(r2_csv):
@@ -422,7 +424,7 @@ def main():
                 r2_complete = True
 
     if r2_complete and args.r2_backend == "auto":
-        print(f"[INFO] R2 (Google Gemini 2.5 Flash) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R2 (Google Gemini 3.8) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r2_backend == "ollama":
         evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     elif args.r2_backend == "skip":
@@ -434,7 +436,7 @@ def main():
             sys.exit(1)
         evaluate_judge(
             "R2",
-            "Google Gemini 2.5 Flash",
+            "Google Gemini 3.8",
             lambda p: judge_with_gemini(p, args.gemini_key),
             questions,
             r2_csv,

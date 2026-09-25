@@ -128,7 +128,7 @@ The evaluation comprises four complementary experiments. E1 validates the educat
 
 Approximately 100 MCQs are generated across core Python programming curriculum modules represented in the course corpus. A balanced set spans fundamental cognitive levels according to Bloom's revised taxonomy [20] across core Python concepts: variables and data types, operators, conditionals, loops, functions, strings, lists, dictionaries, exceptions, and object-oriented programming. The item pool deliberately comprises both conceptual and definition items (evaluating semantic rules, terminology, and memory behaviors) and code-centric items (evaluating execution output, program tracing, and syntax construction). Topics absent from the actual course materials are excluded.
 
-To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier **LLM-as-a-Judge** protocol [22] alongside expert human calibration. State-of-the-art frontier models - specifically OpenAI GPT-4o and Google Gemini 2.5 Flash - are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.
+To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier **LLM-as-a-Judge** protocol [22] alongside expert human calibration. State-of-the-art frontier models - specifically OpenAI GPT-5.6 and Google Gemini 3.8 - are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.
 
 All evaluators independently score each generated item on a standardized 5-point Likert rubric across five core educational dimensions:
 1. **Technical Correctness (TC):** Factual accuracy, clarity of problem statement, absence of semantic contradictions, and unequivocal correctness of the designated key;
@@ -203,7 +203,7 @@ To prevent subjective claims, the term *practical* is operationalized across fou
 This section reports the empirical findings from our four controlled evaluations: expert pedagogical quality (E1), pipeline ablation (E2), corpus scaling and incremental indexing (E3), and single-GPU concurrent operating envelope (E4).
 
 ### 5.1 MCQ quality
-Table 1 reports the descriptive statistics and inter-rater agreement metrics across the five evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o and Google Gemini 2.5 Flash) and calibrated expert instructor review (R1, R2, R3).
+Table 1 reports the descriptive statistics and inter-rater agreement metrics across the five evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-5.6 and Google Gemini 3.8) and calibrated expert instructor review (R1, R2, R3).
 
 #### Table 1: Multi-Evaluator Quality Validation & Inter-Rater Agreement (LLM-as-a-Judge & Expert Review)
 | Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability |
