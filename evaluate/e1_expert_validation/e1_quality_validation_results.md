@@ -1,7 +1,7 @@
 # Experiment 1 (E1): Expert Quality Validation Results
 
 - **Evaluated Questions**: 100
-- **Curriculum Topics**: 10
+- **Curriculum Topics**: 5
 - **Independent Expert Raters**: 3 (R1, R2, R3)
 - **Rating Scale**: 5-point Likert scale (1 = Inadequate, 5 = Excellent)
 
@@ -9,22 +9,18 @@
 
 | Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability |
 |:---------------------|:---------:|:------------------:|:---------------:|:--------:|:-----------:|
-| Technical Correctness (TC) | 4.45 ± 1.17 | 0.148 | Fair | 0.637 | Good |
-| Distractor Plausibility (DP) | 4.16 ± 0.66 | 0.024 | Fair | 0.036 | Moderate |
-| Pedagogical Relevance (PR) | 4.83 ± 0.47 | 0.281 | Fair | 0.518 | Moderate |
-| Code Executability (CE) | 4.82 ± 0.78 | 0.048 | Fair | 0.220 | Moderate |
+| Technical Correctness (TC) | 4.45 ± 1.17 | 0.162 | Fair | 0.614 | Good |
+| Distractor Plausibility (DP) | 4.12 ± 0.64 | -0.015 | Fair | 0.156 | Moderate |
+| Pedagogical Relevance (PR) | 4.81 ± 0.48 | 0.074 | Fair | 0.298 | Moderate |
+| Code Executability (CE) | 4.81 ± 0.80 | 0.071 | Fair | 0.322 | Moderate |
+| Context Groundedness (CG) | 4.94 ± 0.23 | -0.060 | Fair | 0.000 | Moderate |
 
 ### Topic-by-Topic Quality Breakdown
 
-| Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability |
-|:------|:---------------------:|:-----------------------:|:---------------------:|:------------------:|
-| Conditionals & Boolean Control Flow | 4.17 ± 1.56 | 4.13 ± 0.97 | 4.70 ± 0.79 | 4.87 ± 0.73 |
-| Dictionaries, Sets & Hash Lookups | 4.50 ± 1.07 | 4.20 ± 0.61 | 4.83 ± 0.46 | 4.73 ± 1.01 |
-| Exception Handling & Custom Exceptions | 4.20 ± 1.27 | 4.13 ± 0.73 | 4.77 ± 0.43 | 4.70 ± 1.02 |
-| File I/O & Context Managers | 4.97 ± 0.18 | 4.13 ± 0.43 | 4.97 ± 0.18 | 4.93 ± 0.25 |
-| Functions, Arguments & Variable Scope | 4.00 ± 1.51 | 4.10 ± 0.96 | 4.63 ± 0.72 | 4.73 ± 1.01 |
-| Lists, Tuples & Sequence Slicing | 4.00 ± 1.44 | 4.20 ± 0.61 | 4.80 ± 0.41 | 4.83 ± 0.65 |
-| Object-Oriented Programming & Inheritance | 4.53 ± 0.94 | 4.07 ± 0.52 | 4.83 ± 0.38 | 4.87 ± 0.73 |
-| Recursion & Fundamental Algorithms | 4.30 ± 1.37 | 4.00 ± 0.59 | 4.87 ± 0.43 | 4.57 ± 1.22 |
-| String Manipulation & Formatting | 4.97 ± 0.18 | 4.23 ± 0.43 | 4.97 ± 0.18 | 5.00 ± 0.00 |
-| Variables, Data Types & Type Casting | 4.83 ± 0.59 | 4.43 ± 0.50 | 4.93 ± 0.25 | 5.00 ± 0.00 |
+| Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability | Context Groundedness |
+|:------|:---------------------:|:-----------------------:|:---------------------:|:------------------:|:--------------------:|
+| Conditionals & Boolean Control Flow | 4.98 ± 0.15 | 4.22 ± 0.42 | 4.91 ± 0.29 | 5.00 ± 0.00 | 4.87 ± 0.34 |
+| Functions & Scope | 4.30 ± 1.32 | 4.07 ± 0.66 | 4.80 ± 0.44 | 4.58 ± 1.17 | 5.00 ± 0.00 |
+| Loops & Iteration | 4.77 ± 0.70 | 4.08 ± 0.46 | 4.87 ± 0.34 | 4.90 ± 0.54 | 4.92 ± 0.28 |
+| Python Data Structures | 4.00 ± 1.43 | 4.04 ± 0.72 | 4.73 ± 0.58 | 4.72 ± 0.98 | 4.93 ± 0.25 |
+| Variables, Data Types & Type Casting | 4.47 ± 1.21 | 4.22 ± 0.76 | 4.80 ± 0.61 | 4.93 ± 0.52 | 4.98 ± 0.13 |
