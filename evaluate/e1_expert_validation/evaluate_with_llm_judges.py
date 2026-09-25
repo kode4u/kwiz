@@ -414,10 +414,11 @@ def main():
             print("[WARNING] No OpenAI API Key found for R1. Set OPENAI_API_KEY or pass --openai-key.")
         else:
             evaluate_judge("R1", "OpenAI GPT-4o", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
-    elif args.r1_backend == "ollama":
+    elif args.r1_backend == "ollama" or (args.r1_backend == "auto" and not args.openai_key):
+        print("[INFO] No OpenAI API key provided. Evaluating R1 with local Ollama Qwen2.5-Coder-7B on GPU...")
         evaluate_judge("R1", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r1_csv)
     else:
-        print("[INFO] Skipping R1 (No OpenAI API key provided. Pass --openai-key or set OPENAI_API_KEY)")
+        print("[INFO] Skipping R1.")
 
     # 2. Setup R2 (Google Gemini 3.5 Flash / Fallback)
     r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
@@ -433,10 +434,11 @@ def main():
                 r2_csv,
                 inter_delay=2.0
             )
-    elif args.r2_backend == "ollama":
+    elif args.r2_backend == "ollama" or (args.r2_backend == "auto" and not args.gemini_key):
+        print("[INFO] No Gemini API key provided. Evaluating R2 with local Ollama Qwen2.5-Coder-7B on GPU...")
         evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     else:
-        print("[INFO] Skipping R2 (No Gemini API key provided. Pass --gemini-key or set GEMINI_API_KEY)")
+        print("[INFO] Skipping R2.")
 
     # 3. Setup R3 (Calibrated Independent Reviewer or Local LLM)
     r3_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R3.csv")
