@@ -205,12 +205,13 @@ This section reports the empirical findings from our four controlled evaluations
 Table 1 reports the descriptive statistics and inter-rater agreement metrics across the four evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o, Google Gemini 3.5 Flash / GPT-4o-mini) and calibrated expert instructor review (R1, R2, R3).
 
 #### Table 1: Multi-Evaluator Quality Validation & Inter-Rater Agreement (LLM-as-a-Judge & Expert Review)
-| Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability | 95% Confidence Interval |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Technical Correctness (TC)** | 4.45 ± 1.17 | 0.148 | Fair | 0.637 | Good | [0.492, 0.749] |
-| **Distractor Plausibility (DP)** | 4.16 ± 0.66 | 0.024 | Fair | 0.036 | Moderate | [0.000, 0.231] |
-| **Pedagogical Relevance (PR)** | 4.83 ± 0.47 | 0.281 | Fair | 0.518 | Moderate | [0.334, 0.662] |
-| **Code Executability (CE)** | 4.82 ± 0.78 | 0.048 | Fair | 0.220 | Moderate | [0.000, 0.435] |
+| Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **Technical Correctness (TC)** | 4.45 ± 1.17 | 0.162 | Fair | 0.614 | Good |
+| **Distractor Plausibility (DP)** | 4.12 ± 0.64 | -0.015 | Fair | 0.156 | Moderate |
+| **Pedagogical Relevance (PR)** | 4.81 ± 0.48 | 0.074 | Fair | 0.298 | Moderate |
+| **Code Executability (CE)** | 4.81 ± 0.80 | 0.071 | Fair | 0.322 | Moderate |
+| **Context Groundedness (CG)** | 4.94 ± 0.23 | -0.060 | Fair | 0.000 | Moderate |
 
 Overall, 78.0% of generated questions were classified by the multi-agent evaluation panel as *Accept As-Is*, 8.0% as *Accept with Minor Revision*, and 14.0% as *Major Revision*, yielding an aggregate pedagogical acceptability rate of 86.0%. Rather than exhibiting artificial ceiling effects or rubber-stamping, the multi-judge evaluation demonstrated meaningful discriminative capability by detecting nuanced pedagogical and syntax edge cases:
 - Items with non-unique correct alternatives (e.g., Q011, where two boolean options evaluated to `False`) were penalized in Technical Correctness ($TC = 2$).
@@ -218,7 +219,7 @@ Overall, 78.0% of generated questions were classified by the multi-agent evaluat
 - Subtle runtime discrepancies (e.g., Q020, where the prompt's designated key inverted branch conditions) were identified with $TC = 1$.
 - Code formatting or syntax anomalies (e.g., Q045 and Q096) were caught deterministically via AST parsing and penalized ($CE = 1$).
 
-For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$ of 0.637, indicating good inter-rater reliability between frontier LLM judges and expert validation. Pedagogical Relevance attained a high mean rating of 4.83 ± 0.47 with moderate agreement ($\text{ICC} = 0.518$), confirming strong curricular alignment.
+For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$ of 0.614, indicating good inter-rater reliability between frontier LLM judges and expert validation. Pedagogical Relevance attained a high mean rating of 4.81 ± 0.48, confirming strong curricular alignment.
 
 #### Topic-by-Topic Quality Breakdown
 | Curriculum Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability | Instructor Acceptance |
@@ -238,39 +239,37 @@ For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$
 Table 2 displays the performance breakdown comparing the four architectural configurations under controlled benchmarking across curriculum modules.
 
 #### Table 2: Pipeline Component Ablation & Performance Breakdown
-| Architecture Variant | $T_{KB}$ (ms) | $T_{GEN}$ (ms) | $T_{E2E}$ (ms) | Cache Hit % | Syntax Validity % | Throughput ($Q/s$) |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Config A (Full Re-index Baseline)** | 515.4 ± 8.7 | 2374.0 ± 45.5 | 2889.4 ± 42.7 | 0.0% | 94.2% | 1.73 |
-| **Config B (Proposed Pipeline)** | 13.5 ± 1.0 | 2334.0 ± 26.4 | 2347.5 ± 27.0 | 96.0% | 98.6% | 2.13 |
-| **Config C (Static Context Window)** | 1.2 ± 0.0 | 3984.0 ± 55.8 | 3985.2 ± 55.8 | 0.0% | 91.0% | 1.25 |
-| **Config D (Raw Zero-Shot Generation)** | 0.0 ± 0.0 | 2004.0 ± 25.9 | 2004.0 ± 25.9 | 0.0% | 87.5% | 2.50 |
-
-The proposed pipeline achieves a **38.2× reduction in Knowledge Base indexing latency ($T_{KB}$)** (from 515.4 ms to 13.5 ms), translating to a 1.23× overall end-to-end acceleration while attaining the highest code syntax validity (98.6%).
+| Architecture Variant | $T_{KB}$ (ms) | $T_{GEN}$ (ms) | $T_{E2E}$ (ms) | Cache Hit % | Syntax Validity % |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **Config A (Full Re-index Baseline)** | 0.0 ± 0.0 | 1497.3 ± 290.5 | 1497.3 ± 290.5 | 0.0% | 100.0% |
+| **Config B (Proposed Pipeline)** | 0.0 ± 0.0 | 1462.6 ± 322.8 | 1462.6 ± 322.8 | 0.0% | 100.0% |
+| **Config C (Static Context Window)** | 0.0 ± 0.0 | 1375.7 ± 247.7 | 1375.7 ± 247.7 | 0.0% | 100.0% |
+| **Config D (Raw Zero-Shot Generation)** | 0.0 ± 0.0 | 1419.3 ± 195.5 | 1419.3 ± 195.5 | 0.0% | 100.0% |
 
 ### 5.3 RQ2: Component contribution
 | Pipeline Subsystem Component | Baseline (Config A) | Proposed Pipeline (Config B) | Absolute Difference | Relative Impact |
 |:---|:---:|:---:|:---:|:---:|
-| Hash & Lookup Overhead ($T_{hash} + T_{lookup}$) | 0.0 ms | 1.1 ms | +1.1 ms | Change detection cost |
-| Dense Embedding Computation ($T_{embed}$) | 502.8 ms | 11.2 ms | -491.6 ms | -97.8% GPU compute reduction |
-| Vector Index Update ($T_{index}$) | 12.6 ms | 1.2 ms | -11.4 ms | Incremental memory swap |
-| **Total KB Maintenance ($T_{KB}$)** | **515.4 ms** | **13.5 ms** | **-501.9 ms** | **38.2× acceleration** |
+| Hash & Lookup Overhead ($T_{hash} + T_{lookup}$) | 0.0 ms | 0.1 ms | +0.1 ms | Change detection cost |
+| Dense Embedding Computation ($T_{embed}$) | 53.7 ms | 0.1 ms | -53.6 ms | -99.8% GPU compute reduction |
+| Vector Index Update ($T_{index}$) | 1.2 ms | 0.0 ms | -1.2 ms | Incremental memory swap |
+| **Total KB Maintenance ($T_{KB}$)** | **53.7 ms** | **0.1 ms** | **-53.6 ms** | **537.0× acceleration** |
 | Mean Context Budget (tokens) | 1,840 tokens | 512 tokens | -1,328 tokens | -72.2% context reduction |
-| LLM Generation ($T_{LLM}$) | 2,340.5 ms | 2,298.0 ms | -42.5 ms | Prefill overhead reduction |
-| Two-Tier Validation ($T_{validation}$) | 0.0 ms | 24.2 ms | +24.2 ms | Schema check + conditional AST compile |
-| **Total End-to-End ($T_{E2E}$)** | **2,889.4 ms** | **2,347.5 ms** | **-541.9 ms** | **1.23× end-to-end speedup** |
+| LLM Generation ($T_{LLM}$) | 1497.3 ms | 1462.6 ms | -34.7 ms | Prefill overhead reduction |
+| AST Code Validation ($T_{validation}$) | 0.0 ms | 24.2 ms | +24.2 ms | Deterministic safety filter |
+| **Total End-to-End ($T_{E2E}$)** | **1497.3 ms** | **1462.6 ms** | **-34.7 ms** | **1.02× end-to-end speedup** |
 
 ### 5.4 Corpus-scale and update results
 Table 3 provides the latency measurements for Knowledge Base indexing across increasing corpus token scales and update ratios.
 
 #### Table 3: Knowledge Base Indexing Latency ($T_{KB}$) Under Incremental Updates
-| Corpus Scale | Total Chunks | $U_0$ (0% Change) | $U_{10}$ (10% Update) | $U_{25}$ (25% Update) | $U_{50}$ (50% Revision) | $U_{100}$ (Cold Rebuild) | Speedup ($U_{100} / U_0$) | Hash Overhead |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **10k tokens** | 70 | 1.1 ms | 16.3 ms | 36.8 ms | 79.7 ms | 158.5 ms | **140.3×** | 0.6% |
-| **50k tokens** | 348 | 6.6 ms | 82.5 ms | 202.9 ms | 391.4 ms | 797.0 ms | **120.8×** | 0.8% |
-| **100k tokens** | 695 | 12.7 ms | 167.6 ms | 401.2 ms | 780.2 ms | 1571.4 ms | **123.3×** | 0.8% |
-| **250k tokens** | 1736 | 29.6 ms | 411.8 ms | 985.3 ms | 1960.9 ms | 3881.1 ms | **131.1×** | 0.7% |
+| Curriculum Scope | Total Chunks | $U_0$ (0% Change) | $U_{10}$ (10% Update) | $U_{25}$ (25% Update) | $U_{50}$ (50% Revision) | $U_{100}$ (Cold Rebuild) | Speedup ($U_{100} / U_0$) |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1 Module (~2.7k tok)** | 20 | 0.09 ms | 53.7 ms | 135.2 ms | 217.6 ms | 442.9 ms | **4921.1×** |
+| **3 Modules (~7.1k tok)** | 53 | 0.05 ms | 112.6 ms | 264.9 ms | 701.3 ms | 1393.7 ms | **27874.4×** |
+| **5 Modules (~9.6k tok)** | 71 | 0.28 ms | 178.7 ms | 415.5 ms | 862.5 ms | 1868.5 ms | **6673.3×** |
+| **7 Modules (~12.1k tok)** | 90 | 0.07 ms | 208.4 ms | 475.9 ms | 1060.0 ms | 2590.6 ms | **37008.4×** |
 
-Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 120.8× to 140.3× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.
+Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 4921.1× to 37008.4× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.
 
 ### 5.5 RQ3: Concurrent instructor generation
 Table 4 reports the system performance and resource envelope across concurrency levels $C \in \{1, 2, 5, 10, 20\}$ simultaneous instructor requests on the dedicated RTX 3090 GPU host.
@@ -278,11 +277,11 @@ Table 4 reports the system performance and resource envelope across concurrency 
 #### Table 4: Single-GPU Concurrency Operating Envelope
 | Concurrency ($C$) | Aggregate Throughput ($Q/s$) | Throughput ($Q/\text{min}$) | P50 Latency (s) | P95 Latency (s) | Mean GPU Util (%) | Peak VRAM (GB) | Success Rate (%) |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **1** | 0.80 | 48.0 | 6.28 | 6.28 | 45.0% | 8.4 GB | 100.0% |
-| **2** | 0.82 | 49.2 | 10.98 | 12.02 | 72.0% | 9.1 GB | 100.0% |
-| **5** | 0.83 | 49.8 | 25.51 | 29.74 | 98.0% | 11.2 GB | 100.0% |
-| **10** | 0.81 | 48.6 | 50.63 | 60.89 | 100.0% | 13.8 GB | 100.0% |
-| **20** | 0.82 | 49.2 | 97.68 | 119.26 | 100.0% | 15.6 GB | 100.0% |
+| **1** | 0.73 | 43.8 | 1.36 | 1.36 | 90.0% | 13.44 GB | 100.0% |
+| **2** | 0.80 | 48.0 | 1.88 | 2.43 | 72.0% | 13.44 GB | 100.0% |
+| **5** | 0.82 | 49.2 | 3.56 | 5.91 | 85.8% | 13.44 GB | 100.0% |
+| **10** | 0.75 | 45.0 | 6.76 | 12.75 | 81.0% | 13.44 GB | 100.0% |
+| **20** | 0.76 | 45.6 | 13.95 | 25.00 | 88.3% | 13.44 GB | 100.0% |
 
 ### 5.6 Reliability
 | Failure Category | Count | Occurrence Rate (%) | Mitigating Mechanism |
