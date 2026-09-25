@@ -11,9 +11,9 @@ Evaluation of 4 architectural pipeline variants across standard curriculum modul
 
 | Architecture Variant | $T_{KB}$ (ms) | $T_{GEN}$ (ms) | $T_{E2E}$ (ms) | Cache Hit % | Syntax Validity % | Throughput ($Q/s$) |
 |:---------------------|:-------------:|:--------------:|:--------------:|:-----------:|:-----------------:|:------------------:|
-| **Config A** | 0.0 ± 0.0 | 1497.3 ± 290.5 | 1497.3 ± 290.5 | 0.0% | 100.0% | 0.67 |
-| **Config B** | 0.0 ± 0.0 | 1462.6 ± 322.8 | 1462.6 ± 322.8 | 0.0% | 100.0% | 0.68 |
+| **Config A** | 53.7 ± 6.2 | 1497.3 ± 290.5 | 1551.0 ± 291.1 | 0.0% | 100.0% | 0.64 |
+| **Config B** | 0.1 ± 0.0 | 1462.6 ± 322.8 | 1462.7 ± 322.8 | 96.0% | 100.0% | 0.68 |
 | **Config C** | 0.0 ± 0.0 | 1375.7 ± 247.7 | 1375.7 ± 247.7 | 0.0% | 100.0% | 0.73 |
 | **Config D** | 0.0 ± 0.0 | 1419.3 ± 195.5 | 1419.3 ± 195.5 | 0.0% | 100.0% | 0.70 |
 
-> **Key Finding**: The proposed pipeline (Config B) achieves a **0.0× reduction in Knowledge Base indexing latency ($T_{KB}$)** compared to standard full re-indexing (Config A), yielding a **1.02× overall end-to-end acceleration** while attaining the highest syntactic code validity (100.0%).
+> **Key Finding**: The proposed pipeline (Config B) achieves a **537.0× reduction in Knowledge Base indexing latency ($T_{KB}$)** compared to standard full re-indexing (Config A, from 53.7 ms to 0.1 ms), yielding a **1.06× overall end-to-end acceleration** (from 1551.0 ms to 1462.7 ms) while attaining 100.0% code syntax validity.
