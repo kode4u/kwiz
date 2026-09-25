@@ -308,12 +308,27 @@ def main():
     parser.add_argument("--gen-model", default="qwen2.5-coder:7b", help="LLM generation model name")
     parser.add_argument("--output-json", default="evaluate/e1_expert_validation/e1_questions.json", help="Output JSON questions file")
     parser.add_argument("--output-audit", default="evaluate/e1_expert_validation/RETRIEVAL_CHUNKS_AUDIT.md", help="Output human-readable retrieval audit markdown")
+    parser.add_argument("--force", action="store_true", help="Force re-generation of questions even if output already exists")
     args = parser.parse_args()
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     corpus_file = os.path.join(base_dir, args.corpus)
     out_json = os.path.join(base_dir, args.output_json)
     out_audit = os.path.join(base_dir, args.output_audit)
+
+    if os.path.exists(out_json) and os.path.exists(out_audit) and not args.force:
+        try:
+            with open(out_json, "r", encoding="utf-8") as f:
+                existing_q = json.load(f)
+            if len(existing_q) == len(AUTHENTIC_TOPIC_TARGETS):
+                print("========================================================================")
+                print(f"    INACON E1: Found {len(existing_q)} existing course-grounded questions.")
+                print(f"    Preserving established item bank at: {out_json}")
+                print("    (Pass --force to explicitly re-generate all items).")
+                print("========================================================================")
+                return
+        except Exception:
+            pass
 
     print("========================================================================")
     print("    INACON E1: Generating 100 Authentic Course-Grounded MCQs")

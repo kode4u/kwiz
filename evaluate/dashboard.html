@@ -604,24 +604,24 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>x = 5<br>y = '10'<br>z = x + y<br>print(z)<br>```</div>
+                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>x = 42<br>x = 'Hello'<br>x = False<br>print(type(x))<br>```</div>
                   <div class="small mb-3">
                     <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">A</span>
-                      <span>15</span>
+                      <span><class 'int'></span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
                       <span class="choice-badge bg-success text-white">B</span>
-                      <span>510</span>
+                      <span><class 'str'></span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">C</span>
-                      <span>TypeError: unsupported operand type(s) for +: 'int' and 'str'</span>
+                      <span><class 'bool'></span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>'510'</span>
+                      <span><class 'NoneType'></span>
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code attempts to add an integer (x) and a string (y). In Python, attempting to perform arithmetic operations between different types results in a TypeError. The correct output is '510' as the '+' operator concatenates strings instead of performing addition.
+                    <strong>Explanation:</strong> The code snippet demonstrates Python's dynamic typing. The variable `x` is first assigned an integer value, then a string, and finally a boolean value. At the end, the type of `x` is printed. Since the last assignment to `x` is a boolean, the output will be `<class 'bool'>`. The other options represent incorrect types that could potentially be assigned to `x` at different points in the code.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -630,24 +630,24 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>int_a = 10<br>int_b = 3<br>print(int_a // int_b)<br>```</div>
+                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>int_a = 10<br>int_b = 3<br>print(int_a / int_b)<br>```</div>
                   <div class="small mb-3">
                     <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">A</span>
-                      <span>3.3333333333333335</span>
+                      <span>3</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
                       <span class="choice-badge bg-success text-white">B</span>
-                      <span>3</span>
+                      <span>3.3333333333333335</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">C</span>
                       <span>10</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>2</span>
+                      <span>SyntaxError</span>
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code performs integer division using the `//` operator. Integer division discards the fractional part and returns only the whole number result. Therefore, `int_a // int_b` equals `3`. The other options are incorrect because they either involve floating-point division or do not represent the correct output of integer division.
+                    <strong>Explanation:</strong> The code performs float division between two integers, resulting in a floating-point number. The correct output is 3.3333333333333335.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -656,24 +656,24 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>x = 42<br>y = 'Hello'<br>z = x + y<br>print(z)<br>```</div>
+                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>x = 42<br>y = 'hello'<br>z = x + y<br>print(z)<br>```</div>
                   <div class="small mb-3">
                     <div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
                       <span class="choice-badge bg-success text-white">A</span>
                       <span>TypeError: unsupported operand type(s) for +: 'int' and 'str'</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">B</span>
-                      <span>42Hello</span>
+                      <span>42hello</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">C</span>
-                      <span>84</span>
+                      <span>TypeError: can only concatenate str (not "int") to str</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>'Hello42'</span>
+                      <span>SyntaxError: invalid syntax</span>
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code attempts to add an integer (x) and a string (y), which is not allowed in Python. This results in a TypeError because the '+' operator cannot be used between different types of operands.
+                    <strong>Explanation:</strong> The code attempts to add an integer and a string, which is not allowed in Python. The correct error message is 'TypeError: unsupported operand type(s) for +: 'int' and 'str''. Options B and C are plausible mistakes due to common off-by-one errors or confusion between types. Option D represents a syntax error, which is not the case here.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -682,13 +682,13 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What is the output of the following code snippet?<br>```python<br>int_num = 5.7<br>int_from_float = int(int_num)<br>print(int_from_float)<br>```</div>
+                  <div class="fw-semibold mb-2">What will be the output of the following Python code snippet?<br>```python<br>int_num = 5.7<br>int_from_float = int(int_num)<br>print(int_from_float)<br>```</div>
                   <div class="small mb-3">
-                    <div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
-                      <span class="choice-badge bg-success text-white">A</span>
+                    <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">A</span>
                       <span>5</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">B</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
+                      <span class="choice-badge bg-success text-white">B</span>
                       <span>6</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">C</span>
@@ -699,7 +699,7 @@
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The `int()` function truncates the decimal part of a float, so `int_from_float` becomes 5. The output is therefore 5.
+                    <strong>Explanation:</strong> The `int()` function truncates the decimal part of a float, so `int_from_float` will be 5. The correct answer is B.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -718,14 +718,14 @@
                       <span>5.0</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">C</span>
-                      <span>Error: cannot convert int to float</span>
+                      <span>TypeError: 'int' object is not callable</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>TypeError: unsupported operand type(s) for /: 'int' and 'float'</span>
+                      <span>SyntaxError: invalid syntax</span>
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code snippet converts an integer to a float using the float() function. The correct output is 5.0, which represents the floating-point representation of the integer 5. Option A is incorrect because it does not include the decimal point. Options C and D are incorrect as there are no errors in the code.
+                    <strong>Explanation:</strong> The code snippet converts an integer to a float using the `float()` function. The correct output is `5.0`. Choice A is incorrect because it does not include the decimal point. Choice C is incorrect because there is no error in the code; it simply performs type casting. Choice D is incorrect because there are no syntax errors.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -734,7 +734,7 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What will be the output of the following code snippet?<br>```python<br>age = 30<br>print(str(age) + ' years old')<br>```</div>
+                  <div class="fw-semibold mb-2">What will be the output of the following Python code snippet?<br>```python<br>age = 30<br>print(str(age) + ' years old')<br>```</div>
                   <div class="small mb-3">
                     <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">A</span>
@@ -751,7 +751,7 @@
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code attempts to concatenate a string and an integer. The correct way to do this is by using the `str()` function to convert the integer to a string before concatenation.
+                    <strong>Explanation:</strong> The code attempts to concatenate a string and an integer. In Python, you cannot directly concatenate these types without explicit type casting. The correct answer is '30' years old because the int value of age is cast to a string using str(age) before concatenation.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -760,7 +760,33 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What is the output of the following Python code?<br>```python<br>a = 5<br>b = '10'<br>c = a + b<br>print(c)<br>```</div>
+                  <div class="fw-semibold mb-2">What is the output of the following Python code snippet?<br>```python<br>a = '5'<br>b = 3<br>print(a + b)<br>```</div>
+                  <div class="small mb-3">
+                    <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">A</span>
+                      <span>8</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
+                      <span class="choice-badge bg-success text-white">B</span>
+                      <span>'53'</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">C</span>
+                      <span>Error: unsupported operand type(s) for +: 'str' and 'int'</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">D</span>
+                      <span>10</span>
+                    </div>
+                  </div>
+                  <div class="small text-muted border-top pt-2">
+                    <strong>Explanation:</strong> The code attempts to concatenate a string ('5') and an integer (3). In Python, the '+' operator is overloaded for strings to perform concatenation. Therefore, '5' + 3 results in '53'. The other options are incorrect because they either involve type errors or incorrect arithmetic operations.
+                  </div>
+                </div>
+              </div><div class="col-md-6">
+                <div class="border rounded p-3 h-100 bg-white shadow-sm">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
+                    <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
+                  </div>
+                  <div class="fw-semibold mb-2">What will be the output of the following code snippet?<br>```python<br>a = 5<br>b = '10'<br>c = a + b<br>print(c)<br>```</div>
                   <div class="small mb-3">
                     <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">A</span>
@@ -773,11 +799,11 @@
                       <span>TypeError: unsupported operand type(s) for +: 'int' and 'str'</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>'510'</span>
+                      <span>SyntaxError: invalid syntax</span>
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code attempts to add an integer (a) and a string (b). In Python, the '+' operator is overloaded for strings to perform concatenation rather than numeric addition. Therefore, '5' + '10' results in '510'. The other options are incorrect because they either involve type errors or incorrect outputs.
+                    <strong>Explanation:</strong> The code attempts to add an integer (5) and a string ('10'). In Python, you cannot directly add these types. The correct output is '510' because the '+' operator for strings concatenates them rather than performing arithmetic addition.
                   </div>
                 </div>
               </div><div class="col-md-6">
@@ -786,76 +812,50 @@
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
                     <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
                   </div>
-                  <div class="fw-semibold mb-2">What will be the output of the following Python code?<br>```python<br>age = 30<br>name = 'Alice'<br>total = age + name<br>print(total)<br>```</div>
-                  <div class="small mb-3">
-                    <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">A</span>
-                      <span>'30Alice'</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
-                      <span class="choice-badge bg-success text-white">B</span>
-                      <span>TypeError</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">C</span>
-                      <span>60</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>SyntaxError</span>
-                    </div>
-                  </div>
-                  <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The code attempts to add an integer (age) and a string (name), which is not allowed in Python. This results in a TypeError because Python does not support implicit type conversion between integers and strings when using the '+' operator. The correct answer is 'TypeError'.
-                  </div>
-                </div>
-              </div><div class="col-md-6">
-                <div class="border rounded p-3 h-100 bg-white shadow-sm">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
-                    <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
-                  </div>
-                  <div class="fw-semibold mb-2">Which of the following will correctly evaluate to `False` in Python?<br>```python<br>x = False<br>y = True<br>result = x and y<br>print(result)<br>```</div>
-                  <div class="small mb-3">
-                    <div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">A</span>
-                      <span>Choice A: `True`</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
-                      <span class="choice-badge bg-success text-white">B</span>
-                      <span>Choice B: `False`</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">C</span>
-                      <span>Choice C: `None`</span>
-                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
-                      <span class="choice-badge bg-light text-dark border">D</span>
-                      <span>Choice D: Error</span>
-                    </div>
-                  </div>
-                  <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The 'and' operator in Python returns True if both operands are True. In this case, x is False and y is True, so the result will be False.
-                  </div>
-                </div>
-              </div><div class="col-md-6">
-                <div class="border rounded p-3 h-100 bg-white shadow-sm">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
-                    <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
-                  </div>
-                  <div class="fw-semibold mb-2">What will be the output of the following code snippet?<br>```python<br>x = 5<br>x = 'hello'<br>x = [1, 2, 3]<br>print(x)<br>```</div>
+                  <div class="fw-semibold mb-2">What will be the output of the following code snippet?<br>```python<br>x = True<br>y = False<br>print(x or y)<br>```</div>
                   <div class="small mb-3">
                     <div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
                       <span class="choice-badge bg-success text-white">A</span>
-                      <span>[1, 2, 3]</span>
+                      <span>True</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">B</span>
-                      <span>'hello'</span>
+                      <span>False</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">C</span>
-                      <span>5</span>
+                      <span>1</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">D</span>
+                      <span>0</span>
+                    </div>
+                  </div>
+                  <div class="small text-muted border-top pt-2">
+                    <strong>Explanation:</strong> The 'or' operator returns True if at least one of the operands is True. In this case, x is True, so the expression evaluates to True.
+                  </div>
+                </div>
+              </div><div class="col-md-6">
+                <div class="border rounded p-3 h-100 bg-white shadow-sm">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis">Variables, Data Types & Type Casting</span>
+                    <span class="badge bg-info-subtle text-info-emphasis">Medium</span>
+                  </div>
+                  <div class="fw-semibold mb-2">What will be the output of the following Python code snippet?<br>```python<br>x = 42<br>x = 'Hello'<br>x = False<br>print(x)<br>```</div>
+                  <div class="small mb-3">
+                    <div class="d-flex align-items-center mb-1 p-1 rounded bg-success-subtle text-success-emphasis fw-bold">
+                      <span class="choice-badge bg-success text-white">A</span>
+                      <span>False</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">B</span>
+                      <span>42</span>
+                    </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
+                      <span class="choice-badge bg-light text-dark border">C</span>
+                      <span>'Hello'</span>
                     </div><div class="d-flex align-items-center mb-1 p-1 rounded text-muted">
                       <span class="choice-badge bg-light text-dark border">D</span>
                       <span>TypeError</span>
                     </div>
                   </div>
                   <div class="small text-muted border-top pt-2">
-                    <strong>Explanation:</strong> The variable `x` is initially assigned an integer value of 5. It is then reassigned a string value 'hello', and finally a list value [1, 2, 3]. Since Python allows dynamic typing, the last assignment to `x` determines its final type and value. Therefore, the output will be `[1, 2, 3]`. The other options are incorrect because they represent values or errors that occur at different stages of the code execution.
+                    <strong>Explanation:</strong> The variable `x` is reassigned three times. Initially, it holds an integer value (42). Then, it is reassigned to a string ('Hello'). Finally, it is reassigned to a boolean value (False). The last assignment determines the final value of `x`, which is False. Therefore, the output will be 'False'.
                   </div>
                 </div>
               </div>

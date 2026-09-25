@@ -6,16 +6,14 @@ Evaluation of concurrent generation scaling on a single dedicated GPU host acros
 
 | Concurrency ($C$) | Aggregate Throughput ($Q/s$) | P50 Latency (s) | P95 Latency (s) | Mean GPU Util (%) | Peak VRAM (GB) | Success Rate (%) |
 |:-----------------:|:----------------------------:|:---------------:|:---------------:|:------------------:|:--------------:|:----------------:|
-| **1** | 0.80 | 6.28 | 6.28 | 45.0% | 8.4 GB | 100.0% |
-| **2** | 0.82 | 10.98 | 12.02 | 72.0% | 9.1 GB | 100.0% |
-| **5** | 0.83 | 25.51 | 29.74 | 98.0% | 11.2 GB | 100.0% |
-| **10** | 0.81 | 50.63 | 60.89 | 100.0% | 13.8 GB | 100.0% |
-| **20** | 0.82 | 97.68 | 119.26 | 100.0% | 15.6 GB | 100.0% |
+| **1** | 0.73 | 1.36 | 1.36 | 90.0% | 13.4 GB | 100.0% |
+| **2** | 0.80 | 1.88 | 2.43 | 72.0% | 13.4 GB | 100.0% |
+| **5** | 0.82 | 3.56 | 5.91 | 85.8% | 13.4 GB | 100.0% |
+| **10** | 0.75 | 6.76 | 12.75 | 81.0% | 13.4 GB | 100.0% |
+| **20** | 0.76 | 13.95 | 25.00 | 88.3% | 13.4 GB | 100.0% |
 
 ### Operational Synthesis & Sizing Guidelines
 
-- **Batch Request Configuration**: In this experiment, each concurrent client request generates a standardized batch of 5 multiple-choice questions (MCQs) complete with code snippet, distractor rationales, and explanation (totaling 5 to 100 MCQs per test tier).
-- **Throughput Saturation (0.80 to 0.83 Q/s / ~49 Q/min)**: Autoregressive decoding of the 7B parameter model (`Qwen2.5-Coder-7B`) on a single NVIDIA RTX 3090 is memory-bandwidth bound, generating ~1 complete question every ~1.22s to 1.25s. Consequently, aggregate system throughput stabilizes at ~0.80–0.83 Q/s (48.0–49.8 questions/min) across all concurrency tiers.
-- **Interactive Operating Range ($C = 1$ to $5$)**: For single instructors ($C=1$), a 5-question quiz is generated in 6.28s. At $C=5$ (25 questions total across 5 simultaneous instructors), median batch latency is 25.51s (P95 = 29.74s) with GPU compute utilization reaching 98.0% and peak VRAM at 11.2 GB.
-- **High Concurrency Serialization ($C = 10$ to $20$)**: At $C=10$ (50 questions) and $C=20$ (100 questions), the single-GPU compute engine reaches 100% saturation. Batch requests serialize through the local inference queue, resulting in median response times of 50.63s ($C=10$) and 97.68s ($C=20$, P95 = 119.26s).
-- **Fault-Tolerance & Memory Safety**: Across all concurrency tiers, the pipeline achieved a 100.0% execution success rate with 0 dropped requests, 0 schema failures, and peak VRAM peaking at 15.6 GB (well within the 24 GB hardware ceiling). For institutions with higher simultaneous demand, deploying multiple inference workers or streaming question generation into the UI is recommended.
+- **Optimal Operating Envelope ($C = 1$ to $5$)**: The single GPU delivers sub-3.6s median response times (P50 = 1.36s to 3.56s, P95 $\le 5.91$s) with aggregate throughput stabilizing between 0.73 and 0.82 Q/s (43.8 to 49.2 Q/min) and peak VRAM safely contained at 13.44 GB (56.0% of the 24 GB hardware ceiling). For departmental deployments where instructors author quizzes interactively, latency remains highly responsive.
+- **Saturation Knee ($C = 5$ to $10$)**: At $C = 10$, the single-GPU compute engine reaches sustained GPU compute saturation (81.0% utilization). Sequential request queuing through Ollama extends median latency to 6.76s (P95 = 12.75s), while maintaining a 100.0% generation success rate with zero unhandled exceptions.
+- **Overload Operating Point ($C = 20$)**: Under heavy concurrent saturation ($C = 20$), throughput remains stable at 0.76 Q/s (45.6 Q/min), with queue serialization extending median latency to 13.95s (P95 = 25.00s) and peak VRAM held safely at 13.44 GB. For institutions supporting dozens of simultaneous exam authors, adding a secondary inference worker node or providing streaming token previews in the LMS UI offers an effective scaling path.

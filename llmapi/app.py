@@ -522,7 +522,7 @@ def generate_with_gemini(topic: str, level: str, n_questions: int, language: str
             raise Exception("Gemini API key not configured")
         
         genai.configure(api_key=effective_api_key)
-        model = genai.GenerativeModel('gemini-3.8')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
 

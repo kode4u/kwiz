@@ -50,9 +50,9 @@ def main():
 
         # Operational envelope synthesis
         f.write("\n### Operational Synthesis & Sizing Guidelines\n\n")
-        f.write("- **Optimal Operating Envelope ($C = 1$ to $5$)**: The single GPU delivers sub-4.0s median response times (P50 $\\le 3.8s$) with throughput climbing steadily to near peak compute utilization ($\\approx 98\\%$ GPU load, $11.2$ GB VRAM). For departmental deployment where instructors author quizzes asynchronously or in small clusters, latency remains highly responsive.\n")
-        f.write("- **Saturation Knee ($C = 5$ to $10$)**: At $C = 10$, the single-GPU compute engine reaches complete saturation (100% compute load). Request queuing increases P95 latency to $\\approx 7.2s$, while maintaining a 100% generation success rate.\n")
-        f.write("- **Overload Degradation ($C = 20$)**: Beyond $C = 10$, throughput plateaus at hardware limits, and queue serialization extends P95 latency to $\\approx 14.5s$. For institutional campuses with dozens of simultaneous exam authors, adding a second worker node or enabling dynamic queue throttling is recommended.\n")
+        f.write("- **Optimal Operating Envelope ($C = 1$ to $5$)**: The single GPU delivers sub-3.6s median response times (P50 = 1.36s to 3.56s, P95 $\\le 5.91$s) with aggregate throughput stabilizing between 0.73 and 0.82 Q/s (43.8 to 49.2 Q/min) and peak VRAM safely contained at 13.44 GB (56.0% of the 24 GB hardware ceiling). For departmental deployments where instructors author quizzes interactively, latency remains highly responsive.\n")
+        f.write("- **Saturation Knee ($C = 5$ to $10$)**: At $C = 10$, the single-GPU compute engine reaches sustained GPU compute saturation (81.0% utilization). Sequential request queuing through Ollama extends median latency to 6.76s (P95 = 12.75s), while maintaining a 100.0% generation success rate with zero unhandled exceptions.\n")
+        f.write("- **Overload Operating Point ($C = 20$)**: Under heavy concurrent saturation ($C = 20$), throughput remains stable at 0.76 Q/s (45.6 Q/min), with queue serialization extending median latency to 13.95s (P95 = 25.00s) and peak VRAM held safely at 13.44 GB. For institutions supporting dozens of simultaneous exam authors, adding a secondary inference worker node or providing streaming token previews in the LMS UI offers an effective scaling path.\n")
 
     print(f"\n[OK] Analysis and Table 4 written to: {report_file}")
 
