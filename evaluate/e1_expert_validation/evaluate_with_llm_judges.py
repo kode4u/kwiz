@@ -143,9 +143,9 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-4o") -> Optio
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-1.5-pro"
+    model: str = "gemini-2.5-flash"
 ) -> Optional[Dict[str, Any]]:
-    gemini_models = [model, "gemini-1.5-flash", "gemini-2.0-flash"]
+    gemini_models = [model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-2.5-pro"]
     
     for g_model in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={api_key}"
@@ -411,7 +411,7 @@ def main():
             sys.exit(1)
         evaluate_judge("R1", "OpenAI GPT-4o", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
 
-    # 2. Setup R2 (Google Gemini 1.5 Pro)
+    # 2. Setup R2 (Google Gemini 2.5 Flash)
     r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
     r2_complete = False
     if os.path.exists(r2_csv):
@@ -422,7 +422,7 @@ def main():
                 r2_complete = True
 
     if r2_complete and args.r2_backend == "auto":
-        print(f"[INFO] R2 (Google Gemini 1.5 Pro) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R2 (Google Gemini 2.5 Flash) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r2_backend == "ollama":
         evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     elif args.r2_backend == "skip":
@@ -434,7 +434,7 @@ def main():
             sys.exit(1)
         evaluate_judge(
             "R2",
-            "Google Gemini 1.5 Pro",
+            "Google Gemini 2.5 Flash",
             lambda p: judge_with_gemini(p, args.gemini_key),
             questions,
             r2_csv,
