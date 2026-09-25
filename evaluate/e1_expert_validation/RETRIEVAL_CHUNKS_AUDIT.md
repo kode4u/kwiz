@@ -14,21 +14,21 @@ This document provides full traceability for all 100 generated Python MCQs, veri
 **Target Learning Objective:** *Python variable assignment, dynamic typing, and object identity*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+What is the output of the following Python code snippet?
 ```python
-x = 5
-y = '10'
-z = x + y
-print(z)
+x = 42
+x = 'Hello'
+x = False
+print(type(x))
 ```
 
 **Choices:**
-- **[A]** `15`
-- **[B]** `510` **(CORRECT)**
-- **[C]** `TypeError: unsupported operand type(s) for +: 'int' and 'str'`
-- **[D]** `'510'`
+- **[A]** `<class 'int'>`
+- **[B]** `<class 'str'>` **(CORRECT)**
+- **[C]** `<class 'bool'>`
+- **[D]** `<class 'NoneType'>`
 
-**Explanation:** The code attempts to add an integer (x) and a string (y). In Python, when you try to perform arithmetic operations between different types, it tries to convert them to the same type. Since '10' is a string, Python converts x (5) to a string ('5') before concatenating, resulting in '510'.
+**Explanation:** The code snippet demonstrates Python's dynamic typing. The variable `x` is first assigned an integer value, then a string, and finally a boolean value. At the end, the type of `x` is printed. Since the last assignment to `x` is a boolean, the output will be `<class 'bool'>`. The other options represent incorrect types that could potentially be assigned to `x` at different points in the code.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.8417`):
@@ -109,21 +109,20 @@ print(z)
 **Target Learning Objective:** *Python integer and float numeric operations and arithmetic division*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+What is the output of the following Python code snippet?
 ```python
 int_a = 10
 int_b = 3
-result = int_a / int_b
-print(result)
+print(int_a / int_b)
 ```
 
 **Choices:**
 - **[A]** `3`
 - **[B]** `3.3333333333333335` **(CORRECT)**
 - **[C]** `10`
-- **[D]** `3.0`
+- **[D]** `SyntaxError`
 
-**Explanation:** The code performs floating-point division because both `int_a` and `int_b` are integers, but the `/` operator in Python 3 performs true division for integer operands. The result is a float with high precision.
+**Explanation:** The code performs float division between two integers, resulting in a floating-point number. The correct output is 3.3333333333333335.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #25, Cosine Similarity: `0.8224`):
@@ -201,21 +200,21 @@ print(result)
 **Target Learning Objective:** *Python type() inspection function and built-in type names*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+What is the output of the following Python code snippet?
 ```python
 x = 42
-y = 'Hello'
+y = 'hello'
 z = x + y
 print(z)
 ```
 
 **Choices:**
 - **[A]** `TypeError: unsupported operand type(s) for +: 'int' and 'str'` **(CORRECT)**
-- **[B]** `'Hello42'`
-- **[C]** `42`
-- **[D]** `'Hello'`
+- **[B]** `42hello`
+- **[C]** `TypeError: can only concatenate str (not "int") to str`
+- **[D]** `SyntaxError: invalid syntax`
 
-**Explanation:** The code attempts to add an integer (x) and a string (y), which is not allowed in Python. This results in a TypeError because the '+' operator cannot be used between these types.
+**Explanation:** The code attempts to add an integer and a string, which is not allowed in Python. The correct error message is 'TypeError: unsupported operand type(s) for +: 'int' and 'str''. Options B and C are plausible mistakes due to common off-by-one errors or confusion between types. Option D represents a syntax error, which is not the case here.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7405`):
@@ -296,20 +295,20 @@ print(z)
 **Target Learning Objective:** *Explicit type casting using int() from float and string*
 
 ### Generated MCQ
-What will be the output of the following code snippet?
+What will be the output of the following Python code snippet?
 ```python
-float_num = 10.7
-int_from_float = int(float_num)
+int_num = 5.7
+int_from_float = int(int_num)
 print(int_from_float)
 ```
 
 **Choices:**
-- **[A]** `10` **(CORRECT)**
-- **[B]** `11`
-- **[C]** `10.7`
-- **[D]** `Error`
+- **[A]** `5`
+- **[B]** `6` **(CORRECT)**
+- **[C]** `5.7`
+- **[D]** `TypeError`
 
-**Explanation:** The `int()` function truncates the decimal part of a float, converting it to an integer. Therefore, `int_from_float` will be 10.
+**Explanation:** The `int()` function truncates the decimal part of a float, so `int_from_float` will be 5. The correct answer is B.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #25, Cosine Similarity: `0.7234`):
@@ -397,10 +396,10 @@ print(float_from_int)
 **Choices:**
 - **[A]** `5`
 - **[B]** `5.0` **(CORRECT)**
-- **[C]** `TypeError: 'float' object is not callable`
+- **[C]** `TypeError: 'int' object is not callable`
 - **[D]** `SyntaxError: invalid syntax`
 
-**Explanation:** The `float()` function converts an integer to a floating-point number. In this case, `int_num` is 5, and calling `float(int_num)` results in the float value 5.0. The correct output is '5.0'.
+**Explanation:** The code snippet converts an integer to a float using the `float()` function. The correct output is `5.0`. Choice A is incorrect because it does not include the decimal point. Choice C is incorrect because there is no error in the code; it simply performs type casting. Choice D is incorrect because there are no syntax errors.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #25, Cosine Similarity: `0.7340`):
@@ -478,7 +477,7 @@ print(float_from_int)
 **Target Learning Objective:** *Explicit type casting using str() from numbers*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+What will be the output of the following Python code snippet?
 ```python
 age = 30
 print(str(age) + ' years old')
@@ -490,7 +489,7 @@ print(str(age) + ' years old')
 - **[C]** `TypeError: can only concatenate str (not "int") to str`
 - **[D]** `SyntaxError: invalid syntax`
 
-**Explanation:** The code attempts to concatenate a string and an integer. By using the `str()` function, we explicitly convert the integer `age` to a string before concatenation. This prevents a TypeError and correctly outputs the string '30 years old'.
+**Explanation:** The code attempts to concatenate a string and an integer. In Python, you cannot directly concatenate these types without explicit type casting. The correct answer is '30' years old because the int value of age is cast to a string using str(age) before concatenation.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7071`):
@@ -568,7 +567,7 @@ print(str(age) + ' years old')
 **Target Learning Objective:** *String concatenation with plus operator vs numeric addition*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+What is the output of the following Python code snippet?
 ```python
 a = '5'
 b = 3
@@ -579,9 +578,9 @@ print(a + b)
 - **[A]** `8`
 - **[B]** `'53'` **(CORRECT)**
 - **[C]** `Error: unsupported operand type(s) for +: 'str' and 'int'`
-- **[D]** `'5' * 3`
+- **[D]** `10`
 
-**Explanation:** The code attempts to concatenate a string and an integer using the '+' operator. In Python, the '+' operator is overloaded for strings to perform concatenation, not addition. Therefore, '5' (a string) and 3 (an integer) are concatenated to form the string '53'. The other options represent common mistakes or misunderstandings about type handling in Python.
+**Explanation:** The code attempts to concatenate a string ('5') and an integer (3). In Python, the '+' operator is overloaded for strings to perform concatenation. Therefore, '5' + 3 results in '53'. The other options are incorrect because they either involve type errors or incorrect arithmetic operations.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.6980`):
@@ -658,21 +657,21 @@ print(a + b)
 **Target Learning Objective:** *TypeError when adding incompatible types like integer and string*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+What will be the output of the following code snippet?
 ```python
-age = 30
-name = 'Alice'
-total = age + name
-print(total)
+a = 5
+b = '10'
+c = a + b
+print(c)
 ```
 
 **Choices:**
-- **[A]** `'30Alice'`
-- **[B]** `TypeError: unsupported operand type(s) for +: 'int' and 'str'` **(CORRECT)**
-- **[C]** `60`
-- **[D]** `30Alice30`
+- **[A]** `15`
+- **[B]** `510` **(CORRECT)**
+- **[C]** `TypeError: unsupported operand type(s) for +: 'int' and 'str'`
+- **[D]** `SyntaxError: invalid syntax`
 
-**Explanation:** The code attempts to add an integer (age) and a string (name), which is not allowed in Python. This results in a TypeError because the '+' operator cannot be used between incompatible types.
+**Explanation:** The code attempts to add an integer (5) and a string ('10'). In Python, you cannot directly add these types. The correct output is '510' because the '+' operator for strings concatenates them rather than performing arithmetic addition.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7324`):
@@ -748,7 +747,7 @@ print(total)
 **Target Learning Objective:** *Python boolean literals True and False and bool() conversion*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
+What will be the output of the following code snippet?
 ```python
 x = True
 y = False
@@ -758,8 +757,8 @@ print(x or y)
 **Choices:**
 - **[A]** `True` **(CORRECT)**
 - **[B]** `False`
-- **[C]** `SyntaxError`
-- **[D]** `TypeError`
+- **[C]** `1`
+- **[D]** `0`
 
 **Explanation:** The 'or' operator returns True if at least one of the operands is True. In this case, x is True, so the expression evaluates to True.
 
@@ -852,7 +851,7 @@ print(x or y)
 **Target Learning Objective:** *Variable reassignment to different data types during execution*
 
 ### Generated MCQ
-What will be the output of the following code snippet?
+What will be the output of the following Python code snippet?
 ```python
 x = 42
 x = 'Hello'
@@ -866,7 +865,7 @@ print(x)
 - **[C]** `'Hello'`
 - **[D]** `TypeError`
 
-**Explanation:** The variable `x` is initially assigned an integer value (42). It is then reassigned a string ('Hello') and finally a boolean value (False). The last assignment to `x` determines its final value, which is False. Python allows variables to be reassigned to different types during execution.
+**Explanation:** The variable `x` is reassigned three times. Initially, it holds an integer value (42). Then, it is reassigned to a string ('Hello'). Finally, it is reassigned to a boolean value (False). The last assignment determines the final value of `x`, which is False. Therefore, the output will be 'False'.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7187`):
@@ -947,7 +946,7 @@ print(x)
 What is the output of the following Python code snippet?
 ```python
 name = 'Alice'
-print(name[1])
+print(name[2])
 ```
 
 **Choices:**
@@ -956,7 +955,7 @@ print(name[1])
 - **[C]** `'i'`
 - **[D]** `'c'`
 
-**Explanation:** The code snippet prints the second character of the string 'Alice'. In Python, indexing starts at 0, so 'A' is at index 0, 'l' is at index 1, and so on. Therefore, the output is 'l'.
+**Explanation:** The code snippet prints the character at index 2 of the string 'Alice'. In Python, indexing starts at 0. Therefore, name[2] refers to the third character in the string, which is 'l'.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7599`):
@@ -1039,18 +1038,17 @@ print(name[1])
 ### Generated MCQ
 What is the output of the following Python code snippet?
 ```python
-name = 'Alice'
-length = len(name)
-print(length)
+my_string = "Hello, World!"
+print(len(my_string))
 ```
 
 **Choices:**
-- **[A]** `5`
-- **[B]** `6` **(CORRECT)**
-- **[C]** `7`
-- **[D]** `8`
+- **[A]** `12`
+- **[B]** `13` **(CORRECT)**
+- **[C]** `14`
+- **[D]** `15`
 
-**Explanation:** The `len()` function returns the number of characters in a string. The string 'Alice' has 5 characters, so the output is 6.
+**Explanation:** The `len()` function in Python returns the number of characters in a string. In this case, 'Hello, World!' has 13 characters including the comma and space.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #87, Cosine Similarity: `0.6939`):
@@ -1124,7 +1122,7 @@ print(length)
 **Target Learning Objective:** *Integer floor division // and modulus % remainder operators*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
+What is the output of the following code snippet?
 ```python
 a = 10
 b = 3
@@ -1134,12 +1132,12 @@ print(c, d)
 ```
 
 **Choices:**
-- **[A]** `3 1` **(CORRECT)**
-- **[B]** `4 2`
-- **[C]** `3 0`
-- **[D]** `4 0`
+- **[A]** `3 1`
+- **[B]** `4 2` **(CORRECT)**
+- **[C]** `5 0`
+- **[D]** `6 -1`
 
-**Explanation:** The floor division operator // divides the first operand by the second and rounds down to the nearest whole number. The modulus operator % returns the remainder of the division. In this case, 10 // 3 = 3 (since 10 divided by 3 is 3 with a remainder) and 10 % 3 = 1 (the remainder). Therefore, the output is '3 1'.
+**Explanation:** The floor division operator // divides the first operand by the second and rounds down to the nearest whole number. In this case, 10 // 3 equals 3. The modulus operator % returns the remainder of the division. Here, 10 % 3 equals 1.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #25, Cosine Similarity: `0.6676`):
@@ -1221,21 +1219,21 @@ print(c, d)
 **Target Learning Objective:** *Exponentiation operator ** vs multiplication*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
+What is the output of the following Python code?
 ```python
-a = 2
-b = 3
-c = a ** b
-print(c)
+x = 2
+y = 3
+result = x ** y + 1
+print(result)
 ```
 
 **Choices:**
-- **[A]** `6`
+- **[A]** `9`
 - **[B]** `8` **(CORRECT)**
-- **[C]** `9`
-- **[D]** `12`
+- **[C]** `7`
+- **[D]** `6`
 
-**Explanation:** The code snippet calculates the exponentiation of `a` to the power of `b`. Here, `a = 2` and `b = 3`, so `c = 2 ** 3 = 8`. Therefore, the output is 8.
+**Explanation:** The code calculates the exponentiation of x by y (2^3 = 8) and then adds 1, resulting in 9. The correct answer is A.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7082`):
@@ -1312,7 +1310,7 @@ print(c)
 **Target Learning Objective:** *Compound assignment operators += and -=*
 
 ### Generated MCQ
-What will be the value of `x` after executing the following code snippet?
+What is the output of the following code snippet?
 ```python
 x = 5
 x += 3
@@ -1321,11 +1319,11 @@ print(x)
 
 **Choices:**
 - **[A]** `8` **(CORRECT)**
-- **[B]** `7`
-- **[C]** `6`
-- **[D]** `9`
+- **[B]** `10`
+- **[C]** `7`
+- **[D]** `6`
 
-**Explanation:** The code snippet uses the compound assignment operator `+=`, which is equivalent to `x = x + 3`. Initially, `x` is assigned the value 5. After executing `x += 3`, `x` becomes 8. The print statement then outputs the value of `x`, which is 8.
+**Explanation:** The code snippet uses the compound assignment operator `+=` to add 3 to the variable `x`. Initially, `x` is assigned the value 5. After executing `x += 3`, `x` becomes 8. The print statement then outputs the value of `x`, which is 8.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.6966`):
@@ -1417,20 +1415,19 @@ print(x)
 **Target Learning Objective:** *String repetition using multiplication operator **
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+What is the output of the following Python code snippet?
 ```python
-name = 'Alice'
-repeated_name = name * 3
-print(repeated_name)
+name = "Alice"
+print(name * 3)
 ```
 
 **Choices:**
 - **[A]** `AliceAliceAlice` **(CORRECT)**
 - **[B]** `Alice, Alice, Alice`
-- **[C]** `AliceeAliceeAlicee`
-- **[D]** `Alice*3`
+- **[C]** `Alice*3`
+- **[D]** `Error: unsupported operand type(s) for *: 'str' and 'int'`
 
-**Explanation:** The code snippet multiplies the string 'Alice' by 3, resulting in 'AliceAliceAlice'. The multiplication operator * is used to repeat a string multiple times.
+**Explanation:** The code snippet multiplies the string 'Alice' by 3, resulting in 'AliceAliceAlice'. The multiplication operator * is used to repeat a string a specified number of times.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7064`):
@@ -1515,12 +1512,12 @@ print(c)
 ```
 
 **Choices:**
-- **[A]** `1`
-- **[B]** `0` **(CORRECT)**
+- **[A]** `0`
+- **[B]** `1` **(CORRECT)**
 - **[C]** `-1`
 - **[D]** `2`
 
-**Explanation:** The code snippet converts the boolean values True and False to integers using int(True) which is 1 and int(False) which is 0. The sum of these two integers (1 + 0) results in 1.
+**Explanation:** The `int()` function converts boolean values to integers. `True` is converted to 1 and `False` is converted to 0. Therefore, `c = int(True) + int(False)` results in `c = 1 + 0`, which equals 1.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7420`):
@@ -1596,20 +1593,35 @@ print(c)
 **Target Learning Objective:** *Handling string numbers with int() and float() conversion*
 
 ### Generated MCQ
-What is the output of the following code snippet?
-```python
-str_num = "45"
-int_from_str = int(str_num)
-print(int_from_str)
-```
+Which of the following code snippets correctly converts a string to an integer and then adds it to another integer?
 
 **Choices:**
-- **[A]** `45.0`
-- **[B]** `45` **(CORRECT)**
-- **[C]** `TypeError: invalid literal for int() with base 10: '45'`
-- **[D]** `SyntaxError: invalid syntax`
+- **[A]** ````python
+str_num = '5'
+int_num = int(str_num)
+total = int_num + 3
+print(total) # Output: 8
+```` **(CORRECT)**
+- **[B]** ````python
+str_num = '5'
+int_num = float(str_num)
+total = int_num + 3
+print(total) # Output: 8.0
+````
+- **[C]** ````python
+str_num = '5'
+int_num = str(str_num)
+total = int_num + 3
+print(total) # Output: '53'
+````
+- **[D]** ````python
+str_num = '5'
+int_num = int(str_num)
+total = int_num * 3
+print(total) # Output: 15
+````
 
-**Explanation:** The code converts the string "45" to an integer using the int() function. The result is 45, which is printed as output.
+**Explanation:** The correct answer converts the string '5' to an integer using int(str_num) and then adds it to another integer (3), resulting in a total of 8. The other options either perform incorrect type conversions or use operations that do not match the problem statement.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #25, Cosine Similarity: `0.7289`):
@@ -1689,19 +1701,19 @@ print(int_from_str)
 ### Generated MCQ
 What is the output of the following Python code?
 ```python
-a = 5
-b = 3
-c = a + b * 2
-print(c)
+x = 5
+y = 2
+z = x + y * 3
+print(z)
 ```
 
 **Choices:**
-- **[A]** `14`
+- **[A]** `17`
 - **[B]** `11` **(CORRECT)**
-- **[C]** `8`
-- **[D]** `7`
+- **[C]** `9`
+- **[D]** `8`
 
-**Explanation:** The code performs arithmetic operations based on operator precedence. Multiplication is performed before addition, so the expression evaluates to `5 + (3 * 2) = 5 + 6 = 11`. Therefore, the correct output is 11.
+**Explanation:** The code snippet calculates the value of z using operator precedence. According to Python rules, multiplication is performed before addition. Therefore, y * 3 is calculated first (2 * 3 = 6), and then added to x (5 + 6 = 11). The correct output is 11.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.7012`):
@@ -1795,19 +1807,18 @@ print(c)
 ### Generated MCQ
 What will be the output of the following Python code snippet?
 ```python
-x = 10
-y = '5'
-z = x + y
-print(z)
+age = 30
+Age = 40
+print(age)
 ```
 
 **Choices:**
-- **[A]** `15`
-- **[B]** `105` **(CORRECT)**
-- **[C]** `TypeError: unsupported operand type(s) for +: 'int' and 'str'`
-- **[D]** `'105'`
+- **[A]** `30` **(CORRECT)**
+- **[B]** `40`
+- **[C]** `Error: NameError`
+- **[D]** `Error: TypeError`
 
-**Explanation:** The code attempts to add an integer (x) and a string (y). In Python, you cannot directly add these types. The correct output is '105' because the '+' operator concatenates strings when one of the operands is a string.
+**Explanation:** In Python, variable names are case-sensitive. The code declares a variable 'age' and then attempts to print it. Since 'Age' is a different variable (case difference), the original value of 'age' remains unchanged and is printed as 30.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #22, Cosine Similarity: `0.8302`):
@@ -1888,19 +1899,27 @@ print(z)
 **Target Learning Objective:** *Python list creation, element types, and zero-based positive indexing*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
-```python
-my_list = [10, 'hello', 3.14, True]
-print(my_list[2])
-```
+Which of the following Python code snippets correctly creates a list with elements 'apple', 42, and True, and then accesses the first element using zero-based indexing?
 
 **Choices:**
-- **[A]** `10`
-- **[B]** `3.14` **(CORRECT)**
-- **[C]** `'hello'`
-- **[D]** `True`
+- **[A]** ````python
+my_list = ['apple', 42, True]
+print(my_list[0])
+```` **(CORRECT)**
+- **[B]** ````python
+my_list = ('apple', 42, True)
+print(my_list[1])
+````
+- **[C]** ````python
+my_list = ['apple', 42, True]
+print(my_list[-1])
+````
+- **[D]** ````python
+my_list = [42, 'apple', True]
+print(my_list[0])
+````
 
-**Explanation:** The code snippet accesses the third element of the list `my_list` using a zero-based index. In Python, indices start at 0, so `my_list[2]` refers to the third element in the list, which is `3.14`. Therefore, the output will be `3.14`.
+**Explanation:** The correct answer is A. It creates a list with the specified elements and accesses the first element using zero-based indexing correctly. Choice B uses a tuple instead of a list, which is incorrect for this task. Choice C attempts to access the last element using negative indexing, which is not relevant to the question. Choice D has the correct order of elements but incorrectly accesses the first element.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #33, Cosine Similarity: `0.7880`):
@@ -1964,19 +1983,30 @@ print(my_list[2])
 **Target Learning Objective:** *Negative indexing in Python lists accessing elements from the end*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
-```python
-my_list = [10, 'hello', 3.14, True]
-print(my_list[-2])
-```
+Which of the following Python code snippets correctly prints the last element of a list using negative indexing?
 
 **Choices:**
-- **[A]** `True`
-- **[B]** `3.14` **(CORRECT)**
-- **[C]** `'hello'`
-- **[D]** `10`
+- **[A]** ````python
+my_list = [10, 'hello', 3.14, True]
+print(my_list[-2])
+````
+- **[B]** ````python
+my_list = [10, 'hello', 3.14, True]
+print(my_list[-1])
+```` **(CORRECT)**
+- **[C]** ````python
+my_list = [10, 'hello', 3.14, True]
+print(my_list[0])
+````
+- **[D]** ````python
+my_list = [10, 'hello', 3.14, True]
+print(my_list[-5])
+````
 
-**Explanation:** The code snippet accesses the second last element of the list using negative indexing. In Python, negative indices start from -1 for the last element. Therefore, my_list[-2] refers to the second last element, which is 3.14.
+**Explanation:** The correct answer is B: ```python
+my_list = [10, 'hello', 3.14, True]
+print(my_list[-1])
+``` This code snippet correctly prints the last element of the list using negative indexing (-1). The other options either print an incorrect element or raise an IndexError.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #36, Cosine Similarity: `0.7735`):
@@ -2040,31 +2070,31 @@ print(my_list[-2])
 **Target Learning Objective:** *List element reassignment and in-place mutability*
 
 ### Generated MCQ
-Which of the following code snippets correctly demonstrates reassigning an element in a list in Python?
+Which of the following code snippets correctly demonstrates reassigning an element in a list and verifying its mutability?
 
 **Choices:**
 - **[A]** ````python
 my_list = [1, 2, 3]
-my_list[0] = 'a'
+my_list[0] = 4
 print(my_list)
 ````
 - **[B]** ````python
-my_list = [1, 2, 3]
-my_list[1] = 4
-print(my_list)
-```` **(CORRECT)**
+my_tuple = (1, 2, 3)
+my_tuple[0] = 4
+print(my_tuple)
+````
 - **[C]** ````python
 my_list = [1, 2, 3]
 my_list.append(4)
 print(my_list)
-````
+```` **(CORRECT)**
 - **[D]** ````python
-my_list = (1, 2, 3)
-my_list[1] = 4
-print(my_list)
+my_dict = {1: 'a', 2: 'b'}
+del my_dict[1]
+print(my_dict)
 ````
 
-**Explanation:** The correct answer demonstrates reassigning an element in a list, which is allowed due to the mutable nature of lists. Choice A attempts to change an element in a tuple, which is immutable and will raise a TypeError. Choice C shows appending an element to a list, not reassigning an existing one. Choice D tries to reassign an element in a tuple, which is also not allowed.
+**Explanation:** The correct answer demonstrates reassigning an element in a list, which is mutable. The other options involve operations on immutable data structures (tuple) or dictionary operations that do not demonstrate element reassignment.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #48, Cosine Similarity: `0.7954`):
@@ -2122,17 +2152,18 @@ print(my_list)
 **Target Learning Objective:** *List slicing syntax list[start:stop] and boundary rules*
 
 ### Generated MCQ
-Which of the following Python code snippets correctly slices a list to include elements from index 2 to 4 (inclusive) in a new list? ```python
+Which of the following Python code snippets correctly slices a list to get elements from index 2 to 4 (inclusive)? ```python
 my_list = [10, 20, 30, 40, 50]
-sliced_list = my_list[2:5]```
+sliced_list = my_list[2:5]
+```
 
 **Choices:**
-- **[A]** `Choice A text`
-- **[B]** `Choice B text` **(CORRECT)**
-- **[C]** `Choice C text`
-- **[D]** `Choice D text`
+- **[A]** `sliced_list will be [30, 40, 50]`
+- **[B]** `sliced_list will be [20, 30, 40]` **(CORRECT)**
+- **[C]** `sliced_list will be [10, 20, 30]`
+- **[D]** `sliced_list will be [30, 40]`
 
-**Explanation:** The correct slicing syntax is my_list[2:5], which includes elements from index 2 to 4 (inclusive). The slice starts at the start index (2) and stops just before the stop index (5).
+**Explanation:** The correct slice is my_list[2:5], which includes elements at indices 2, 3, and 4. Python list slicing is inclusive of the start index but exclusive of the stop index.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.7513`):
@@ -2190,19 +2221,31 @@ sliced_list = my_list[2:5]```
 **Target Learning Objective:** *List slicing with step list[start:stop:step]*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
-```python
-my_list = [10, 'hello', 3.14, True]
-print(my_list[1:4:2])
-```
+Which of the following code snippets correctly slices a list to get elements from index 2 to 5 with a step of 2?
 
 **Choices:**
-- **[A]** `['hello']`
-- **[B]** `[10, 3.14]` **(CORRECT)**
-- **[C]** `['hello', True]`
-- **[D]** `[3.14]`
+- **[A]** ````python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:5:2]
+print(sliced_list)
+````
+- **[B]** ````python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:6:2]
+print(sliced_list)
+```` **(CORRECT)**
+- **[C]** ````python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:5:3]
+print(sliced_list)
+````
+- **[D]** ````python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:7:2]
+print(sliced_list)
+````
 
-**Explanation:** The code snippet slices the list `my_list` from index 1 to index 4 with a step of 2. This means it starts at index 1 ('hello'), skips the next element (3.14), and takes the element at index 3 (True). The resulting slice is ['hello', True].
+**Explanation:** The correct answer is B. The slice `my_list[2:6:2]` correctly starts at index 2, ends before index 6 (exclusive), and takes every second element, resulting in `[3, 5]`. Choice A has an incorrect end index, C has an incorrect step size, and D has an incorrect end index.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.6986`):
@@ -2275,10 +2318,10 @@ print(my_list[:2])
 **Choices:**
 - **[A]** `[10, 'hello']` **(CORRECT)**
 - **[B]** `[10]`
-- **[C]** `['hello', 3.14]`
-- **[D]** `[3.14, True]`
+- **[C]** `[10, 'hello', 3.14]`
+- **[D]** `[10, 'hello', 3.14, True]`
 
-**Explanation:** The code snippet slices the list from the beginning up to but not including index 2. In Python, slicing is exclusive of the end index. Therefore, my_list[:2] returns [10, 'hello'].
+**Explanation:** The code snippet slices the list `my_list` from the beginning up to but not including index 2. Therefore, it outputs `[10, 'hello']`. The other options are incorrect because they either include elements beyond index 1 or do not include all elements up to index 1.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.7224`):
@@ -2351,9 +2394,9 @@ reversed_list = my_list[::-1]
 - **[A]** `Choice A: reversed_list = my_list[::1]`
 - **[B]** `Choice B: reversed_list = my_list[::-1]` **(CORRECT)**
 - **[C]** `Choice C: reversed_list = my_list[-1::-1]`
-- **[D]** `Choice D: reversed_list = my_list[1::2]`
+- **[D]** `Choice D: reversed_list = my_list[0:-1]`
 
-**Explanation:** The correct answer is Choice B: reversed_list = my_list[::-1]. This uses Python's slicing feature to create a new list that is the reverse of my_list. The slice notation [::-1] means start at the end of the list and end at position 0, move with the step -1 (which means one step backwards). Choice A is incorrect because it does not reverse the list; it creates a copy of the original list. Choice C is also incorrect as it starts from the last element but does not include all elements in reverse order. Choice D is incorrect because it slices every other element starting from the second element, which does not reverse the list.
+**Explanation:** The correct answer is Choice B: reversed_list = my_list[::-1]. This uses Python's slicing syntax to create a new list that is the reverse of my_list. The slice [::-1] means start at the end of the list and end at position 0, move with the step -1 (which means one step backwards). Choices A, C, and D are incorrect because they do not correctly reverse the list.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #36, Cosine Similarity: `0.7413`):
@@ -2417,20 +2460,31 @@ reversed_list = my_list[::-1]
 **Target Learning Objective:** *Adding elements to a list using append() method*
 
 ### Generated MCQ
-What is the output of the following code snippet?
-```python
-my_list = [10, 'hello']
-my_list.append(3.14)
-print(my_list)
-```
+Which of the following code snippets correctly appends an element to a list?
 
 **Choices:**
-- **[A]** `[10, 'hello', 3.14]` **(CORRECT)**
-- **[B]** `[10, 'hello']`
-- **[C]** `[10, 'hello', 3.14, 3.14]`
-- **[D]** `[3.14, 10, 'hello']`
+- **[A]** ````python
+my_list = [1, 2, 3]
+my_list.append(4)
+print(my_list) # Output: [1, 2, 3, 4]
+```` **(CORRECT)**
+- **[B]** ````python
+my_list = [1, 2, 3]
+my_list.insert(4, 4)
+print(my_list) # Output: [1, 2, 3, 4]
+````
+- **[C]** ````python
+my_list = [1, 2, 3]
+my_list.remove(4)
+print(my_list) # Output: [1, 2, 3]
+````
+- **[D]** ````python
+my_list = [1, 2, 3]
+my_list.extend([4])
+print(my_list) # Output: [1, 2, 3, 4]
+````
 
-**Explanation:** The `append()` method adds an item to the end of the list. In this case, 3.14 is appended to the existing list `[10, 'hello']`, resulting in `[10, 'hello', 3.14]`.
+**Explanation:** The correct answer is A. The `append()` method adds an item to the end of the list, so `[1, 2, 3]` becomes `[1, 2, 3, 4]`. Option B uses `insert(4, 4)`, which inserts the element at index 4, resulting in `[1, 2, 3, None, 4]`. Option C attempts to remove an item that does not exist, so the list remains unchanged. Option D uses `extend([4])`, which adds each element of the iterable to the end of the list, resulting in `[1, 2, 3, 4]`.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #37, Cosine Similarity: `0.7407`):
@@ -2507,22 +2561,26 @@ print(my_list)
 **Target Learning Objective:** *Inserting elements at specific index using insert() method*
 
 ### Generated MCQ
-Which of the following code snippets correctly inserts the element 'world' at index 2 in the list `my_list`? ```python
+Which of the following code snippets correctly inserts the element 'world' at index 2 in the list `my_list`?
+```python
 my_list = [10, 'hello']
 # insert code here
+print(my_list)
 ```
 
 **Choices:**
 - **[A]** `my_list.insert(2, 'world')` **(CORRECT)**
 - **[B]** `my_list.append('world', 2)`
 - **[C]** `my_list[2] = 'world'`
-- **[D]** `my_list.insert('world', 2)`
+- **[D]** `my_list.insert(1, 'world')`
 
-**Explanation:** The correct choice is `my_list.insert(2, 'world')`. This correctly inserts the element 'world' at index 2 in the list. The other choices are incorrect because: 
+**Explanation:** The correct answer is A: my_list.insert(2, 'world'). The insert() method inserts an item at a specified position. In this case, we want to insert 'world' at index 2.
 
-- `my_list.append('world', 2)` is invalid syntax for the `append` method and does not support inserting at a specific index.
-- `my_list[2] = 'world'` attempts to assign a value directly at index 2, which will raise an `IndexError` since the list only has two elements currently.
-- `my_list.insert('world', 2)` is invalid syntax as the first argument should be the element to insert, not the index.
+Choice B is incorrect because append() adds an item to the end of the list and takes only one argument, not two.
+
+Choice C is incorrect because it attempts to assign a value directly to an index in the list, which will result in an IndexError if the index is out of range. In this case, my_list does not have an index 2 yet, so this would raise an error.
+
+Choice D is incorrect because it inserts 'world' at index 1, not index 2.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #37, Cosine Similarity: `0.7275`):
@@ -2591,23 +2649,23 @@ my_list = [10, 'hello']
 **Target Learning Objective:** *Removing elements by value using remove() vs pop() by index*
 
 ### Generated MCQ
-Which of the following code snippets correctly removes the first occurrence of the value '2' from a list and prints the updated list? ```python
-my_list = [1, 2, 3, 4, 5]
+Which of the following code snippets correctly removes the first occurrence of the value '3' from a list and prints the updated list? ```python
+my_list = [1, 2, 3, 4, 3]
 # Code here
 print(my_list)
 ```
 
 **Choices:**
-- **[A]** `my_list.remove(2)
-` **(CORRECT)**
-- **[B]** `my_list.pop(2)
-`
-- **[C]** `del my_list[1]
-`
-- **[D]** `my_list.sort()
-`
+- **[A]** `my_list.remove(3)
+Output: [1, 2, 4, 3]`
+- **[B]** `my_list.pop(3)
+Output: [1, 2, 3, 4]` **(CORRECT)**
+- **[C]** `my_list.remove(3)
+Output: [1, 2, 3, 4]`
+- **[D]** `my_list.pop(my_list.index(3))
+Output: [1, 2, 3, 4]`
 
-**Explanation:** The correct choice is `my_list.remove(2)`, which removes the first occurrence of '2' from the list. The output will be `[1, 3, 4, 5]`. The distractors are incorrect because: `my_list.pop(2)` removes the item at index 2 (which is '3'), not '2'. `del my_list[1]` removes the item at index 1 (which is '2'), but it does not remove all occurrences of '2'. `my_list.sort()` sorts the list in ascending order, which is not related to removing an element.
+**Explanation:** The correct choice is B. The `pop(3)` method removes the element at index 3, which is the fourth element in the list (since Python uses zero-indexing). The other choices either use the wrong method (`remove` instead of `pop`) or remove a different element.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.7024`):
@@ -2679,17 +2737,18 @@ print(my_list)
 ### Generated MCQ
 What is the output of the following Python code snippet?
 ```python
-my_list = [1, 2, [3, 4], 5]
-print(len(my_list))
+my_list = [[1, 2], [3, 4], [5, 6]]
+nested_length = len(my_list)
+print(nested_length)
 ```
 
 **Choices:**
-- **[A]** `4`
-- **[B]** `5` **(CORRECT)**
-- **[C]** `6`
-- **[D]** `7`
+- **[A]** `3` **(CORRECT)**
+- **[B]** `6`
+- **[C]** `2`
+- **[D]** `1`
 
-**Explanation:** The `len()` function in Python returns the number of items in an object. In this case, `my_list` contains four elements: two integers and one nested list. Therefore, the length of `my_list` is 4.
+**Explanation:** The `len()` function returns the number of elements in a list. In this case, `my_list` contains three sublists, so `len(my_list)` returns 3.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #33, Cosine Similarity: `0.6930`):
@@ -2756,35 +2815,21 @@ print(len(my_list))
 **Target Learning Objective:** *List concatenation with plus operator*
 
 ### Generated MCQ
-Which of the following code snippets correctly concatenates two lists in Python?
-
-**Choices:**
-- **[A]** ````python
-list1 = [1, 2]
-list2 = [3, 4]
+What is the output of the following code snippet?
+```python
+list1 = [1, 2, 3]
+list2 = [4, 5]
 result = list1 + list2
 print(result)
-```` **(CORRECT)**
-- **[B]** ````python
-list1 = [1, 2]
-list2 = [3, 4]
-result = list1 * list2
-print(result)
-````
-- **[C]** ````python
-list1 = [1, 2]
-list2 = [3, 4]
-result = list1 - list2
-print(result)
-````
-- **[D]** ````python
-list1 = [1, 2]
-list2 = [3, 4]
-result = list1 / list2
-print(result)
-````
+```
 
-**Explanation:** The correct answer uses the '+' operator to concatenate two lists, which is the appropriate method for combining lists in Python. The distractors use operators that are not valid for list concatenation: '*' performs element-wise multiplication, '-' and '/' perform subtraction and division respectively, which do not apply to lists.
+**Choices:**
+- **[A]** `[1, 2, 3, 4, 5]` **(CORRECT)**
+- **[B]** `[1, 2, 3, 4]`
+- **[C]** `[4, 5, 1, 2, 3]`
+- **[D]** `[1, 2, 3, 5]`
+
+**Explanation:** The '+' operator is used for list concatenation in Python. It combines the elements of two lists into a new list. Therefore, `list1 + list2` results in `[1, 2, 3, 4, 5]`. The other options are incorrect because they either miss or include extra elements.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.7066`):
@@ -2855,35 +2900,39 @@ print(result)
 **Target Learning Objective:** *Checking element membership using 'in' operator with lists*
 
 ### Generated MCQ
-Which of the following code snippets correctly checks if the element `4` is in the list `[1, 2, 3]` using the 'in' operator?
+Which of the following code snippets correctly checks if the number 4 is a member of the list `my_list` using the 'in' operator?
 
 **Choices:**
 - **[A]** ````python
-if 4 in [1, 2, 3]:
+my_list = [1, 2, 3]
+if my_list in 4:
     print('Found')
 else:
     print('Not Found')
 ````
 - **[B]** ````python
-if 4 not in [1, 2, 3]:
-    print('Not Found')
-else:
+my_list = [1, 2, 3]
+if 4 in my_list:
     print('Found')
+else:
+    print('Not Found')
 ```` **(CORRECT)**
 - **[C]** ````python
-if 4 == [1, 2, 3]:
+my_list = [1, 2, 3]
+if 4 not in my_list:
     print('Found')
 else:
     print('Not Found')
 ````
 - **[D]** ````python
-if 4 in range(1, 4):
+my_list = [1, 2, 3]
+if 4 == my_list:
     print('Found')
 else:
     print('Not Found')
 ````
 
-**Explanation:** The correct choice uses the 'in' operator to check if `4` is in the list `[1, 2, 3]`. The 'in' operator returns `False` because `4` is not an element of the list. Therefore, the code prints 'Not Found'. Choice A incorrectly checks for membership using `==`, which compares the entire list to `4`, resulting in `False`. Choice C attempts to check if `4` is equal to the list `[1, 2, 3]`, which is not a valid comparison and will raise a TypeError. Choice D uses `range(1, 4)`, which generates numbers from 1 to 3 (not including 4), so it correctly identifies that `4` is not in the range.
+**Explanation:** The 'in' operator in Python checks if a value is present in a sequence (like a list). The correct code snippet uses `4 in my_list` to check if the number 4 is an element of the list. Choice A incorrectly uses `my_list in 4`, which will always be False because it checks if the entire list is equal to the integer 4. Choice C incorrectly uses `4 not in my_list`, which would print 'Not Found' even though 4 is in the list. Choice D incorrectly uses `4 == my_list`, which compares the value of 4 with the entire list, resulting in False.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.6798`):
@@ -2953,15 +3002,23 @@ else:
 **Target Learning Objective:** *Python tuple creation with parentheses and comma syntax*
 
 ### Generated MCQ
-Which of the following is a valid Python tuple creation syntax?
+Which of the following Python code snippets correctly creates a tuple with two elements?
 
 **Choices:**
-- **[A]** `my_tuple = (1, 2, 3)` **(CORRECT)**
-- **[B]** `my_tuple = [1, 2, 3]`
-- **[C]** `my_tuple = {1, 2, 3}`
-- **[D]** `my_tuple = (1)  # Missing trailing comma`
+- **[A]** ````python
+my_tuple = (10, 20)
+```` **(CORRECT)**
+- **[B]** ````python
+my_tuple = [10, 20]
+````
+- **[C]** ````python
+my_tuple = (10)  # Missing comma
+````
+- **[D]** ````python
+my_tuple = (10, 20,)
+```` **(CORRECT)**
 
-**Explanation:** A tuple in Python is created using parentheses. The correct syntax includes a trailing comma for single-element tuples to distinguish them from expressions.
+**Explanation:** The correct answer is `my_tuple = (10, 20,)`. In Python, a tuple with more than one element must include a trailing comma to distinguish it from a parenthesized expression. The other options are incorrect because they either use square brackets (which create lists), lack the required trailing comma, or do not use parentheses at all.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #40, Cosine Similarity: `0.7912`):
@@ -3030,27 +3087,19 @@ Which of the following is a valid Python tuple creation syntax?
 **Target Learning Objective:** *Tuple immutability: attempting item assignment raises TypeError*
 
 ### Generated MCQ
-Which of the following code snippets will raise a TypeError when executed?
-
-**Choices:**
-- **[A]** ````python
+What will be the output of the following code snippet?
+```python
 my_tuple = (1, 'hello', 3.14)
 my_tuple[0] = 2
-```` **(CORRECT)**
-- **[B]** ````python
-my_list = [1, 'hello', 3.14]
-my_list[0] = 2
-````
-- **[C]** ````python
-my_dict = {'a': 1, 'b': 'hello'}
-my_dict['c'] = 3.14
-````
-- **[D]** ````python
-my_set = {1, 'hello', 3.14}
-my_set.add(2)
-````
+```
 
-**Explanation:** The correct answer is A. Tuples in Python are immutable, meaning that once a tuple is created, its elements cannot be changed. Attempting to assign a new value to an element of a tuple will raise a TypeError. In contrast, lists, dictionaries, and sets are mutable data structures, allowing for item assignment and modification.
+**Choices:**
+- **[A]** `TypeError: 'tuple' object does not support item assignment` **(CORRECT)**
+- **[B]** `(2, 'hello', 3.14)`
+- **[C]** `(1, 'hello', 3.14)`
+- **[D]** `(1, 'world', 3.14)`
+
+**Explanation:** The code attempts to modify an element of a tuple, which is not allowed because tuples are immutable in Python. This will raise a TypeError.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #39, Cosine Similarity: `0.7779`):
@@ -3114,16 +3163,16 @@ my_set.add(2)
 Consider the following Python code snippet:
 ```python
 my_tuple = (10, 20, 30, 40, 50)
-print(my_tuple[2])
+print(len(my_tuple))
 ```
 
 **Choices:**
-- **[A]** `30` **(CORRECT)**
-- **[B]** `20`
-- **[C]** `10`
-- **[D]** `40`
+- **[A]** `A. 4`
+- **[B]** `B. 5` **(CORRECT)**
+- **[C]** `C. 6`
+- **[D]** `D. 7`
 
-**Explanation:** The code snippet prints the third element of the tuple `my_tuple`. In Python, indexing starts at 0. Therefore, `my_tuple[2]` refers to the third element, which is 30.
+**Explanation:** The `len()` function in Python returns the number of items in an object. For a tuple, it counts all elements including those at both ends. Therefore, the length of `(10, 20, 30, 40, 50)` is 5.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #33, Cosine Similarity: `0.7853`):
@@ -3189,7 +3238,7 @@ print(my_tuple[2])
 **Target Learning Objective:** *Python set creation, unique elements, and duplicate elimination*
 
 ### Generated MCQ
-Which of the following Python code snippets correctly creates a set from a list, ensuring all elements are unique?
+Which of the following code snippets correctly creates a set from a list while removing duplicates?
 
 **Choices:**
 - **[A]** ````python
@@ -3209,11 +3258,11 @@ print(my_list)  # Output: [1, 2, 3, 2, 4]
 ````
 - **[D]** ````python
 my_list = [1, 2, 3, 2, 4]
-my_set = {my_list}
-print(my_set)  # Output: [[1, 2, 3, 2, 4]]
+my_set = set(my_list)
+print(my_set)  # Output: {4, 2, 3, 1}
 ````
 
-**Explanation:** The correct answer is A. The `set()` function in Python automatically removes duplicate values from a collection, so when applied to a list, it creates a set with unique elements. Choice B attempts to convert the set back to a list, which is unnecessary and does not change the uniqueness of the elements. Choice C tries to print the original list instead of the set, which would output `[1, 2, 3, 2, 4]` rather than `{1, 2, 3, 4}`. Choice D attempts to create a set containing the entire list as a single element, resulting in `[[1, 2, 3, 2, 4]]` instead of `{1, 2, 3, 4}`.
+**Explanation:** The correct answer is A. The `set()` function in Python automatically removes duplicate values from a list when creating a set, and it does not maintain any order of elements. Option B attempts to convert the set back to a list, which is unnecessary and does not change the output. Option C prints the original list instead of the set. Option D shows an incorrect output due to the unordered nature of sets.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #42, Cosine Similarity: `0.8296`):
@@ -3276,35 +3325,35 @@ print(my_set)  # Output: [[1, 2, 3, 2, 4]]
 **Target Learning Objective:** *Set operations: union, intersection, and difference*
 
 ### Generated MCQ
-Which of the following code snippets correctly demonstrates how to find the intersection of two sets in Python?
+Which of the following Python code snippets correctly demonstrates how to find the intersection of two sets?
 
 **Choices:**
 - **[A]** ````python
 set1 = {1, 2, 3}
 set2 = {3, 4, 5}
-intersection = set1.intersection(set2)
-print(intersection)  # Output: {3, 4, 5}
-````
-- **[B]** ````python
-set1 = {1, 2, 3}
-set2 = {3, 4, 5}
 intersection = set1 & set2
-print(intersection)  # Output: {3}
+print(intersection)
 ```` **(CORRECT)**
+- **[B]** ````python
+list1 = [1, 2, 3]
+list2 = [3, 4, 5]
+intersection = list1.intersection(list2)
+print(intersection)
+````
 - **[C]** ````python
-set1 = [1, 2, 3]
-set2 = [3, 4, 5]
-intersection = list(set(set1) & set(set2))
-print(intersection)  # Output: {3}
+dict1 = {1: 'a', 2: 'b'}
+dict2 = {3: 'c', 4: 'd'}
+intersection = dict1 & dict2
+print(intersection)
 ````
 - **[D]** ````python
-set1 = (1, 2, 3)
-set2 = (3, 4, 5)
-intersection = set(set1).intersection(set(set2))
-print(intersection)  # Output: {3}
+set1 = {1, 2, 3}
+set2 = {4, 5, 6}
+difference = set1 - set2
+print(difference)
 ````
 
-**Explanation:** The correct answer uses the intersection method or the '&' operator to find common elements between two sets. The first and third options are incorrect because they either use lists or tuples instead of sets, which would result in a TypeError. The fourth option is also incorrect because it attempts to create sets from tuples using set(set1) and set(set2), which is unnecessary and redundant.
+**Explanation:** The correct answer demonstrates the use of the '&' operator to find the intersection of two sets. The other options either use incorrect data types (list, dictionary) or perform a different operation (difference).
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #49, Cosine Similarity: `0.7375`):
@@ -3375,19 +3424,23 @@ print(intersection)  # Output: {3}
 **Target Learning Objective:** *Python dictionary key-value pair structure and curly braces syntax*
 
 ### Generated MCQ
-Given the following Python code snippet, what will be the output of `print(student['major'])`?
-```python
-student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}
-```
-
+Which of the following Python code snippets correctly creates a dictionary with three key-value pairs?
 
 **Choices:**
-- **[A]** `Alice`
-- **[B]** `Computer Science` **(CORRECT)**
-- **[C]** `20`
-- **[D]** `name`
+- **[A]** ````python
+dict = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}
+```` **(CORRECT)**
+- **[B]** ````python
+student = ('name': 'Alice', 'age': 20, 'major': 'Computer Science')
+````
+- **[C]** ````python
+student = {'name': 'Alice', age: 20, major: 'Computer Science'}
+````
+- **[D]** ````python
+student = {name='Alice', age=20, major='Computer Science'}
+````
 
-**Explanation:** The correct choice is 'Computer Science'. The code snippet defines a dictionary `student` with keys 'name', 'age', and 'major'. When we access `student['major']`, it retrieves the value associated with the key 'major', which is 'Computer Science'. The other choices are incorrect because they either refer to other values in the dictionary or are not valid keys.
+**Explanation:** The correct answer is A. It uses curly braces `{}` to create a dictionary with three key-value pairs, where each key is unique and maps to a specific value. Option B uses parentheses `()` instead of curly braces, which creates a tuple not a dictionary. Option C incorrectly uses colons `:` instead of commas `,` in the dictionary syntax. Option D uses equal signs `=` instead of colons `:` for key-value pairs.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #33, Cosine Similarity: `0.7828`):
@@ -3473,7 +3526,7 @@ student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}
 - **[C]** `20`
 - **[D]** `NameError: name 'major' is not defined`
 
-**Explanation:** The code snippet defines a dictionary `student` with keys 'name', 'age', and 'major'. The value associated with the key 'major' is 'Computer Science'. When we access `student['major']`, it retrieves the value 'Computer Science'. Therefore, the output will be 'Computer Science'.
+**Explanation:** The correct choice is 'Computer Science'. The code accesses the value associated with the key 'major' in the dictionary `student`. Distractors include incorrect keys ('name', 'age'), and a NameError which would occur if trying to access an undefined variable.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #45, Cosine Similarity: `0.7538`):
@@ -3539,21 +3592,22 @@ student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}
 **Target Learning Objective:** *Modifying existing dictionary values and adding new key-value pairs*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+Consider the following Python code snippet:
 ```python
 student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}
 student['age'] = 21
 student['gender'] = 'Female'
 print(student)
 ```
+What will be the output of this code?
 
 **Choices:**
-- **[A]** `{'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Male'}`
+- **[A]** `{'name': 'Alice', 'age': 20, 'major': 'Computer Science'}`
 - **[B]** `{'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Female'}` **(CORRECT)**
-- **[C]** `{'name': 'Alice', 'age': 20, 'major': 'Computer Science', 'gender': 'Female'}`
-- **[D]** `TypeError: unhashable type: 'dict'`
+- **[C]** `{'name': 'Alice', 'age': 20, 'major': 'Computer Science', 'gender': 'Male'}`
+- **[D]** `TypeError: unhashable type: 'list'`
 
-**Explanation:** The code correctly modifies the value associated with the key 'age' and adds a new key-value pair for 'gender'. The dictionary maintains its order, so the output is {'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Female'}.
+**Explanation:** The code snippet modifies the existing dictionary by changing the value associated with the key 'age' from 20 to 21. It also adds a new key-value pair ('gender': 'Female') to the dictionary. The output will be {'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Female'}.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #45, Cosine Similarity: `0.7899`):
@@ -3614,7 +3668,7 @@ print(student)
 **Target Learning Objective:** *Dictionary get() method with default fallback values*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+Consider the following Python code snippet:
 ```python
 student = {'name': 'Alice', 'age': 20}
 print(student.get('email'))
@@ -3622,12 +3676,12 @@ print(student.get('phone', 'N/A'))
 ```
 
 **Choices:**
-- **[A]** `None N/A`
+- **[A]** `None None`
 - **[B]** `None N/A` **(CORRECT)**
 - **[C]** `Alice None`
 - **[D]** `20 None`
 
-**Explanation:** The `get()` method is used to retrieve the value for a specified key in the dictionary. If the key does not exist, it returns `None` by default. In this case, 'email' and 'phone' keys do not exist in the dictionary, so both calls return `None`. The second call with a default value of 'N/A' is ignored because the key exists.
+**Explanation:** The `get()` method is used to retrieve the value for a specified key in a dictionary. If the key does not exist, it returns `None` by default unless a second argument (default value) is provided. In this case, 'email' and 'phone' keys do not exist in the `student` dictionary, so the first print statement outputs `None`. The second print statement provides a default value of 'N/A', so it outputs 'N/A'.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #33, Cosine Similarity: `0.6946`):
@@ -3700,20 +3754,26 @@ print(student.get('phone', 'N/A'))
 **Target Learning Objective:** *Dictionary keys() and values() iteration and membership*
 
 ### Generated MCQ
-Consider the following Python code snippet:
-```python
-student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}
-print(student.keys())
-``` What will be the output of this code?
-
+Which of the following code snippets correctly prints all keys in a dictionary named `student`?
 
 **Choices:**
-- **[A]** `['name', 'age', 'major']` **(CORRECT)**
-- **[B]** `('name', 'age', 'major')`
-- **[C]** `{'name': 'Alice', 'age': 20, 'major': 'Computer Science'}`
-- **[D]** `[('name', 'Alice'), ('age', 20), ('major', 'Computer Science')]`
+- **[A]** ````python
+for key in student:
+    print(key)
+````
+- **[B]** ````python
+for key in student.keys():
+    print(key)
+```` **(CORRECT)**
+- **[C]** ````python
+for value in student.values():
+    print(value)
+````
+- **[D]** ````python
+print(student.keys())
+````
 
-**Explanation:** The `keys()` method returns a view object that displays a list of all the keys in the dictionary. The output is a list of strings representing the keys, not a tuple or another dictionary.
+**Explanation:** The correct choice uses the `keys()` method to iterate over all keys in the dictionary. The other options either attempt to print values or use a non-existent method, which would result in errors.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #45, Cosine Similarity: `0.7790`):
@@ -3784,10 +3844,10 @@ print(student)
 **Choices:**
 - **[A]** `{'name': 'Alice', 'major': 'Computer Science'}` **(CORRECT)**
 - **[B]** `{'name': 'Alice', 'age': 20, 'major': 'Computer Science'}`
-- **[C]** `{'name': 'Alice', 'age': 19, 'major': 'Computer Science'}`
-- **[D]** `{'name': 'Bob', 'age': 20, 'major': 'Computer Science'}`
+- **[C]** `{'name': 'Alice', 'age': 21, 'major': 'Computer Science'}`
+- **[D]** `{'name': 'Bob', 'major': 'Computer Science'}`
 
-**Explanation:** The `del` statement is used to remove a key-value pair from the dictionary. In this case, 'age': 20 is removed, leaving {'name': 'Alice', 'major': 'Computer Science'}. The other options are incorrect because they either do not reflect the removal of the 'age' key or introduce new keys and values that were not present in the original dictionary.
+**Explanation:** The correct answer is A. The `del` statement removes the key-value pair with the key 'age' from the dictionary, resulting in {'name': 'Alice', 'major': 'Computer Science'}. Choice B is incorrect because it does not reflect any changes to the dictionary. Choice C is incorrect because it attempts to modify an element that no longer exists in the dictionary. Choice D is completely unrelated and does not follow the code provided.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #45, Cosine Similarity: `0.7375`):
@@ -3853,20 +3913,27 @@ print(student)
 **Target Learning Objective:** *Nested dictionaries and nested lists indexing traversal*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
-```python
-my_list = [1, 2, 3]
-my_list[0] = 4
-print(my_list)
-```
+Which of the following Python code snippets correctly accesses the value 'world' from a nested dictionary?
 
 **Choices:**
-- **[A]** `[1, 2, 3]`
-- **[B]** `[4, 2, 3]` **(CORRECT)**
-- **[C]** `[1, 4, 3]`
-- **[D]** `[1, 2, 4]`
+- **[A]** ````python
+dict = {'hello': {'world': 'Python'}}
+print(dict['hello']['world'])
+```` **(CORRECT)**
+- **[B]** ````python
+dict = {'hello': ['world', 'Python']}
+print(dict['hello'][1])
+````
+- **[C]** ````python
+dict = {'hello': {'world': 'Python'}}
+print(dict['hello'][0])
+````
+- **[D]** ````python
+dict = {'hello': ['Python']}
+print(dict['hello']['world'])
+````
 
-**Explanation:** The code snippet creates a list `my_list` with elements [1, 2, 3]. It then modifies the first element of the list to be 4. The correct output is `[4, 2, 3]`. Choice A is incorrect because it shows no change. Choice C and D are incorrect because they modify different elements.
+**Explanation:** The correct answer accesses the nested dictionary correctly by first accessing the inner dictionary with the key 'hello' and then accessing the value associated with the key 'world'. The other options either attempt to access elements in a list or use incorrect keys.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #33, Cosine Similarity: `0.7812`):
@@ -3935,12 +4002,12 @@ else:
 ```
 
 **Choices:**
-- **[A]** `x is less than y`
-- **[B]** `x is not less than y` **(CORRECT)**
+- **[A]** `x is less than y` **(CORRECT)**
+- **[B]** `x is not less than y`
 - **[C]** `SyntaxError: invalid syntax`
-- **[D]** `RuntimeError: division by zero`
+- **[D]** `IndentationError: unexpected indent`
 
-**Explanation:** The code snippet correctly compares the values of x and y. Since 5 is less than 10, the condition `x < y` evaluates to True, and the first print statement 'x is less than y' is executed. The else block is not reached.
+**Explanation:** The code snippet correctly compares the values of x and y. Since 5 is less than 10, the condition `x < y` evaluates to True, and the first print statement executes. The else block is not executed because the if condition is met.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #59, Cosine Similarity: `0.7714`):
@@ -4018,18 +4085,20 @@ Consider the following Python code snippet:
 x = 5
 y = 10
 if x < y:
-    print('x is less than y')
+    if x > 3:
+        print('Both conditions met')
 else:
-    print('x is not less than y')
+    print('Outer condition not met')
 ```
+What will be the output of this code?
 
 **Choices:**
-- **[A]** `x is less than y`
-- **[B]** `x is not less than y` **(CORRECT)**
-- **[C]** `SyntaxError: invalid syntax`
-- **[D]** `RuntimeError: division by zero`
+- **[A]** `Both conditions met` **(CORRECT)**
+- **[B]** `Outer condition not met`
+- **[C]** `SyntaxError`
+- **[D]** `TypeError`
 
-**Explanation:** The code snippet correctly compares the values of x and y. Since 5 is less than 10, the condition `x < y` evaluates to True, and 'x is less than y' is printed.
+**Explanation:** The code snippet first checks if x < y, which is True. Then it checks the inner condition if x > 3, which is also True. Since both conditions are met, 'Both conditions met' will be printed.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #59, Cosine Similarity: `0.7653`):
@@ -4102,43 +4171,47 @@ else:
 **Target Learning Objective:** *if-elif-else multi-way branching and first-match execution*
 
 ### Generated MCQ
-Which of the following code snippets will correctly print '2' when executed?
+Which of the following code snippets will output '2' when executed?
 
 **Choices:**
 - **[A]** ````python
-x = 10
-if x > 5:
-    if x < 8:
-        print('2')
-else:
-    print('3')
-````
-- **[B]** ````python
-x = 7
-if x > 5:
-    if x < 10:
-        print('2')
+x = 5
+if x > 3:
+    print('1')
+elif x == 4:
+    print('2')
 else:
     print('3')
 ```` **(CORRECT)**
+- **[B]** ````python
+x = 5
+if x > 4:
+    print('1')
+elif x == 4:
+    print('2')
+else:
+    print('3')
+````
 - **[C]** ````python
-x = 4
-if x > 5:
-    if x < 8:
-        print('2')
+x = 5
+if x > 3:
+    print('1')
+elif x == 5:
+    print('2')
 else:
     print('3')
 ````
 - **[D]** ````python
-x = 6
-if x > 5:
-    if x < 7:
-        print('2')
+x = 5
+if x > 4:
+    print('1')
+elif x < 5:
+    print('2')
 else:
     print('3')
 ````
 
-**Explanation:** The correct choice is B. The code snippet checks if `x` is greater than 5 and less than 10, which is true for `x = 7`. Therefore, it prints '2'. Choice A fails because the inner condition is not met (x < 8). Choice C also fails because x is not greater than 5. Choice D fails because the inner condition is not met (x < 7).
+**Explanation:** The correct answer is A. The code checks the conditions sequentially. Since x = 5, the first condition `x > 3` is True, but it does not execute the print statement because there is an `elif` clause that follows. The second condition `x == 4` is False, so it moves to the next `elif` clause. The third condition `x == 5` is True, and it prints '2'. The other options have errors in their conditions or logic.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #61, Cosine Similarity: `0.7713`):
@@ -4220,23 +4293,35 @@ else:
 **Target Learning Objective:** *Equality operator == vs assignment operator =*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
-```python
-x = 5
-y = 10
-if x == y:
-    print('Equal')
-else:
-    print('Not Equal')
-```
+Which of the following code snippets correctly uses a conditional statement to check if a number is even?
 
 **Choices:**
-- **[A]** `Equal`
-- **[B]** `Not Equal` **(CORRECT)**
-- **[C]** `True`
-- **[D]** `False`
+- **[A]** ````python
+number = 5
+if number == 0:
+    print('Even')
+else:
+    print('Odd')````
+- **[B]** ````python
+number = 6
+if number % 2 == 0:
+    print('Even')
+else:
+    print('Odd')```` **(CORRECT)**
+- **[C]** ````python
+number = 7
+if number != 0:
+    print('Even')
+else:
+    print('Odd')````
+- **[D]** ````python
+number = 8
+if number == 2:
+    print('Even')
+else:
+    print('Odd')````
 
-**Explanation:** The code compares the values of x and y using the equality operator '=='. Since x (5) is not equal to y (10), the condition in the if statement evaluates to False. Therefore, the else block is executed, printing 'Not Equal'.
+**Explanation:** The correct choice uses the modulo operator `%` to check if a number is even. The expression `number % 2 == 0` evaluates to True if the remainder when `number` is divided by 2 is zero, indicating that the number is even.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #54, Cosine Similarity: `0.7204`):
@@ -4323,9 +4408,9 @@ else:
 - **[A]** `x is greater than y`
 - **[B]** `x is not equal to y` **(CORRECT)**
 - **[C]** `x is equal to y`
-- **[D]** `SyntaxError: invalid syntax`
+- **[D]** `Syntax Error`
 
-**Explanation:** The code snippet compares the values of x and y using the != operator. Since x (5) is not equal to y (10), the condition in the if statement evaluates to True, and 'x is not equal to y' is printed.
+**Explanation:** The code snippet checks if x is not equal to y. Since 5 is indeed not equal to 10, the condition is True and 'x is not equal to y' will be printed.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #30, Cosine Similarity: `0.7511`):
@@ -4414,37 +4499,21 @@ Which of the following Python code snippets correctly demonstrates the use of th
 - **[A]** ````python
 x = True
 y = False
-if x and y:
-    print('Both conditions are true')
-else:
-    print('At least one condition is false')
-````
+print(x and y) # Output: True``
 - **[B]** ````python
 x = True
 y = True
-if x and y:
-    print('Both conditions are true')
-else:
-    print('At least one condition is false')
-```` **(CORRECT)**
+print(x and y) # Output: True`` **(CORRECT)**
 - **[C]** ````python
 x = False
 y = False
-if x and y:
-    print('Both conditions are true')
-else:
-    print('At least one condition is false')
-````
+print(x and y) # Output: False``
 - **[D]** ````python
-x = True
-y = None
-if x and y:
-    print('Both conditions are true')
-else:
-    print('At least one condition is false')
-````
+x = 5
+y = 10
+print(x and y) # Output: 5``
 
-**Explanation:** The correct choice demonstrates the use of the 'and' operator to check if both conditions are True. In this case, both x and y are True, so the condition is met and 'Both conditions are true' is printed. The other choices either have one or both conditions as False (Choice A), or they involve a non-boolean value (Choice D), which would result in an error.
+**Explanation:** The correct answer is B. The 'and' operator returns True only if both conditions are True. In this case, x and y are both True, so the output will be True. Option A is incorrect because it sets y to False, making the result False. Option C is incorrect because both x and y are False, making the result False. Option D is incorrect because 'and' does not work with integers in this way; it returns the first False value or the last value if all are True.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #31, Cosine Similarity: `0.7644`):
@@ -4552,13 +4621,13 @@ print(x or y) # Output: True`` **(CORRECT)**
 - **[C]** ````python
 x = 5
 y = 10
-print(x > y or x < y) # Output: False``
+print(x or y) # Output: 5``
 - **[D]** ````python
 x = 'hello'
 y = 'world'
-print(x == y or x != y) # Output: True``
+print(x or y) # Output: hello``
 
-**Explanation:** The correct answer is B. The 'or' operator returns True if at least one of the conditions is True. In this case, x or y is True because x is True. Choice A is incorrect because both x and y are False, so the output should be False. Choice C is incorrect because 5 > 10 is False and 5 < 10 is True, but since 'or' only needs one condition to be True, the output should be True. Choice D is correct because 'hello' != 'world' is True, so the output will be True.
+**Explanation:** The correct answer is B. The 'or' operator returns True if at least one of the conditions is True. In this case, x is True and y is False, so the output should be True. Choice A is incorrect because both conditions are False, so the output would be False. Choice C is incorrect because it uses numerical values instead of boolean expressions. Choice D is incorrect because it uses string concatenation instead of a logical 'or' operation.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #31, Cosine Similarity: `0.7630`):
@@ -4652,7 +4721,7 @@ print(x == y or x != y) # Output: True``
 **Target Learning Objective:** *Logical operator 'not': negating boolean truth values*
 
 ### Generated MCQ
-What will be the output of the following Python code?
+What is the output of the following Python code snippet?
 ```python
 x = True
 y = False
@@ -4665,7 +4734,7 @@ print(not x or y)
 - **[C]** `SyntaxError`
 - **[D]** `TypeError`
 
-**Explanation:** The expression `not x or y` is evaluated using short-circuit evaluation. Since `x` is True, `not x` evaluates to False. The OR operator then checks the second condition, which is `y`. Since `y` is False, the entire expression evaluates to False.
+**Explanation:** The `not` operator negates the boolean value of `x`, making it False. The `or` operator then checks if at least one condition is True, which is true because `y` is True. Therefore, the output is True.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #31, Cosine Similarity: `0.7325`):
@@ -4764,31 +4833,20 @@ print(not x or y)
 **Target Learning Objective:** *Short-circuit evaluation in boolean expressions with and/or*
 
 ### Generated MCQ
-Which of the following code snippets will output 'True' when executed?
-
-**Choices:**
-- **[A]** ````python
-x = True
-y = False
-print(x or y)
-````
-- **[B]** ````python
+What is the output of the following Python code snippet?
+```python
 x = True
 y = False
 print(x and y)
-```` **(CORRECT)**
-- **[C]** ````python
-x = False
-y = True
-print(not x)
-````
-- **[D]** ````python
-x = 5
-y = 10
-print(x > y)
-````
+```
 
-**Explanation:** The correct choice is B. The 'and' operator short-circuits and stops evaluating as soon as it encounters a False value, so it does not evaluate the second operand (y). Since x is True, the result of x and y is False. Choice A outputs 'True' because 'or' returns True if at least one condition is True. Choice C outputs 'False' because 'not' reverses the boolean value of x to False. Choice D outputs 'False' because 5 is not greater than 10.
+**Choices:**
+- **[A]** `True`
+- **[B]** `False` **(CORRECT)**
+- **[C]** `SyntaxError`
+- **[D]** `TypeError`
+
+**Explanation:** The 'and' operator in Python performs a logical AND operation. It returns True if both operands are True, otherwise it returns False. In this case, x is True and y is False, so the expression evaluates to False.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #31, Cosine Similarity: `0.7417`):
@@ -4886,31 +4944,23 @@ Which of the following Python code snippets will output 'False'?
 
 **Choices:**
 - **[A]** ````python
-if []:
-    print(True)
-else:
-    print(False)
+x = []
+print(bool(x))
 ````
 - **[B]** ````python
-if '' in {}:
-    print(True)
-else:
-    print(False)
+y = ''
+print(y == '')
 ```` **(CORRECT)**
 - **[C]** ````python
-if 0 == False:
-    print(True)
-else:
-    print(False)
+d = {}
+print(d is None)
 ````
 - **[D]** ````python
-if 'hello' and []:
-    print(True)
-else:
-    print(False)
+z = 0
+print(z != 0)
 ````
 
-**Explanation:** The empty list [], the empty dictionary {}, and zero all evaluate to False in Python. The 'in' operator checks for membership, so '' in {} is False. The 'and' operator short-circuits and returns the first False value it encounters, which is 0 == False.
+**Explanation:** The correct choice is B. The empty string '' evaluates to False in Python, so the comparison y == '' returns True. Choice A and C are incorrect because they evaluate to True (an empty list and an empty dictionary are considered truthy). Choice D is incorrect because 0 evaluates to False.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #31, Cosine Similarity: `0.7023`):
@@ -4999,31 +5049,23 @@ else:
 **Target Learning Objective:** *Truthiness: non-empty strings and non-zero numbers evaluate to True*
 
 ### Generated MCQ
-Which of the following code snippets will output 'True'?
-
-**Choices:**
-- **[A]** ````python
+What will be the output of the following Python code snippet?
+```python
 x = 5
 y = 10
-print(x < y)
-```` **(CORRECT)**
-- **[B]** ````python
-x = 3
-y = 3
-print(x != y)
-````
-- **[C]** ````python
-x = 'hello'
-y = ''
-print(y == x)
-````
-- **[D]** ````python
-x = True
-y = False
-print(not x and y)
-````
+if x < y:
+    print('x is less than y')
+else:
+    print('x is not less than y')
+```
 
-**Explanation:** The correct choice is A. The expression `x < y` evaluates to True because 5 is less than 10. Choice B is incorrect because `x != y` evaluates to False because both x and y are equal to 3. Choice C is incorrect because an empty string evaluates to False in a boolean context, so `y == x` evaluates to False. Choice D is incorrect because `not x and y` evaluates to False because `not x` is True (since x is True), and the `and` operator requires both conditions to be True for the entire expression to evaluate to True.
+**Choices:**
+- **[A]** `x is less than y` **(CORRECT)**
+- **[B]** `x is not less than y`
+- **[C]** `SyntaxError`
+- **[D]** `RuntimeError`
+
+**Explanation:** The code snippet compares the values of x and y using the less than operator. Since 5 is indeed less than 10, the condition `x < y` evaluates to True. Therefore, the first branch of the if-else statement is executed, printing 'x is less than y'. The other options are incorrect because there are no syntax or runtime errors in the code.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #31, Cosine Similarity: `0.7546`):
@@ -5117,24 +5159,24 @@ print(not x and y)
 **Target Learning Objective:** *Nested if conditional statements within code blocks*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+Consider the following Python code snippet:
 ```python
 x = 5
 y = 10
-if x > 3:
-    if y < 20:
-        print('Condition met')
+if x < y:
+    if y > 7:
+        print('Both conditions are true')
 else:
-    print('Outer else')
+    print('Outer condition is false')
 ```
 
 **Choices:**
-- **[A]** `Condition met` **(CORRECT)**
-- **[B]** `Outer else`
-- **[C]** `SyntaxError`
-- **[D]** `IndentationError`
+- **[A]** `Both conditions are true`
+- **[B]** `Outer condition is false` **(CORRECT)**
+- **[C]** `Inner condition is false`
+- **[D]** `Syntax error`
 
-**Explanation:** The code snippet has two nested if statements. The outer if condition `x > 3` is True because x (5) is greater than 3. The inner if condition `y < 20` is also True because y (10) is less than 20. Therefore, the code inside the inner if block will execute, printing 'Condition met'.
+**Explanation:** The outer if statement checks if x < y, which is true (5 < 10). The inner if statement checks if y > 7, which is also true (10 > 7). Therefore, the code inside both conditions will execute, printing 'Both conditions are true'.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #59, Cosine Similarity: `0.7806`):
@@ -5218,7 +5260,7 @@ else:
 **Target Learning Objective:** *Chained comparison operators like 10 < x < 20 in Python*
 
 ### Generated MCQ
-What will be the output of the following Python code?
+Consider the following Python code snippet:
 ```python
 x = 15
 if 10 < x < 20:
@@ -5228,12 +5270,12 @@ else:
 ```
 
 **Choices:**
-- **[A]** `'x is between 10 and 20'` **(CORRECT)**
-- **[B]** `'x is not between 10 and 20'`
-- **[C]** `SyntaxError`
-- **[D]** `TypeError`
+- **[A]** `Choice A: 'x is between 10 and 20'`
+- **[B]** `Choice B: 'x is not between 10 and 20'` **(CORRECT)**
+- **[C]** `Choice C: 'SyntaxError'`
+- **[D]** `Choice D: 'RuntimeError'`
 
-**Explanation:** The code uses chained comparison operators to check if x is between 10 and 20. Since 15 satisfies this condition, the output will be 'x is between 10 and 20'. The other options are incorrect because there is no syntax or type error in the code.
+**Explanation:** The code snippet uses chained comparison operators to check if x is between 10 and 20. Since x = 15, the condition 10 < x < 20 evaluates to True, so 'x is between 10 and 20' is printed. Choice A is incorrect because it does not match the output. Choice C is incorrect because there are no syntax errors in the code. Choice D is incorrect because there are no runtime errors.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #30, Cosine Similarity: `0.7948`):
@@ -5329,7 +5371,7 @@ print(status)
 - **[C]** `Choice C: Error`
 - **[D]** `Choice D: SyntaxError`
 
-**Explanation:** The ternary operator checks if `age >= 18`. Since `age` is 20, which is greater than or equal to 18, the condition is True. Therefore, 'Adult' is assigned to the variable `status`, and it gets printed.
+**Explanation:** The ternary operator checks if `age >= 18`. Since `20` is greater than or equal to `18`, the condition is True, and 'Adult' is assigned to `status`. The code then prints 'Adult'. Choice A is incorrect because it suggests 'Minor', which is not the output. Choice C and D are incorrect as there are no errors in the syntax.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #59, Cosine Similarity: `0.8198`):
@@ -5402,23 +5444,23 @@ print(status)
 **Target Learning Objective:** *Combining logical and comparison operators in complex conditions*
 
 ### Generated MCQ
-Consider the following Python code snippet:
+What will be the output of the following Python code snippet?
 ```python
 x = 5
 y = 10
-if x < y and y > 7:
-    print('Condition met')
+if x < y:
+    print('x is less than y')
 else:
-    print('Condition not met')
+    print('x is not less than y')
 ```
 
 **Choices:**
-- **[A]** `Condition met` **(CORRECT)**
-- **[B]** `Condition not met`
+- **[A]** `x is less than y` **(CORRECT)**
+- **[B]** `x is not less than y`
 - **[C]** `SyntaxError: invalid syntax`
-- **[D]** `TypeError: unsupported operand type(s) for +: 'int' and 'str'`
+- **[D]** `TypeError: '<' not supported between instances of 'int' and 'str'`
 
-**Explanation:** The code snippet checks if both conditions (x < y and y > 7) are true. Since x is indeed less than y (5 < 10) and y is greater than 7 (10 > 7), the condition is met, and 'Condition met' will be printed.
+**Explanation:** The code snippet compares the values of x and y using the less than operator (<). Since 5 is indeed less than 10, the condition `x < y` evaluates to True. Therefore, the code inside the if block will execute, printing 'x is less than y'. The other choices are incorrect because they either represent a different output or an error that would occur in this context.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #54, Cosine Similarity: `0.7599`):
@@ -5501,17 +5543,22 @@ else:
 **Target Learning Objective:** *Basic for loop syntax iterating over elements of a list*
 
 ### Generated MCQ
-Which of the following code snippets correctly prints each element in a list of numbers from 0 to 4 using a for loop? ```python
-# code here
+Consider the following Python code snippet:
+```python
+numbers = [1, 2, 3, 4]
+total = 0
+for number in numbers:
+total += number
+print(total)
 ```
 
 **Choices:**
-- **[A]** `for i in range(5): print(i)` **(CORRECT)**
-- **[B]** `for i in range(6): print(i)`
-- **[C]** `for i in range(0, 4): print(i)`
-- **[D]** `for i in range(1, 5): print(i)`
+- **[A]** `The output will be 10` **(CORRECT)**
+- **[B]** `The output will be 9`
+- **[C]** `The output will be 8`
+- **[D]** `The output will be 7`
 
-**Explanation:** The correct answer is `for i in range(5): print(i)`. This loop starts from 0 and goes up to (but not including) 5, printing each number from 0 to 4. The other options either start from the wrong number or go one step too far.
+**Explanation:** Explanation: The for loop iterates over each number in the list [1, 2, 3, 4] and adds it to the variable total. After the loop completes, the final value of total is printed, which is 10.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #63, Cosine Similarity: `0.8347`):
@@ -5595,20 +5642,30 @@ Which of the following code snippets correctly prints each element in a list of 
 **Target Learning Objective:** *for loop iterating over characters of a string*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
-```python
-word = 'hello'
-for char in word:
-    print(char.upper())
-```
+Which of the following code snippets will correctly print each character of the string 'hello' on a new line using a for loop?
 
 **Choices:**
-- **[A]** `HELLO` **(CORRECT)**
-- **[B]** `hello`
-- **[C]** `Hello`
-- **[D]** `hELLO`
+- **[A]** ````python
+for i in range(5):
+    print('hello'[i])
+````
+- **[B]** ````python
+word = 'hello'
+for char in word:
+    print(char)
+```` **(CORRECT)**
+- **[C]** ````python
+word = 'hello'
+for i in range(6):
+    print(word[i])
+````
+- **[D]** ````python
+word = 'hello'
+for i in range(len(word)):
+    print(word[i+1])
+````
 
-**Explanation:** The code iterates over each character in the string 'hello' and converts it to uppercase using the `upper()` method. The correct output is 'HELLO'. Choice B is incorrect because it does not convert any characters to uppercase. Choice C is incorrect because it capitalizes only the first letter of the word. Choice D is incorrect because it capitalizes every other character.
+**Explanation:** The correct answer is B. The for loop iterates over each character in the string 'hello' and prints it on a new line. Choice A uses range(5) which will only iterate 5 times, but does not correctly access each character of the string. Choice C attempts to access an index that is out of bounds (word[5] does not exist). Choice D tries to print all characters except the first one by using i+1, which also results in an out-of-bounds error.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #63, Cosine Similarity: `0.7552`):
@@ -5700,10 +5757,10 @@ for i in range(5):
 **Choices:**
 - **[A]** `0 1 2 3 4` **(CORRECT)**
 - **[B]** `1 2 3 4 5`
-- **[C]** `0 1 2 3`
-- **[D]** `1 2 3 4`
+- **[C]** `0 2 4 6 8`
+- **[D]** `-1 0 1 2 3`
 
-**Explanation:** The range(5) function generates numbers from 0 to 4. The for loop iterates over this sequence and prints each number. Therefore, the output will be '0 1 2 3 4'.
+**Explanation:** The `range(5)` function generates numbers starting from 0 up to (but not including) 5. Therefore, the output will be '0 1 2 3 4'. Choice B is incorrect because it starts from 1 instead of 0. Choice C is incorrect because it uses a step of 2 and starts from 0, which does not match the range function used here. Choice D is incorrect because it uses negative numbers.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #65, Cosine Similarity: `0.8075`):
@@ -5789,20 +5846,19 @@ for i in range(5):
 **Target Learning Objective:** *range() function with two arguments range(start, stop)*
 
 ### Generated MCQ
-Consider the following Python code snippet:
+What will be printed when the following code is executed?
 ```python
 for i in range(3, 8):
     print(i)
 ```
-What will be printed to the console?
 
 **Choices:**
-- **[A]** `3 4 5 6 7` **(CORRECT)**
-- **[B]** `2 3 4 5 6`
-- **[C]** `1 2 3 4 5`
-- **[D]** `0 1 2 3 4`
+- **[A]** `1 2 3 4 5 6 7`
+- **[B]** `3 4 5 6 7` **(CORRECT)**
+- **[C]** `0 1 2 3 4 5 6`
+- **[D]** `2 3 4 5 6 7 8`
 
-**Explanation:** The range function starts at 3 and goes up to (but not including) 8. Therefore, the numbers printed will be 3, 4, 5, 6, and 7.
+**Explanation:** The range function starts from the 'start' value (inclusive) and goes up to but does not include the 'stop' value. Therefore, for i in range(3, 8), it will print numbers starting from 3 up to but not including 8.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #65, Cosine Similarity: `0.7801`):
@@ -5881,20 +5937,19 @@ What will be printed to the console?
 **Target Learning Objective:** *range() function with three arguments range(start, stop, step)*
 
 ### Generated MCQ
-Consider the following Python code snippet:
+What is the output of the following Python code snippet?
 ```python
-for i in range(0, 10, 3):
+for i in range(1, 5, 2):
     print(i)
 ```
-What will be the output of this code?
 
 **Choices:**
-- **[A]** `0 3 6 9` **(CORRECT)**
-- **[B]** `0 2 4 6 8`
-- **[C]** `1 4 7`
-- **[D]** `0 1 2 3 4 5 6 7 8 9`
+- **[A]** `1 3` **(CORRECT)**
+- **[B]** `0 2 4`
+- **[C]** `1 2 3 4`
+- **[D]** `2 4`
 
-**Explanation:** The range function starts at 0, goes up to (but not including) 10, and increments by 3. Therefore, it will print 0, 3, 6, and 9.
+**Explanation:** The range function generates numbers starting from the 'start' value (1) up to but not including the 'stop' value (5), incrementing by the 'step' value (2). Therefore, it prints 1 and then skips 3, printing only 1.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #65, Cosine Similarity: `0.7734`):
@@ -5973,27 +6028,19 @@ What will be the output of this code?
 **Target Learning Objective:** *Counting backwards using negative step in range()*
 
 ### Generated MCQ
-Which of the following code snippets will correctly print the numbers from 5 to 2 in descending order using a range function?
+What will be printed when the following code is executed?
+```python
+for i in range(10, -1, -2):
+    print(i)
+```
 
 **Choices:**
-- **[A]** ````python
-for i in range(2, 6):
-    print(i)
-````
-- **[B]** ````python
-for i in range(5, 0, -1):
-    print(i)
-```` **(CORRECT)**
-- **[C]** ````python
-for i in range(6, 2, -1):
-    print(i)
-````
-- **[D]** ````python
-for i in range(0, 5, -1):
-    print(i)
-````
+- **[A]** `8 6 4 2 0` **(CORRECT)**
+- **[B]** `9 7 5 3 1`
+- **[C]** `10 8 6 4 2`
+- **[D]** `10 8 6 4 2 0 -2`
 
-**Explanation:** The correct answer uses the `range(start, stop, step)` function with a negative step to count backwards. The start is 5, the stop is 0 (exclusive), and the step is -1. This will print 5, 4, 3, 2. Option A has an incorrect range that starts from 2 instead of 5. Option C incorrectly sets the start to 6 instead of 5. Option D uses a positive step which would count upwards.
+**Explanation:** The range function starts at 10 and decrements by 2 each iteration until it reaches -1 (exclusive). The correct sequence is 8, 6, 4, 2, 0.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #65, Cosine Similarity: `0.7545`):
@@ -6072,21 +6119,22 @@ for i in range(0, 5, -1):
 **Target Learning Objective:** *Basic while loop syntax and condition-controlled iteration*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+Consider the following Python code snippet:
 ```python
 i = 0
 while i < 5:
     print(i)
     i += 1
 ```
+What will be the output of this code?
 
 **Choices:**
 - **[A]** `0 1 2 3 4` **(CORRECT)**
-- **[B]** `0 1 2 3 4 5`
+- **[B]** `0 1 2 3 5`
 - **[C]** `-1 0 1 2 3`
 - **[D]** `1 2 3 4 5`
 
-**Explanation:** The code initializes a variable `i` to 0 and enters a while loop that continues as long as `i` is less than 5. Inside the loop, it prints the value of `i` and then increments `i` by 1. The loop will run 5 times, printing 0 through 4.
+**Explanation:** The correct answer is '0 1 2 3 4'. The loop starts with i = 0 and increments i by 1 in each iteration. It continues as long as i is less than 5, printing the current value of i each time. The distractors are incorrect because they either include an extra number (Choice B), start from a negative number (Choice C), or print numbers starting from 1 (Choice D).
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #66, Cosine Similarity: `0.8629`):
@@ -6166,22 +6214,22 @@ while i < 5:
 ### Generated MCQ
 Consider the following Python code snippet:
 ```python
-# Count down from 5 to 1, but it's missing a crucial line!
+# Count down from 5 to 1 with a while loop
 count = 5
 while count > 0:
     print(count)
-# Missing line here
+    # Missing line of code
 ```
-Which of the following lines should be added after `print(count)` to ensure the loop terminates correctly and prints numbers from 5 to 1?
+Which line should be added after `print(count)` to ensure the loop terminates correctly?
 
 
 **Choices:**
-- **[A]** `count += 1`
-- **[B]** `count -= 1` **(CORRECT)**
-- **[C]** `count = count + 1`
-- **[D]** `count = count - 1`
+- **[A]** `count += 1` **(CORRECT)**
+- **[B]** `count -= 1`
+- **[C]** `count = count + 2`
+- **[D]** `count *= 0.5`
 
-**Explanation:** The correct answer is B: `count -= 1`. This line decrements the value of `count` by 1 after each iteration, ensuring that the loop will eventually terminate when `count` becomes less than or equal to 0. Option A increments `count`, which would cause an infinite loop since it never decreases. Options C and D are equivalent to A and B respectively, but using `-=` is more concise.
+**Explanation:** The correct choice is `count += 1` because it updates the loop counter variable, ensuring that the condition `count > 0` will eventually become false and the loop will terminate. The other choices either do not update the counter (B), increase it too much (C), or modify it in a way that does not help the loop terminate (D).
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #66, Cosine Similarity: `0.8033`):
@@ -6258,39 +6306,34 @@ Which of the following lines should be added after `print(count)` to ensure the 
 **Target Learning Objective:** *break statement terminating loop execution immediately*
 
 ### Generated MCQ
-Which of the following code snippets will correctly print 'apple' and then terminate the loop immediately when encountering 'cherry'?
+Which of the following code snippets will terminate the loop immediately when `x` equals 3?
 
 **Choices:**
 - **[A]** ````python
-fruits = ['apple', 'banana', 'cherry']
-for fruit in fruits:
-    if fruit == 'cherry':
+for x in range(5):
+    if x == 3:
         continue
-    print(fruit)
 ````
 - **[B]** ````python
-fruits = ['apple', 'banana', 'cherry']
-for fruit in fruits:
-    if fruit == 'cherry':
+while True:
+    x = int(input('Enter a number: '))
+    if x == 3:
         break
-    print(fruit)
 ```` **(CORRECT)**
 - **[C]** ````python
-fruits = ['apple', 'banana', 'cherry']
-for fruit in fruits:
-    if fruit == 'cherry':
-        pass
-    print(fruit)
+for x in range(5):
+    if x == 3:
+        print('Found 3')
 ````
 - **[D]** ````python
-fruits = ['apple', 'banana', 'cherry']
-for fruit in fruits:
-    if fruit == 'cherry':
-        return
-    print(fruit)
+x = 0
+while x < 5:
+    x += 1
+    if x == 3:
+        pass
 ````
 
-**Explanation:** The correct answer uses the `break` statement, which terminates the loop immediately when 'cherry' is encountered. The other options use `continue`, `pass`, and `return`, which do not terminate the loop as intended.
+**Explanation:** The correct answer is B. The `break` statement in the while loop will terminate the entire loop immediately when `x` equals 3. In contrast, options A and C use `continue`, which skips the current iteration but does not exit the loop. Option D uses a `pass` statement, which does nothing and continues to the next iteration.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #68, Cosine Similarity: `0.7929`):
@@ -6379,26 +6422,25 @@ for num in numbers:
 - **[B]** ````python
 numbers = [1, 2, 3, 4, 5]
 for num in numbers:
-    if num % 2 == 0:
+    if num % 2 != 0:
         continue
     print(num)
 ```` **(CORRECT)**
 - **[C]** ````python
 numbers = [1, 2, 3, 4, 5]
 for num in numbers:
-    if num % 2 != 0:
-        continue
+    if num % 2 == 0:
+        break
     print(num)
 ````
 - **[D]** ````python
 numbers = [1, 2, 3, 4, 5]
 for num in numbers:
-    if num % 2 == 0:
-        break
-    print(num)
+    if num % 2 != 0:
+        print(num)
 ````
 
-**Explanation:** The correct answer uses the `continue` statement inside an if condition to skip printing even numbers. This means that when a number is even, the loop continues to the next iteration without executing the print statement for that number. The other options either incorrectly use `print` instead of `continue`, or they use `break` which would exit the loop entirely.
+**Explanation:** The correct choice uses the `continue` statement to skip printing even numbers. The code checks if a number is even (`num % 2 == 0`). If it is, the `continue` statement skips the rest of the current iteration and moves on to the next number. This results in only odd numbers being printed. Choice A incorrectly prints even numbers because it does not use `continue`. Choice C uses `break`, which exits the loop entirely when an even number is found, rather than skipping the print statement for that number. Choice D correctly prints odd numbers but does not use `continue` to skip printing even numbers.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #69, Cosine Similarity: `0.8402`):
@@ -6482,19 +6524,38 @@ for num in numbers:
 
 ### Generated MCQ
 Which of the following code snippets correctly calculates the sum of numbers from 1 to 5 using a for loop? ```python
+# code here
+```
+
+**Choices:**
+- **[A]** ````python
+sum = 0
+for i in range(6):
+    sum += i
+print(sum)
+````
+- **[B]** ````python
 sum = 0
 for i in range(1, 6):
     sum += i
 print(sum)
-```
+```` **(CORRECT)**
+- **[C]** ````python
+sum = 0
+for i in range(5):
+    sum += i + 1
+print(sum)
+````
+- **[D]** ````python
+sum = 0
+i = 1
+while i <= 5:
+    sum += i
+    i += 1
+print(sum)
+````
 
-**Choices:**
-- **[A]** `Choice A: The code is correct and will output 15.` **(CORRECT)**
-- **[B]** `Choice B: The code has an off-by-one error and will output 20.`
-- **[C]** `Choice C: The code uses the wrong loop type and will not work.`
-- **[D]** `Choice D: The code initializes sum to 1 instead of 0, so it will output 15.`
-
-**Explanation:** The correct answer is Choice A. The code initializes sum to 0 and iterates over the range from 1 to 5 (inclusive), adding each number to sum. After the loop, it prints the final value of sum, which is 15. Choice B has an off-by-one error because range(1, 6) already includes 5, so no additional increment is needed. Choice C suggests using a while loop instead of a for loop, which would require more code and is not necessary in this case. Choice D incorrectly initializes sum to 1 instead of 0.
+**Explanation:** The correct answer is B. The range function in Python starts from the first argument and goes up to, but does not include, the second argument. Therefore, range(1, 6) generates numbers from 1 to 5. Choice A has an off-by-one error because it includes 0 in the sum. Choice C also has an off-by-one error by starting the loop at 0 and adding 1 to each iteration. Choice D uses a while loop instead of a for loop, which is not required for this problem.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #63, Cosine Similarity: `0.7257`):
@@ -6575,17 +6636,19 @@ print(sum)
 Consider the following Python code snippet:
 ```python
 numbers = [1, 2, 3]
-for i in range(len(numbers)):
-    print(numbers[i])
+squares = []
+for num in numbers:
+    squares.append(num ** 2)
+print(squares)
 ```
 
 **Choices:**
-- **[A]** `Prints: 0 1 2`
-- **[B]** `Prints: 1 2 3` **(CORRECT)**
-- **[C]** `Prints: 2 3 4`
-- **[D]** `Raises an IndexError`
+- **[A]** `[1, 4, 9]` **(CORRECT)**
+- **[B]** `[0, 1, 4]`
+- **[C]** `[1, 3, 5]`
+- **[D]** `[2, 4, 6]`
 
-**Explanation:** The code iterates over the list 'numbers' using a for loop with the range of its length. The index 'i' starts at 0 and goes up to len(numbers) - 1, which are the valid indices for the list. Therefore, it prints each element in the list starting from the first (index 0) to the last (index 2).
+**Explanation:** The code iterates over the list `numbers` and appends the square of each number to the list `squares`. The correct output is `[1, 4, 9]`. Option B is incorrect because it squares the indices instead of the numbers. Options C and D are completely wrong as they do not represent the squares of the original numbers.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #63, Cosine Similarity: `0.7109`):
@@ -6683,7 +6746,7 @@ for key in my_dict.keys():
 - **[C]** `{'a': 1, 'b': 2, 'c': 3}`
 - **[D]** `TypeError: 'dict_keys' object is not iterable`
 
-**Explanation:** The code snippet iterates over the keys of a dictionary using `my_dict.keys()`. The `keys()` method returns a view object that displays a list of all the keys in the dictionary. Therefore, the output will be 'a b c'. Option B is incorrect because it prints the values instead of the keys. Option C is incorrect because it attempts to print the entire dictionary rather than its keys. Option D is incorrect because there is no error; the code runs successfully.
+**Explanation:** The code iterates over the keys of the dictionary `my_dict` and prints each key. The correct output is 'a b c'. Choice B is incorrect because it prints the values instead of keys. Choice C is incorrect because it attempts to print the entire dictionary, not its keys. Choice D is incorrect because there are no issues with iterating over dictionary keys.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #63, Cosine Similarity: `0.7801`):
@@ -6767,8 +6830,8 @@ for key in my_dict.keys():
 Consider the following Python code snippet:
 ```python
 fruits = ['apple', 'banana', 'cherry']
-for i, fruit in enumerate(fruits):
-    print(i, fruit)
+for index, fruit in enumerate(fruits):
+    print(index, fruit)
 ```
 What will be the output of this code?
 
@@ -6779,16 +6842,10 @@ What will be the output of this code?
 - **[B]** `apple 0
 banana 1
 c cherry 2`
-- **[C]** `1 apple
-2 banana
-3 cherry`
-- **[D]** `apple 1
-banana 2
-c cherry 3`
+- **[C]** `apple banana cherry`
+- **[D]** `SyntaxError: invalid syntax`
 
-**Explanation:** The `enumerate()` function adds a counter to an iterable and returns it in a form of enumerate object. The syntax is `enumerate(iterable, start=0)`. In this case, the loop starts with index 0 for 'apple', then 1 for 'banana', and 2 for 'cherry'. Therefore, the correct output is '0 apple
-1 banana
-2 cherry'.
+**Explanation:** The `enumerate()` function adds a counter to an iterable and returns it in a form of enumerate object. In this case, it starts counting from 0 by default. Therefore, the output will be '0 apple', '1 banana', and '2 cherry'. Choice B is incorrect because it reverses the order of index and fruit name. Choice C is incorrect because it only prints the fruit names without their indices. Choice D is incorrect because there are no syntax errors in the code.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #70, Cosine Similarity: `0.6987`):
@@ -6869,7 +6926,7 @@ c cherry 3`
 **Target Learning Objective:** *Finding maximum or minimum value in a list using a loop*
 
 ### Generated MCQ
-Which of the following code snippets correctly finds the maximum value in a list using a for loop? ```python
+Which of the following Python code snippets correctly finds the maximum value in a list using a for loop? ```python
 numbers = [3, 5, 1, 8, 2]
 max_value = None
 for number in numbers:
@@ -6884,7 +6941,7 @@ print(max_value)
 - **[C]** `Choice C text`
 - **[D]** `Choice D text`
 
-**Explanation:** The correct answer is B. The code initializes `max_value` to `None` and iterates through the list, updating `max_value` whenever it finds a number greater than the current `max_value`. This ensures that by the end of the loop, `max_value` holds the maximum value in the list. Choice A has an off-by-one error in the loop condition. Choice C attempts to find the minimum value instead of the maximum. Choice D incorrectly uses a while loop instead of a for loop.
+**Explanation:** The correct code snippet initializes `max_value` to `None` and updates it whenever a larger number is found in the list. This ensures that by the end of the loop, `max_value` holds the maximum value in the list. The distractors involve common mistakes such as initializing `max_value` to an incorrect initial value or not updating `max_value` correctly.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #70, Cosine Similarity: `0.7258`):
@@ -6963,43 +7020,22 @@ print(max_value)
 **Target Learning Objective:** *Counting occurrences of a specific element inside a loop*
 
 ### Generated MCQ
-Which of the following code snippets correctly counts how many times the letter 'a' appears in a given string using a for loop?
-
-**Choices:**
-- **[A]** ````python
-string = 'banana'
+Which of the following code snippets correctly counts how many times the letter 'a' appears in a given string using a for loop? ```python
+word = 'banana'
 count = 0
-for char in string:
-    if char == 'b':
-        count += 1
-print(count)
-````
-- **[B]** ````python
-string = 'banana'
-count = 0
-for char in string:
+for char in word:
     if char == 'a':
         count += 1
 print(count)
-```` **(CORRECT)**
-- **[C]** ````python
-string = 'banana'
-count = 0
-for char in string:
-    if char == 'A':
-        count += 1
-print(count)
-````
-- **[D]** ````python
-string = 'banana'
-count = 0
-for char in string:
-    if char != 'a':
-        count += 1
-print(count)
-````
+```
 
-**Explanation:** The correct code snippet counts the occurrences of 'a' in the string 'banana'. It initializes a counter to zero and increments it each time it encounters the character 'a'. The other options either count a different character, are case-sensitive, or incorrectly decrement the counter.
+**Choices:**
+- **[A]** `Choice A text`
+- **[B]** `Choice B text` **(CORRECT)**
+- **[C]** `Choice C text`
+- **[D]** `Choice D text`
+
+**Explanation:** The correct choice is B. The code iterates over each character in the string 'banana' and increments the count variable every time it encounters the letter 'a'. After the loop, it prints the final count, which should be 3. Choice A has a syntax error (missing colon at the end of the if statement). Choice C attempts to use a while loop instead of a for loop, which is not necessary in this case since we know the length of the string. Choice D incorrectly increments the count when encountering any vowel, not just 'a'.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #70, Cosine Similarity: `0.7358`):
@@ -7083,23 +7119,23 @@ print(count)
 **Target Learning Objective:** *Building a new filtered list inside a for loop with append()*
 
 ### Generated MCQ
-Given the following Python code snippet, what will be the output after its execution?
+Given the following code snippet, which of the following is the correct output?
 ```python
-numbers = [10, 20, 30, 40]
-filtered_numbers = []
+numbers = [1, 2, 3, 4, 5]
+even_numbers = []
 for number in numbers:
-    if number > 25:
-        filtered_numbers.append(number)
-print(filtered_numbers)
+    if number % 2 == 0:
+        even_numbers.append(number)
+print(even_numbers)
 ```
 
 **Choices:**
-- **[A]** `[10, 20]`
-- **[B]** `[30, 40]` **(CORRECT)**
-- **[C]** `[10, 20, 30, 40]`
-- **[D]** `SyntaxError`
+- **[A]** `[1, 2, 3, 4]`
+- **[B]** `[2, 4]` **(CORRECT)**
+- **[C]** `[1, 3, 5]`
+- **[D]** `[0, 2, 4]`
 
-**Explanation:** The for loop iterates over the list 'numbers'. The if condition checks if each number is greater than 25. If true, it appends the number to the 'filtered_numbers' list. After the loop completes, the output will be [30, 40].
+**Explanation:** The code iterates over the list `numbers` and checks if each number is even. If it is, the number is appended to the `even_numbers` list. The final output should be `[2, 4]`, which are the even numbers in the original list.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #63, Cosine Similarity: `0.7037`):
@@ -7180,7 +7216,7 @@ print(filtered_numbers)
 **Target Learning Objective:** *while loop with break condition and user input simulation*
 
 ### Generated MCQ
-What will be the output of the following Python code?
+What will be the output of the following Python code snippet?
 ```python
 user_input = ""
 while user_input != "quit":
@@ -7191,12 +7227,12 @@ print("Loop ended")
 ```
 
 **Choices:**
-- **[A]** `The program will print 'Loop ended' and then wait for the next input.`
-- **[B]** `The program will keep asking for input until 'quit' is entered, or 'stop' is entered to break out of the loop.` **(CORRECT)**
-- **[C]** `The program will print an error message and terminate.`
-- **[D]** `The program will enter an infinite loop because 'stop' does not equal 'quit'.`
+- **[A]** `The loop will run indefinitely until the program is manually stopped.`
+- **[B]** `The loop will print 'Loop ended' and then terminate when the user enters 'quit'.` **(CORRECT)**
+- **[C]** `The loop will print 'Loop ended' and then terminate when the user enters 'stop'.`
+- **[D]** `The loop will raise an error because 'break' is used outside a loop.`
 
-**Explanation:** Explanation: The code uses a while loop to continuously prompt the user for input until they enter 'quit'. If the user enters 'stop', the break statement is executed, which exits the loop immediately. Therefore, the correct output will be 'Loop ended' followed by the program terminating. Choice A is incorrect because it suggests the program waits for another input after printing 'Loop ended', which is not the case. Choice C is incorrect because there are no error messages in the code. Choice D is incorrect because entering 'stop' does not cause an infinite loop; instead, it breaks out of the loop.
+**Explanation:** Explanation: The code uses a while loop to continuously prompt the user for input until they enter 'quit'. Inside the loop, there is an if statement that checks if the user enters 'stop'. If 'stop' is entered, the break statement is executed, which terminates the loop. Therefore, the correct output is 'Loop ended'. The other options are incorrect because they either misinterpret the behavior of the code or introduce non-existent errors.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #66, Cosine Similarity: `0.7686`):
@@ -7279,29 +7315,24 @@ print("Loop ended")
 **Target Learning Objective:** *Execution tracing: predicting final variable state after nested loops*
 
 ### Generated MCQ
-Which of the following code snippets correctly counts down from 5 to 1 using a while loop? ```python
-# code here
+Consider the following Python code snippet:
+```python
+numbers = [1, 2, 3, 4, 5]
+count = 0
+for num in numbers:
+    if num % 2 == 0:
+        continue
+count += 1
+print(count)
 ```
 
 **Choices:**
-- **[A]** `count = 5
-while count > 0:
-    print(count)
-count -= 1`
-- **[B]** `count = 5
-while count >= 1:
-    print(count)
-count += 1` **(CORRECT)**
-- **[C]** `count = 5
-while count > 0:
-    print(count)
-count -= 2`
-- **[D]** `count = 5
-while count >= 1:
-    print(count)
-count -= 1`
+- **[A]** `The code will output 0`
+- **[B]** `The code will output 5` **(CORRECT)**
+- **[C]** `The code will output 4`
+- **[D]** `The code will output an error`
 
-**Explanation:** The correct answer is B. The while loop should continue as long as `count` is greater than or equal to 1, and it should decrement `count` by 1 each iteration. Choice A decrements `count` too early, Choice C decrements `count` by 2 instead of 1, and Choice D increments `count` instead of decrementing it.
+**Explanation:** Explanation: The loop iterates over the list `numbers`. When it encounters an even number (2 and 4), the `continue` statement is executed, skipping the rest of the current iteration. Therefore, the count variable is only incremented for odd numbers (1 and 3). Since there are two odd numbers in the list, the final value of `count` will be 2. However, due to a mistake in the code snippet provided, it seems the intention was to increment `count` for each number processed, leading to an output of 5.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #70, Cosine Similarity: `0.7278`):
@@ -7384,17 +7415,19 @@ numbers = [1, 2, 3, 4, 5]
 for number in numbers:
     if number == 3:
         found = True
-        break
-print(found)
+if not found:
+    print('Number not found')
+else:
+    print('Number found')
 ```
 
 **Choices:**
-- **[A]** `True`
-- **[B]** `False` **(CORRECT)**
-- **[C]** `SyntaxError`
-- **[D]** `RuntimeError`
+- **[A]** `The output will be 'Number not found'`
+- **[B]** `The output will be 'Number found'` **(CORRECT)**
+- **[C]** `The code will enter an infinite loop`
+- **[D]** `The code will raise a TypeError`
 
-**Explanation:** The code initializes a boolean flag `found` to False. It then iterates over the list `numbers`. When it finds the number 3, it sets `found` to True and breaks out of the loop. The final print statement outputs the value of `found`, which is False because the loop completes without finding any other numbers.
+**Explanation:** Explanation: The for loop iterates over the list 'numbers'. When it encounters the number 3, it sets the variable 'found' to True. After the loop, since 'found' is True, the code prints 'Number found'. Choice A is incorrect because the number 3 is found in the list. Choice C is incorrect because there is no condition that would cause an infinite loop. Choice D is incorrect because there are no type errors in the code.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #66, Cosine Similarity: `0.6901`):
@@ -7478,7 +7511,7 @@ print(found)
 **Target Learning Objective:** *Defining functions using def keyword and calling functions*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+What is the output of the following Python code snippet?
 ```python
 def greet(name):
     return f'Hello, {name}!'
@@ -7486,17 +7519,16 @@ def greet(name):
 def main():
     print(greet('Alice'))
 
-if __name__ == '__main__':
-    main()
+main()
 ```
 
 **Choices:**
-- **[A]** `SyntaxError: invalid syntax`
-- **[B]** `Hello, Alice!` **(CORRECT)**
-- **[C]** `NameError: name 'greet' is not defined`
-- **[D]** `TypeError: greet() missing 1 required positional argument: 'name'`
+- **[A]** `Hello, Alice!` **(CORRECT)**
+- **[B]** `Hello, Bob!`
+- **[C]** `NameError: name 'name' is not defined`
+- **[D]** `TypeError: greet() takes 0 positional arguments but 1 was given`
 
-**Explanation:** The code defines a function `greet` that takes one parameter `name` and returns a greeting string. The `main` function calls `greet('Alice')`, which correctly substitutes 'Alice' for the `name` parameter in the `greet` function, resulting in the output 'Hello, Alice!'.
+**Explanation:** The function `greet` is defined to take one parameter, `name`. In the `main` function, we call `greet('Alice')`, which correctly passes 'Alice' as an argument. The function returns the string 'Hello, Alice!', which is then printed by the `print` statement in `main()`. Choice B is incorrect because it assumes a different name was passed. Choice C is incorrect because there are no issues with variable scope or undefined names. Choice D is incorrect because the function correctly accepts one argument.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #74, Cosine Similarity: `0.7514`):
@@ -7573,28 +7605,22 @@ if __name__ == '__main__':
 **Target Learning Objective:** *Function parameters and passing positional arguments*
 
 ### Generated MCQ
-Which of the following code snippets correctly defines a function named `calculate_area` that takes two parameters, `length` and `width`, and returns their product?
+What is the output of the following Python code snippet?
+```python
+def greet(name):
+    return 'Hello, ' + name
+
+result = greet('Alice')
+print(result)
+```
 
 **Choices:**
-- **[A]** ````python
-def calculate_area(length, width):
-    return length * width
-```` **(CORRECT)**
-- **[B]** ````python
-def calculate_area(length, width):
-    area = length + width
-    return area
-````
-- **[C]** ````python
-def calculate_area(length, width):
-    print(length * width)
-````
-- **[D]** ````python
-def calculate_area(length, width):
-    return length / width
-````
+- **[A]** `Hello, Alice` **(CORRECT)**
+- **[B]** `Hello, Bob`
+- **[C]** `Good morning, Alice`
+- **[D]** `Alice`
 
-**Explanation:** The correct answer defines a function named `calculate_area` with two parameters, `length` and `width`, and returns their product. Choice B incorrectly adds the length and width instead of multiplying them. Choice C prints the area instead of returning it. Choice D attempts to divide the length by the width, which is not what the question asks for.
+**Explanation:** The function `greet` is called with the argument 'Alice'. The function concatenates 'Hello, ' with the name provided and returns the result. Therefore, the output is 'Hello, Alice'.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #75, Cosine Similarity: `0.7028`):
@@ -7685,18 +7711,18 @@ def calculate_area(length, width):
 What is the output of the following Python code snippet?
 ```python
 def multiply(a, b):
-    return a * b
-result = multiply(4, 3)
+    return a * b + 1
+result = multiply(3, 4)
 print(result)
 ```
 
 **Choices:**
-- **[A]** `12` **(CORRECT)**
-- **[B]** `15`
-- **[C]** `8`
-- **[D]** `7`
+- **[A]** `12`
+- **[B]** `13` **(CORRECT)**
+- **[C]** `15`
+- **[D]** `16`
 
-**Explanation:** The function `multiply` takes two arguments, `a` and `b`, and returns their product. In this case, `4 * 3 = 12`. Choice A is correct. Choices B, C, and D are incorrect because they represent different arithmetic operations or results.
+**Explanation:** The function `multiply(a, b)` is defined to return the product of `a` and `b`, plus one. When called with `multiply(3, 4)`, it computes `3 * 4 + 1 = 12 + 1 = 13`. Therefore, the output is 13.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #76, Cosine Similarity: `0.7385`):
@@ -7783,7 +7809,7 @@ print(result)
 **Target Learning Objective:** *Difference between print() displaying output and return producing a value*
 
 ### Generated MCQ
-What will be the output of the following Python code snippet?
+What is the output of the following code snippet?
 ```python
 def greet(name):
     return f'Hello, {name}!'
@@ -7797,7 +7823,7 @@ print(greet('Alice'))
 - **[C]** `None`
 - **[D]** `TypeError: greet() missing 1 required positional argument: 'name'`
 
-**Explanation:** The function `greet` is defined to return a string that includes the name passed as an argument. When calling `print(greet('Alice'))`, the function correctly returns 'Hello, Alice!', which is then printed.
+**Explanation:** The function `greet` is defined to return a string that includes the name passed as an argument. When calling `print(greet('Alice'))`, the function returns 'Hello, Alice!', which is then printed. Choice A is correct because it matches the expected output. Choice B is incorrect because it omits the name in the greeting. Choice C is incorrect because the function does not return None; instead, it returns a string. Choice D is incorrect because there are no missing arguments when calling the function.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #76, Cosine Similarity: `0.7279`):
@@ -7897,10 +7923,10 @@ print(result)
 **Choices:**
 - **[A]** `None` **(CORRECT)**
 - **[B]** `'Hello, Alice!'`
-- **[C]** `Error: function does not return anything`
-- **[D]** `SyntaxError`
+- **[C]** `SyntaxError`
+- **[D]** `TypeError`
 
-**Explanation:** The function `greet` is defined to print a greeting message but does not have an explicit return statement. In Python, if no return statement is provided, the function implicitly returns None.
+**Explanation:** The function `greet` does not have an explicit return statement. In Python, if no return statement is provided, the function implicitly returns None. Therefore, `result` will be None.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #77, Cosine Similarity: `0.6830`):
@@ -7996,7 +8022,7 @@ def get_values():
 def get_values():
     x = 10
     y = 20
-    return (x, y)
+    return (x)
 ````
 - **[C]** ````python
 def get_values():
@@ -8011,7 +8037,7 @@ def get_values():
     return x + y
 ````
 
-**Explanation:** The correct answer is Choice A. The function `get_values` returns a tuple containing the values of `x` and `y`. Choices B, C, and D either return a list or a single value instead of a tuple.
+**Explanation:** The correct function returns a tuple containing two values, `x` and `y`. Choice B is incorrect because it returns a single value in parentheses, which is not a tuple. Choice C is incorrect because it returns a list instead of a tuple. Choice D is incorrect because it returns the sum of `x` and `y`, not a tuple.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #76, Cosine Similarity: `0.7021`):
@@ -8106,22 +8132,23 @@ def get_values():
 **Target Learning Objective:** *Default parameter values and optional arguments in function definition*
 
 ### Generated MCQ
-Consider the following Python function:
-```python
-def add_item(item, items=[]):
-    items.append(item)
-    return items
-```
-What is the output of calling `add_item('apple')` followed by `add_item('banana')`?
-
+Which of the following is the correct way to define a function with default parameters in Python, avoiding potential bugs related to mutable default arguments?
 
 **Choices:**
-- **[A]** `[apple, banana]` **(CORRECT)**
-- **[B]** `[banana]`
-- **[C]** `[apple]`
-- **[D]** `Error`
+- **[A]** ````python
+def add_item(item, items=[]):\n    items.append(item)\n    return items```
+This will work correctly and avoid any issues.`
+- **[B]** ````python
+def greet(name='World', message='Hello'):\n    print(f'{message}, {name}!')```
+This is the correct way to define a function with default parameters.` **(CORRECT)**
+- **[C]** ````python
+def calculate_total(quantity, price=4.44):\n    return quantity * price\ncalculate_total(6)  # Output: $26.64```
+This will not work correctly because the default value is calculated at function definition time.`
+- **[D]** ````python
+def add_to_list(item, my_list=None):\n    if my_list is None:\n        my_list = []\n    my_list.append(item)\n    return my_list```
+This is the correct way to define a function with default parameters and avoid issues related to mutable defaults.`
 
-**Explanation:** The function `add_item` uses a mutable default argument `items=[]`. When called with 'apple', it appends 'apple' to the list. The same list is then used when calling with 'banana', appending 'banana'. Thus, the final output is [apple, banana].
+**Explanation:** The correct answer defines a function with default parameters using the recommended approach. The distractors include common mistakes related to mutable default arguments and incorrect usage of default values.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #79, Cosine Similarity: `0.7224`):
@@ -8196,23 +8223,21 @@ What is the output of calling `add_item('apple')` followed by `add_item('banana'
 **Target Learning Objective:** *Keyword arguments specifying parameter names during function call*
 
 ### Generated MCQ
-Which of the following function calls will correctly pass keyword arguments to a function named `greet` that expects two parameters, `name` and `age`?
-```python
+Which of the following is the correct way to call a function with keyword arguments in Python? ```python
+# Define a function that takes two parameters
 def greet(name, age):
     print(f'Hello, {name}. You are {age} years old.')
 
-# Function call
-result = greet(?, ?)
+# Call the function using keyword arguments
 ```
-
 
 **Choices:**
 - **[A]** `greet('Alice', 30)`
 - **[B]** `greet(name='Alice', age=30)` **(CORRECT)**
 - **[C]** `greet(age=30, 'Alice')`
-- **[D]** `greet(30, 'Alice')`
+- **[D]** `greet(30, name='Alice')`
 
-**Explanation:** The correct choice is `greet(name='Alice', age=30)`. This correctly passes keyword arguments to the function, specifying the parameter names. The other choices either use positional arguments incorrectly or mix up the order of parameters.
+**Explanation:** The correct way to call a function with keyword arguments is by specifying the parameter names followed by their values. This allows for clearer and more readable code, especially when dealing with functions that have many parameters. The other options either miss the parameter names (A and C) or incorrectly place the argument values (B and D).
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #75, Cosine Similarity: `0.7376`):
@@ -8311,12 +8336,12 @@ print(x)
 What will be the output of this code?
 
 **Choices:**
-- **[A]** `5 10`
-- **[B]** `10 5` **(CORRECT)**
-- **[C]** `5 5`
-- **[D]** `10 10`
+- **[A]** `10 5` **(CORRECT)**
+- **[B]** `5 10`
+- **[C]** `10 10`
+- **[D]** `5 5`
 
-**Explanation:** The function `my_function` has a local variable `x` which shadows the global variable `x`. When `my_function` is called, it prints its local `x`, which is 10. After calling the function, the global `x` remains unchanged and is printed as 5.
+**Explanation:** The function `my_function` has a local variable `x` which shadows the global variable `x`. When `my_function` is called, it prints its local `x`, which is 10. After the function call, the global `x` remains unchanged and is printed as 5.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #74, Cosine Similarity: `0.6351`):
@@ -8406,13 +8431,14 @@ average = calculate_average([1, 2, 3, 4, 5])
 print(average)
 ```
 
+
 **Choices:**
 - **[A]** `10.0`
 - **[B]** `3.0` **(CORRECT)**
-- **[C]** `2.5`
-- **[D]** `5.0`
+- **[C]** `5.0`
+- **[D]** `2.5`
 
-**Explanation:** The function `calculate_average` correctly calculates the average of the list `[1, 2, 3, 4, 5]`, which is `(1+2+3+4+5) / 5 = 15 / 5 = 3.0`. The variable `average` holds this value and is printed.
+**Explanation:** The function `calculate_average` correctly calculates the average of the numbers in the list [1, 2, 3, 4, 5], which is 3.0.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #75, Cosine Similarity: `0.5900`):
@@ -8494,7 +8520,7 @@ print(average)
 **Target Learning Objective:** *Shadowing global variables with local variables of the same name*
 
 ### Generated MCQ
-What is the output of the following Python code?
+Consider the following Python code snippet:
 ```python
 x = 5
 
@@ -8502,8 +8528,10 @@ def my_function():
     x = 10
     return x
 
-print(my_function())
+result = my_function()
+print(result)
 ```
+What will be printed to the console?
 
 **Choices:**
 - **[A]** `5`
@@ -8511,7 +8539,7 @@ print(my_function())
 - **[C]** `None`
 - **[D]** `Error`
 
-**Explanation:** The function `my_function` defines a local variable `x` with the value 10. When calling the function, it returns this local `x`, not the global `x`. Therefore, the output is 10.
+**Explanation:** The function `my_function` defines a local variable `x` with the value 10. When `result = my_function()` is executed, it calls the function and returns the local `x`, which is 10. The global `x` remains unchanged at 5.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #75, Cosine Similarity: `0.5574`):
@@ -8599,44 +8627,43 @@ print(my_function())
 **Target Learning Objective:** *Passing mutable objects like lists to functions and in-place side effects*
 
 ### Generated MCQ
-Which of the following code snippets correctly demonstrates how to pass a mutable object like a list to a function without causing unintended side effects?
+Which of the following code snippets correctly demonstrates how to pass a mutable object like a list to a function without causing side effects?
 
 **Choices:**
 - **[A]** ````python
-def add_item(item, items=[]):
-    items.append(item)
-    return items
+def modify_list(items=[]):
+    items.append(1)
 
-my_list = [1, 2, 3]
-result = add_item(4, my_list)
-print(result) # Output: [1, 2, 3, 4]````
+my_list = [2, 3]
+modify_list(my_list)
+print(my_list) # Output: [2, 3, 1]`
 - **[B]** ````python
-def add_item(item, items=None):
+def modify_list(items=None):
     if items is None:
         items = []
-    items.append(item)
-    return items
+    items.append(1)
 
-my_list = [1, 2, 3]
-result = add_item(4, my_list)
-print(result) # Output: [1, 2, 3, 4]```` **(CORRECT)**
+my_list = [2, 3]
+modify_list(my_list)
+print(my_list) # Output: [2, 3, 1]` **(CORRECT)**
 - **[C]** ````python
-def add_item(item, items=[]):
-    items.append(item)
-    return items
+def modify_list(items=[]):
+    items.append(1)
 
-my_list = [1, 2, 3]
-result = add_item(4)
-print(result) # Output: [4]````
+my_list = [2, 3]
+modify_list()
+print(my_list) # Output: [2, 3, 1]`
 - **[D]** ````python
-def add_item(item, items=[]):
-    return items + [item]
+def modify_list(items=None):
+    if items is None:
+        items = []
+    return items.append(1)
 
-my_list = [1, 2, 3]
-result = add_item(4, my_list)
-print(result) # Output: [1, 2, 3, 4]````
+my_list = [2, 3]
+modify_list(my_list)
+print(my_list) # Output: [2, 3, 1]`
 
-**Explanation:** The correct answer uses `items=None` and checks if it is `None` inside the function. This ensures that a new list is created each time the function is called without affecting any external lists passed as arguments.
+**Explanation:** The correct answer uses `items=None` and initializes the list inside the function if it is not provided. This avoids the common pitfall of using mutable default arguments in Python, which can lead to unintended side effects when the function is called multiple times.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #83, Cosine Similarity: `0.6978`):
@@ -8721,24 +8748,18 @@ print(result) # Output: [1, 2, 3, 4]````
 **Target Learning Objective:** *Passing immutable objects like integers and strings to functions*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
-```python
-def modify_string(s):
-    s += ' World'
-    return s
-
-greeting = 'Hello'
-new_greeting = modify_string(greeting)
-print(new_greeting)
-```
+Consider the following Python function that calculates the square of a number. ```python
+def square(number):
+    return number ** 2
+``` What will be the output if we call this function with `square(5)`?
 
 **Choices:**
-- **[A]** `Hello`
-- **[B]** `Hello World` **(CORRECT)**
-- **[C]** `World Hello`
-- **[D]** `Error: cannot modify string`
+- **[A]** `10`
+- **[B]** `25` **(CORRECT)**
+- **[C]** `30`
+- **[D]** `40`
 
-**Explanation:** The function `modify_string` takes a string `s`, appends ' World' to it, and returns the new string. The variable `greeting` is passed to this function, and the returned value is stored in `new_greeting`. Therefore, the output is 'Hello World'.
+**Explanation:** The function `square` takes an integer as input and returns its square. When called with `square(5)`, the function calculates 5 ** 2, which equals 25.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #74, Cosine Similarity: `0.6879`):
@@ -8814,24 +8835,23 @@ print(new_greeting)
 **Target Learning Objective:** *Functions calling other functions and functional decomposition*
 
 ### Generated MCQ
-What is the output of the following code snippet?
+Consider the following Python code snippet:
 ```python
 def greet(name):
     return f'Hello, {name}!'
+def introduce(greeting):
+    print(greet('Alice'))
+introduce()
+``` What will be the output of this code?
 
-def introduce(greeting_function, name):
-    print(greeting_function(name))
-
-introduce(greet, 'Alice')
-```
 
 **Choices:**
 - **[A]** `Hello, Alice!` **(CORRECT)**
 - **[B]** `Hello, Bob!`
 - **[C]** `NameError: name 'name' is not defined`
-- **[D]** `TypeError: greet() takes 1 positional argument but 2 were given`
+- **[D]** `TypeError: greet() missing 1 required positional argument: 'name'`
 
-**Explanation:** The code defines two functions, `greet` and `introduce`. The `greet` function takes a name as an argument and returns a greeting string. The `introduce` function takes another function (a greeting function) and a name as arguments, then calls the greeting function with the provided name. When calling `introduce(greet, 'Alice')`, it correctly passes the `greet` function and the string `'Alice'` to `introduce`. Inside `introduce`, `greet('Alice')` is called, which returns `'Hello, Alice!'`, and this value is printed.
+**Explanation:** The `introduce()` function calls the `greet('Alice')` function, which returns the string 'Hello, Alice!'. The `print()` statement in `introduce()` then outputs this string. Choice B is incorrect because it assumes a different name is passed to `greet()`. Choice C is incorrect because there are no undefined names in the code. Choice D is incorrect because `greet()` is called with an argument, so it does not raise a TypeError.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #72, Cosine Similarity: `0.7365`):
@@ -8908,23 +8928,23 @@ introduce(greet, 'Alice')
 **Target Learning Objective:** *Docstrings and documenting function behavior with triple quotes*
 
 ### Generated MCQ
-What is the output of the following Python code snippet?
+What is the output of the following code snippet?
 ```python
-def calculate_stats(data):
-    return sum(data) / len(data)
+def calculate_average(numbers):
+    return sum(numbers) / len(numbers)
 
 data = [1, 2, 3, 4, 5]
-result = calculate_stats(data)
-print(result)
+avg = calculate_average(data)
+print(avg)
 ```
 
 **Choices:**
-- **[A]** `10.0`
+- **[A]** `5.0`
 - **[B]** `3.0` **(CORRECT)**
 - **[C]** `2.5`
-- **[D]** `5.0`
+- **[D]** `1.0`
 
-**Explanation:** The function `calculate_stats` calculates the average of a list by summing all elements and dividing by the number of elements. For the input `[1, 2, 3, 4, 5]`, the sum is 15 and there are 5 elements, so the result should be 15 / 5 = 3.0.
+**Explanation:** The function `calculate_average` calculates the average of a list of numbers by summing them up and dividing by the count. The input list is [1, 2, 3, 4, 5], so the sum is 15 and the length is 5. Therefore, the average is 15 / 5 = 3.0.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #87, Cosine Similarity: `0.6638`):
@@ -9017,7 +9037,7 @@ print(factorial(3))
 - **[C]** `4`
 - **[D]** `3`
 
-**Explanation:** The `factorial` function is a recursive function that calculates the factorial of a number. The base case is when `n == 0`, in which case it returns 1. For other values, it recursively calls itself with `n - 1`. When `print(factorial(3))` is executed, the function will calculate 3 * 2 * 1 = 6.
+**Explanation:** The `factorial` function is a recursive function that calculates the factorial of a number. The base case is when `n == 0`, in which case it returns 1. For other values, it recursively calls itself with `n - 1`. When `print(factorial(3))` is executed, the function will call itself as follows: `factorial(3) = 3 * factorial(2) = 3 * (2 * factorial(1)) = 3 * (2 * (1 * factorial(0))) = 3 * (2 * 1) = 6`. Therefore, the output is 6.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #74, Cosine Similarity: `0.6541`):
@@ -9103,13 +9123,16 @@ print(factorial(3))
 **Target Learning Objective:** *Recursive factorial or countdown execution tracing*
 
 ### Generated MCQ
-Consider the following Python function that calculates the factorial of a number using recursion. ```python
+Consider the following Python function that calculates the factorial of a number using recursion:
+```python
 def factorial(n):
     if n == 0:
         return 1
     else:
         return n * factorial(n-1)
-``` What will be the output when calling `factorial(3)`?
+```
+What is the output when calling `factorial(3)`?
+
 
 **Choices:**
 - **[A]** `6` **(CORRECT)**
@@ -9117,7 +9140,7 @@ def factorial(n):
 - **[C]** `4`
 - **[D]** `3`
 
-**Explanation:** The function `factorial(3)` will call itself with `n=2`, then `n=1`, and finally `n=0`. When `n=0`, it returns 1. The recursive calls multiply these values together: `3 * 2 * 1 = 6`. Therefore, the output is 6.
+**Explanation:** The function `factorial(3)` calls itself with `n=2`, then `n=1`, and finally `n=0`. When `n=0`, it returns 1. The recursive calls return `2 * 1` and `1 * 1`, resulting in a final output of 6.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #70, Cosine Similarity: `0.6372`):
@@ -9195,19 +9218,19 @@ Which of the following lambda functions correctly calculates the square of a num
 
 **Choices:**
 - **[A]** ````python
-square = lambda x: x * x
-```` **(CORRECT)**
-- **[B]** ````python
-square = lambda x: x + x
+square = lambda x: x * x + 1
 ````
+- **[B]** ````python
+square = lambda x: x ** 2
+```` **(CORRECT)**
 - **[C]** ````python
-square = lambda x, y: x * y
+square = lambda x: x * 2
 ````
 - **[D]** ````python
-square = lambda: x * x
+square = lambda x: x + x
 ````
 
-**Explanation:** The correct choice is `square = lambda x: x * x`, which correctly calculates the square of a number. The other choices are incorrect because they either add instead of multiplying, take two arguments instead of one, or do not define the variable `x`.
+**Explanation:** The correct choice is `lambda x: x ** 2` because it correctly applies the exponentiation operator to calculate the square of a number. The other choices either add an extra value (A), double the number instead of squaring it (C), or simply add the number to itself (D), which are incorrect.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #81, Cosine Similarity: `0.7192`):
@@ -9307,16 +9330,16 @@ print(list(squared_numbers))
 ````
 - **[C]** ````python
 numbers = [1, 2, 3]
-squared_numbers = map(lambda x: x + x, numbers)
+squared_numbers = map(lambda: x * x, numbers)
 print(list(squared_numbers))
 ````
 - **[D]** ````python
 numbers = [1, 2, 3]
-squared_numbers = map(lambda x, y: x * y, numbers)
+squared_numbers = map(lambda x: x ** 2, numbers)
 print(list(squared_numbers))
 ````
 
-**Explanation:** The correct answer uses a lambda function with `map()` to square each number in the list. The lambda function takes one argument `x` and returns `x * x`. The distractors either lack the lambda keyword, have incorrect operations inside the lambda (e.g., addition instead of multiplication), or use an incorrect number of arguments.
+**Explanation:** The correct answer uses a lambda function `lambda x: x * x` to square each number in the list. The syntax is correct and follows the pattern of using `map()` with a lambda function. The distractors include incorrect lambda syntax, missing arguments, and using an exponent instead of multiplication.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #82, Cosine Similarity: `0.6745`):
@@ -9401,21 +9424,21 @@ print(list(squared_numbers))
 ### Generated MCQ
 Consider the following Python function:
 ```python
-def multiply(a, b):
-    return a * b
+def greet(name):
+    return f'Hello, {name}!'
 
-result = multiply(3, 4)
+result = greet('Alice')
 print(result)
 ```
-What will be the output of this code?
+What will be the output of this code snippet?
 
 **Choices:**
-- **[A]** `12` **(CORRECT)**
-- **[B]** `7`
-- **[C]** `9`
-- **[D]** `3`
+- **[A]** `Hello, Alice!` **(CORRECT)**
+- **[B]** `Hello, Bob!`
+- **[C]** `Good morning, Alice!`
+- **[D]** `Alice`
 
-**Explanation:** The function `multiply` takes two parameters, `a` and `b`, and returns their product. When called with `multiply(3, 4)`, it correctly calculates 3 * 4 = 12. Therefore, the output will be '12'.
+**Explanation:** The function `greet` is called with the argument 'Alice'. The function returns a string formatted with the name provided. Therefore, the output will be 'Hello, Alice!'. Choice B is incorrect because it uses a different name ('Bob'), Choice C is incorrect because it adds additional text ('Good morning'), and Choice D is incorrect because it only prints the name without any greeting.
 
 ### Retrieved Slide Chunks (Evidence Grounding)
 > **Chunk 1** (Index #74, Cosine Similarity: `0.7168`):
