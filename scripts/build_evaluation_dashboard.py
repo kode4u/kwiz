@@ -618,6 +618,14 @@ def main():
                   <td class="text-center">1.000</td>
                   <td class="text-center"><span class="badge badge-soft-success">Excellent</span></td>
                 </tr>
+                <tr>
+                  <td class="fw-bold">Context Groundedness (CG)</td>
+                  <td class="text-center fw-bold text-success">5.00 ± 0.00</td>
+                  <td class="text-center">1.000</td>
+                  <td class="text-center"><span class="badge badge-soft-success">Substantial</span></td>
+                  <td class="text-center">1.000</td>
+                  <td class="text-center"><span class="badge badge-soft-success">Excellent</span></td>
+                </tr>
               </tbody>
             </table>
           </div>

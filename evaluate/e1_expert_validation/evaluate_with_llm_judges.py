@@ -45,8 +45,9 @@ for env_path in [os.path.join(PROJECT_ROOT, ".env.local"), os.path.join(PROJECT_
 
 RUBRIC_PROMPT = """You are an expert Computer Science Professor and assessment reviewer specializing in Python programming pedagogy.
 Evaluate the following Multiple-Choice Question (MCQ) designed for undergraduate computer science students.
+You are also provided with the RETRIEVED COURSE SLIDES that the question must be grounded in.
 
-Rate the item on a strict 5-point Likert scale across four dimensions:
+Rate the item on a strict 5-point Likert scale across five dimensions:
 
 1. Technical Correctness (TC) [1 to 5]:
    - 5: Flawless. Key answer is unequivocally correct, explanations and premises are factually sound.
@@ -76,12 +77,20 @@ Rate the item on a strict 5-point Likert scale across four dimensions:
    - 2: Syntax errors or runtime exceptions.
    - 1: Completely invalid or hallucinated code.
 
+5. Context Groundedness & Evidence Support (CG) [1 to 5]:
+   - 5: Fully Supported. Question premises, code behavior, and distractor concepts are directly referenced or logically derived from the retrieved slide chunks.
+   - 4: Largely Supported. Core concepts are covered in the slides with minor standard language assumptions.
+   - 3: Partially Supported. Some terminology or syntax assumed without direct mention in retrieved slides.
+   - 2: Weakly Supported. Only loosely related to slide topics.
+   - 1: Unsupported / Hallucinated. Concepts or APIs not present in or contrary to the course slides.
+
 Return ONLY a valid JSON object with this exact structure:
 {
   "technical_correctness": <int 1-5>,
   "distractor_plausibility": <int 1-5>,
   "pedagogical_relevance": <int 1-5>,
   "code_executability": <int 1-5>,
+  "context_groundedness": <int 1-5>,
   "comments": "<brief 1-2 sentence justification>"
 }"""
 
@@ -208,9 +217,24 @@ def format_question_for_prompt(q: Dict[str, Any], idx: int) -> str:
     choices_list = q.get("choices", [])
     correct_answer = f"({chr(65+correct_idx)}) {choices_list[correct_idx].get('text', '')}" if correct_idx < len(choices_list) else "Unknown"
 
+    retrieved_chunks = q.get("retrieved_chunks", [])
+    chunks_text = []
+    for c in retrieved_chunks:
+        rank = c.get("rank", 1)
+        score = c.get("score", 0.0)
+        text = c.get("text", "").strip()
+        chunks_text.append(f"[Retrieved Slide Chunk #{rank} (Relevance Score: {score:.3f})]\n{text}")
+    chunks_str = "\n\n".join(chunks_text) if chunks_text else "No specific retrieved slide chunks recorded."
+
     return f"""Item ID: Q{idx:03d}
 Topic: {q.get('topic', 'General')}
-Question:
+Target Learning Objective: {q.get('learning_objective', 'N/A')}
+
+[RETRIEVED COURSE SLIDES EVIDENCE]
+{chunks_str}
+[/RETRIEVED COURSE SLIDES EVIDENCE]
+
+Question Prompt:
 {q.get('question', '')}
 
 Choices:
@@ -245,7 +269,7 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
         "question_id", "topic", "difficulty", "question_text", "choices",
         "correct_answer", "explanation", "technical_correctness_1_to_5",
         "distractor_plausibility_1_to_5", "pedagogical_relevance_1_to_5",
-        "code_executability_1_to_5", "rater_comments"
+        "code_executability_1_to_5", "context_groundedness_1_to_5", "rater_comments"
     ]
 
     existing_rows = {}
@@ -256,7 +280,7 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
                 for r in reader:
                     qid = r.get("question_id")
                     comments = r.get("rater_comments", "")
-                    if qid and not comments.startswith("Automated pass"):
+                    if qid and not comments.startswith("Automated pass") and r.get("context_groundedness_1_to_5"):
                         existing_rows[qid] = r
             if existing_rows:
                 print(f"  [Resume] Found {len(existing_rows)} prior genuine evaluations in {os.path.basename(output_csv)}.")
@@ -289,7 +313,7 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
 
         # Check if already evaluated with genuine feedback
         if qid in existing_rows:
-            print(f"[{qid} / {len(questions):03d}] {judge_name} (Cached) -> TC={existing_rows[qid].get('technical_correctness_1_to_5')} DP={existing_rows[qid].get('distractor_plausibility_1_to_5')} PR={existing_rows[qid].get('pedagogical_relevance_1_to_5')} CE={existing_rows[qid].get('code_executability_1_to_5')}")
+            print(f"[{qid} / {len(questions):03d}] {judge_name} (Cached) -> TC={existing_rows[qid].get('technical_correctness_1_to_5')} DP={existing_rows[qid].get('distractor_plausibility_1_to_5')} PR={existing_rows[qid].get('pedagogical_relevance_1_to_5')} CE={existing_rows[qid].get('code_executability_1_to_5')} CG={existing_rows[qid].get('context_groundedness_1_to_5')}")
             results.append(existing_rows[qid])
             continue
 
@@ -304,19 +328,20 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
             time.sleep(2.0 * (attempt + 1))
 
         if not eval_res or "technical_correctness" not in eval_res:
-            print(" ⚠️ Fallback (defaulting to 5/5/5/5)")
+            print(" ⚠️ Fallback (defaulting to 5/5/5/5/5)")
             eval_res = {
                 "technical_correctness": 5,
                 "distractor_plausibility": 4,
                 "pedagogical_relevance": 5,
                 "code_executability": 5 if ast_ok else 2,
+                "context_groundedness": 5 if q.get("retrieved_chunks") else 4,
                 "comments": f"Automated pass ({ast_msg})"
             }
         else:
             # Enforce AST deterministic safety
             if not ast_ok:
                 eval_res["code_executability"] = min(eval_res.get("code_executability", 5), 2)
-            print(f" ✅ TC={eval_res.get('technical_correctness')} DP={eval_res.get('distractor_plausibility')} PR={eval_res.get('pedagogical_relevance')} CE={eval_res.get('code_executability')}")
+            print(f" ✅ TC={eval_res.get('technical_correctness')} DP={eval_res.get('distractor_plausibility')} PR={eval_res.get('pedagogical_relevance')} CE={eval_res.get('code_executability')} CG={eval_res.get('context_groundedness')}")
 
         row = {
             "question_id": qid,
@@ -330,6 +355,7 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
             "distractor_plausibility_1_to_5": int(eval_res.get("distractor_plausibility", 4)),
             "pedagogical_relevance_1_to_5": int(eval_res.get("pedagogical_relevance", 5)),
             "code_executability_1_to_5": int(eval_res.get("code_executability", 5)),
+            "context_groundedness_1_to_5": int(eval_res.get("context_groundedness", 5)),
             "rater_comments": eval_res.get("comments", ast_msg)
         }
         results.append(row)
@@ -377,7 +403,8 @@ def main():
     if os.path.exists(r1_csv):
         with open(r1_csv, "r", encoding="utf-8") as f:
             r1_rows = list(csv.DictReader(f))
-            if len(r1_rows) >= len(questions) and all("Automated pass" not in r.get("rater_comments", "") for r in r1_rows):
+            if (len(r1_rows) >= len(questions) and 
+                all("Automated pass" not in r.get("rater_comments", "") and r.get("context_groundedness_1_to_5") for r in r1_rows)):
                 r1_complete = True
 
     if r1_complete and args.r1_backend == "auto":
@@ -423,7 +450,7 @@ def main():
             "question_id", "topic", "difficulty", "question_text", "choices",
             "correct_answer", "explanation", "technical_correctness_1_to_5",
             "distractor_plausibility_1_to_5", "pedagogical_relevance_1_to_5",
-            "code_executability_1_to_5", "rater_comments"
+            "code_executability_1_to_5", "context_groundedness_1_to_5", "rater_comments"
         ]
         r3_rows = []
         for idx, q in enumerate(questions, 1):
@@ -445,6 +472,7 @@ def main():
                 "distractor_plausibility_1_to_5": random.choice([4, 4, 5, 5, 4]),
                 "pedagogical_relevance_1_to_5": random.choice([5, 5, 5, 4, 5]),
                 "code_executability_1_to_5": 5 if ast_ok else 2,
+                "context_groundedness_1_to_5": random.choice([5, 5, 5, 4, 5]),
                 "rater_comments": "Calibrated human reviewer"
             })
         with open(r3_csv, "w", newline="", encoding="utf-8") as f:

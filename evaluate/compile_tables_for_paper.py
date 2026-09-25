@@ -13,6 +13,27 @@ import json
 import statistics
 from collections import defaultdict
 
+def compile_e1():
+    path = os.path.join(os.path.dirname(__file__), "e1_expert_validation", "e1_quality_validation_results.md")
+    if not os.path.isfile(path):
+        print(f"[INFO] E1 results not yet compiled at {path}")
+        return
+
+    print("\n" + "="*80)
+    print("TABLE 1: Expert Quality Validation & Inter-Rater Agreement (E1)")
+    print("="*80)
+    with open(path, "r", encoding="utf-8") as f:
+        in_table = False
+        for line in f:
+            if "Table 1:" in line:
+                in_table = True
+                continue
+            if in_table:
+                if line.startswith("###") or (line.strip() == "" and in_table and "---" not in line):
+                    if line.startswith("###"):
+                        break
+                print(line.rstrip())
+
 def compile_e2():
     path = os.path.join(os.path.dirname(__file__), "e2_pipeline_ablation", "ablation_results.jsonl")
     if not os.path.isfile(path):
@@ -112,6 +133,7 @@ def compile_e4():
             print(f"| C = {c:<8} | {qps:16.2f} | {p50:10.2f} | {p95:10.2f} | {succ:8.1f}% | {gpu:10.1f}% | {vram:10.2f} |")
 
 def main():
+    compile_e1()
     compile_e2()
     compile_e3()
     compile_e4()

@@ -27,3 +27,11 @@
 - 3: Requires minor fix to run (e.g., missing print statement wrapper).
 - 2: Multiple runtime errors or syntax errors.
 - 1: Completely invalid code or hallucinated syntax.
+
+## Dimension 5: Context Groundedness & Evidence Support (CG)
+- 5: Fully Supported. Question premises, code behavior, and distractor concepts are directly referenced or logically derived from the retrieved slide chunks.
+- 4: Largely Supported. Core concepts are covered in the slides with minor standard language assumptions.
+- 3: Partially Supported. Some terminology or syntax assumed without direct mention in retrieved slides.
+- 2: Weakly Supported. Only loosely related to slide topics.
+- 1: Unsupported / Hallucinated. Concepts or APIs not present in or contrary to the course slides.
+

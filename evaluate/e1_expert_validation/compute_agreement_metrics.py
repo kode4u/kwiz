@@ -20,7 +20,8 @@ DIMENSIONS = [
     ("technical_correctness_1_to_5", "Technical Correctness (TC)"),
     ("distractor_plausibility_1_to_5", "Distractor Plausibility (DP)"),
     ("pedagogical_relevance_1_to_5", "Pedagogical Relevance (PR)"),
-    ("code_executability_1_to_5", "Code Executability (CE)")
+    ("code_executability_1_to_5", "Code Executability (CE)"),
+    ("context_groundedness_1_to_5", "Context Groundedness (CG)")
 ]
 
 def compute_mean_std(values: list[float]) -> tuple[float, float]:
@@ -222,10 +223,10 @@ def main():
             f.write(f"| {d['label']} | {d['mean']:.2f} ± {d['std']:.2f} | {d['kappa']:.3f} | {k_level} | {d['icc']:.3f} | {icc_rel} |\n")
 
         f.write("\n### Topic-by-Topic Quality Breakdown\n\n")
-        f.write("| Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability |\n")
-        f.write("|:------|:---------------------:|:-----------------------:|:---------------------:|:------------------:|\n")
+        f.write("| Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability | Context Groundedness |\n")
+        f.write("|:------|:---------------------:|:-----------------------:|:---------------------:|:------------------:|:--------------------:|\n")
         for t in topics:
-            f.write(f"| {t} | {topic_results[t]['technical_correctness_1_to_5']} | {topic_results[t]['distractor_plausibility_1_to_5']} | {topic_results[t]['pedagogical_relevance_1_to_5']} | {topic_results[t]['code_executability_1_to_5']} |\n")
+            f.write(f"| {t} | {topic_results[t]['technical_correctness_1_to_5']} | {topic_results[t]['distractor_plausibility_1_to_5']} | {topic_results[t]['pedagogical_relevance_1_to_5']} | {topic_results[t]['code_executability_1_to_5']} | {topic_results[t]['context_groundedness_1_to_5']} |\n")
 
     print(f"\n[OK] Report and Table 1 written to: {report_path}")
 
