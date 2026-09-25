@@ -49,8 +49,11 @@ services:
     container_name: jica-llmapi
     environment:
       FLASK_PORT: 5001
-      LLM_BACKEND: ${LLM_BACKEND:-openai}
+      LLM_BACKEND: ${LLM_BACKEND:-local}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       LOCAL_LLM_URL: ${LOCAL_LLM_URL:-http://host.docker.internal:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5-coder:7b}
       OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}

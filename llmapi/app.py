@@ -67,9 +67,11 @@ except AttributeError:
 CORS(app)
 
 # Configuration
-LLM_BACKEND = os.getenv('LLM_BACKEND', 'openai')
+LLM_BACKEND = os.getenv('LLM_BACKEND', 'local')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
 LOCAL_LLM_URL = os.getenv('LOCAL_LLM_URL', 'http://localhost:11434')  # Ollama default
 MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', '20'))
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', 'en')
@@ -466,7 +468,7 @@ IMPORTANT:
 - Return the array directly, nothing else."""
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": "You are an expert educational content generator. Always return valid JSON."},
                 {"role": "user", "content": prompt}
@@ -522,7 +524,7 @@ def generate_with_gemini(topic: str, level: str, n_questions: int, language: str
             raise Exception("Gemini API key not configured")
         
         genai.configure(api_key=effective_api_key)
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel(GEMINI_MODEL)
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
 
