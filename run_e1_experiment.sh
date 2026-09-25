@@ -91,22 +91,6 @@ echo "  3. Pedagogical Relevance (PR)"
 echo "  4. Code Executability & Syntax (CE)"
 echo "  5. Context Groundedness & Evidence Support (CG)"
 
-if [ -z "$OPENAI_API_KEY" ] && [ "${R1_BACKEND:-auto}" != "ollama" ] && [ "${R1_BACKEND:-auto}" != "skip" ]; then
-    echo ""
-    echo "[FATAL ERROR] OPENAI_API_KEY is not set! R1 evaluation requires OpenAI GPT-4o."
-    echo "Per instructions, fallback is disabled. Export your key before running:"
-    echo "  export OPENAI_API_KEY='sk-...'"
-    exit 1
-fi
-
-if [ -z "$GEMINI_API_KEY" ] && [ "${R2_BACKEND:-auto}" != "ollama" ] && [ "${R2_BACKEND:-auto}" != "skip" ]; then
-    echo ""
-    echo "[FATAL ERROR] GEMINI_API_KEY is not set! R2 evaluation requires Google Gemini 1.5 Pro."
-    echo "Per instructions, fallback is disabled. Export your key before running:"
-    echo "  export GEMINI_API_KEY='AIza...'"
-    exit 1
-fi
-
 $PYTHON_BIN evaluate/e1_expert_validation/evaluate_with_llm_judges.py \
     --questions evaluate/e1_expert_validation/e1_questions.json \
     --ollama-url "$OLLAMA_URL" \

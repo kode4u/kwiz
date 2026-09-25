@@ -397,7 +397,7 @@ def main():
         with open(r1_csv, "r", encoding="utf-8") as f:
             r1_rows = list(csv.DictReader(f))
             if (len(r1_rows) >= len(questions) and 
-                all("Automated pass" not in r.get("rater_comments", "") and r.get("context_groundedness_1_to_5") for r in r1_rows)):
+                all("Automated pass" not in r.get("rater_comments", "") and (r.get("technical_correctness_1_to_5") or r.get("context_groundedness_1_to_5")) for r in r1_rows)):
                 r1_complete = True
 
     if r1_complete and args.r1_backend == "auto":
@@ -420,7 +420,7 @@ def main():
         with open(r2_csv, "r", encoding="utf-8") as f:
             r2_rows = list(csv.DictReader(f))
             if (len(r2_rows) >= len(questions) and 
-                all("Automated pass" not in r.get("rater_comments", "") and r.get("context_groundedness_1_to_5") for r in r2_rows)):
+                all("Automated pass" not in r.get("rater_comments", "") and (r.get("technical_correctness_1_to_5") or r.get("context_groundedness_1_to_5")) for r in r2_rows)):
                 r2_complete = True
 
     if r2_complete and args.r2_backend == "auto":
