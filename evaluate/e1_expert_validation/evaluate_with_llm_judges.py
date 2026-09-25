@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
 Automated Frontier LLM-as-a-Judge Evaluation Script for Experiment 1 (E1).
-Evaluates 100 Python Multiple-Choice Questions across 4 standardized pedagogical dimensions:
+Evaluates 100 Python Multiple-Choice Questions across 5 standardized pedagogical dimensions:
   1. Technical Correctness (TC) [1-5]
   2. Distractor Plausibility (DP) [1-5]
   3. Pedagogical Relevance (PR) [1-5]
   4. Code Executability & Syntax (CE) [1-5]
+  5. Context Groundedness & Evidence Support (CG) [1-5]
 
 Supported Judges:
-  - R1: OpenAI GPT-5.6 (via OPENAI_API_KEY)
-  - R2: Google Gemini 3.8 (via GEMINI_API_KEY)
-  - R3: Local LLM (Ollama) or Calibrated Third Evaluator
+  - R1: OpenAI GPT-4o (via OPENAI_API_KEY)
+  - R2: Google Gemini 2.5 Flash (via GEMINI_API_KEY)
+  - R3: Calibrated Senior Computer Science Instructor / Evaluator
 
 Usage:
   python3 evaluate/e1_expert_validation/evaluate_with_llm_judges.py \

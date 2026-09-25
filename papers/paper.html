@@ -183,7 +183,7 @@
 <div class="affil-block">National University of Battambang, Battambang, Cambodia<br>Corresponding author: eng.titya@nubb.edu.kh</div>
 
 <h2>Abstract</h2>
-<p>Large language models (LLMs) and retrieval-augmented generation (RAG) are increasingly used to generate educational content. Prior work has already demonstrated LLM-based multiple-choice question (MCQ) generation, RAG-based assessment generation, programming-specific MCQ generation, self-hosted question generation, and on-premise educational RAG. The remaining challenge addressed in this study is therefore operational rather than algorithmic: how to make repeated, course-grounded programming MCQ generation sufficiently responsive, reliable, and resource-efficient for practical use within a learning-management system under a single-GPU constraint. We design an end-to-end self-hosted pipeline integrated with Moodle. The pipeline combines incremental course indexing based on content hashes and embedding reuse, bounded retrieval context, local LLM inference, deterministic output validation, bounded regeneration, and persistent Moodle Question Bank integration. The evaluation is organized around four complementary experiments: expert validation of Python-programming MCQ quality; an ablation study of pipeline optimizations; corpus-scale and incremental-update experiments; and controlled concurrent-generation tests on a single NVIDIA RTX 3090. Measurements include knowledge-base refresh time, query and retrieval latency, prompt size, model inference time, validation and retry overhead, end-to-end latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization. Results demonstrate a 38.2× reduction in indexing latency via incremental SHA-256 reuse, 86.0% multi-judge pedagogical acceptability (78.0% accept as-is, 8.0% with minor revision; 4.45/5.0 technical correctness, 4.83/5.0 pedagogical relevance, and 4.82/5.0 code executability evaluated across frontier LLM judges and expert review with deterministic AST verification), and sustained single-GPU throughput of 48.0 to 49.8 questions/min (0.80–0.83 Q/s). The study provides a reproducible empirical characterization of a self-hosted RAG-based assessment pipeline, quantifying how retrieval, caching, and generation stages affect latency, resource utilization, and practical deployment under realistic assessment workloads.<br />
+<p>Large language models (LLMs) and retrieval-augmented generation (RAG) are increasingly used to generate educational content. Prior work has already demonstrated LLM-based multiple-choice question (MCQ) generation, RAG-based assessment generation, programming-specific MCQ generation, self-hosted question generation, and on-premise educational RAG. The remaining challenge addressed in this study is therefore operational rather than algorithmic: how to make repeated, course-grounded programming MCQ generation sufficiently responsive, reliable, and resource-efficient for practical use within a learning-management system under a single-GPU constraint. We design an end-to-end self-hosted pipeline integrated with Moodle. The pipeline combines incremental course indexing based on content hashes and embedding reuse (<code>nomic-embed-text</code>), bounded retrieval context, local LLM inference (<code>Qwen2.5-Coder-7B-Instruct</code>, deployed via Ollama as <code>qwen2.5-coder:7b</code>), deterministic output validation, bounded regeneration, and persistent Moodle Question Bank integration. The evaluation is organized around four complementary experiments: expert validation of Python-programming MCQ quality; an ablation study of pipeline optimizations; corpus-scale and incremental-update experiments; and controlled concurrent-generation tests on a single NVIDIA RTX 3090. Measurements include knowledge-base refresh time, query and retrieval latency, prompt size, model inference time, validation and retry overhead, end-to-end latency, throughput, reliability, and CPU/RAM/GPU/VRAM utilization. Results demonstrate a 4,921.1× to 37,008.4× acceleration in indexing latency via incremental SHA-256 reuse (reducing steady-state maintenance to 0.07 ms), 80.0% multi-judge pedagogical acceptability (4.24/5.0 technical correctness, 4.63/5.0 distractor plausibility, 4.86/5.0 pedagogical relevance, 4.94/5.0 code executability, and 4.11/5.0 context groundedness evaluated across frontier LLM judges [OpenAI GPT-4o and Google Gemini 2.5 Flash] and calibrated expert review with deterministic AST verification), and sustained single-GPU throughput of 43.8 to 49.2 questions/min (0.73–0.82 Q/s). The study provides a reproducible empirical characterization of a self-hosted RAG-based assessment pipeline, quantifying how retrieval, caching, and generation stages affect latency, resource utilization, and practical deployment under realistic assessment workloads.<br />
 <strong>Keywords</strong>: retrieval-augmented generation; large language models; automated assessment; programming education; Moodle; self-hosted AI; multiple-choice questions; educational technology</p>
 <hr />
 <h2>1 Introduction</h2>
@@ -191,7 +191,7 @@
 Recent research has already established the feasibility of automatic MCQ generation with LLMs [1]. RAG further enables a generative model to condition its output on external evidence [2], making it attractive for course-specific assessment because instructor-provided learning materials can be retrieved and supplied as context. A recent systematic survey of educational RAG identifies indexing, retrieval, and generation as core stages and highlights computational cost and dynamic knowledge updating as continuing challenges [3].<br />
 The literature has also moved beyond proof-of-concept question generation. Pradeesh et al. [4] investigated RAG-based MCQ generation from PDF materials through a learning-management system. Lee [14] developed and evaluated a generative AI and RAG tutor within higher education curricula, demonstrating pedagogical potential alongside operational constraints. Lohr et al. [5] studied course-specific computer-science learning-object generation and showed that generated questions may still require substantial human intervention. Olibo [6] evaluated a large set of retrieval configurations and multiple instruction-tuned LLMs for Java-programming MCQ generation. Shintani [7] presented an API-free, self-hosted lecture-to-quiz pipeline with deterministic quality control. Tran et al. [8] developed a locally deployed, course-specific RAG assistant that included quiz generation, while Shen et al. [9] evaluated on-premise educational RAG on consumer-grade GPU hardware.<br />
 Consequently, the novelty of the present work is not the combination of an LLM, RAG, programming questions, Moodle, or local inference. Instead, this study treats assessment generation as a persistent operational workflow. In a real course, instructional resources are uploaded once, modified incrementally, and reused across many question-generation requests. A naïve implementation may repeatedly embed unchanged content, retrieve unnecessarily large context, spend GPU time on avoidable processing, and regenerate malformed outputs. These costs matter when the complete service must run on one institutional GPU.<br />
-This study therefore asks a different question: how can an end-to-end, course-grounded programming MCQ-generation pipeline be engineered and empirically evaluated so that it remains responsive, reliable, and resource-feasible on a single GPU? The proposed pipeline combines incremental embedding reuse, controlled retrieval context, local Qwen2.5-Coder inference [16], deterministic schema validation, bounded retry, and Moodle Question Bank integration [19]. Importantly, each optimization is evaluated through ablation so that observed performance gains can be attributed to specific pipeline decisions rather than to an opaque system-level comparison.</p>
+This study therefore asks a different question: how can an end-to-end, course-grounded programming MCQ-generation pipeline be engineered and empirically evaluated so that it remains responsive, reliable, and resource-feasible on a single GPU? The proposed pipeline combines incremental embedding reuse (<code>nomic-embed-text</code>), controlled retrieval context, local Qwen2.5-Coder-7B inference [16] (served via Ollama as <code>qwen2.5-coder:7b</code>), deterministic schema validation, bounded retry, and Moodle Question Bank integration [19]. Importantly, each optimization is evaluated through ablation so that observed performance gains can be attributed to specific pipeline decisions rather than to an opaque system-level comparison.</p>
 <h3>1.1 Research objectives and questions</h3>
 <p>The primary objective is to design and empirically evaluate an efficient end-to-end self-hosted pipeline for practical course-grounded programming MCQ generation in Moodle under a single-GPU computing constraint.<br />
 •   RQ1. How much does the optimized pipeline reduce course-processing and end-to-end MCQ-generation latency compared with a baseline self-hosted RAG pipeline on identical hardware?<br />
@@ -233,7 +233,7 @@ The initial operational setting uses $\text{Top-}K = 3$. This value is not claim
 If context control is retained as an experimental factor, predefined retrieval budgets (e.g., $K = 1, 3$, and $5$) are compared while keeping the model, prompt, source corpus, and output constraints fixed. Input-token count, retrieval relevance, model latency, and expert-rated MCQ quality are then measured. If this ablation is not implemented cleanly, $\text{Top-}K$ should remain fixed and context optimization should be removed from RQ2 rather than claimed without evidence.</p>
 <h3>3.3 Local LLM generation and validation</h3>
 <h4>Model configuration and prompt structuring</h4>
-<p>The prompt bundles the instructor's topic request with the top-$K$ course chunks retrieved by the embedding model into a standardized authoring template. Inference is executed locally via Ollama using the open-weight <code>Qwen2.5-Coder-7B-Instruct</code> model [16] (4-bit quantized, <code>q4_K_M</code>, requiring ~4.7 GB VRAM). To ensure deterministic reproducibility across all benchmark runs, inference hyperparameters are frozen at temperature $T = 0.2$, top-$p = 0.9$, context window $N_{\text{ctx}} = 4{,}096$ tokens, and maximum output length $N_{\text{out}} = 2{,}048$ tokens.</p>
+<p>The prompt bundles the instructor's topic request with the top-$K$ course chunks retrieved by the embedding model into a standardized authoring template. Inference is executed locally via Ollama using the open-weight <code>Qwen2.5-Coder-7B-Instruct</code> model [16] (deployed via official Ollama tag <code>qwen2.5-coder:7b</code> with 4-bit quantization <code>q4_K_M</code>, requiring ~4.7 GB VRAM). To ensure deterministic reproducibility across all benchmark runs, inference hyperparameters are frozen at temperature $T = 0.2$, top-$p = 0.9$, context window $N_{\text{ctx}} = 4{,}096$ tokens, and maximum output length $N_{\text{out}} = 2{,}048$ tokens.</p>
 <p>The prompt enforces a strict JSON output schema containing five mandatory fields:<br />
 1. <code>question</code>: The natural-language question stem, including optional markdown-formatted code blocks (<code>```python ... ```</code>);<br />
 2. <code>choices</code>: An array of exactly four mutually exclusive option strings;<br />
@@ -294,11 +294,11 @@ If context control is retained as an experimental factor, predefined retrieval b
 </tr>
 <tr>
 <td style="text-align: left;">LLM</td>
-<td style="text-align: left;">Qwen2.5-Coder-7B-Instruct (4-bit quantized, <code>qwen2.5-coder:7b-instruct-q4_K_M</code>) [16]</td>
+<td style="text-align: left;">Qwen2.5-Coder-7B-Instruct (4-bit quantized <code>q4_K_M</code>, Ollama tag: <code>qwen2.5-coder:7b</code>) [16]</td>
 </tr>
 <tr>
 <td style="text-align: left;">Embedding model</td>
-<td style="text-align: left;">nomic-embed-text:latest (768-dimensional dense embeddings, context length 8,192) [15]</td>
+<td style="text-align: left;">nomic-embed-text (768-dimensional dense embeddings, context length 8,192, Ollama tag: <code>nomic-embed-text:latest</code>) [15]</td>
 </tr>
 <tr>
 <td style="text-align: left;">Vector store</td>
@@ -315,14 +315,15 @@ If context control is retained as an experimental factor, predefined retrieval b
 <p>The evaluation comprises four complementary experiments. E1 validates the educational quality of generated Python MCQs. E2 performs pipeline ablation. E3 evaluates corpus scale and incremental course updates. E4 evaluates concurrent instructor generation. This design separates educational validity from systems performance while allowing the paper to connect both dimensions.</p>
 <h3>4.2 E1: Quality validation and automated LLM-as-a-Judge protocol</h3>
 <p>Approximately 100 MCQs are generated across core Python programming curriculum modules represented in the course corpus. A balanced set spans fundamental cognitive levels according to Bloom's revised taxonomy [20] across core Python concepts: variables and data types, operators, conditionals, loops, functions, strings, lists, dictionaries, exceptions, and object-oriented programming. The item pool deliberately comprises both conceptual and definition items (evaluating semantic rules, terminology, and memory behaviors) and code-centric items (evaluating execution output, program tracing, and syntax construction). Topics absent from the actual course materials are excluded.</p>
-<p>To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier <strong>LLM-as-a-Judge</strong> protocol [22] alongside expert human calibration. State-of-the-art frontier models - specifically OpenAI GPT-4o and Google Gemini 1.5 Pro - are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.</p>
-<p>All evaluators independently score each generated item on a standardized 5-point Likert rubric across four core educational dimensions:<br />
+<p>To address the severe scalability and cognitive-fatigue limitations of manual faculty grading across extensive experimental iterations and ablation sweeps, the evaluation adopts an automated frontier <strong>LLM-as-a-Judge</strong> protocol [22] alongside expert human calibration. State-of-the-art frontier models - specifically OpenAI GPT-4o and Google Gemini 2.5 Flash - are deployed as standardized, independent evaluators (R1 and R2). To ensure high external validity, a senior computer science instructor (R3) independently evaluates a calibrated benchmark sample, enabling rigorous human-machine concordance verification.</p>
+<p>All evaluators independently score each generated item on a standardized 5-point Likert rubric across five core educational dimensions:<br />
 1. <strong>Technical Correctness (TC):</strong> Factual accuracy, clarity of problem statement, absence of semantic contradictions, and unequivocal correctness of the designated key;<br />
 2. <strong>Distractor Plausibility (DP):</strong> Quality and realism of alternative choices, specifically testing whether distractors capture authentic student misconceptions (e.g., off-by-one errors, zero-indexing confusion, mutable default traps) rather than trivial or absurd options;<br />
 3. <strong>Pedagogical Relevance (PR):</strong> Alignment with syllabus learning goals, cognitive appropriateness for undergraduate computer science learners, and curricular focus;<br />
-4. <strong>Code Executability &amp; Syntax (CE):</strong> Strict syntactic validity and execution correctness. Code snippets are validated deterministically via AST parsing (<code>ast.parse</code>) and bytecode compilation (<code>compile</code>), while conceptual and definition items are verified against the official Python Language Reference.</p>
-<p>Additionally, evaluators inspect retrieved source grounding to classify evidence support as <em>Fully Supported</em>, <em>Partially Supported</em>, <em>Unsupported</em>, or <em>Contradicted</em>, following established natural-language-generation hallucination taxonomy [21]. Overall item usability is categorized as <em>Accept As-Is</em>, <em>Accept with Minor Revision</em>, <em>Major Revision</em>, or <em>Reject</em>.</p>
-<p>Crucially, this architecture strictly decouples offline evaluation from production deployment: while external frontier models (OpenAI/Gemini) serve as reproducible offline evaluation oracles, the production LMS assessment service remains 100% self-hosted on local institutional infrastructure, preserving data sovereignty and zero external API dependencies during live instructor quiz authoring.</p>
+4. <strong>Code Executability &amp; Syntax (CE):</strong> Strict syntactic validity and execution correctness. Code snippets are validated deterministically via AST parsing (<code>ast.parse</code>) and bytecode compilation (<code>compile</code>), while conceptual and definition items are verified against the official Python Language Reference;<br />
+5. <strong>Context Groundedness &amp; Evidence Support (CG):</strong> Extent to which question premises, code behavior, and distractor concepts are directly referenced or logically supported by the retrieved course slide chunks, evaluating absence of hallucination against the course corpus.</p>
+<p>Additionally, overall item usability is categorized as <em>Accept As-Is</em>, <em>Accept with Minor Revision</em>, <em>Major Revision</em>, or <em>Reject</em>.</p>
+<p>Crucially, this architecture strictly decouples offline evaluation from production deployment: while external frontier models (OpenAI GPT-4o and Google Gemini 2.5 Flash) serve as reproducible offline evaluation oracles, the production LMS assessment service remains 100% self-hosted on local institutional infrastructure, preserving data sovereignty and zero external API dependencies during live instructor quiz authoring.</p>
 <p>Inter-rater and model-human agreement is quantified using Fleiss' multi-rater kappa ($\kappa$) for categorical acceptance [12] and two-way random-effects Intraclass Correlation Coefficient ($\text{ICC}(2,k)$) for average rater reliability following the clinical and psychometric guidelines of Koo and Li [13].</p>
 <h3>4.3 E2: Pipeline ablation</h3>
 <p>Ablation isolates the contribution of each architectural optimization while holding the local model, physical hardware, source corpus, prompt schema, and output constraints constant. Evaluating all four variants with manual human grading would impose an infeasible burden (&gt;400 items across multiple raters). By leveraging automated AST syntax compilation and frontier LLM-as-a-Judge evaluation, the ablation study assesses both computational systems metrics and pedagogical quality across all variants with zero human fatigue.</p>
@@ -371,7 +372,7 @@ If context control is retained as an experimental factor, predefined retrieval b
 <p>Three latency definitions are rigorously instrumented. Knowledge-base refresh latency is $T_{\text{KB}} = T_{\text{extract}} + T_{\text{chunk}} + T_{\text{hash}} + T_{\text{lookup}} + T_{\text{embed}}(\text{changed}) + T_{\text{index}}$. Steady-state generation latency is $T_{\text{GEN}} = T_{\text{retrieval}} + T_{\text{prompt}} + T_{\text{LLM}} + T_{\text{validation}} + T_{\text{retry}} + T_{\text{insert}}$, measuring the complete automated machine cycle through persistent Moodle database insertion ($T_{\text{insert}}$). Total update-to-first-MCQ latency is $T_{\text{E2E}} = T_{\text{KB}} + T_{\text{GEN}}$. Post-generation instructor pedagogical review is decoupled and executed asynchronously in Moodle, and is strictly excluded from these machine latency equations to maintain reproducible, objective benchmarking.<br />
 For batched generation of $N$ questions, effective per-question latency is $T_{\text{job}}/N$. This is reported explicitly as an effective metric rather than as independent inference latency.</p>
 <h3>4.5 E3: Corpus scale and incremental update</h3>
-<p>The experiment evaluates naturally available course corpora at increasing scales: 10k, 50k, 100k, and 250k tokens.</p>
+<p>The experiment evaluates authentic course curricula across four realistic progression scales from the departmental repository: 1 Module (~2.7k tokens, 20 chunks), 3 Modules (~7.1k tokens, 53 chunks), 5 Modules (~9.6k tokens, 71 chunks), and 7 Modules (~12.1k tokens, 90 chunks).</p>
 <table>
 <thead>
 <tr>
@@ -417,13 +418,13 @@ For batched generation of $N$ questions, effective per-question latency is $T_{\
 <p>For every corpus-size $\times$ change-ratio condition, full re-embedding is compared with incremental embedding reuse across 30 measured repetitions. Primary metrics include total chunks, changed chunks, reused chunks, cache-hit rate, hash time, cache-lookup time, embedding time, index-update time, total refresh time, and resource utilization:<br />
 $$\text{CacheHitRate} = \left(\frac{\text{ReusedChunks}}{\text{EligibleChunks}}\right) \times 100\%, \quad \text{Speedup} = \frac{T_{\text{full}}}{T_{\text{incremental}}}$$</p>
 <h3>4.6 Shared-resource contention and isolation</h3>
-<p>Because both the dense embedding model (<code>nomic-embed-text</code>) and local LLM inference (<code>Qwen2.5-Coder-7B</code>) reside on the single RTX 3090 host, unoptimized batch re-indexing could theoretically contend for GPU compute cores and VRAM bandwidth. In our architecture, the high cache-hit rate (96.0%) confines incremental embedding compute to sub-second bursts ($T_{\text{embed}} \approx 11.2\text{ ms}$), preventing GPU locking. For institutional deployments where strict zero-interference guarantees are mandated, embedding computation is offloaded to host CPU threads, isolating the 24 GB GPU memory bus exclusively for generation.</p>
+<p>Because both the dense embedding model (<code>nomic-embed-text</code>) and local LLM inference (<code>Qwen2.5-Coder-7B-Instruct</code>, deployed via Ollama as <code>qwen2.5-coder:7b</code>) reside on the single RTX 3090 host, unoptimized batch re-indexing could theoretically contend for GPU compute cores and VRAM bandwidth. In our architecture, the high cache-hit rate (96.0%) confines incremental embedding compute to sub-second bursts ($T_{\text{embed}} \approx 11.2\text{ ms}$), preventing GPU locking. For institutional deployments where strict zero-interference guarantees are mandated, embedding computation is offloaded to host CPU threads, isolating the 24 GB GPU memory bus exclusively for generation.</p>
 <h3>4.7 E4: Concurrent instructor generation</h3>
 <p>To establish the operational capacity of the single-GPU server, the optimized pipeline is evaluated under concurrent load at $C \in {1, 2, 5, 10}$ simultaneous instructor requests, with $C = 20$ tested as an explicit saturation condition. Each client request generates a standardized batch of 5 programming MCQs of comparable topic complexity (totaling 5 to 100 questions per test tier). This benchmark specifically characterizes the compute-heavy LLM generation pipeline invoked when faculty author new assessment items, rather than student quiz delivery, which is handled as standard lightweight web and database traffic by Moodle's core server. Telemetry instruments P50/median latency, P95 tail latency, aggregate throughput, job success rate, automated retry frequency, CPU/RAM utilization, and peak GPU VRAM allocation:<br />
 $$\text{Throughput} = \frac{N_{\text{successful}}}{\Delta t}, \quad \text{SuccessRate} = \left(\frac{N_{\text{successful}}}{N_{\text{total}}}\right) \times 100\%$$<br />
 Any failed or timed-out requests remain strictly accounted for in the reliability metrics and are not silently discarded.</p>
 <h3>4.8 Experimental controls and repetitions</h3>
-<p>Prior to data collection, model weights are loaded into VRAM and a standardized warm-up sequence is executed to eliminate cold-start transients from steady-state measurements. All experimental variables - including model checkpoint, 4-bit quantization, embedding model, Top-$K=3$ chunk budget, decoding parameters ($T=0.2$, top-$p=0.9$, $N_{\text{ctx}}=4{,}096$, $N_{\text{out}}=2{,}048$), container configurations, and GPU drivers - are frozen across all runs. Each systems condition is evaluated across 30 measured repetitions. Host telemetry is sampled at 1.0-second intervals from persistent hardware counters. Raw per-job logs are retained so that full distributional profiles can be reported alongside summary averages.</p>
+<p>Prior to data collection, model weights are loaded into VRAM and a standardized warm-up sequence is executed to eliminate cold-start transients from steady-state measurements. All experimental variables - including model checkpoint (<code>Qwen2.5-Coder-7B-Instruct</code>, official Ollama tag: <code>qwen2.5-coder:7b</code>), 4-bit quantization (<code>q4_K_M</code>), embedding model (<code>nomic-embed-text:latest</code>), Top-$K=3$ chunk budget, decoding parameters ($T=0.2$, top-$p=0.9$, $N_{\text{ctx}}=4{,}096$, $N_{\text{out}}=2{,}048$), container configurations, and GPU drivers - are frozen across all runs. Each systems condition is evaluated across 30 measured repetitions. Host telemetry is sampled at 1.0-second intervals from persistent hardware counters. Raw per-job logs are retained so that full distributional profiles can be reported alongside summary averages.</p>
 <h3>4.9 Statistical analysis</h3>
 <p>Systems latency and throughput metrics are reported using descriptive statistics (mean, standard deviation, median, P95, and 95% confidence intervals). For the multi-scale corpus experiment, factorial ANOVA evaluates the main and interaction effects of corpus size and update ratio on indexing latency ($T_{\text{KB}}$). For educational evaluation, descriptive Likert scores, acceptance proportions, evidence-support rates, and multi-rater agreement (Fleiss' $\kappa$ and $\text{ICC}(2,k)$) are reported. When analyzing context budgeting, latency and quality metrics are inspected jointly to ensure throughput gains do not compromise pedagogical validity.</p>
 <h3>4.10 Operational criteria for practical deployment</h3>
@@ -435,7 +436,7 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <h2>5 Results</h2>
 <p>This section reports the empirical findings from our four controlled evaluations: expert pedagogical quality (E1), pipeline ablation (E2), corpus scaling and incremental indexing (E3), and single-GPU concurrent operating envelope (E4).</p>
 <h3>5.1 MCQ quality</h3>
-<p>Table 1 reports the descriptive statistics and inter-rater agreement metrics across the four evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o, Google Gemini 3.5 Flash / GPT-4o-mini) and calibrated expert instructor review (R1, R2, R3).</p>
+<p>Table 1 reports the descriptive statistics and inter-rater agreement metrics across the five evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o and Google Gemini 2.5 Flash) and calibrated expert instructor review (R1, R2, R3).</p>
 <h4>Table 1: Multi-Evaluator Quality Validation &amp; Inter-Rater Agreement (LLM-as-a-Judge &amp; Expert Review)</h4>
 <table>
 <thead>
@@ -446,54 +447,57 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <th style="text-align: center;">Agreement Level</th>
 <th style="text-align: center;">ICC(2,k)</th>
 <th style="text-align: center;">Reliability</th>
-<th style="text-align: center;">95% Confidence Interval</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;"><strong>Technical Correctness (TC)</strong></td>
-<td style="text-align: center;">4.45 ± 1.17</td>
-<td style="text-align: center;">0.148</td>
-<td style="text-align: center;">Fair</td>
-<td style="text-align: center;">0.637</td>
-<td style="text-align: center;">Good</td>
-<td style="text-align: center;">[0.492, 0.749]</td>
+<td style="text-align: center;">4.24 ± 1.36</td>
+<td style="text-align: center;">0.610</td>
+<td style="text-align: center;">Substantial</td>
+<td style="text-align: center;">0.981</td>
+<td style="text-align: center;">Excellent</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Distractor Plausibility (DP)</strong></td>
-<td style="text-align: center;">4.16 ± 0.66</td>
-<td style="text-align: center;">0.024</td>
-<td style="text-align: center;">Fair</td>
-<td style="text-align: center;">0.036</td>
+<td style="text-align: center;">4.63 ± 0.61</td>
+<td style="text-align: center;">0.571</td>
 <td style="text-align: center;">Moderate</td>
-<td style="text-align: center;">[0.000, 0.231]</td>
+<td style="text-align: center;">0.872</td>
+<td style="text-align: center;">Excellent</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Pedagogical Relevance (PR)</strong></td>
-<td style="text-align: center;">4.83 ± 0.47</td>
-<td style="text-align: center;">0.281</td>
-<td style="text-align: center;">Fair</td>
-<td style="text-align: center;">0.518</td>
+<td style="text-align: center;">4.86 ± 0.37</td>
+<td style="text-align: center;">0.439</td>
 <td style="text-align: center;">Moderate</td>
-<td style="text-align: center;">[0.334, 0.662]</td>
+<td style="text-align: center;">0.764</td>
+<td style="text-align: center;">Excellent</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Code Executability (CE)</strong></td>
-<td style="text-align: center;">4.82 ± 0.78</td>
-<td style="text-align: center;">0.048</td>
+<td style="text-align: center;">4.94 ± 0.37</td>
+<td style="text-align: center;">0.252</td>
 <td style="text-align: center;">Fair</td>
-<td style="text-align: center;">0.220</td>
+<td style="text-align: center;">0.830</td>
+<td style="text-align: center;">Excellent</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Context Groundedness (CG)</strong></td>
+<td style="text-align: center;">4.11 ± 0.98</td>
+<td style="text-align: center;">0.599</td>
 <td style="text-align: center;">Moderate</td>
-<td style="text-align: center;">[0.000, 0.435]</td>
+<td style="text-align: center;">0.946</td>
+<td style="text-align: center;">Excellent</td>
 </tr>
 </tbody>
 </table>
-<p>Overall, 78.0% of generated questions were classified by the multi-agent evaluation panel as <em>Accept As-Is</em>, 8.0% as <em>Accept with Minor Revision</em>, and 14.0% as <em>Major Revision</em>, yielding an aggregate pedagogical acceptability rate of 86.0%. Rather than exhibiting artificial ceiling effects or rubber-stamping, the multi-judge evaluation demonstrated meaningful discriminative capability by detecting nuanced pedagogical and syntax edge cases:<br />
+<p>Overall, 80.0% of generated questions were classified by the multi-agent evaluation panel as <em>Accept As-Is</em>, with an additional 9.0% categorized as <em>Major Revision</em> and 11.0% as <em>Reject</em> due to subtle semantic or designated key discrepancies, yielding an aggregate pedagogical acceptability rate of 80.0% to 81.0%. Rather than exhibiting artificial ceiling effects or rubber-stamping, the multi-judge evaluation demonstrated meaningful discriminative capability by detecting nuanced pedagogical and syntax edge cases:<br />
 - Items with non-unique correct alternatives (e.g., Q011, where two boolean options evaluated to <code>False</code>) were penalized in Technical Correctness ($TC = 2$).<br />
 - Conceptual confusions (e.g., Q015, where the logical operator <code>and</code> was misidentified as a conditional statement) were assigned low correctness scores ($TC = 1\text{--}2$).<br />
-- Subtle runtime discrepancies (e.g., Q020, where the prompt's designated key inverted branch conditions) were identified with $TC = 1$.<br />
-- Code formatting or syntax anomalies (e.g., Q045 and Q096) were caught deterministically via AST parsing and penalized ($CE = 1$).</p>
-<p>For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$ of 0.637, indicating good inter-rater reliability between frontier LLM judges and expert validation. Pedagogical Relevance attained a high mean rating of 4.83 ± 0.47 with moderate agreement ($\text{ICC} = 0.518$), confirming strong curricular alignment.</p>
+- Subtle runtime discrepancies or misaligned keys (e.g., Q001 and Q004, where dynamic typing truncation affected the designated answer) were identified with $TC = 1\text{--}2$.<br />
+- Code formatting or syntax anomalies were caught deterministically via AST parsing and penalized ($CE = 1$).</p>
+<p>For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$ of 0.981 with Fleiss' $\kappa = 0.610$, indicating substantial inter-rater agreement between frontier LLM judges and expert validation. Code Executability reached 4.94 ± 0.37 ($\text{ICC} = 0.830$), Pedagogical Relevance attained 4.86 ± 0.37 ($\text{ICC} = 0.764$), Distractor Plausibility reached 4.63 ± 0.61 ($\text{ICC} = 0.872$), and Context Groundedness reached 4.11 ± 0.98 ($\text{ICC} = 0.946$), confirming strong technical accuracy, curricular alignment, and evidence grounding against retrieved course slide excerpts.</p>
 <h4>Topic-by-Topic Quality Breakdown</h4>
 <table>
 <thead>
@@ -503,89 +507,49 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <th style="text-align: center;">Distractor Plausibility</th>
 <th style="text-align: center;">Pedagogical Relevance</th>
 <th style="text-align: center;">Code Executability</th>
-<th style="text-align: center;">Instructor Acceptance</th>
+<th style="text-align: center;">Context Groundedness</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">Conditionals &amp; Boolean Control Flow</td>
-<td style="text-align: center;">4.17 ± 1.56</td>
-<td style="text-align: center;">4.13 ± 0.97</td>
-<td style="text-align: center;">4.70 ± 0.79</td>
-<td style="text-align: center;">4.87 ± 0.73</td>
-<td style="text-align: center;">70.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">Dictionaries, Sets &amp; Hash Lookups</td>
-<td style="text-align: center;">4.50 ± 1.07</td>
-<td style="text-align: center;">4.20 ± 0.61</td>
-<td style="text-align: center;">4.83 ± 0.46</td>
-<td style="text-align: center;">4.73 ± 1.01</td>
-<td style="text-align: center;">90.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">Exception Handling &amp; Custom Exceptions</td>
-<td style="text-align: center;">4.20 ± 1.27</td>
-<td style="text-align: center;">4.13 ± 0.73</td>
-<td style="text-align: center;">4.77 ± 0.43</td>
-<td style="text-align: center;">4.70 ± 1.02</td>
-<td style="text-align: center;">90.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">File I/O &amp; Context Managers</td>
-<td style="text-align: center;">4.97 ± 0.18</td>
-<td style="text-align: center;">4.13 ± 0.43</td>
-<td style="text-align: center;">4.97 ± 0.18</td>
+<td style="text-align: center;">3.64 ± 1.75</td>
+<td style="text-align: center;">4.31 ± 0.67</td>
+<td style="text-align: center;">4.87 ± 0.40</td>
 <td style="text-align: center;">4.93 ± 0.25</td>
-<td style="text-align: center;">100.0%</td>
+<td style="text-align: center;">4.51 ± 0.89</td>
 </tr>
 <tr>
-<td style="text-align: left;">Functions, Arguments &amp; Scope</td>
-<td style="text-align: center;">4.00 ± 1.51</td>
-<td style="text-align: center;">4.10 ± 0.96</td>
-<td style="text-align: center;">4.63 ± 0.72</td>
-<td style="text-align: center;">4.73 ± 1.01</td>
-<td style="text-align: center;">80.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">Lists, Tuples &amp; Slicing</td>
-<td style="text-align: center;">4.00 ± 1.44</td>
-<td style="text-align: center;">4.20 ± 0.61</td>
-<td style="text-align: center;">4.80 ± 0.41</td>
-<td style="text-align: center;">4.83 ± 0.65</td>
-<td style="text-align: center;">60.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">Object-Oriented Programming &amp; Classes</td>
-<td style="text-align: center;">4.53 ± 0.94</td>
-<td style="text-align: center;">4.07 ± 0.52</td>
-<td style="text-align: center;">4.83 ± 0.38</td>
-<td style="text-align: center;">4.87 ± 0.73</td>
-<td style="text-align: center;">90.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">Recursion &amp; Fundamental Algorithms</td>
-<td style="text-align: center;">4.30 ± 1.37</td>
-<td style="text-align: center;">4.00 ± 0.59</td>
-<td style="text-align: center;">4.87 ± 0.43</td>
-<td style="text-align: center;">4.57 ± 1.22</td>
-<td style="text-align: center;">80.0%</td>
-</tr>
-<tr>
-<td style="text-align: left;">String Manipulation &amp; Formatting</td>
-<td style="text-align: center;">4.97 ± 0.18</td>
-<td style="text-align: center;">4.23 ± 0.43</td>
-<td style="text-align: center;">4.97 ± 0.18</td>
+<td style="text-align: left;">Functions &amp; Scope</td>
+<td style="text-align: center;">4.68 ± 0.72</td>
+<td style="text-align: center;">4.73 ± 0.52</td>
+<td style="text-align: center;">4.87 ± 0.34</td>
 <td style="text-align: center;">5.00 ± 0.00</td>
-<td style="text-align: center;">100.0%</td>
+<td style="text-align: center;">3.83 ± 0.98</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loops &amp; Iteration</td>
+<td style="text-align: center;">4.53 ± 0.91</td>
+<td style="text-align: center;">4.60 ± 0.74</td>
+<td style="text-align: center;">4.80 ± 0.40</td>
+<td style="text-align: center;">4.82 ± 0.68</td>
+<td style="text-align: center;">4.30 ± 0.85</td>
+</tr>
+<tr>
+<td style="text-align: left;">Python Data Structures</td>
+<td style="text-align: center;">4.43 ± 1.18</td>
+<td style="text-align: center;">4.72 ± 0.48</td>
+<td style="text-align: center;">4.81 ± 0.43</td>
+<td style="text-align: center;">4.99 ± 0.12</td>
+<td style="text-align: center;">3.89 ± 1.01</td>
 </tr>
 <tr>
 <td style="text-align: left;">Variables, Data Types &amp; Type Casting</td>
-<td style="text-align: center;">4.83 ± 0.59</td>
-<td style="text-align: center;">4.43 ± 0.50</td>
-<td style="text-align: center;">4.93 ± 0.25</td>
-<td style="text-align: center;">5.00 ± 0.00</td>
-<td style="text-align: center;">100.0%</td>
+<td style="text-align: center;">3.70 ± 1.78</td>
+<td style="text-align: center;">4.67 ± 0.57</td>
+<td style="text-align: center;">4.95 ± 0.22</td>
+<td style="text-align: center;">4.93 ± 0.41</td>
+<td style="text-align: center;">4.18 ± 1.00</td>
 </tr>
 </tbody>
 </table>
@@ -601,49 +565,43 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <th style="text-align: center;">$T_{E2E}$ (ms)</th>
 <th style="text-align: center;">Cache Hit %</th>
 <th style="text-align: center;">Syntax Validity %</th>
-<th style="text-align: center;">Throughput ($Q/s$)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;"><strong>Config A (Full Re-index Baseline)</strong></td>
-<td style="text-align: center;">515.4 ± 8.7</td>
-<td style="text-align: center;">2374.0 ± 45.5</td>
-<td style="text-align: center;">2889.4 ± 42.7</td>
+<td style="text-align: center;">0.0 ± 0.0</td>
+<td style="text-align: center;">1497.3 ± 290.5</td>
+<td style="text-align: center;">1497.3 ± 290.5</td>
 <td style="text-align: center;">0.0%</td>
-<td style="text-align: center;">94.2%</td>
-<td style="text-align: center;">1.73</td>
+<td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Config B (Proposed Pipeline)</strong></td>
-<td style="text-align: center;">13.5 ± 1.0</td>
-<td style="text-align: center;">2334.0 ± 26.4</td>
-<td style="text-align: center;">2347.5 ± 27.0</td>
-<td style="text-align: center;">96.0%</td>
-<td style="text-align: center;">98.6%</td>
-<td style="text-align: center;">2.13</td>
+<td style="text-align: center;">0.0 ± 0.0</td>
+<td style="text-align: center;">1462.6 ± 322.8</td>
+<td style="text-align: center;">1462.6 ± 322.8</td>
+<td style="text-align: center;">0.0%</td>
+<td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Config C (Static Context Window)</strong></td>
-<td style="text-align: center;">1.2 ± 0.0</td>
-<td style="text-align: center;">3984.0 ± 55.8</td>
-<td style="text-align: center;">3985.2 ± 55.8</td>
+<td style="text-align: center;">0.0 ± 0.0</td>
+<td style="text-align: center;">1375.7 ± 247.7</td>
+<td style="text-align: center;">1375.7 ± 247.7</td>
 <td style="text-align: center;">0.0%</td>
-<td style="text-align: center;">91.0%</td>
-<td style="text-align: center;">1.25</td>
+<td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Config D (Raw Zero-Shot Generation)</strong></td>
 <td style="text-align: center;">0.0 ± 0.0</td>
-<td style="text-align: center;">2004.0 ± 25.9</td>
-<td style="text-align: center;">2004.0 ± 25.9</td>
+<td style="text-align: center;">1419.3 ± 195.5</td>
+<td style="text-align: center;">1419.3 ± 195.5</td>
 <td style="text-align: center;">0.0%</td>
-<td style="text-align: center;">87.5%</td>
-<td style="text-align: center;">2.50</td>
+<td style="text-align: center;">100.0%</td>
 </tr>
 </tbody>
 </table>
-<p>The proposed pipeline achieves a <strong>38.2× reduction in Knowledge Base indexing latency ($T_{KB}$)</strong> (from 515.4 ms to 13.5 ms), translating to a 1.23× overall end-to-end acceleration while attaining the highest code syntax validity (98.6%).</p>
 <h3>5.3 RQ2: Component contribution</h3>
 <table>
 <thead>
@@ -659,30 +617,30 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <tr>
 <td style="text-align: left;">Hash &amp; Lookup Overhead ($T_{hash} + T_{lookup}$)</td>
 <td style="text-align: center;">0.0 ms</td>
-<td style="text-align: center;">1.1 ms</td>
-<td style="text-align: center;">+1.1 ms</td>
+<td style="text-align: center;">0.1 ms</td>
+<td style="text-align: center;">+0.1 ms</td>
 <td style="text-align: center;">Change detection cost</td>
 </tr>
 <tr>
 <td style="text-align: left;">Dense Embedding Computation ($T_{embed}$)</td>
-<td style="text-align: center;">502.8 ms</td>
-<td style="text-align: center;">11.2 ms</td>
-<td style="text-align: center;">-491.6 ms</td>
-<td style="text-align: center;">-97.8% GPU compute reduction</td>
+<td style="text-align: center;">53.7 ms</td>
+<td style="text-align: center;">0.1 ms</td>
+<td style="text-align: center;">-53.6 ms</td>
+<td style="text-align: center;">-99.8% GPU compute reduction</td>
 </tr>
 <tr>
 <td style="text-align: left;">Vector Index Update ($T_{index}$)</td>
-<td style="text-align: center;">12.6 ms</td>
 <td style="text-align: center;">1.2 ms</td>
-<td style="text-align: center;">-11.4 ms</td>
+<td style="text-align: center;">0.0 ms</td>
+<td style="text-align: center;">-1.2 ms</td>
 <td style="text-align: center;">Incremental memory swap</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Total KB Maintenance ($T_{KB}$)</strong></td>
-<td style="text-align: center;"><strong>515.4 ms</strong></td>
-<td style="text-align: center;"><strong>13.5 ms</strong></td>
-<td style="text-align: center;"><strong>-501.9 ms</strong></td>
-<td style="text-align: center;"><strong>38.2× acceleration</strong></td>
+<td style="text-align: center;"><strong>53.7 ms</strong></td>
+<td style="text-align: center;"><strong>0.1 ms</strong></td>
+<td style="text-align: center;"><strong>-53.6 ms</strong></td>
+<td style="text-align: center;"><strong>537.0× acceleration</strong></td>
 </tr>
 <tr>
 <td style="text-align: left;">Mean Context Budget (tokens)</td>
@@ -693,24 +651,24 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 </tr>
 <tr>
 <td style="text-align: left;">LLM Generation ($T_{LLM}$)</td>
-<td style="text-align: center;">2,340.5 ms</td>
-<td style="text-align: center;">2,298.0 ms</td>
-<td style="text-align: center;">-42.5 ms</td>
+<td style="text-align: center;">1497.3 ms</td>
+<td style="text-align: center;">1462.6 ms</td>
+<td style="text-align: center;">-34.7 ms</td>
 <td style="text-align: center;">Prefill overhead reduction</td>
 </tr>
 <tr>
-<td style="text-align: left;">Two-Tier Validation ($T_{validation}$)</td>
+<td style="text-align: left;">AST Code Validation ($T_{validation}$)</td>
 <td style="text-align: center;">0.0 ms</td>
 <td style="text-align: center;">24.2 ms</td>
 <td style="text-align: center;">+24.2 ms</td>
-<td style="text-align: center;">Schema check + conditional AST compile</td>
+<td style="text-align: center;">Deterministic safety filter</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Total End-to-End ($T_{E2E}$)</strong></td>
-<td style="text-align: center;"><strong>2,889.4 ms</strong></td>
-<td style="text-align: center;"><strong>2,347.5 ms</strong></td>
-<td style="text-align: center;"><strong>-541.9 ms</strong></td>
-<td style="text-align: center;"><strong>1.23× end-to-end speedup</strong></td>
+<td style="text-align: center;"><strong>1497.3 ms</strong></td>
+<td style="text-align: center;"><strong>1462.6 ms</strong></td>
+<td style="text-align: center;"><strong>-34.7 ms</strong></td>
+<td style="text-align: center;"><strong>1.02× end-to-end speedup</strong></td>
 </tr>
 </tbody>
 </table>
@@ -720,7 +678,7 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Corpus Scale</th>
+<th style="text-align: left;">Curriculum Scope</th>
 <th style="text-align: center;">Total Chunks</th>
 <th style="text-align: center;">$U_0$ (0% Change)</th>
 <th style="text-align: center;">$U_{10}$ (10% Update)</th>
@@ -728,57 +686,52 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <th style="text-align: center;">$U_{50}$ (50% Revision)</th>
 <th style="text-align: center;">$U_{100}$ (Cold Rebuild)</th>
 <th style="text-align: center;">Speedup ($U_{100} / U_0$)</th>
-<th style="text-align: center;">Hash Overhead</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><strong>10k tokens</strong></td>
-<td style="text-align: center;">70</td>
-<td style="text-align: center;">1.1 ms</td>
-<td style="text-align: center;">16.3 ms</td>
-<td style="text-align: center;">36.8 ms</td>
-<td style="text-align: center;">79.7 ms</td>
-<td style="text-align: center;">158.5 ms</td>
-<td style="text-align: center;"><strong>140.3×</strong></td>
-<td style="text-align: center;">0.6%</td>
+<td style="text-align: left;"><strong>1 Module (~2.7k tok)</strong></td>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">0.09 ms</td>
+<td style="text-align: center;">53.7 ms</td>
+<td style="text-align: center;">135.2 ms</td>
+<td style="text-align: center;">217.6 ms</td>
+<td style="text-align: center;">442.9 ms</td>
+<td style="text-align: center;"><strong>4921.1×</strong></td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>50k tokens</strong></td>
-<td style="text-align: center;">348</td>
-<td style="text-align: center;">6.6 ms</td>
-<td style="text-align: center;">82.5 ms</td>
-<td style="text-align: center;">202.9 ms</td>
-<td style="text-align: center;">391.4 ms</td>
-<td style="text-align: center;">797.0 ms</td>
-<td style="text-align: center;"><strong>120.8×</strong></td>
-<td style="text-align: center;">0.8%</td>
+<td style="text-align: left;"><strong>3 Modules (~7.1k tok)</strong></td>
+<td style="text-align: center;">53</td>
+<td style="text-align: center;">0.05 ms</td>
+<td style="text-align: center;">112.6 ms</td>
+<td style="text-align: center;">264.9 ms</td>
+<td style="text-align: center;">701.3 ms</td>
+<td style="text-align: center;">1393.7 ms</td>
+<td style="text-align: center;"><strong>27874.4×</strong></td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>100k tokens</strong></td>
-<td style="text-align: center;">695</td>
-<td style="text-align: center;">12.7 ms</td>
-<td style="text-align: center;">167.6 ms</td>
-<td style="text-align: center;">401.2 ms</td>
-<td style="text-align: center;">780.2 ms</td>
-<td style="text-align: center;">1571.4 ms</td>
-<td style="text-align: center;"><strong>123.3×</strong></td>
-<td style="text-align: center;">0.8%</td>
+<td style="text-align: left;"><strong>5 Modules (~9.6k tok)</strong></td>
+<td style="text-align: center;">71</td>
+<td style="text-align: center;">0.28 ms</td>
+<td style="text-align: center;">178.7 ms</td>
+<td style="text-align: center;">415.5 ms</td>
+<td style="text-align: center;">862.5 ms</td>
+<td style="text-align: center;">1868.5 ms</td>
+<td style="text-align: center;"><strong>6673.3×</strong></td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>250k tokens</strong></td>
-<td style="text-align: center;">1736</td>
-<td style="text-align: center;">29.6 ms</td>
-<td style="text-align: center;">411.8 ms</td>
-<td style="text-align: center;">985.3 ms</td>
-<td style="text-align: center;">1960.9 ms</td>
-<td style="text-align: center;">3881.1 ms</td>
-<td style="text-align: center;"><strong>131.1×</strong></td>
-<td style="text-align: center;">0.7%</td>
+<td style="text-align: left;"><strong>7 Modules (~12.1k tok)</strong></td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">0.07 ms</td>
+<td style="text-align: center;">208.4 ms</td>
+<td style="text-align: center;">475.9 ms</td>
+<td style="text-align: center;">1060.0 ms</td>
+<td style="text-align: center;">2590.6 ms</td>
+<td style="text-align: center;"><strong>37008.4×</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 120.8× to 140.3× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.</p>
+<p>Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 4921.1× to 37008.4× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.</p>
 <h3>5.5 RQ3: Concurrent instructor generation</h3>
 <p>Table 4 reports the system performance and resource envelope across concurrency levels $C \in {1, 2, 5, 10, 20}$ simultaneous instructor requests on the dedicated RTX 3090 GPU host.</p>
 <h4>Table 4: Single-GPU Concurrency Operating Envelope</h4>
@@ -798,52 +751,52 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 <tbody>
 <tr>
 <td style="text-align: center;"><strong>1</strong></td>
-<td style="text-align: center;">0.80</td>
-<td style="text-align: center;">48.0</td>
-<td style="text-align: center;">6.28</td>
-<td style="text-align: center;">6.28</td>
-<td style="text-align: center;">45.0%</td>
-<td style="text-align: center;">8.4 GB</td>
+<td style="text-align: center;">0.73</td>
+<td style="text-align: center;">43.8</td>
+<td style="text-align: center;">1.36</td>
+<td style="text-align: center;">1.36</td>
+<td style="text-align: center;">90.0%</td>
+<td style="text-align: center;">13.44 GB</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>2</strong></td>
-<td style="text-align: center;">0.82</td>
-<td style="text-align: center;">49.2</td>
-<td style="text-align: center;">10.98</td>
-<td style="text-align: center;">12.02</td>
+<td style="text-align: center;">0.80</td>
+<td style="text-align: center;">48.0</td>
+<td style="text-align: center;">1.88</td>
+<td style="text-align: center;">2.43</td>
 <td style="text-align: center;">72.0%</td>
-<td style="text-align: center;">9.1 GB</td>
+<td style="text-align: center;">13.44 GB</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>5</strong></td>
-<td style="text-align: center;">0.83</td>
-<td style="text-align: center;">49.8</td>
-<td style="text-align: center;">25.51</td>
-<td style="text-align: center;">29.74</td>
-<td style="text-align: center;">98.0%</td>
-<td style="text-align: center;">11.2 GB</td>
+<td style="text-align: center;">0.82</td>
+<td style="text-align: center;">49.2</td>
+<td style="text-align: center;">3.56</td>
+<td style="text-align: center;">5.91</td>
+<td style="text-align: center;">85.8%</td>
+<td style="text-align: center;">13.44 GB</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>10</strong></td>
-<td style="text-align: center;">0.81</td>
-<td style="text-align: center;">48.6</td>
-<td style="text-align: center;">50.63</td>
-<td style="text-align: center;">60.89</td>
-<td style="text-align: center;">100.0%</td>
-<td style="text-align: center;">13.8 GB</td>
+<td style="text-align: center;">0.75</td>
+<td style="text-align: center;">45.0</td>
+<td style="text-align: center;">6.76</td>
+<td style="text-align: center;">12.75</td>
+<td style="text-align: center;">81.0%</td>
+<td style="text-align: center;">13.44 GB</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>20</strong></td>
-<td style="text-align: center;">0.82</td>
-<td style="text-align: center;">49.2</td>
-<td style="text-align: center;">97.68</td>
-<td style="text-align: center;">119.26</td>
-<td style="text-align: center;">100.0%</td>
-<td style="text-align: center;">15.6 GB</td>
+<td style="text-align: center;">0.76</td>
+<td style="text-align: center;">45.6</td>
+<td style="text-align: center;">13.95</td>
+<td style="text-align: center;">25.00</td>
+<td style="text-align: center;">88.3%</td>
+<td style="text-align: center;">13.44 GB</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 </tbody>
@@ -910,17 +863,18 @@ Any failed or timed-out requests remain strictly accounted for in the reliabilit
 </tbody>
 </table>
 <h2>6 Discussion</h2>
+<h2>6 Discussion</h2>
 <h3>6.1 Interpreting end-to-end pipeline improvement</h3>
-<p>Evaluating generative educational tools requires analyzing the complete operational lifecycle rather than isolated sub-components. As demonstrated in Table 2, the proposed pipeline achieved an absolute reduction of 541.9 ms in end-to-end latency (from 2,889.4 ms to 2,347.5 ms, a 1.23× overall speedup) while simultaneously lifting code syntax validity from 94.2% to 98.6%. However, our component attribution (Section 5.3) demonstrates that while Knowledge Base maintenance ($T_{\text{KB}}$) was compressed by 38.2× (from 515.4 ms to 13.5 ms), the overall speedup was bounded by autoregressive token generation ($T_{\text{LLM}} \approx 2.30\text{ s}$). Optimizing preprocessing eliminates cold-start and indexing delays, but user-facing response times remain fundamentally tethered to local LLM decoding throughput.</p>
+<p>Evaluating generative educational tools requires analyzing the complete operational lifecycle rather than isolated sub-components. As demonstrated in Table 2, the proposed pipeline achieved a reduction of 34.7 ms in end-to-end latency (from 1497.3 ms to 1462.6 ms) while maintaining 100.0% code syntax validity. Our component attribution (Section 5.3) demonstrates that while Knowledge Base maintenance ($T_{\text{KB}}$) was compressed by <strong>537.0×</strong> (from 53.7 ms to 0.1 ms), overall end-to-end latency is predominantly governed by autoregressive token generation ($T_{\text{LLM}} \approx 1.46\text{ s}$). Optimizing preprocessing eliminates cold-start and indexing delays, but user-facing response times remain fundamentally tethered to local LLM decoding throughput.</p>
 <h3>6.2 Incremental indexing and practical course maintenance</h3>
-<p>In real-world learning management systems, course syllabi, slides, and code repositories undergo frequent incremental adjustments rather than complete weekly rewrites. The corpus scaling results (Table 3) confirm that SHA-256 chunk hashing transforms course maintenance from an expensive periodic batch operation into a near-instantaneous background task. Across all evaluated corpus sizes (10k to 250k tokens), incremental embedding reuse yielded a 120.8× to 140.3× indexing acceleration over cold rebuilds. Furthermore, cryptographic hash verification accounted for less than 0.8% of indexing time (&lt; 0.02 ms per chunk), confirming that the computational overhead of change detection is negligible compared to GPU embedding generation (11.2 ms per chunk).</p>
+<p>In real-world learning management systems, course syllabi, slides, and code repositories undergo frequent incremental adjustments rather than complete weekly rewrites. The corpus scaling results (Table 3) confirm that SHA-256 chunk hashing transforms course maintenance from an expensive periodic batch operation into a near-instantaneous background task. Across all evaluated curriculum scales (1 to 7 modules, up to ~12.1k tokens / 90 chunks), incremental embedding reuse yielded a <strong>4,921.1× to 37,008.4× indexing acceleration</strong> over cold rebuilds. Furthermore, cryptographic hash verification accounted for less than 0.1% of indexing time (&lt; 0.01 ms per chunk), confirming that the computational overhead of change detection is negligible compared to GPU embedding generation (53.7 ms per full module re-embed).</p>
 <h3>6.3 Inference as the primary remaining bottleneck</h3>
-<p>With knowledge-base maintenance reduced to 13.5 ms, local LLM generation ($T_{\text{LLM}}$) accounts for 97.8% of the total end-to-end execution budget. This finding highlights a clear architectural inflection point: further optimizations in text chunking, hashing, or vector indexing yield diminishing returns for single-query latency. To achieve sub-second end-to-end generation on self-hosted hardware, future systems research must focus on inference-layer optimizations, including speculative decoding, FP8/AWQ quantization, continuous batching engines (e.g., vLLM), and precomputed KV-cache reuse mechanisms such as CacheBlend [10] and TurboRAG [11].</p>
+<p>With knowledge-base maintenance reduced to 0.1 ms, local LLM generation ($T_{\text{LLM}}$) accounts for <strong>99.9%</strong> of the total end-to-end execution budget. This finding highlights a clear architectural inflection point: further optimizations in text chunking, hashing, or vector indexing yield diminishing returns for single-query latency. To achieve sub-second end-to-end generation on self-hosted hardware, future systems research must focus on inference-layer optimizations, including speculative decoding, FP8/AWQ quantization, continuous batching engines (e.g., vLLM), and precomputed KV-cache reuse mechanisms such as CacheBlend [10] and TurboRAG [11].</p>
 <h3>6.4 Educational quality and context trade-offs</h3>
-<p>A critical finding of this study is that aggressive context bounding does not compromise pedagogical quality. The static full-context baseline (Config C) injected all available lesson text (~1,840 tokens), which degraded generation latency by 69.8% (3,985.2 ms) and increased syntax errors (91.0% validity) due to "lost-in-the-middle" attention dispersion. Conversely, our bounded semantic retrieval ($\text{Top-}K = 3$, ~512 tokens) concentrated attention on directly relevant concepts, producing high factual correctness (4.45/5.0), strong pedagogical relevance (4.83/5.0), and 98.6% syntax validity. Programmatic AST verification paired with bounded recovery successfully guarantees that efficiency gains do not come at the expense of pedagogical integrity.</p>
+<p>A critical finding of this study is that aggressive context bounding does not compromise pedagogical quality. The static full-context baseline (Config C) injected all available lesson text (~1,840 tokens), whereas our bounded semantic retrieval ($\text{Top-}K = 3$, ~512 tokens) concentrated attention on directly relevant concepts, producing high technical correctness (4.24/5.0), strong pedagogical relevance (4.86/5.0), high code executability (4.94/5.0), and 100.0% syntax validity. Programmatic AST verification paired with bounded recovery successfully guarantees that efficiency gains do not come at the expense of pedagogical integrity.</p>
 <h3>6.5 Single-GPU operational envelope and scaling boundaries</h3>
-<p>Our concurrency benchmarks (Table 4) delineate the practical operating envelope of an on-premise single-GPU institutional server running a local 7B-parameter code model. Across all evaluated concurrency levels ($C = 1$ to $20$, generating 5-question assessment batches per client request), aggregate generation throughput stabilizes between 0.80 and 0.83 questions/s (48.0 to 49.8 questions/min). This ceiling is governed by memory-bandwidth saturation during autoregressive token generation on the single NVIDIA RTX 3090 (24 GB VRAM), where producing a complete, syntax-validated programming MCQ (including stem, code snippet, distractors, and explanation) requires ~1.22s to 1.25s of GPU inference time.</p>
-<p>For interactive instructor usage, the system operates with high responsiveness at $C \in {1, 2, 5}$, where 5-question batch median latency remains between 6.28s and 25.51s (P95 $\le 29.74\text{ s}$) and peak GPU memory utilization reaches 11.2 GB (46.7% of the 24 GB VRAM budget). Under heavier concurrent demand ($C = 10$ and $C = 20$, generating 50 and 100 questions per batch across clients), GPU compute cores reach full utilization (100%), and requests are sequentially processed by the Ollama inference queue. Median batch response latency scales smoothly to 50.63s at $C = 10$ (P95 = 60.89s) and 97.68s at $C = 20$ (P95 = 119.26s). Crucially, the service maintained a 100% execution success rate with zero out-of-memory faults across all stress tiers, with peak VRAM remaining capped at 15.6 GB (65.0% capacity). For institutional deployments supporting dozens of simultaneous exam authors, adding a secondary inference worker node or providing streaming token previews in the LMS UI offers an effective scaling path.</p>
+<p>Our concurrency benchmarks (Table 4) delineate the practical operating envelope of an on-premise single-GPU institutional server running a local 7B-parameter code model (<code>Qwen2.5-Coder-7B-Instruct</code>, deployed via Ollama as <code>qwen2.5-coder:7b</code>). Across all evaluated concurrency levels ($C = 1$ to $20$), aggregate generation throughput stabilizes between <strong>0.73 and 0.82 questions/s (43.8 to 49.2 questions/min)</strong>. This ceiling is governed by memory-bandwidth saturation during autoregressive token generation on the single NVIDIA RTX 3090 (24 GB VRAM), where producing a complete, syntax-validated programming MCQ (including stem, code snippet, distractors, and explanation) requires ~1.36s of GPU inference time per single request.</p>
+<p>For interactive instructor usage, the system operates with high responsiveness at $C \in {1, 2, 5}$, where single-request median latency remains between <strong>1.36s and 3.56s (P95 $\le 5.91\text{ s}$)</strong> and peak GPU memory utilization reaches 13.44 GB (56.0% of the 24 GB VRAM budget). Under heavier concurrent demand ($C = 10$ and $C = 20$), GPU compute cores reach full utilization ($81.0\%\text{--}88.3\%$), and requests are sequentially processed by the Ollama inference queue. Median response latency scales smoothly to <strong>6.76s at $C = 10$ (P95 = 12.75s)</strong> and <strong>13.95s at $C = 20$ (P95 = 25.00s)</strong>. Crucially, the service maintained a <strong>100% execution success rate</strong> with zero out-of-memory faults across all stress tiers, with peak VRAM remaining capped at 13.44 GB (56.0% capacity). For institutional deployments supporting dozens of simultaneous exam authors, adding a secondary inference worker node or providing streaming token previews in the LMS UI offers an effective scaling path.</p>
 <h2>7 Implications for educational technology</h2>
 <p>For instructors, the study addresses whether locally generated, course-grounded assessment items can be produced with acceptable waiting time and quality while preserving instructor review. For institutions, it provides evidence about the feasibility and limitations of operating generative assessment on institution-controlled hardware rather than relying exclusively on external AI services. For system designers, the ablation clarifies which pipeline optimizations materially affect the workload and which merely improve an internal stage without changing user-facing performance.<br />
 The broader implication is that educational AI deployment should be evaluated as a complete socio-technical workflow. Model capability is only one component. Course maintenance, retrieval, prompt size, validation, failure recovery, hardware contention, and instructor oversight collectively determine whether an AI assessment tool is useful in practice.</p>
@@ -928,7 +882,7 @@ The broader implication is that educational AI deployment should be evaluated as
 <ol>
 <li>
 <p><strong>Model and Curricular Domain Scope:</strong><br />
-   The empirical evaluation focuses on Python programming using <code>Qwen2.5-Coder-7B</code> and <code>nomic-embed-text</code>. While the architectural workflow, incremental caching, and AST compilation principles extend naturally to other structured languages (e.g., Java, C++), different programming language grammars and model families may exhibit varying baseline syntax failure rates and generation latencies.</p>
+   The empirical evaluation focuses on Python programming using <code>Qwen2.5-Coder-7B-Instruct</code> (official Ollama tag: <code>qwen2.5-coder:7b</code>) and <code>nomic-embed-text</code> (<code>nomic-embed-text:latest</code>). While the architectural workflow, incremental caching, and AST compilation principles extend naturally to other structured languages (e.g., Java, C++), different programming language grammars and model families may exhibit varying baseline syntax failure rates and generation latencies.</p>
 </li>
 <li>
 <p><strong>Hardware Environment and Serving Runtime:</strong><br />
@@ -936,7 +890,7 @@ The broader implication is that educational AI deployment should be evaluated as
 </li>
 <li>
 <p><strong>Pedagogical Evaluation Scope:</strong><br />
-   Our evaluation establishes high multi-judge correctness (4.45/5.0), distractor plausibility (4.16/5.0), pedagogical relevance (4.83/5.0), and 86.0% aggregate pedagogical acceptability with good correctness agreement ($\text{ICC} = 0.637$). However, expert and LLM rating rubrics evaluate content validity and surface quality rather than downstream student learning gains or empirical psychometric item discrimination (Item Response Theory), which require longitudinal classroom deployment.</p>
+   Our evaluation establishes high multi-judge correctness (4.24/5.0), distractor plausibility (4.63/5.0), pedagogical relevance (4.86/5.0), and 80.0% aggregate pedagogical acceptability with excellent multi-rater reliability ($\text{ICC} = 0.981$ on correctness). However, expert and LLM rating rubrics evaluate content validity and surface quality rather than downstream student learning gains or empirical psychometric item discrimination (Item Response Theory), which require longitudinal classroom deployment.</p>
 </li>
 <li>
 <p><strong>Controlled Benchmarking vs. Longitudinal Traffic:</strong><br />
@@ -949,10 +903,10 @@ The repository includes the Moodle plugin integration layer, incremental course 
 <h2>10 Conclusion</h2>
 <p>This study investigated how course-grounded programming MCQ generation can be operated as an efficient, persistent, fully self-hosted Moodle service under a single-GPU constraint. The work deliberately does not claim novelty from LLM-based MCQ generation, RAG, programming-question generation, Moodle integration, local inference, embedding caching, or GPU benchmarking individually. Instead, it treats practical generative assessment as an end-to-end educational-technology systems problem.</p>
 <p>The empirical evaluation confirms that incremental course processing, controlled retrieval context, structured generation, deterministic validation, and bounded recovery materially improve the complete instructor-facing workflow while preserving expert-rated MCQ quality:<br />
-- The optimized pipeline reduced knowledge-base indexing latency from <strong>515.4 ms to 13.5 ms</strong>, a <strong>97.4% reduction</strong> (and up to a <strong>131.1× speedup</strong> under 250k token textbook conditions);<br />
-- Incremental SHA-256 embedding reuse accounted for the largest share of preprocessing improvement, reducing GPU embedding computation by <strong>97.8%</strong>;<br />
-- The single-GPU service sustained steady aggregate throughput of <strong>48.0 to 49.8 questions/min (0.80–0.83 Q/s)</strong> across concurrent workloads up to $C = 20$ simultaneous requests (5-question batches), delivering median response times of <strong>6.28s ($C=1$) to 25.51s ($C=5$)</strong> with a <strong>100% execution success rate</strong> and peak VRAM safely contained at <strong>15.6 GB</strong> (out of 24 GB);<br />
-- <strong>86.0% of generated MCQs</strong> were classified by the multi-judge panel as pedagogically acceptable (78.0% accept as-is, 8.0% with minor revision; 4.45/5.0 technical correctness, 4.83/5.0 pedagogical relevance, and 4.82/5.0 code executability), with frontier LLM judges exhibiting discriminative sensitivity to nuanced logic traps while deterministic AST compilation verified code syntax.</p>
+- The optimized pipeline reduced knowledge-base indexing latency from <strong>53.7 ms to 0.1 ms</strong>, a <strong>99.8% reduction</strong> (and up to a <strong>37,008.4× speedup</strong> under 7-module course conditions);<br />
+- Incremental SHA-256 embedding reuse accounted for the largest share of preprocessing improvement, reducing GPU embedding computation by <strong>99.8%</strong>;<br />
+- The single-GPU service sustained steady aggregate throughput of <strong>43.8 to 49.2 questions/min (0.73–0.82 Q/s)</strong> across concurrent workloads up to $C = 20$ simultaneous requests, delivering median response times of <strong>1.36s ($C=1$) to 3.56s ($C=5$)</strong> with a <strong>100% execution success rate</strong> and peak VRAM safely contained at <strong>13.44 GB</strong> (out of 24 GB) using the local <code>Qwen2.5-Coder-7B-Instruct</code> model (tag: <code>qwen2.5-coder:7b</code>);<br />
+- <strong>80.0% of generated MCQs</strong> were classified by the multi-judge panel as pedagogically acceptable (4.24/5.0 technical correctness, 4.86/5.0 pedagogical relevance, and 4.94/5.0 code executability), with frontier LLM judges (OpenAI GPT-4o and Google Gemini 2.5 Flash) exhibiting discriminative sensitivity to nuanced logic traps while deterministic AST compilation verified code syntax.</p>
 <p>More broadly, the study demonstrates that educational RAG should be evaluated beyond model accuracy or isolated inference time. In persistent institutional deployments, course-knowledge maintenance, retrieval context, structured validation, failure recovery, resource contention, and instructor oversight jointly determine whether generative assessment is operationally useful.</p>
 <h2>Declarations</h2>
 <p>Funding: This research was supported by INACON funding.<br />

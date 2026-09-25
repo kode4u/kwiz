@@ -79,7 +79,7 @@ LOCAL_GEN_BATCH_SIZE = int(os.getenv('LOCAL_GENERATION_BATCH_SIZE', '3'))
 WEBHOOK_TIMEOUT = int(os.getenv('WEBHOOK_TIMEOUT', '30'))
 # Optional: comma-separated list of Ollama models to pre-pull on startup
 OLLAMA_PRELOAD_MODELS = os.getenv('OLLAMA_PRELOAD_MODELS', '').strip()
-OLLAMA_MODEL_DEFAULT = os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+OLLAMA_MODEL_DEFAULT = os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:7b')
 
 log_hardware_once(LOCAL_LLM_URL, OLLAMA_MODEL_DEFAULT, LLM_BACKEND)
 
@@ -301,7 +301,7 @@ def retrieve_relevant_context(
     elif backend == 'gemini':
         model_name = "models/text-embedding-004"
     elif backend == 'local':
-        model_name = os.getenv('OLLAMA_EMBED_MODEL') or local_model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+        model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or local_model or os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:7b')
     else:
         model_name = "unknown"
 
@@ -601,7 +601,7 @@ def generate_with_local_llm(topic: str, level: str, n_questions: int, language: 
                             model: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
     """Generate questions using local LLM (Ollama)"""
     try:
-        ollama_model = model or os.getenv('OLLAMA_MODEL', 'deepseek-coder:latest')
+        ollama_model = model or os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:7b')
         logger.info(f"Connecting to Ollama at {LOCAL_LLM_URL} with model {ollama_model}")
         
         prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
