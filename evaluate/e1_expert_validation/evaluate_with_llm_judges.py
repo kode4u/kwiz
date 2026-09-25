@@ -143,11 +143,9 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-4o") -> Optio
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-3.5-flash",
-    openai_key: str = "",
-    ollama_url: str = "http://localhost:11434"
+    model: str = "gemini-1.5-pro"
 ) -> Optional[Dict[str, Any]]:
-    gemini_models = ["gemini-3-flash-preview", "gemini-3.5-flash"]
+    gemini_models = [model, "gemini-1.5-flash", "gemini-2.0-flash"]
     
     for g_model in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={api_key}"
@@ -160,27 +158,26 @@ def judge_with_gemini(
                 "responseMimeType": "application/json"
             }
         }
-        try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=6.5)
-            if resp.status_code == 200:
-                data = resp.json()
-                candidates = data.get("candidates", [])
-                if candidates:
-                    text = candidates[0]["content"]["parts"][0]["text"]
-                    return json.loads(text)
-            elif resp.status_code in (429, 503):
-                pass
-        except Exception:
-            pass
-    
-    # Fast reliable fallback: gpt-4o-mini
-    if openai_key:
-        print(" [Fallback -> GPT-4o-mini]...", end="", flush=True)
-        return judge_with_openai(prompt, openai_key, model="gpt-4o-mini")
-    
-    # Fallback to local Ollama
-    print(" [Fallback -> Ollama]...", end="", flush=True)
-    return judge_with_ollama(prompt, ollama_url, model="qwen2.5-coder:7b")
+        for attempt in range(3):
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        text = candidates[0]["content"]["parts"][0]["text"]
+                        return json.loads(text)
+                elif resp.status_code == 429:
+                    wait_time = 10 * (attempt + 1)
+                    print(f" [Gemini Rate Limit 429 on {g_model}: waiting {wait_time}s]...", end="", flush=True)
+                    time.sleep(wait_time)
+                else:
+                    print(f" [Gemini Error {resp.status_code} on {g_model}]: {resp.text[:120]}")
+                    time.sleep(3)
+            except Exception as e:
+                print(f" [Gemini Exception on {g_model}]: {e}")
+                time.sleep(3)
+    return None
 
 
 
@@ -328,20 +325,14 @@ def evaluate_judge(judge_id: str, judge_name: str, judge_fn, questions: list, ou
             time.sleep(2.0 * (attempt + 1))
 
         if not eval_res or "technical_correctness" not in eval_res:
-            print(" ⚠️ Fallback (defaulting to 5/5/5/5/5)")
-            eval_res = {
-                "technical_correctness": 5,
-                "distractor_plausibility": 4,
-                "pedagogical_relevance": 5,
-                "code_executability": 5 if ast_ok else 2,
-                "context_groundedness": 5 if q.get("retrieved_chunks") else 4,
-                "comments": f"Automated pass ({ast_msg})"
-            }
-        else:
-            # Enforce AST deterministic safety
-            if not ast_ok:
-                eval_res["code_executability"] = min(eval_res.get("code_executability", 5), 2)
-            print(f" ✅ TC={eval_res.get('technical_correctness')} DP={eval_res.get('distractor_plausibility')} PR={eval_res.get('pedagogical_relevance')} CE={eval_res.get('code_executability')} CG={eval_res.get('context_groundedness')}")
+            print(f"\n[FATAL ERROR] Judge {judge_name} failed to return a valid evaluation for item {qid}!")
+            print("API request failed or returned invalid JSON without fallback. Exiting.")
+            sys.exit(1)
+
+        # Enforce AST deterministic safety
+        if not ast_ok:
+            eval_res["code_executability"] = min(eval_res.get("code_executability", 5), 2)
+        print(f" ✅ TC={eval_res.get('technical_correctness')} DP={eval_res.get('distractor_plausibility')} PR={eval_res.get('pedagogical_relevance')} CE={eval_res.get('code_executability')} CG={eval_res.get('context_groundedness')}")
 
         row = {
             "question_id": qid,
@@ -408,37 +399,47 @@ def main():
                 r1_complete = True
 
     if r1_complete and args.r1_backend == "auto":
-        print(f"[INFO] R1 (OpenAI GPT-4o) already has complete evaluations for all {len(questions)} items. Reusing to conserve OpenAI API credits.")
-    elif args.r1_backend == "openai" or (args.r1_backend == "auto" and args.openai_key):
-        if not args.openai_key:
-            print("[WARNING] No OpenAI API Key found for R1. Set OPENAI_API_KEY or pass --openai-key.")
-        else:
-            evaluate_judge("R1", "OpenAI GPT-4o", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
-    elif args.r1_backend == "ollama" or (args.r1_backend == "auto" and not args.openai_key):
-        print("[INFO] No OpenAI API key provided. Evaluating R1 with local Ollama Qwen2.5-Coder-7B on GPU...")
+        print(f"[INFO] R1 (OpenAI GPT-4o) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+    elif args.r1_backend == "ollama":
         evaluate_judge("R1", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r1_csv)
-    else:
+    elif args.r1_backend == "skip":
         print("[INFO] Skipping R1.")
-
-    # 2. Setup R2 (Google Gemini 3.5 Flash / Fallback)
-    r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
-    if args.r2_backend == "gemini" or (args.r2_backend == "auto" and args.gemini_key):
-        if not args.gemini_key:
-            print("[WARNING] No Gemini API Key found for R2. Set GEMINI_API_KEY or pass --gemini-key.")
-        else:
-            evaluate_judge(
-                "R2",
-                "Google Gemini 3.5 Flash",
-                lambda p: judge_with_gemini(p, args.gemini_key, openai_key=args.openai_key, ollama_url=args.ollama_url),
-                questions,
-                r2_csv,
-                inter_delay=2.0
-            )
-    elif args.r2_backend == "ollama" or (args.r2_backend == "auto" and not args.gemini_key):
-        print("[INFO] No Gemini API key provided. Evaluating R2 with local Ollama Qwen2.5-Coder-7B on GPU...")
-        evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     else:
+        if not args.openai_key:
+            print("\n[FATAL ERROR] OPENAI_API_KEY is missing! Evaluation requires a valid OpenAI API key.")
+            print("Per instructions, fallback is disabled. Please export OPENAI_API_KEY='sk-...' or pass --openai-key.")
+            sys.exit(1)
+        evaluate_judge("R1", "OpenAI GPT-4o", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
+
+    # 2. Setup R2 (Google Gemini 1.5 Pro)
+    r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
+    r2_complete = False
+    if os.path.exists(r2_csv):
+        with open(r2_csv, "r", encoding="utf-8") as f:
+            r2_rows = list(csv.DictReader(f))
+            if (len(r2_rows) >= len(questions) and 
+                all("Automated pass" not in r.get("rater_comments", "") and r.get("context_groundedness_1_to_5") for r in r2_rows)):
+                r2_complete = True
+
+    if r2_complete and args.r2_backend == "auto":
+        print(f"[INFO] R2 (Google Gemini 1.5 Pro) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+    elif args.r2_backend == "ollama":
+        evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
+    elif args.r2_backend == "skip":
         print("[INFO] Skipping R2.")
+    else:
+        if not args.gemini_key:
+            print("\n[FATAL ERROR] GEMINI_API_KEY is missing! Evaluation requires a valid Gemini API key.")
+            print("Per instructions, fallback is disabled. Please export GEMINI_API_KEY='AIza...' or pass --gemini-key.")
+            sys.exit(1)
+        evaluate_judge(
+            "R2",
+            "Google Gemini 1.5 Pro",
+            lambda p: judge_with_gemini(p, args.gemini_key),
+            questions,
+            r2_csv,
+            inter_delay=2.0
+        )
 
     # 3. Setup R3 (Calibrated Independent Reviewer or Local LLM)
     r3_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R3.csv")
