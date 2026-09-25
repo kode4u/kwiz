@@ -140,7 +140,7 @@ All evaluators independently score each generated item on a standardized 5-point
 2. **Distractor Plausibility (DP):** Quality and realism of alternative choices, specifically testing whether distractors capture authentic student misconceptions (e.g., off-by-one errors, zero-indexing confusion, mutable default traps) rather than trivial or absurd options;
 3. **Pedagogical Relevance (PR):** Alignment with syllabus learning goals, cognitive appropriateness for undergraduate computer science learners, and curricular focus;
 4. **Code Executability & Syntax (CE):** Strict syntactic validity and compilability. Code snippets are validated deterministically via AST parsing (`ast.parse`) and bytecode compilation (`compile`) to establish syntactic correctness, while conceptual and definition items are verified against the official Python Language Reference; semantic execution correctness is evaluated by the expert rater panel;
-5. **Context Groundedness & Evidence Support (CG):** Extent to which question premises, code behavior, and distractor concepts are directly referenced or logically supported by the retrieved course slide chunks, evaluating absence of hallucination against the course corpus.
+5. **Context Groundedness & Evidence Support (CG):** Extent to which question premises, code behavior, and distractor concepts are directly referenced or logically supported by the retrieved course slide chunks, evaluating the absence of factual hallucination against the course corpus [21].
 
 Additionally, overall item usability is categorized as *Accept As-Is*, *Accept with Minor Revision*, *Major Revision*, or *Reject*.
 
@@ -210,7 +210,7 @@ To prevent subjective claims, the term *practical* is operationalized across fou
 This section reports the empirical findings from our four controlled evaluations: expert pedagogical quality (E1), pipeline ablation (E2), corpus scaling and incremental indexing (E3), and single-GPU concurrent operating envelope (E4).
 
 ### 5.1 MCQ quality
-Table 1 reports the descriptive statistics and inter-rater agreement metrics across the five evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising frontier LLM judges (OpenAI GPT-4o [model ID: `gpt-4o`] and Google Gemini 2.5 Flash [model ID: `gemini-2.5-flash`]) and calibrated expert instructor review (R1, R2, R3).
+Table 1 reports the descriptive statistics and inter-rater agreement metrics across the five evaluation dimensions for the 100 generated Python programming MCQs evaluated by the multi-evaluator panel comprising two frontier LLM judges (R1: OpenAI GPT-4o [model ID: `gpt-4o`]; R2: Google Gemini 2.5 Flash [model ID: `gemini-2.5-flash`]) and calibrated expert instructor review (R3).
 
 #### Table 1: Multi-Evaluator Quality Validation & Inter-Rater Agreement (LLM-as-a-Judge & Expert Review)
 | Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability |
