@@ -318,6 +318,7 @@ def convert_md_to_docx(md_path, docx_path):
         
     i = 0
     n = len(lines)
+    in_references = False
     
     while i < n:
         line = lines[i].rstrip('\r\n')
@@ -380,6 +381,7 @@ def convert_md_to_docx(md_path, docx_path):
         # Heading 1 (## Heading)
         if stripped.startswith('## '):
             h_text = stripped[3:].strip()
+            in_references = (h_text == 'References')
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(14)
             p.paragraph_format.space_after = Pt(4)
@@ -390,6 +392,7 @@ def convert_md_to_docx(md_path, docx_path):
             
         # Heading 2 (### Heading)
         if stripped.startswith('### '):
+            in_references = False
             h_text = stripped[4:].strip()
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(10)
@@ -401,6 +404,7 @@ def convert_md_to_docx(md_path, docx_path):
 
         # Heading 3 (#### Heading)
         if stripped.startswith('#### '):
+            in_references = False
             h_text = stripped[5:].strip()
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(8)
@@ -628,22 +632,38 @@ def convert_md_to_docx(md_path, docx_path):
 
         # Standard Paragraph
         p = doc.add_paragraph()
-        p.paragraph_format.space_before = Pt(0)
-        p.paragraph_format.space_after = Pt(6)
         p.paragraph_format.line_spacing = 1.15
         
         # Check if it is the References section
-        if stripped.startswith('[') and ']' in stripped and re.match(r'^\[\d+\]', stripped):
+        if in_references:
+            p.paragraph_format.left_indent = Inches(0.4)
+            p.paragraph_format.first_line_indent = Inches(-0.4)
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after = Pt(4)
+            add_formatted_text(p, stripped, base_font_size=10)
+        elif stripped.startswith('[') and ']' in stripped and re.match(r'^\[\d+\]', stripped):
             p.paragraph_format.left_indent = Inches(0.3)
             p.paragraph_format.first_line_indent = Inches(-0.3)
+            p.paragraph_format.space_before = Pt(0)
+            p.paragraph_format.space_after = Pt(6)
             add_formatted_text(p, stripped, base_font_size=9.5)
         else:
+            p.paragraph_format.space_before = Pt(0)
+            p.paragraph_format.space_after = Pt(6)
             add_formatted_text(p, stripped, base_font_size=11)
             
         i += 1
 
     doc.save(docx_path)
     print(f"Generated {docx_path} ({os.path.getsize(docx_path)} bytes)")
+
+    # Also sync to root papers/
+    root_papers_dir = os.path.abspath(os.path.join(os.path.dirname(docx_path), '..', '..', 'papers'))
+    if os.path.exists(root_papers_dir) and root_papers_dir != os.path.dirname(docx_path):
+        root_docx = os.path.join(root_papers_dir, os.path.basename(docx_path))
+        import shutil
+        shutil.copyfile(docx_path, root_docx)
+        print(f"Synced to {root_docx}")
 
 if __name__ == '__main__':
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

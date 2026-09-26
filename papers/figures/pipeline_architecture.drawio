@@ -1,0 +1,121 @@
+<mxfile host="app.diagrams.net" modified="2026-09-21T03:00:00.000Z" agent="5.0" version="21.0.0" type="device">
+  <diagram id="pipeline_arch" name="Pipeline Architecture">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Figure Title -->
+        <mxCell id="title" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Figure 1: Architecture and Multi-Stage Processing Pipeline of the Self-Hosted System&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="220" y="15" width="560" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 1 CONTAINER -->
+        <mxCell id="stg1" value="&lt;b&gt;1. Course Indexing (T_KB)&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=26;fillColor=#f8fafc;strokeColor=#475569;fontColor=#0f172a;fontSize=10;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="45" width="175" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_docs" value="&lt;b&gt;Course Documents&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Normalized Chunks (d_i)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg1">
+          <mxGeometry x="12" y="38" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_hash" value="&lt;b&gt;SHA-256 Hashing&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;h_i = SHA256(model : d_i)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg1">
+          <mxGeometry x="12" y="102" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_dec" value="&lt;b&gt;In Cache?&lt;/b&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9;" vertex="1" parent="stg1">
+          <mxGeometry x="38" y="166" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_hit" value="&lt;font style=&quot;font-size: 8.5px;&quot;&gt;&lt;b&gt;Hit:&lt;/b&gt; Reuse Vector (0 ms)&lt;br&gt;&lt;b&gt;Miss:&lt;/b&gt; nomic-embed (GPU)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9;" vertex="1" parent="stg1">
+          <mxGeometry x="12" y="230" width="150" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 2 CONTAINER -->
+        <mxCell id="stg2" value="&lt;b&gt;2. Semantic Retrieval&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=26;fillColor=#f8fafc;strokeColor=#475569;fontColor=#0f172a;fontSize=10;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="45" width="175" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_req" value="&lt;b&gt;Instructor Request&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Topic &amp;amp; Difficulty Query (q)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg2">
+          <mxGeometry x="12" y="38" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_embed" value="&lt;b&gt;Query Vectorization&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Dense 768-dim vector&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg2">
+          <mxGeometry x="12" y="102" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_cos" value="&lt;b&gt;Cosine Similarity&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;sim(q, d) &amp;gt;= 0.50&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg2">
+          <mxGeometry x="12" y="166" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ctx" value="&lt;b&gt;Top-K Context Budget&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;K = 3 chunks (~512 tokens)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg2">
+          <mxGeometry x="12" y="230" width="150" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 3 CONTAINER -->
+        <mxCell id="stg3" value="&lt;b&gt;3. LLM Generation&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=26;fillColor=#f8fafc;strokeColor=#475569;fontColor=#0f172a;fontSize=10;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="45" width="175" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_srv" value="&lt;b&gt;Local LLM Serving&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Qwen2.5-Coder-7B (Ollama)&lt;br&gt;Single RTX 3090 (4-bit)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg3">
+          <mxGeometry x="12" y="38" width="150" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_pmt" value="&lt;b&gt;Prompt Structuring&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Strict JSON schema&lt;br&gt;4 options, key, explanation&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg3">
+          <mxGeometry x="12" y="112" width="150" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_out" value="&lt;b&gt;Candidate MCQ Item&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;T_GEN = 2.33 s&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg3">
+          <mxGeometry x="12" y="210" width="150" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 4 CONTAINER -->
+        <mxCell id="stg4" value="&lt;b&gt;4. Deterministic Validation&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=26;fillColor=#f8fafc;strokeColor=#475569;fontColor=#0f172a;fontSize=10;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="45" width="185" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_t1" value="&lt;b&gt;Tier 1: Schema Check&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Pydantic: JSON parse, 4 choices&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg4">
+          <mxGeometry x="12" y="38" width="160" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_t2" value="&lt;b&gt;Tier 2: Python AST Check&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;ast.parse &amp;amp; compile (exec)&lt;br&gt;(Bypassed for non-code items)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg4">
+          <mxGeometry x="12" y="105" width="160" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_pass" value="&lt;b&gt;Verified Question Item&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg4">
+          <mxGeometry x="12" y="180" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_retry" value="&lt;b&gt;Retry Loop (M &amp;lt;= 3)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8px;&quot; color=&quot;#475569&quot;&gt;Injects traceback into prompt&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#475569;strokeDasharray=3 3;fontSize=8.5;" vertex="1" parent="stg4">
+          <mxGeometry x="12" y="235" width="160" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 5 CONTAINER -->
+        <mxCell id="stg5" value="&lt;b&gt;5. LMS Persistence&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=26;fillColor=#f8fafc;strokeColor=#475569;fontColor=#0f172a;fontSize=10;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="790" y="45" width="180" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_db" value="&lt;b&gt;Moodle Question Bank&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Direct insert: mdl_question&lt;br&gt;&lt;b&gt;End of Machine Latency (T_E2E)&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg5">
+          <mxGeometry x="12" y="38" width="156" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_rev" value="&lt;b&gt;Instructor Review&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Asynchronous review in LMS&lt;br&gt;Accept / Edit / Reject&lt;br&gt;&lt;i&gt;(Excluded from T_E2E)&lt;/i&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg5">
+          <mxGeometry x="12" y="125" width="156" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_act" value="&lt;b&gt;Active Course Quiz&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8.5px;&quot; color=&quot;#475569&quot;&gt;Published to students&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;fontSize=9.5;" vertex="1" parent="stg5">
+          <mxGeometry x="12" y="215" width="156" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- Edges (Clean Orthogonal Connectors) -->
+        <mxCell id="e1_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s1_docs" target="s1_hash"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e1_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s1_hash" target="s1_dec"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e1_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s1_dec" target="s1_hit"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e2_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s2_req" target="s2_embed"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s2_embed" target="s2_cos"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s2_cos" target="s2_ctx"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_inter1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeDasharray=2 2;" edge="1" parent="1" source="s1_hit" target="s2_cos"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e3_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s3_srv" target="s3_pmt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s3_pmt" target="s3_out"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_inter2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s2_ctx" target="s3_pmt"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e4_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s4_t1" target="s4_t2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s4_t2" target="s4_pass"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_inter3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s3_out" target="s4_t1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_retry1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeDasharray=3 3;" edge="1" parent="1" source="s4_t1" target="s4_retry"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_retry2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeDasharray=3 3;" edge="1" parent="1" source="s4_retry" target="s3_pmt"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e5_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s4_pass" target="s5_db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeDasharray=3 3;" edge="1" parent="1" source="s5_db" target="s5_rev"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1e293b;" edge="1" parent="1" source="s5_rev" target="s5_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

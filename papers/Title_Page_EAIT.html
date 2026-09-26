@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title Page - Toward Efficient Course-Grounded Programming MCQ Generation</title>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- KaTeX for LaTeX math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm;
+        }
+        body {
+            font-family: 'Times New Roman', Times, 'Liberation Serif', serif;
+            font-size: 10.5pt;
+            line-height: 1.55;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        h1 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 18pt;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #0d2b45;
+            line-height: 1.25;
+        }
+        .author-block {
+            text-align: center;
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .affil-block {
+            text-align: center;
+            font-size: 9.5pt;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        h2 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 13pt;
+            font-weight: bold;
+            border-bottom: 1.5px solid #0d2b45;
+            padding-bottom: 4px;
+            margin-top: 26px;
+            margin-bottom: 10px;
+            color: #0d2b45;
+        }
+        h3 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            color: #1a4a72;
+        }
+        h4 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            color: #2c3e50;
+        }
+        h1, h2, h3, h4 {
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+        p {
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+        ul, ol {
+            margin-top: 4px;
+            margin-bottom: 10px;
+            padding-left: 22px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 9pt;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        th, td {
+            border: 1px solid #d0d7de;
+            padding: 7px 9px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f4f8;
+            font-weight: bold;
+            color: #0d2b45;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fbfd;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f6f8;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 9pt;
+        }
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 12px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 8.5pt;
+            line-height: 1.4;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        blockquote {
+            border-left: 3.5px solid #0d2b45;
+            margin: 12px 0;
+            padding: 6px 14px;
+            background-color: #f4f8fc;
+            color: #333;
+            font-style: italic;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #e1e4e8;
+            margin: 20px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 14px auto 6px auto;
+        }
+        p:has(> img) {
+            text-align: center;
+            margin-top: 18px;
+            margin-bottom: 18px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        /* APA 7th Edition Reference List Hanging Indent */
+        .apa-references {
+            margin-top: 12px;
+        }
+        .apa-references p {
+            padding-left: 2.5em !important;
+            text-indent: -2.5em !important;
+            margin-bottom: 8px !important;
+            line-height: 1.45 !important;
+            font-size: 9.5pt !important;
+            text-align: left !important;
+        }
+    </style>
+
+</head>
+<body style="max-width: 800px; padding: 40px 30px;">
+    <h1>Toward Efficient Course-Grounded Programming MCQ Generation: An End-to-End Self-Hosted RAG Pipeline for Moodle</h1>
+    <p style="text-align: center; color: #475569; font-style: italic; margin-bottom: 25px; font-size: 11pt;">
+        <strong>Title Page for Double-Blind Review</strong><br>
+        Target Journal: <em>Education and Information Technologies</em> (EAIT, Springer Nature)
+    </p>
+
+    <h2>Author Information</h2>
+    <p>
+        <strong>Author:</strong> ENG Titya<br>
+        <strong>Affiliation:</strong> Faculty of Science and Technology, National University of Battambang, Battambang 020101, Cambodia<br>
+        <strong>Corresponding Author:</strong> ENG Titya (Email: <code>eng.titya@nubb.edu.kh</code>)
+    </p>
+
+    <h2>Statements and Declarations</h2>
+    <ul>
+        <li><strong>Funding:</strong> This research was supported by INACON research funding.</li>
+        <li><strong>Competing Interests:</strong> The author declares that they have no competing financial or non-financial interests that are directly or indirectly related to the work submitted for publication.</li>
+        <li><strong>Ethics Approval:</strong> Not applicable. This investigation evaluates an automated computational software pipeline, local machine learning models, and synthetic assessment question generation. No human subjects, patients, or student academic records were involved, and no personal identifiable data were collected or processed.</li>
+        <li><strong>Informed Consent to Participate:</strong> Not applicable.</li>
+        <li><strong>Consent for Publication:</strong> Not applicable.</li>
+        <li><strong>Data Availability:</strong> All course benchmark materials, configuration templates, rating rubrics, and empirical telemetry logs generated during the study are included in the companion open-source repository.</li>
+        <li><strong>Code Availability:</strong> The complete self-hosted RAG pipeline, Moodle Question Bank integration plugin, Docker Compose multi-container orchestrations, and automated evaluation suites are publicly available at <code>https://github.com/kode4u/kwiz.git</code>.</li>
+        <li><strong>Author Contributions:</strong> ENG Titya conceived and designed the study, implemented the RAG pipeline architecture and native Moodle plugin integration, performed the experimental benchmarks and statistical evaluations, analyzed the empirical results, and authored the complete manuscript.</li>
+        <li><strong>Generative AI Disclosure:</strong> In accordance with Springer Nature editorial policy, the author confirms that large language models (local Qwen2.5-Coder-7B and frontier LLM judges) served as the operational subject of the research pipeline and that automated LLM evaluation was calibrated against deterministic AST verification. Generative tools were only utilized for minor English language proofreading; the author takes full personal responsibility for the accuracy and originality of all content.</li>
+    </ul>
+
+    <h2>Acknowledgments</h2>
+    <p>The author acknowledges the institutional support provided by the National University of Battambang (NUBB) and the computational infrastructure provided for single-GPU experimental benchmarking.</p>
+</body>
+</html>
