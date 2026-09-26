@@ -21,41 +21,214 @@ def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
         tcMar.append(node)
     tcPr.append(tcMar)
 
+def add_math_runs(paragraph, math_str, base_font_size=11, is_bold=False):
+    """
+    Renders LaTeX math expressions into clean Word text runs with proper
+    italics, subscripts (e.g. T_E2E -> T with subscript E2E), superscripts,
+    and Unicode mathematical symbols.
+    """
+    s = math_str.strip()
+    
+    # Common mathematical macro replacements
+    s = s.replace(r'\le', '≤')
+    s = s.replace(r'\ge', '≥')
+    s = s.replace(r'\times', '×')
+    s = s.replace(r'\pm', '±')
+    s = s.replace(r'\approx', '≈')
+    s = s.replace(r'\in', '∈')
+    s = s.replace(r'\kappa', 'κ')
+    s = s.replace(r'\Delta', 'Δ')
+    s = s.replace(r'\,', ' ')
+    s = s.replace(r'\quad', '   ')
+    s = s.replace(r'\{', '{')
+    s = s.replace(r'\}', '}')
+    s = s.replace(r'\%', '%')
+    s = s.replace(r'\left(', '(')
+    s = s.replace(r'\right)', ')')
+    s = s.replace(r'\cdot', '·')
+    
+    # Handle fractions: \frac{A}{B} -> (A / B)
+    frac_pattern = r'\\frac\{([^{}]+)\}\{([^{}]+)\}'
+    while re.search(frac_pattern, s):
+        s = re.sub(frac_pattern, r'(\1 / \2)', s)
+        
+    # Match patterns:
+    # 1. Base_{sub}: T_{\text{E2E}}, T_{KB}, N_{\text{ctx}}, U_{10}
+    # 2. Base_sub: d_i, h_i
+    # 3. Base^{sup}: X^2, X^{\text{sup}}
+    # 4. Bold: \mathbf{q}
+    # 5. Text: \text{abc}
+    token_pattern = r'([A-Za-z0-9_\(\)]+)_\{(?:\\text\{)?([^{}]+?)(?:\})?\}|([A-Za-z])_([A-Za-z0-9])|([A-Za-z0-9]+)\^\{(?:\\text\{)?([^{}]+?)(?:\})?\}|([A-Za-z0-9])\^([A-Za-z0-9])|\\mathbf\{([^}]+)\}|\\text\{([^}]+)\}'
+    
+    pos = 0
+    for match in re.finditer(token_pattern, s):
+        start, end = match.span()
+        if start > pos:
+            plain = s[pos:start]
+            r = paragraph.add_run(plain)
+            r.font.name = 'Times New Roman'
+            r.font.size = Pt(base_font_size)
+            if is_bold:
+                r.bold = True
+            if plain.strip() in ['T', 'K', 'M', 'N', 'C', 'p', 'q', 'd', 't', 'x', 'i']:
+                r.italic = True
+                
+        g = match.groups()
+        if g[0] and g[1]: # X_{sub}
+            base = g[0]
+            sub = g[1].replace(r'\text{', '').replace('}', '')
+            r_base = paragraph.add_run(base)
+            r_base.font.name = 'Times New Roman'
+            r_base.font.size = Pt(base_font_size)
+            r_base.italic = True
+            if is_bold:
+                r_base.bold = True
+            r_sub = paragraph.add_run(sub)
+            r_sub.font.name = 'Times New Roman'
+            r_sub.font.size = Pt(base_font_size)
+            r_sub.font.subscript = True
+            if is_bold:
+                r_sub.bold = True
+        elif g[2] and g[3]: # X_i
+            base = g[2]
+            sub = g[3]
+            r_base = paragraph.add_run(base)
+            r_base.font.name = 'Times New Roman'
+            r_base.font.size = Pt(base_font_size)
+            r_base.italic = True
+            if is_bold:
+                r_base.bold = True
+            r_sub = paragraph.add_run(sub)
+            r_sub.font.name = 'Times New Roman'
+            r_sub.font.size = Pt(base_font_size)
+            r_sub.font.subscript = True
+            if is_bold:
+                r_sub.bold = True
+        elif g[4] and g[5]: # X^{sup}
+            base = g[4]
+            sup = g[5].replace(r'\text{', '').replace('}', '')
+            r_base = paragraph.add_run(base)
+            r_base.font.name = 'Times New Roman'
+            r_base.font.size = Pt(base_font_size)
+            r_base.italic = True
+            if is_bold:
+                r_base.bold = True
+            r_sup = paragraph.add_run(sup)
+            r_sup.font.name = 'Times New Roman'
+            r_sup.font.size = Pt(base_font_size)
+            r_sup.font.superscript = True
+            if is_bold:
+                r_sup.bold = True
+        elif g[6] and g[7]: # X^2
+            base = g[6]
+            sup = g[7]
+            r_base = paragraph.add_run(base)
+            r_base.font.name = 'Times New Roman'
+            r_base.font.size = Pt(base_font_size)
+            r_base.italic = True
+            if is_bold:
+                r_base.bold = True
+            r_sup = paragraph.add_run(sup)
+            r_sup.font.name = 'Times New Roman'
+            r_sup.font.size = Pt(base_font_size)
+            r_sup.font.superscript = True
+            if is_bold:
+                r_sup.bold = True
+        elif g[8]: # \mathbf{x}
+            r_bold = paragraph.add_run(g[8])
+            r_bold.font.name = 'Times New Roman'
+            r_bold.font.size = Pt(base_font_size)
+            r_bold.bold = True
+        elif g[9]: # \text{word}
+            r_txt = paragraph.add_run(g[9])
+            r_txt.font.name = 'Times New Roman'
+            r_txt.font.size = Pt(base_font_size)
+            if is_bold:
+                r_txt.bold = True
+            
+        pos = end
+        
+    if pos < len(s):
+        plain = s[pos:]
+        r = paragraph.add_run(plain)
+        r.font.name = 'Times New Roman'
+        r.font.size = Pt(base_font_size)
+        if is_bold:
+            r.bold = True
+        if plain.strip() in ['T', 'K', 'M', 'N', 'C', 'p', 'q', 'd', 't', 'x', 'i']:
+            r.italic = True
+
 def add_formatted_text(paragraph, text, base_font_size=11, is_italic=False, is_bold=False):
     # Regex to tokenize bold, italic, code, and inline math
-    # Tokens: `code`, **bold**, *italic*, $math$
-    pattern = r'(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`|\$[^\$]+?\$)'
+    pattern = r'(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`|\$[^$]+?\$)'
     parts = re.split(pattern, text)
     for part in parts:
         if not part:
             continue
-        run = paragraph.add_run()
-        run.font.name = 'Times New Roman'
-        run.font.size = Pt(base_font_size)
-        run.font.color.rgb = RGBColor(0x1a, 0x1a, 0x1a)
-        
         if part.startswith('**') and part.endswith('**'):
-            run.text = part[2:-2]
-            run.bold = True
-            run.italic = is_italic
+            inner = part[2:-2]
+            if '$' in inner:
+                sub_parts = re.split(r'(\$[^$]+?\$)', inner)
+                for sp in sub_parts:
+                    if not sp:
+                        continue
+                    if sp.startswith('$') and sp.endswith('$'):
+                        add_math_runs(paragraph, sp[1:-1], base_font_size=base_font_size, is_bold=True)
+                    else:
+                        r = paragraph.add_run(sp)
+                        r.font.name = 'Times New Roman'
+                        r.font.size = Pt(base_font_size)
+                        r.font.color.rgb = RGBColor(0x1a, 0x1a, 0x1a)
+                        r.bold = True
+                        r.italic = is_italic
+            else:
+                run = paragraph.add_run(inner)
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(base_font_size)
+                run.font.color.rgb = RGBColor(0x1a, 0x1a, 0x1a)
+                run.bold = True
+                run.italic = is_italic
         elif part.startswith('*') and part.endswith('*'):
-            run.text = part[1:-1]
-            run.italic = True
-            run.bold = is_bold
+            inner = part[1:-1]
+            if '$' in inner:
+                sub_parts = re.split(r'(\$[^$]+?\$)', inner)
+                for sp in sub_parts:
+                    if not sp:
+                        continue
+                    if sp.startswith('$') and sp.endswith('$'):
+                        add_math_runs(paragraph, sp[1:-1], base_font_size=base_font_size, is_bold=is_bold)
+                    else:
+                        r = paragraph.add_run(sp)
+                        r.font.name = 'Times New Roman'
+                        r.font.size = Pt(base_font_size)
+                        r.font.color.rgb = RGBColor(0x1a, 0x1a, 0x1a)
+                        r.italic = True
+                        r.bold = is_bold
+            else:
+                run = paragraph.add_run(inner)
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(base_font_size)
+                run.font.color.rgb = RGBColor(0x1a, 0x1a, 0x1a)
+                run.italic = True
+                run.bold = is_bold
         elif part.startswith('`') and part.endswith('`'):
-            run.text = part[1:-1]
+            run = paragraph.add_run(part[1:-1])
             run.font.name = 'Courier New'
             run.font.size = Pt(base_font_size - 0.5)
             run.font.color.rgb = RGBColor(0x0f, 0x17, 0x2a)
+            if is_bold:
+                run.bold = True
         elif part.startswith('$') and part.endswith('$'):
-            # Math formatting
-            run.text = part[1:-1]
-            run.font.name = 'Cambria Math'
-            run.italic = True
+            add_math_runs(paragraph, part[1:-1], base_font_size=base_font_size, is_bold=is_bold)
         else:
-            run.text = part
+            run = paragraph.add_run(part)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(base_font_size)
+            run.font.color.rgb = RGBColor(0x1a, 0x1a, 0x1a)
             run.bold = is_bold
             run.italic = is_italic
+
+
 
 def convert_md_to_docx(md_path, docx_path):
     doc = Document()
@@ -185,12 +358,13 @@ def convert_md_to_docx(md_path, docx_path):
                 caption = img_match.group(1)
                 img_path = img_match.group(2)
                 # Map SVG to generated PNG
+                fig_dir = os.path.join(os.path.dirname(md_path), 'figures')
                 if 'pipeline_architecture' in img_path:
-                    png_path = '/Users/engtitya/Desktop/kwiz/papers/figures/pipeline_architecture.png'
+                    png_path = os.path.join(fig_dir, 'pipeline_architecture.png')
                 elif 'cache_decision_flow' in img_path:
-                    png_path = '/Users/engtitya/Desktop/kwiz/papers/figures/cache_decision_flow.png'
+                    png_path = os.path.join(fig_dir, 'cache_decision_flow.png')
                 else:
-                    png_path = os.path.join('/Users/engtitya/Desktop/kwiz/papers', img_path)
+                    png_path = os.path.join(fig_dir, os.path.basename(img_path))
                 
                 if os.path.exists(png_path):
                     p_img = doc.add_paragraph()
@@ -234,10 +408,7 @@ def convert_md_to_docx(md_path, docx_path):
             p_math.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p_math.paragraph_format.space_before = Pt(6)
             p_math.paragraph_format.space_after = Pt(6)
-            run = p_math.add_run(stripped[2:-2].strip())
-            run.font.name = 'Cambria Math'
-            run.font.size = Pt(11)
-            run.italic = True
+            add_math_runs(p_math, stripped[2:-2].strip(), base_font_size=11)
             i += 1
             continue
 
@@ -339,6 +510,7 @@ def convert_md_to_docx(md_path, docx_path):
     print(f"Generated {docx_path} ({os.path.getsize(docx_path)} bytes)")
 
 if __name__ == '__main__':
-    md_file = '/Users/engtitya/Desktop/kwiz/papers/paper.md'
-    docx_file = '/Users/engtitya/Desktop/kwiz/papers/paper.docx'
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    md_file = os.path.join(base_dir, 'papers', 'paper.md')
+    docx_file = os.path.join(base_dir, 'papers', 'paper.docx')
     convert_md_to_docx(md_file, docx_file)
