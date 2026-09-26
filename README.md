@@ -1,139 +1,56 @@
-# KwizRAG — AI-Enhanced Gamified Moodle Quiz System
+# Kwiz: Toward Efficient Course-Grounded Programming MCQ Generation
 
-**KwizRAG** is a local RAG-powered, gamified assessment system integrated with Moodle (`mod_gamifiedquiz`). It combines on-premise AI question generation (`qwen2.5-coder:7b` + `nomic-embed-text` vector caching) with real-time multiplayer gamification (Socket.IO + Redis).
+This repository contains the software and research evaluation artifacts for **Kwiz**, an end-to-end self-hosted RAG pipeline integrated into Moodle (`mod_gamifiedquiz`).
 
-## 🏗️ Project Structure
+The repository is organized into two primary directories:
 
 ```
-jica/
-├── moodle-plugin/          # Moodle PHP plugin
-├── websocket-server/       # Node.js real-time server
-├── llmapi/                 # LLM adapter service (Python/Flask)
-├── docker/                 # Docker Compose and configurations
-├── docs/                   # Documentation
-└── evaluate/               # Research evaluation (metrics, SUS, JMeter, classroom)
+kwiz/
+├── kwiz/                 # 🚀 PRODUCTION & DEPLOYMENT (Install plugin, Docker backend, WebSocket)
+└── experiment/           # 🔬 RESEARCH & BENCHMARKS (Reproduce E1-E4, paper drafts, datasets)
 ```
-
-## 📄 Research Paper & Publication
-
-This repository contains the full draft and reproducible evaluation code for our research paper:
-
-*   **Research Paper Draft**: [papers/paper.md](papers/paper.md) — *Toward Efficient Course-Grounded Programming MCQ Generation: An End-to-End Self-Hosted RAG Pipeline for Moodle*
-*   **Academic References & BibTeX**: [references.md](references.md) — Citations for RAG, Cosine Similarity, SHA-256 caching, and SUS metrics.
-*   **System Documentation**: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — System features and architecture.
-
-## 🚀 Quick Start (Docker)
-
-1. **Clone and setup:**
-   ```bash
-   git clone <repository-url>
-   cd kwiz
-   cp docker/env.template docker/.env
-   # Edit docker/.env with your settings
-   ```
-
-2. **Start all services:**
-   ```bash
-   docker compose up -d
-   ```
-
-3. **Access services:**
-   - Moodle: `http://localhost:8080`
-   - WebSocket Server: `ws://localhost:3001`
-   - LLM API: `http://localhost:5001`
-   - Redis: `localhost:6379`
-
-4. **View logs:**
-   ```bash
-   docker-compose logs -f
-   ```
-
-5. **Initialize Moodle:**
-   - Open http://localhost:8080
-   - Complete installation wizard
-   - Configure plugin settings (see [QUICKSTART.md](QUICKSTART.md))
-
-## 📚 Documentation
-
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [Installation Guide](docs/INSTALLATION.md)
-- [Development Guide](docs/DEVELOPMENT.md)
-- [API Documentation](docs/API.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-
-## 🔧 Services
-
-### 1. Moodle Plugin (`moodle-plugin/`)
-- PHP-based Moodle activity plugin
-- Teacher dashboard for quiz sessions
-- Student interface for participation
-- JWT token generation for WebSocket auth
-
-### 2. WebSocket Server (`websocket-server/`)
-- Real-time communication hub
-- Room/session management
-- Leaderboard updates
-- Timer synchronization
-
-### 3. LLM API (`llmapi/`)
-- Question generation service
-- Supports multiple LLM backends
-- Structured MCQ output
-- Multi-language support (English, Khmer)
-
-## 🐳 Docker Services
-
-All services are containerized:
-- `moodle-plugin`: Moodle with plugin installed
-- `websocket-server`: Node.js Socket.IO server
-- `llmapi`: Python Flask API
-- `redis`: Caching and pub/sub
-- `mysql`: Database (Moodle)
-
-## 📋 Development Workflow
-
-1. **Local Development:**
-   - Each service can run independently
-   - Use `docker-compose.dev.yml` for development
-   - Hot-reload enabled for Node.js and Python
-
-2. **Testing:**
-   - Unit tests in each service
-   - Integration tests in `tests/`
-   - Load testing with k6/Artillery
-
-3. **Deployment:**
-   - Production Docker Compose
-   - Kubernetes manifests (optional)
-   - CI/CD with GitHub Actions
-
-## 🔐 Security
-
-- JWT authentication for WebSocket
-- HTTPS/WSS in production
-- Rate limiting on APIs
-- Input sanitization
-- Environment-based secrets
-
-## 📊 Monitoring
-
-- Prometheus metrics (optional)
-- Application logs via Docker
-- Health check endpoints
-
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
-
-## 📄 License
-
-GPL v3 (Moodle plugin compatibility)
-
-## 📞 Support
-
-For issues and questions, please open a GitHub issue.
 
 ---
 
-**Project Timeline:** Oct 2025 - Sep 2026  
-**Status:** Development Phase
+## 1. 🚀 `kwiz/` — Production Deployment & Moodle Plugin
+
+If you are an **instructor, system administrator, or developer** wanting to use Kwiz:
+
+👉 **[Go to the `kwiz/` Directory](kwiz/)**
+
+* **Moodle Activity Plugin** (`kwiz/moodle-plugin/mod/gamifiedquiz`): Ready to install into Moodle.
+* **One-Command Docker Deployment** (`kwiz/docker-compose.yml`):
+  ```bash
+  cd kwiz
+  cp .env.example .env
+  docker compose up -d
+  ```
+* **Services Launched**:
+  * Python LLM & AST Validation API (`http://localhost:5001`) with automatic PDF/PPTX/DOCX extraction.
+  * Real-Time Multiplayer WebSocket Server (`http://localhost:3001`).
+  * Bundled Moodle LMS with plugin pre-mounted (`http://localhost:8080`).
+  * MySQL 8.0 & Redis 7.
+* **Moodle Connection Instructions**: How to configure Moodle Site Administration to connect to the Docker container by IP and port.
+
+---
+
+## 2. 🔬 `experiment/` — Research Evaluation & Paper Reproduction
+
+If you are a **peer reviewer or researcher** seeking to inspect the methodology or reproduce benchmark results:
+
+👉 **[Go to the `experiment/` Directory](experiment/)**
+
+* **Research Paper Drafts**:
+  * Markdown: [`experiment/papers/paper.md`](experiment/papers/paper.md)
+  * Microsoft Word: [`experiment/papers/paper.docx`](experiment/papers/paper.docx)
+* **Empirical Benchmarks (E1 – E4)**:
+  * **E1**: Quality & Inter-Rater Agreement (`evaluate/e1_expert_validation/`) — 100 questions, Fleiss' $\kappa$, ICC.
+  * **E2**: Pipeline Component Ablation (`evaluate/e2_pipeline_ablation/`) — Config A, B, C, D latencies.
+  * **E3**: Corpus Scaling & Incremental Indexing (`evaluate/e3_corpus_scale/`) — 10k–250k token caching speedups.
+  * **E4**: Single-GPU Concurrency Stress-Test (`evaluate/e4_concurrent_generation/`) — Multi-instructor envelopes.
+* **Authentic Course Datasets**: 6 university Python slide decks (PDF, PPTX) and extracted text corpora in `experiment/data/`.
+* **Automated Runner**:
+  ```bash
+  cd experiment
+  bash run_real_nvidia_experiments.sh
+  ```
