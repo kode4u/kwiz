@@ -133,59 +133,64 @@
             return userDetailsCache;
         }
 
-        // Initialize Socket.IO connection (declare at function scope)
+        // Initialize Socket.IO connection (optional; only needed for live multiplayer quiz)
         let socket = null;
         
         try {
-            if (typeof io === 'undefined') {
-                console.error('Socket.IO not loaded. Please check if the library is available.');
-                // Show error message
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger gq-container';
-                errorDiv.style.cssText = 'background: #f8d7da; border: 1px solid #dc3545; color: #721c24; margin: 10px;';
-                errorDiv.textContent = 'WebSocket library not loaded. Please refresh the page.';
-                const container = document.querySelector('.gamifiedquiz-container') || document.body;
-                container.insertBefore(errorDiv, container.firstChild);
+            if (!config.wsUrl) {
+                console.log('Gamified Quiz: WebSocket URL not configured. Live multiplayer disabled; running in standalone AI Question Generation mode.');
+            } else if (typeof io === 'undefined') {
+                console.warn('Gamified Quiz: Socket.IO library not loaded. Live multiplayer disabled.');
             } else {
                 socket = io(config.wsUrl, {
-        auth: {
-            token: config.jwtToken
-        },
-                transports: ['websocket', 'polling'],
-                reconnection: true,
-                reconnectionDelay: 1000,
-                reconnectionAttempts: 5
-    });
+                    auth: {
+                        token: config.jwtToken
+                    },
+                    transports: ['websocket', 'polling'],
+                    reconnection: true,
+                    reconnectionDelay: 1000,
+                    reconnectionAttempts: 5
+                });
 
-    // Connection handlers
-    socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
-    });
+                // Connection handlers
+                socket.on('connect', () => {
+                    console.log('Connected to WebSocket server');
+                });
 
-    socket.on('disconnect', () => {
-        console.log('Disconnected from WebSocket server');
-    });
+                socket.on('disconnect', () => {
+                    console.log('Disconnected from WebSocket server');
+                });
 
-            socket.on('connect_error', (error) => {
-                console.error('WebSocket connection error:', error);
-                if (config.role === 'teacher') {
-                    const status = document.getElementById('session-status');
-                    if (status) {
-                        status.style.display = 'block';
-                        status.textContent = 'Warning: WebSocket connection failed. Some features may not work.';
-                        status.style.background = '#fff3cd';
-                        status.style.borderColor = '#ffc107';
+                socket.on('connect_error', (error) => {
+                    console.error('WebSocket connection error:', error);
+                    if (config.role === 'teacher') {
+                        const status = document.getElementById('session-status');
+                        if (status) {
+                            status.style.display = 'block';
+                            status.textContent = 'Warning: WebSocket connection failed. Live multiplayer disabled.';
+                            status.style.background = '#fff3cd';
+                            status.style.borderColor = '#ffc107';
+                        }
                     }
-                }
-    });
+                });
 
-    socket.on('error', (error) => {
-        console.error('WebSocket error:', error);
-    });
+                socket.on('error', (error) => {
+                    console.error('WebSocket error:', error);
+                });
             }
         } catch (error) {
             console.error('Error initializing Socket.IO:', error);
             socket = null;
+        }
+        
+        // Fallback safe no-op socket for standalone AI Question Generation mode
+        if (!socket) {
+            socket = {
+                on: function() {},
+                emit: function() {},
+                off: function() {},
+                connected: false
+            };
         }
         
         // Make socket available globally for this module

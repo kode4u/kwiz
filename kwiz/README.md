@@ -97,10 +97,34 @@ Once the plugin is installed in Moodle:
      * If Moodle and Docker run on the same machine: `http://localhost:5001`
      * If Moodle is inside the Docker compose network: `http://llmapi:5001`
      * If Moodle is on a different server: `http://<DOCKER_SERVER_IP>:5001`
-   * **WebSocket URL**:
-     * `http://<DOCKER_SERVER_IP>:3001` (or `ws://<DOCKER_SERVER_IP>:3001`)
+   * **WebSocket URL**: *(Optional)*
+     * If you want live multiplayer quiz games: `http://<DOCKER_SERVER_IP>:3001` (or `ws://<DOCKER_SERVER_IP>:3001`).
+     * **If you only want AI Question Generation**: **Leave this blank!** The system runs smoothly in standalone AI mode with zero WebSocket dependencies or warnings.
    * **Default LLM Backend**: Select `local` (Ollama).
 4. Click **Save changes**.
+
+---
+
+## 🔒 Single-Port Internal Deployment (Expose Only 1 IP:Port)
+
+If you want everything to run internally in Docker and expose **only one single IP:port**, this is fully supported and recommended:
+
+### Setup 1: Bundled Moodle in Docker (Only Expose Port 8080 or 80)
+When running everything in Docker:
+* Moodle talks to the LLM API via internal Docker DNS: `http://llmapi:5001`.
+* Moodle talks to MySQL on internal port `db:3306`.
+* **Exposed Port**: You only open **Port `8080` (or `80`)** for Moodle to the outside world!
+* In `docker-compose.yml`, ports `3307`, `6380`, `5001`, and `3001` do not need to be mapped to the host firewall at all.
+
+### Setup 2: Connecting an Existing External Moodle to Docker (Only Expose Port 5001)
+If your university already has a Moodle server and Docker only runs the AI engine:
+* Run only the `llmapi` container on your GPU host.
+* **Exposed Port**: You only open **Port `5001`** (`http://<GPU_SERVER_IP>:5001`).
+* In your Moodle settings:
+  * **LLM API URL**: `http://<GPU_SERVER_IP>:5001`
+  * **WebSocket URL**: *Leave blank*
+* You do **not** need WebSocket, Redis, or MySQL running on the GPU host. Just one container and one single port!
+
 
 ---
 

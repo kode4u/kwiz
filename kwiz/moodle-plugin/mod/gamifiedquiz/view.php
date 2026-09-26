@@ -37,11 +37,10 @@ $role = $is_teacher ? 'teacher' : 'student';
 $session_id = 'session_' . $gamifiedquiz->id . '_' . $cm->id;
 $jwt_token = gamifiedquiz_generate_jwt($USER->id, $session_id, $role);
 
-// Get WebSocket URL
+// Get WebSocket URL (optional, only needed for live multiplayer quiz)
 $ws_url = get_config('mod_gamifiedquiz', 'websocket_url');
-if (empty($ws_url)) {
-    $ws_url = 'ws://localhost:3001';
-}
+$ws_url = !empty($ws_url) ? trim($ws_url) : '';
+
 
 $PAGE->set_url('/mod/gamifiedquiz/view.php', array('id' => $cm->id));
 $PAGE->set_title($gamifiedquiz->name);
