@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Executive Compendium of Related Literature</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #1e293b;
+            background-color: #ffffff;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 18pt;
+            color: #0f172a;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 10.5pt;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+        h2 {
+            font-size: 12pt;
+            color: #1e3a8a;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-left: 4px solid #2563eb;
+            padding-left: 10px;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+        h3 {
+            font-size: 11pt;
+            color: #0f172a;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+        blockquote {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            margin: 10px 0;
+            padding: 8px 14px;
+            font-size: 9.5pt;
+            color: #14532d;
+            border-radius: 4px;
+        }
+        ul {
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-family: Menlo, Monaco, Consolas, monospace;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e2e8f0;
+            margin: 18px 0;
+        }
+        .card {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Executive Compendium of Related Literature</h1>
+<h2>An Annotated Guide to Key References for Course-Grounded Assessment Generation in Moodle</h2>
+<p><strong>Companion Research Dossier for Manuscript Submission to <em>Education and Information Technologies</em> (EAIT)</strong></p>
+<hr />
+<h3>Executive Overview</h3>
+<p>This compendium synthesizes the <strong>19 core foundational and contemporary research works</strong> informing the architecture, empirical methodology, and systems evaluation of our self-hosted RAG assessment pipeline for Moodle (<strong>Kwiz</strong>). </p>
+<p>For rapid manual reading and verification, each entry below provides:<br />
+1. <strong>Bibliographic Metadata &amp; Local PDF Filename</strong> in <code>experiment/papers/reference_pdfs/</code><br />
+2. <strong>Core Research Objective &amp; Methodology</strong><br />
+3. <strong>Key Findings &amp; Quantitative Benchmarks</strong><br />
+4. <strong>Direct Relevance to Our Manuscript</strong> (what gap it left, how our work compares, and why it is cited)<br />
+5. <strong>1-Minute Quick-Scan Takeaway</strong></p>
+<hr />
+<h2>[1] Automatic Multiple-Choice Question Generation and Evaluation Systems Based on LLM: A Study Case with University Resolutions</h2>
+<ul>
+<li><strong>Authors:</strong> S. S. Mucciaccia, T. M. Paixão, F. W. Mutz, C. S. Badue, A. F. de Souza, &amp; T. Oliveira-Santos</li>
+<li><strong>Venue &amp; Year:</strong> Proceedings of the 31st International Conference on Computational Linguistics (COLING 2025), pp. 2246–2260</li>
+<li><strong>Category:</strong> <code>MCQ Generation &amp; Evaluation</code></li>
+<li><strong>Associated File:</strong> <code>mucciaccia_2025_mcq_coling.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Proves LLM-based MCQ generation is pedagogically feasible for institutional texts, but highlights the necessity of deterministic verification and grounding.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To investigate automated multiple-choice question generation and multi-dimensional LLM evaluation systems grounded in institutional regulatory documents (university resolutions).</li>
+<li><strong>Methodology &amp; Architecture:</strong> Constructed an automated question generation pipeline using large language models conditioned on official administrative texts. Employed automated LLM evaluators to score questions across factual consistency, relevance, and distractor plausibility.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Demonstrated that instruction-tuned LLMs can reliably generate multiple-choice questions from institutional corpora, but naive generation frequently introduces subtle distractor ambiguities or hallucinations without strict grounding constraints.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Directly cited in Section 1 and Section 2.1 as foundational precedent establishing LLM-based MCQ generation. We extend Mucciaccia et al. by shifting from administrative university texts to programming-specific code generation with deterministic Python AST syntax compilation and Moodle Question Bank integration.</li>
+</ul>
+<hr />
+<h2>[2] Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</h2>
+<ul>
+<li><strong>Authors:</strong> Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, &amp; Douwe Kiela</li>
+<li><strong>Venue &amp; Year:</strong> Advances in Neural Information Processing Systems (NeurIPS 2020), 33, 9459–9474</li>
+<li><strong>Category:</strong> <code>Foundational RAG Architecture</code></li>
+<li><strong>Associated File:</strong> <code>lewis_2020_rag.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+The seminal paper establishing that external retrieval dramatically reduces hallucination in generative language models.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To develop a general-purpose hybrid architecture that combines parametric memory (pre-trained seq2seq models) with non-parametric memory (dense vector index of Wikipedia) for knowledge-intensive generation tasks.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Proposed RAG-Sequence and RAG-Token models using a dense passage retriever (DPR) coupled with a BART generator, fine-tuning retrieval and generation end-to-end.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> RAG models achieved state-of-the-art results on open-domain question answering (Natural Questions, TriviaQA), substantially reducing factual hallucinations compared to purely parametric models.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Foundational citation in Section 1 and Section 2.1. Our architecture adapts Lewis et al.'s retrieval-augmented paradigm specifically for educational courseware, using local dense retrieval (<code>nomic-embed-text</code>) to ground programming questions in instructor-uploaded slides.</li>
+</ul>
+<hr />
+<h2>[3] Retrieval-Augmented Generation for Educational Application: A Systematic Survey</h2>
+<ul>
+<li><strong>Authors:</strong> Z. Li, Z. Wang, W. Wang, K. Hung, H. Xie, &amp; F. L. Wang</li>
+<li><strong>Venue &amp; Year:</strong> Computers and Education: Artificial Intelligence (2025), 8, 100417</li>
+<li><strong>Category:</strong> <code>Educational RAG Survey</code></li>
+<li><strong>Associated File:</strong> <code>li_2025_educational_rag_survey.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Highlights that computational cost and dynamic knowledge updating are the primary barriers to deploying educational RAG.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To systematically survey the emerging landscape of retrieval-augmented generation applications across educational contexts, identifying pedagogical opportunities, technical architectures, and open challenges.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Systematic literature review covering interactive learning companions, automated assessment systems, content curation pipelines, and institutional tutoring platforms across K-12 and higher education.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Identified knowledge-base updating latency, computational resource constraints in educational institutions, and curricular hallucinations as the three foremost technical bottlenecks impeding widespread RAG adoption in schools and universities.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Key motivating literature in Section 1, Section 2.1, and Section 2.5. Our Kwiz paper directly resolves the exact challenges identified by Li et al. by proposing incremental SHA-256 chunk caching and a single-GPU self-hosted architecture for Moodle.</li>
+</ul>
+<hr />
+<h2>[4] Retrieval-Augmented Generation for Multiple-Choice Questions and Answers Generation</h2>
+<ul>
+<li><strong>Authors:</strong> N. Pradeesh, T. Remya, M. G. Thushara, K. A. Krishna, &amp; V. Pranav</li>
+<li><strong>Venue &amp; Year:</strong> Procedia Computer Science (2025), 259, 504–511</li>
+<li><strong>Category:</strong> <code>LMS Question Generation</code></li>
+<li><strong>Associated File:</strong> <code>Reference [4] (Procedia Computer Science)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Validates PDF-to-quiz generation in an LMS, establishing the baseline workflow that Kwiz optimizes.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To investigate automated multiple-choice question generation from PDF course resources and integrate question delivery within the Ample Learning Management System.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Extracted text from lecture PDFs, chunked content into passages, embedded text into a vector database, and prompted an LLM to generate questions and corresponding options.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Confirmed that grounding generation on PDF textbooks significantly improves topical alignment, but full re-indexing of course documents upon each upload introduces noticeable server delays.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 1 and Section 2.2 to demonstrate that LMS-integrated RAG question generation has precedent. We advance beyond Pradeesh et al. by introducing incremental content-hash caching, programming code execution validation, and native Moodle Question Bank persistence.</li>
+</ul>
+<hr />
+<h2>[5] Leveraging Large Language Models to Generate Course-Specific Semantically Annotated Learning Objects</h2>
+<ul>
+<li><strong>Authors:</strong> D. Lohr, M. Berges, A. Chugh, M. Kohlhase, &amp; D. Müller</li>
+<li><strong>Venue &amp; Year:</strong> Journal of Computer Assisted Learning (2025), 41(1), e13101</li>
+<li><strong>Category:</strong> <code>Computer Science Education</code></li>
+<li><strong>Associated File:</strong> <code>Reference [5] (JCAL Wiley)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Shows that automated CS question generation still needs human instructor oversight, justifying our asynchronous Moodle staging design.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To evaluate the feasibility and quality of LLM-generated computer science assessment objects grounded in university course materials.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Evaluated generated programming learning objects using computer science education faculty raters across multiple cognitive complexity levels.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Found that while LLMs generate syntactically plausible items, approximately 15–25% of generated computer science questions still require manual human intervention due to subtle conceptual errors or misaligned distractors.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Directly cited in Section 1, Section 2.2, and Section 3.4. Lohr et al.'s finding that expert intervention remains necessary directly motivated our asynchronous human-in-the-loop workflow: generated items are staged in Moodle for instructor review rather than published directly to active student quizzes.</li>
+</ul>
+<hr />
+<h2>[6] Enhancing RAG-Based MCQ Generation for Java Programming Education: A Modular Evaluation of Chunking, Retrieval and LLM Performance</h2>
+<ul>
+<li><strong>Authors:</strong> E. Olibo</li>
+<li><strong>Venue &amp; Year:</strong> Bachelor's Thesis, Kristianstad University (2025)</li>
+<li><strong>Category:</strong> <code>Programming-Specific RAG</code></li>
+<li><strong>Associated File:</strong> <code>Reference [6] (Kristianstad DiVA)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Confirms code-specialized LLMs outperform general LLMs for programming MCQs, justifying our selection of Qwen2.5-Coder.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To conduct an extensive modular evaluation comparing various text chunking strategies, vector retrieval top-K configurations, and instruction-tuned LLMs for generating Java programming MCQs.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Benchmarked multiple embedding models and open-weight LLMs across diverse chunking sizes (256, 512, 1024 tokens) and evaluated question quality across syntax, distractors, and difficulty.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Demonstrated that programming MCQ generation requires specialized instruction-tuned code models (such as Qwen-Coder or CodeLlama) and that bounded context windows prevent retrieval noise from corrupting code syntax.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 2.2 as closely related domain work. Because Olibo thoroughly explored hyperparameter sweeps for Java, our study fixes a single optimal deployment configuration (<code>Qwen2.5-Coder-7B-Instruct</code> + <code>nomic-embed-text</code>) and investigates operational systems metrics: latency, caching, and concurrency.</li>
+</ul>
+<hr />
+<h2>[7] Self-Hosted Lecture-to-Quiz: Local LLM MCQ Generation with Deterministic Quality Control</h2>
+<ul>
+<li><strong>Authors:</strong> S. A. Shintani</li>
+<li><strong>Venue &amp; Year:</strong> arXiv preprint arXiv:2603.08729 (2026)</li>
+<li><strong>Category:</strong> <code>Self-Hosted Assessment Tool</code></li>
+<li><strong>Associated File:</strong> <code>Reference [7] (arXiv:2603.08729)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Demonstrated local, self-hosted question generation is feasible, but lacked vector retrieval, incremental caching, and LMS database integration.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To develop an API-free, self-hosted lecture-to-quiz authoring tool that runs locally on commodity hardware with deterministic quality verification.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Fed raw lecture slide transcripts directly into a locally hosted LLM without vector retrieval, applying heuristic rule-based checks and exporting questions as static Google Forms CSV files.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Demonstrated that local inference avoids recurring commercial API costs and protects institutional privacy. However, feeding entire lectures directly into the prompt without retrieval causes severe context token bloat and limits scalability.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 1 and Section 2.3. Kwiz improves upon Shintani's architecture by: (1) incorporating dense vector retrieval (RAG) rather than injecting full slides, (2) adding SHA-256 incremental embedding reuse, (3) validating code via Python AST, and (4) integrating dynamically into Moodle's relational database instead of static CSV exports.</li>
+</ul>
+<hr />
+<h2>[8] A Course-Specific Agentic RAG Chatbot for IT Student Support: Architecture, Local Deployment, and Preliminary Evaluation</h2>
+<ul>
+<li><strong>Authors:</strong> H. V. Tran, P. V. Nguyen, T. T. N. Vu, H. P. Luong, &amp; D.-N. Le</li>
+<li><strong>Venue &amp; Year:</strong> Next-Generation Computing Systems and Technologies (2026), 2(2), 21–34</li>
+<li><strong>Category:</strong> <code>On-Premise University RAG</code></li>
+<li><strong>Associated File:</strong> <code>Reference [8] (NGCST 2026)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Confirms on-premise university RAG satisfies privacy and compliance, but underscores the need for hardware-efficient inference.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To design, deploy, and evaluate an on-premise agentic RAG chatbot for course-specific IT student tutoring at Hai Phong University.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Deployed an open-weight language model on a local institutional server, indexing syllabus and lecture documents to support student Q&amp;A interactions.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Proved that local institutional deployments effectively resolve student data privacy concerns and institutional compliance mandates, but identified high server response latency during peak student usage hours.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 2.3. While Tran et al. focused on conversational student Q&amp;A, our study focuses on instructor-facing structured assessment generation, deterministic schema compilation, and concurrent batch generation.</li>
+</ul>
+<hr />
+<h2>[9] Towards Sustainable AI Knowledge-Base Assistants in Computer Science Education: On-Premise Deployment and Optimization with Open Educational Resources</h2>
+<ul>
+<li><strong>Authors:</strong> X. Shen, L. Feng, S. Hua, D. Liu, Z. Xie, &amp; B. Liu</li>
+<li><strong>Venue &amp; Year:</strong> Frontiers in Psychology (2026), 17, 1843444</li>
+<li><strong>Category:</strong> <code>Sustainable On-Premise AI</code></li>
+<li><strong>Associated File:</strong> <code>shen_2026_sustainable_ai_assistant.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Validates that a single 24 GB consumer GPU (RTX 3090) is the optimal, sustainable hardware sweet spot for university AI deployment.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To evaluate the sustainability, financial feasibility, and operational envelope of deploying local LLM assistants using consumer-grade GPUs in computer science education.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Deployed open-source models on consumer-grade NVIDIA graphics cards (RTX 3090/4090), measuring power consumption, VRAM occupancy, and response turnaround across open educational resource (OER) corpora.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Showed that a single 24 GB GPU can sustainably host 7B–14B quantized models for educational workloads, eliminating cloud subscription fees while maintaining acceptable response times under low-to-moderate concurrency.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Directly cited in Section 1 and Section 2.3. Shen et al. validate our hardware constraint (a single dedicated RTX 3090 host). We build on their systems analysis by evaluating an assessment authoring pipeline with incremental caching and multi-request instructor load testing.</li>
+</ul>
+<hr />
+<h2>[10] CacheBlend: Fast Large Language Model Serving for RAG with Cached Knowledge Fusion</h2>
+<ul>
+<li><strong>Authors:</strong> J. Yao, H. Li, Y. Liu, S. Ray, Y. Cheng, Q. Zhang, K. Du, S. Lu, &amp; J. Jiang</li>
+<li><strong>Venue &amp; Year:</strong> Proceedings of the Twentieth European Conference on Computer Systems (EuroSys '25), pp. 94–109</li>
+<li><strong>Category:</strong> <code>Inference KV-Cache Optimization</code></li>
+<li><strong>Associated File:</strong> <code>yao_2025_cacheblend.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Demonstrates that caching intermediate representations in RAG prevents GPU bottlenecks, reinforcing our pipeline caching philosophy.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To eliminate the redundant prompt prefill computation in RAG systems by dynamically reusing and fusing precomputed Key-Value (KV) cache states of retrieved document chunks.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Developed CacheBlend, an inference-engine extension that selectively merges KV-cache activations of retrieved chunks, reducing prompt token prefill overhead on GPU memory.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Achieved 2.3× to 4.7× speedup in Time-to-First-Token (TTFT) and significantly reduced prefill compute for long-context RAG pipelines.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 2.4 and Section 6.3. We distinguish our work from CacheBlend: whereas CacheBlend operates at the GPU inference layer (KV-cache fusion), Kwiz operates earlier in the pipeline (content hashing and embedding reuse during courseware indexing). We identify KV-cache fusion as the primary scaling path for future sub-second generation.</li>
+</ul>
+<hr />
+<h2>[11] TurboRAG: Accelerating Retrieval-Augmented Generation with Precomputed KV Caches for Chunked Text</h2>
+<ul>
+<li><strong>Authors:</strong> S. Lu, H. Wang, Y. Rong, Z. Chen, &amp; Y. Tang</li>
+<li><strong>Venue &amp; Year:</strong> Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP 2025), pp. 6588–6601</li>
+<li><strong>Category:</strong> <code>RAG Acceleration &amp; KV-Cache</code></li>
+<li><strong>Associated File:</strong> <code>lu_2025_turborag.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Proves that avoiding repeated text encoding is the key to high-throughput RAG systems.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To accelerate RAG response generation by offline precomputing and caching Key-Value states for static knowledge base chunks.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Pre-processes text chunks through LLM attention layers offline and stores KV tensors, retrieving and concatenating KV representations at query time to bypass token prefill.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> TurboRAG reduced prompt processing latency by up to 80% with minimal degradation in generation accuracy.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 2.4 and Section 6.3 alongside CacheBlend. We cite TurboRAG to contextualize where caching occurs in modern RAG literature and clarify that Kwiz's contribution lies in workload-level courseware lifecycle reuse rather than algorithmic KV-cache manipulation.</li>
+</ul>
+<hr />
+<h2>[12] Developing a Computer-Based Tutor Utilizing Generative Artificial Intelligence (GAI) and Retrieval-Augmented Generation (RAG)</h2>
+<ul>
+<li><strong>Authors:</strong> Youngjin Lee</li>
+<li><strong>Venue &amp; Year:</strong> Education and Information Technologies (EAIT 2025), 30(6), 7841–7862</li>
+<li><strong>Category:</strong> <code>EAIT Journal Precedent</code></li>
+<li><strong>Associated File:</strong> <code>Reference [14] (EAIT Springer)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Direct EAIT precedent confirming that RAG is essential for curriculum grounding and eliminating AI inaccuracies in higher education.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To design, implement, and evaluate an intelligent computer-based tutor utilizing generative AI and RAG to support personalized statistics education while curbing hallucinations.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Integrated external textbook and curriculum resources into a RAG framework, evaluating student interaction logs, conceptual learning gains, and factual response accuracy.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Demonstrated that grounding LLM responses in curricular texts significantly enhances conceptual accuracy, mitigates hallucination, and fosters student trust in automated tutoring systems.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Crucial precedent published in EAIT (our target journal). Lee (2025) proves EAIT's active interest in educational RAG. Our work directly complements Lee by addressing the instructor-facing assessment authoring counterpart (generating verified questions for the LMS Question Bank).</li>
+</ul>
+<hr />
+<h2>[13] Qwen2.5-Coder Technical Report</h2>
+<ul>
+<li><strong>Authors:</strong> B. Hui, J. Yang, Z. Cui, X. Yang, D. Liu, L. Zhang, &amp; J. Lin</li>
+<li><strong>Venue &amp; Year:</strong> arXiv preprint arXiv:2409.12186 (2024)</li>
+<li><strong>Category:</strong> <code>Foundation Code LLM</code></li>
+<li><strong>Associated File:</strong> <code>hui_2024_qwen2.5_coder.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Establishes Qwen2.5-Coder-7B as the premier open-weight model for local code generation, making single-GPU hosting possible.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To report the architecture, pre-training corpus, instruction tuning, and code benchmark performance of the open-weight Qwen2.5-Coder series.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Pre-trained on 5.5 trillion tokens of code, mathematical reasoning, and technical text, followed by multi-stage instruction tuning and reinforcement learning from code execution feedback.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Qwen2.5-Coder-7B-Instruct matched or outperformed proprietary models (including GPT-4o-mini and Claude-3.5-Haiku) on Python code generation benchmarks (HumanEval: 88.4%, MBPP: 82.2%).</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 1, Section 3.3, and Section 4.8. Explains why we chose <code>Qwen2.5-Coder-7B-Instruct</code> as our production model: it provides state-of-the-art Python syntax accuracy while operating within the 24 GB VRAM envelope under 4-bit quantization (~4.7 GB).</li>
+</ul>
+<hr />
+<h2>[14] Nomic Embed: Training a Reproducible Long-Context Text Embedder</h2>
+<ul>
+<li><strong>Authors:</strong> Z. Nussbaum, J. X. Morris, B. Dinh, &amp; A. Mostern</li>
+<li><strong>Venue &amp; Year:</strong> arXiv preprint arXiv:2402.01613 (2024)</li>
+<li><strong>Category:</strong> <code>Dense Text Embeddings</code></li>
+<li><strong>Associated File:</strong> <code>nussbaum_2024_nomic_embed.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Validates nomic-embed-text as a high-accuracy, 8k-context open-weight embedding model for document retrieval.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To train and release a high-performance, fully reproducible, open-weight text embedding model with an extended context window (8,192 tokens).</li>
+<li><strong>Methodology &amp; Architecture:</strong> Multi-stage contrastive pre-training and fine-tuning on diverse text retrieval pairs, producing 768-dimensional dense vector embeddings optimized for sentence and paragraph similarity.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Achieved top-tier retrieval performance on the MTEB benchmark, outperforming OpenAI <code>text-embedding-ada-002</code> while supporting long-context document chunks.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 3.1 and Section 4.8. <code>nomic-embed-text</code> is the dedicated embedding backbone of Kwiz, enabling semantic retrieval over curriculum slide chunks with sub-millisecond similarity computation.</li>
+</ul>
+<hr />
+<h2>[15] Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</h2>
+<ul>
+<li><strong>Authors:</strong> L. Zheng, W.-L. Chiang, Y. Sheng, S. Zhuang, Z. Wu, Y. Zhuang, Z. Lin, Z. Li, D. Li, E. P. Xing, H. Zhang, J. E. Gonzalez, &amp; I. Stoica</li>
+<li><strong>Venue &amp; Year:</strong> Advances in Neural Information Processing Systems (NeurIPS 2023), 36, 46595–46623</li>
+<li><strong>Category:</strong> <code>Automated Evaluation Protocol</code></li>
+<li><strong>Associated File:</strong> <code>zheng_2023_judging_llm_as_a_judge.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+The benchmark study validating LLM-as-a-Judge as a scientifically rigorous evaluation methodology matching human agreement.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To examine whether frontier large language models (such as GPT-4) can act as automated, scalable, and reliable evaluators for natural language generation benchmarks.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Benchmarked LLM judge agreement against human expert consensus across pairwise and Likert evaluations on MT-Bench and Chatbot Arena, analyzing position bias, verbosity bias, and self-enhancement bias.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Demonstrated that strong frontier LLM judges achieve &gt;80% agreement with human experts, matching human-to-human inter-rater reliability levels.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Methodological foundation for Section 4.2. We adopted Zheng et al.'s LLM-as-a-Judge framework (deploying GPT-4o and Gemini 2.5 Flash as multi-evaluators) alongside calibrated human faculty grading to evaluate our 100-item MCQ corpus across five dimensions.</li>
+</ul>
+<hr />
+<h2>[16] Survey of Hallucination in Natural Language Generation</h2>
+<ul>
+<li><strong>Authors:</strong> Z. Ji, N. Lee, R. Frieske, T. Yu, D. Su, Y. Xu, E. Ishii, Y. J. Yeung, A. Del Luceno, &amp; P. Fung</li>
+<li><strong>Venue &amp; Year:</strong> ACM Computing Surveys (2023), 55(12), 1–38</li>
+<li><strong>Category:</strong> <code>Hallucination &amp; Grounding</code></li>
+<li><strong>Associated File:</strong> <code>ji_2023_hallucination_survey.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Comprehensive taxonomy defining intrinsic and extrinsic hallucination and establishing retrieval as the primary countermeasure.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To provide a comprehensive taxonomy, detection methodology, and mitigation survey of hallucinations in natural language generation.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Categorized hallucinations into intrinsic (conflicting with source evidence) and extrinsic (unverifiable from source text), surveying retrieval-based, decoding-based, and post-processing mitigation techniques.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Concluded that conditioning generation on retrieved evidence chunks and enforcing structured schema constraints are among the most effective mechanisms to curb factual fabrication.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 4.2 for our Context Groundedness (CG) evaluation rubric. Used to formally define factual hallucination against course slide chunks and justify our two-tier validation engine.</li>
+</ul>
+<hr />
+<h2>[17] Measuring Nominal Scale Agreement Among Many Raters &amp; Intraclass Correlation Coefficients for Reliability</h2>
+<ul>
+<li><strong>Authors:</strong> J. L. Fleiss (1971) &amp; T. K. Koo &amp; M. Y. Li (2016)</li>
+<li><strong>Venue &amp; Year:</strong> Psychological Bulletin (1971), 76(5), 378–382; Journal of Chiropractic Medicine (2016), 15(2), 155–163</li>
+<li><strong>Category:</strong> <code>Psychometrics &amp; Statistical Reliability</code></li>
+<li><strong>Associated File:</strong> <code>Reference [12] &amp; [13]</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+Provides the formal mathematical criteria and benchmark thresholds for our inter-rater reliability results.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To provide formal mathematical formulations and interpretation benchmarks for multi-rater agreement (Fleiss' kappa for categorical data) and intraclass correlation (ICC(2,k) for continuous ordinal ratings).</li>
+<li><strong>Methodology &amp; Architecture:</strong> Formulated statistical estimators that account for chance agreement across multi-judge evaluation panels.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Established standard interpretative thresholds: kappa 0.61–0.80 denotes substantial agreement; ICC 0.75–0.90 denotes good reliability, and &gt;0.90 denotes excellent reliability.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Methodological citations in Section 4.9 and Section 5.1. Guided our statistical analysis: our evaluation achieved Fleiss' kappa = 0.610 (substantial agreement) and ICC(2,k) = 0.764–0.981 across five dimensions.</li>
+</ul>
+<hr />
+<h2>[18] Moodle: Using Learning Communities to Create an Open Source Course Management System</h2>
+<ul>
+<li><strong>Authors:</strong> Martin Dougiamas &amp; Peter C. Taylor</li>
+<li><strong>Venue &amp; Year:</strong> Proceedings of the ED-MEDIA 2003 Conference, pp. 171–178</li>
+<li><strong>Category:</strong> <code>LMS Platform Architecture</code></li>
+<li><strong>Associated File:</strong> <code>Reference [19] (ED-MEDIA 2003)</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+The foundational paper defining Moodle's modular database architecture and Question Bank design.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To present the educational philosophy (social constructionist pedagogy), software architecture, and modular database schema of Moodle.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Documented the modular course architecture, relational question bank structures, and assessment slot management mechanisms in Moodle.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> Showed that a modular, open-source LMS architecture fosters collaborative learning, customizable workflows, and extensible database hooks for automated plugins.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 3.4 and Section 4.1. Kwiz directly integrates into Moodle's core relational database schema (<code>mdl_question</code>, <code>mdl_question_answers</code>, and <code>mdl_quiz_slots</code>), allowing generated programming MCQs to become persistent, native learning assets.</li>
+</ul>
+<hr />
+<h2>[19] Secure Hash Standard (SHS)</h2>
+<ul>
+<li><strong>Authors:</strong> National Institute of Standards and Technology (NIST)</li>
+<li><strong>Venue &amp; Year:</strong> Federal Information Processing Standards Publication (FIPS PUB 180-4, 2015)</li>
+<li><strong>Category:</strong> <code>Cryptographic Content Hashing</code></li>
+<li><strong>Associated File:</strong> <code>nist_2015_sha256_fips180-4.pdf</code> in <code>reference_pdfs/</code></li>
+</ul>
+<blockquote>
+<p><strong>1-Minute Quick-Scan Takeaway:</strong><br />
+The official standard for SHA-256, providing the cryptographic foundation for Kwiz's 549x cache speedup.</p>
+</blockquote>
+<ul>
+<li><strong>Core Research Objective:</strong> To specify secure hash algorithms (SHA-1, SHA-224, SHA-256, SHA-384, SHA-512) for computing a condensed representation of electronic data.</li>
+<li><strong>Methodology &amp; Architecture:</strong> Defined mathematical bitwise operations, padding constants, and compression functions guaranteeing collision resistance.</li>
+<li><strong>Key Findings &amp; Evidence:</strong> SHA-256 generates a deterministic 256-bit cryptographic message digest with negligible collision probability, making it the industry standard for content integrity verification.</li>
+<li><strong>Direct Relevance to Our Kwiz Paper:</strong> Cited in Section 3.1 and Section 4.5. Kwiz computes SHA-256 hashes for each normalized course chunk, using the hash as an immutable cache lookup key to detect unchanged syllabus content and bypass redundant embedding computation.</li>
+</ul>
+<hr />
+</body>
+</html>
