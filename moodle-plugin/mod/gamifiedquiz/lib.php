@@ -2436,8 +2436,19 @@ function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id 
             $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder', false);
             if ($files) {
                 foreach ($files as $file) {
-                    if (!$file->is_directory() && ($file->get_mimetype() === 'text/plain' || $file->get_mimetype() === 'text/html')) {
-                        $content .= $file->get_content() . "\n\n";
+                    if (!$file->is_directory()) {
+                        $mimetype = $file->get_mimetype();
+                        $filename = $file->get_filename();
+                        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+                        if ($mimetype === 'text/plain' || $mimetype === 'text/html' || in_array($ext, ['txt', 'md', 'html', 'htm'])) {
+                            $content .= $file->get_content() . "\n\n";
+                        } else if (in_array($ext, ['pdf', 'pptx', 'ppt', 'docx', 'doc'])) {
+                            $extracted = gamifiedquiz_extract_file_content_via_api($file);
+                            if (!empty($extracted)) {
+                                $content .= $extracted . "\n\n";
+                            }
+                        }
                     }
                 }
             }
@@ -2452,6 +2463,57 @@ function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id 
     
     return '';
 }
+
+/**
+ * Extract plain text from PDF, PPTX, or DOCX file via LLM API /extract_file endpoint.
+ *
+ * @param stored_file $file Moodle stored_file object
+ * @return string Extracted text
+ */
+function gamifiedquiz_extract_file_content_via_api($file) {
+    $api_url = get_config('mod_gamifiedquiz', 'llmapi_url');
+    if (empty($api_url)) {
+        $api_url = 'http://llmapi:5001';
+    }
+    if (strpos($api_url, 'localhost') !== false || strpos($api_url, '127.0.0.1') !== false) {
+        $api_url = str_replace(['localhost', '127.0.0.1'], 'llmapi', $api_url);
+    }
+
+    try {
+        $file_content = $file->get_content();
+        if (empty($file_content)) {
+            return '';
+        }
+
+        $payload = array(
+            'filename' => $file->get_filename(),
+            'file_content_base64' => base64_encode($file_content),
+        );
+
+        $ch = curl_init(rtrim($api_url, '/') . '/extract_file');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 90);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_code === 200 && !empty($response)) {
+            $data = json_decode($response, true);
+            if (!empty($data['success']) && !empty($data['text'])) {
+                return $data['text'];
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Gamified Quiz: File extraction error for " . $file->get_filename() . ": " . $e->getMessage());
+    }
+    return '';
+}
+
 
 /**
  * Get aggregated text content of all RAG-compatible modules in a section.

@@ -587,6 +587,11 @@ if ($is_teacher) {
     echo '    <select id="rag-subitem-select" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;"><option value="">-- All Subitems --</option></select>';
     echo '  </div>';
     echo '</div>';
+    echo '<div style="margin-bottom: 12px; padding: 10px; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 6px;">';
+    echo '  <label for="generate-file-upload" style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px;">📁 Or upload course material directly (PDF, PPTX, DOCX, TXT):</label>';
+    echo '  <input type="file" id="generate-file-upload" accept=".pdf,.pptx,.ppt,.docx,.doc,.txt,.md" style="font-size: 13px;">';
+    echo '  <div id="file-upload-status" style="font-size: 12px; color: #0284c7; margin-top: 4px; display: none;"></div>';
+    echo '</div>';
     echo '<label for="generate-lesson-content" style="display: block; margin-bottom: 5px; font-weight: bold;">Or paste custom lesson content: <span style="font-weight: normal; color: #666;">(' . get_string('optional', 'core') . ')</span></label>';
     echo '<textarea id="generate-lesson-content" name="lesson" rows="6" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;" placeholder="' . s(get_string('lesson_content_placeholder', 'mod_gamifiedquiz')) . '"></textarea>';
     echo '<p style="margin: 8px 0 0; font-size: 13px; color: #666;">' . get_string('lesson_content_help', 'mod_gamifiedquiz') . '</p>';

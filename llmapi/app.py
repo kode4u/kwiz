@@ -10,6 +10,8 @@ import time
 import threading
 import requests
 import hashlib
+import io
+import base64
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -1470,6 +1472,100 @@ def validate_question():
         'score': 0.85,
         'feedback': 'Question quality is good'
     }), 200
+
+
+def extract_text_from_file_bytes(file_bytes: bytes, filename: str) -> str:
+    """Extract plain text from PDF, PPTX, DOCX, or text files."""
+    ext = os.path.splitext(filename)[1].lower()
+    
+    if ext == '.pdf':
+        try:
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+            pages = []
+            for i, page in enumerate(reader.pages):
+                text = page.extract_text() or ""
+                if text.strip():
+                    pages.append(f"--- Page {i+1} ---\n{text.strip()}")
+            return "\n\n".join(pages)
+        except ImportError:
+            raise RuntimeError("pypdf is not installed. Please run 'pip install pypdf'.")
+            
+    elif ext in ('.pptx', '.ppt'):
+        try:
+            import pptx
+            prs = pptx.Presentation(io.BytesIO(file_bytes))
+            slides = []
+            for i, slide in enumerate(prs.slides):
+                slide_text = []
+                for shape in slide.shapes:
+                    if hasattr(shape, "text") and shape.text.strip():
+                        slide_text.append(shape.text.strip())
+                if slide_text:
+                    slides.append(f"--- Slide {i+1} ---\n" + "\n".join(slide_text))
+            return "\n\n".join(slides)
+        except ImportError:
+            raise RuntimeError("python-pptx is not installed. Please run 'pip install python-pptx'.")
+            
+    elif ext in ('.docx', '.doc'):
+        try:
+            import docx
+            doc = docx.Document(io.BytesIO(file_bytes))
+            paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+            return "\n\n".join(paragraphs)
+        except ImportError:
+            raise RuntimeError("python-docx is not installed. Please run 'pip install python-docx'.")
+            
+    else:
+        # Default plain text decode for .txt, .md, .py, .html, .json
+        return file_bytes.decode('utf-8', errors='replace')
+
+
+@app.route('/extract_file', methods=['POST'])
+def extract_file_endpoint():
+    """Extract text from uploaded PDF, PPTX, DOCX, or plain text course files."""
+    filename = "document"
+    try:
+        file_bytes = b""
+        
+        # 1. Check multipart/form-data upload
+        if 'file' in request.files:
+            uploaded_file = request.files['file']
+            filename = uploaded_file.filename or "uploaded_file"
+            file_bytes = uploaded_file.read()
+        # 2. Check JSON payload with base64 or file_path
+        elif request.is_json:
+            data = request.json or {}
+            filename = data.get('filename', 'document.txt')
+            if 'file_content_base64' in data:
+                file_bytes = base64.b64decode(data['file_content_base64'])
+            elif 'file_path' in data:
+                file_path = data['file_path']
+                if os.path.isfile(file_path):
+                    filename = os.path.basename(file_path)
+                    with open(file_path, 'rb') as f:
+                        file_bytes = f.read()
+                else:
+                    return jsonify({'success': False, 'error': f'File not found: {file_path}'}), 404
+        
+        if not file_bytes:
+            return jsonify({'success': False, 'error': 'No file received. Upload multipart file or provide JSON file_content_base64'}), 400
+            
+        extracted_text = extract_text_from_file_bytes(file_bytes, filename)
+        chars = len(extracted_text)
+        approx_tokens = int(chars / 4)
+        
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'text': extracted_text,
+            'characters': chars,
+            'approx_tokens': approx_tokens
+        }), 200
+    except Exception as e:
+        logger.error(f"Error extracting text from file {filename}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 # -------------------------------------------------------------------------

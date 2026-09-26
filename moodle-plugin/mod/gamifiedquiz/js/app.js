@@ -1625,6 +1625,46 @@
                     });
                 }
 
+                // Direct File upload extraction logic (PDF, PPTX, DOCX, TXT)
+                const fileInput = document.getElementById('generate-file-upload');
+                const fileStatus = document.getElementById('file-upload-status');
+                const lessonTextarea = document.getElementById('generate-lesson-content');
+
+                if (fileInput && fileStatus && lessonTextarea) {
+                    fileInput.addEventListener('change', async (e) => {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) return;
+
+                        fileStatus.style.display = 'block';
+                        fileStatus.style.color = '#0284c7';
+                        fileStatus.textContent = `⏳ Extracting text from ${file.name}...`;
+
+                        try {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            formData.append('sesskey', config.sesskey);
+
+                            const resp = await fetch(M.cfg.wwwroot + '/mod/gamifiedquiz/ajax/extract_file.php', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            const result = await resp.json();
+                            if (result.success && result.text) {
+                                lessonTextarea.value = result.text;
+                                fileStatus.style.color = '#16a34a';
+                                fileStatus.textContent = `✅ Successfully extracted ${result.characters.toLocaleString()} characters (~${result.approx_tokens.toLocaleString()} tokens) from ${result.filename}!`;
+                            } else {
+                                fileStatus.style.color = '#dc2626';
+                                fileStatus.textContent = `❌ Extraction error: ${result.error || 'Unknown error'}`;
+                            }
+                        } catch (err) {
+                            fileStatus.style.color = '#dc2626';
+                            fileStatus.textContent = `❌ Network error extracting file: ${err.message}`;
+                        }
+                    });
+                }
+
                 multiCategoryInitDone = true;
             }
 

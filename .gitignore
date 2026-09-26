@@ -62,4 +62,5 @@ secrets/
 # Temporary files
 tmp/
 temp/
+~$*
 
