@@ -2448,12 +2448,58 @@ function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id 
                         $filename = $file->get_filename();
                         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-                        if ($mimetype === 'text/plain' || $mimetype === 'text/html' || in_array($ext, ['txt', 'md', 'html', 'htm'])) {
-                            $content .= $file->get_content() . "\n\n";
-                        } else if (in_array($ext, ['pdf', 'pptx', 'ppt', 'docx', 'doc'])) {
+                        if ($mimetype === 'text/plain' || $mimetype === 'text/html' || in_array($ext, ['txt', 'md', 'html', 'htm', 'py', 'c', 'cpp', 'java', 'json', 'csv'])) {
+                            $content .= "=== File: " . $filename . " ===\n" . $file->get_content() . "\n\n";
+                        } else if (in_array($ext, ['pdf', 'pptx', 'ppt', 'docx', 'doc', 'png', 'jpg', 'jpeg', 'webp'])) {
                             $extracted = gamifiedquiz_extract_file_content_via_api($file);
                             if (!empty($extracted)) {
-                                $content .= $extracted . "\n\n";
+                                $content .= "=== File: " . $filename . " ===\n" . $extracted . "\n\n";
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ($cm->modname === 'folder') {
+            $context = context_module::instance($cm->id);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'mod_folder', 'content', 0, 'sortorder', false);
+            if ($files) {
+                foreach ($files as $file) {
+                    if (!$file->is_directory()) {
+                        $filename = $file->get_filename();
+                        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                        $mimetype = $file->get_mimetype();
+                        if ($mimetype === 'text/plain' || $mimetype === 'text/html' || in_array($ext, ['txt', 'md', 'html', 'htm', 'py', 'c', 'cpp', 'java', 'json', 'csv'])) {
+                            $content .= "=== File: " . $filename . " ===\n" . $file->get_content() . "\n\n";
+                        } else if (in_array($ext, ['pdf', 'pptx', 'ppt', 'docx', 'doc', 'png', 'jpg', 'jpeg', 'webp'])) {
+                            $extracted = gamifiedquiz_extract_file_content_via_api($file);
+                            if (!empty($extracted)) {
+                                $content .= "=== File: " . $filename . " ===\n" . $extracted . "\n\n";
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ($cm->modname === 'label') {
+            $label = $DB->get_record('label', array('id' => $cm->instance));
+            if ($label && !empty($label->intro)) {
+                // 1. Text from label intro (including alt text in images)
+                $content .= "=== Course Note / Label ===\n" . $label->intro . "\n\n";
+
+                // 2. Extract media/images attached to the label file area
+                $context = context_module::instance($cm->id);
+                $fs = get_file_storage();
+                $files = $fs->get_area_files($context->id, 'mod_label', 'intro', 0, 'sortorder', false);
+                if ($files) {
+                    foreach ($files as $file) {
+                        if (!$file->is_directory()) {
+                            $filename = $file->get_filename();
+                            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                            if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'pdf', 'docx', 'pptx'])) {
+                                $extracted = gamifiedquiz_extract_file_content_via_api($file);
+                                if (!empty($extracted)) {
+                                    $content .= "=== Attached Media: " . $filename . " ===\n" . $extracted . "\n\n";
+                                }
                             }
                         }
                     }
@@ -2538,7 +2584,7 @@ function gamifiedquiz_get_section_text_content($courseid, $sectionnum) {
     $aggregated_content = '';
     foreach ($modinfo->sections[$sectionnum] as $cmid) {
         $cm_item = $modinfo->cms[$cmid];
-        if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+        if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
             $content = gamifiedquiz_get_module_text_content($cmid);
             if (!empty($content)) {
                 $aggregated_content .= "=== Activity: " . $cm_item->name . " ===\n";
@@ -2552,7 +2598,7 @@ function gamifiedquiz_get_section_text_content($courseid, $sectionnum) {
 
 
 /**
- * Find the course module ID of the page/lesson/book activity preceding this quiz in the course.
+ * Find the course module ID of the page/lesson/book/resource/label activity preceding this quiz in the course.
  *
  * @param int $current_cmid The course module ID of the gamified quiz
  * @return int|null Preceding module ID or null if none
@@ -2586,7 +2632,7 @@ function gamifiedquiz_get_preceding_activity_cmid($current_cmid) {
             continue;
         }
         $prev_cm = $modinfo->cms[$prev_cmid];
-        if (in_array($prev_cm->modname, ['page', 'lesson', 'book', 'resource'])) {
+        if (in_array($prev_cm->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
             return $prev_cmid;
         }
     }

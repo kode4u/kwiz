@@ -512,15 +512,102 @@
                 cacheDebounceTimer = setTimeout(checkEmbeddingCacheStatus, 400);
             }
 
+            // Pill Select Design for Generation Parameters (Count, Difficulty, Language)
+            document.querySelectorAll('.gq-pill-select').forEach(group => {
+                const targetId = group.dataset.target;
+                const targetSelect = document.getElementById(targetId);
+                if (!targetSelect) return;
+
+                const btns = group.querySelectorAll('.gq-pill-btn');
+                btns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        btns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        targetSelect.value = btn.dataset.value;
+                        targetSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                });
+
+                if (targetSelect.value) {
+                    btns.forEach(btn => {
+                        if (btn.dataset.value === targetSelect.value) {
+                            btns.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+            });
+
+            // Quick Filter Pills for RAG Sources
+            document.querySelectorAll('.gq-pill-filter').forEach(filterBtn => {
+                filterBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.gq-pill-filter').forEach(b => b.classList.remove('active'));
+                    filterBtn.classList.add('active');
+
+                    const filter = filterBtn.dataset.filter || 'all';
+                    const items = document.querySelectorAll('.studio-rag-item');
+                    const headers = document.querySelectorAll('.studio-rag-group-header');
+
+                    items.forEach(item => {
+                        const cat = item.dataset.category || '';
+                        if (filter === 'all') {
+                            item.style.display = 'flex';
+                        } else if (filter === 'chapter') {
+                            item.style.display = (cat === 'chapter') ? 'flex' : 'none';
+                        } else if (filter === 'lesson') {
+                            item.style.display = (cat === 'lesson') ? 'flex' : 'none';
+                        } else if (filter === 'file') {
+                            item.style.display = (cat === 'file') ? 'flex' : 'none';
+                        } else if (filter === 'label') {
+                            item.style.display = (cat === 'label') ? 'flex' : 'none';
+                        } else {
+                            item.style.display = 'flex';
+                        }
+                    });
+
+                    headers.forEach(h => {
+                        const htype = h.dataset.header || '';
+                        if (filter === 'all') {
+                            h.style.display = 'block';
+                        } else if (filter === 'chapter') {
+                            h.style.display = (htype === 'chapter') ? 'block' : 'none';
+                        } else if (filter === 'lesson' || filter === 'file' || filter === 'label') {
+                            h.style.display = (htype === 'module') ? 'block' : 'none';
+                        }
+                    });
+                });
+            });
+
+            function updateRowSelectionState(cb) {
+                const itemRow = cb.closest('.studio-rag-item');
+                if (itemRow) {
+                    if (cb.checked) {
+                        itemRow.classList.add('selected');
+                    } else {
+                        itemRow.classList.remove('selected');
+                    }
+                }
+            }
+
             // Wire up checkbox events
             ragCheckboxes.forEach(cb => {
-                cb.addEventListener('change', debouncedCheckCache);
+                updateRowSelectionState(cb);
+                cb.addEventListener('change', () => {
+                    updateRowSelectionState(cb);
+                    debouncedCheckCache();
+                });
             });
 
             if (ragSelectAllBtn) {
                 ragSelectAllBtn.addEventListener('click', () => {
                     ragCheckboxes.forEach(cb => {
-                        if (cb.value !== 'auto') cb.checked = true;
+                        const itemRow = cb.closest('.studio-rag-item');
+                        if (itemRow && itemRow.style.display === 'none') return;
+                        if (cb.value !== 'auto') {
+                            cb.checked = true;
+                            updateRowSelectionState(cb);
+                        }
                     });
                     debouncedCheckCache();
                 });
@@ -528,7 +615,10 @@
 
             if (ragClearAllBtn) {
                 ragClearAllBtn.addEventListener('click', () => {
-                    ragCheckboxes.forEach(cb => { cb.checked = false; });
+                    ragCheckboxes.forEach(cb => {
+                        cb.checked = false;
+                        updateRowSelectionState(cb);
+                    });
                     debouncedCheckCache();
                 });
             }

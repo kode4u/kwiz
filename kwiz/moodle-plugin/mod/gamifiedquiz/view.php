@@ -103,7 +103,7 @@ $rag_sources = [];
 $course_labels = [];
 foreach ($modinfo->cms as $cm_item) {
     if ($cm_item->uservisible) {
-        if (in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+        if (in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder'])) {
             $rag_sources[] = array(
                 'id' => $cm_item->id,
                 'name' => $cm_item->name,
@@ -111,17 +111,23 @@ foreach ($modinfo->cms as $cm_item) {
             );
         } else if ($cm_item->modname === 'label') {
             $label_rec = $DB->get_record('label', array('id' => $cm_item->instance));
+            $clean_text = '';
             if ($label_rec && !empty($label_rec->intro)) {
                 $clean_text = html_to_text($label_rec->intro, 0, false);
                 $clean_text = trim(preg_replace('/\s+/', ' ', $clean_text));
-                if (!empty($clean_text)) {
-                    $display_name = strlen($clean_text) > 60 ? substr($clean_text, 0, 60) . '...' : $clean_text;
-                    $course_labels[] = array(
-                        'id' => $cm_item->id,
-                        'name' => $display_name . ' (Label)',
-                        'content' => $clean_text
-                    );
-                }
+            }
+            $display_name = !empty($clean_text) ? (strlen($clean_text) > 60 ? substr($clean_text, 0, 60) . '...' : $clean_text) : 'Course Note / Label';
+            $rag_sources[] = array(
+                'id' => $cm_item->id,
+                'name' => $display_name,
+                'type' => 'label'
+            );
+            if (!empty($clean_text)) {
+                $course_labels[] = array(
+                    'id' => $cm_item->id,
+                    'name' => $display_name . ' (Label)',
+                    'content' => $clean_text
+                );
             }
         }
     }
@@ -134,7 +140,7 @@ foreach ($modinfo->sections as $sectionnum => $cmids) {
     foreach ($cmids as $sec_cmid) {
         if (isset($modinfo->cms[$sec_cmid])) {
             $cm_item = $modinfo->cms[$sec_cmid];
-            if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+            if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
                 $section_has_rag = true;
                 break;
             }
@@ -363,19 +369,28 @@ if ($is_teacher) {
 
     // RAG sources multi-select checkboxes
     echo '      <div style="margin-bottom: 16px;">';
-    echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">';
+    echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">';
     echo '          <label style="font-weight: 600; color: #1e293b; margin: 0;">Course Context Grounding (RAG Sources):</label>';
-    echo '          <div style="font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">';
-    echo '            <span id="studio-rag-summary" style="color: #64748b; font-size: 0.78rem;"></span>';
-    echo '            <button type="button" id="studio-rag-refresh-btn" class="btn btn-link btn-sm" style="padding: 0 4px; font-size: 0.8rem; color: #0f6cbf; text-decoration: none;">Refresh</button> | ';
-    echo '            <button type="button" id="studio-rag-select-all" class="btn btn-link btn-sm" style="padding: 0 4px; font-size: 0.8rem; color: #0f6cbf; text-decoration: none;">Select All</button> | ';
-    echo '            <button type="button" id="studio-rag-clear-all" class="btn btn-link btn-sm" style="padding: 0 4px; font-size: 0.8rem; color: #64748b; text-decoration: none;">Clear</button>';
+    echo '          <div class="gq-pill-filter-group">';
+    echo '            <button type="button" class="gq-pill gq-pill-filter active" data-filter="all">All</button>';
+    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="chapter">Chapters</button>';
+    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="lesson">Lessons &amp; Pages</button>';
+    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="file">Files &amp; Docs</button>';
+    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="label">Labels &amp; Media</button>';
+    echo '            <span class="gq-pill-separator"></span>';
+    echo '            <button type="button" class="gq-pill gq-pill-action" id="studio-rag-select-all">Select All</button>';
+    echo '            <button type="button" class="gq-pill gq-pill-action" id="studio-rag-clear-all">Clear</button>';
+    echo '            <button type="button" class="gq-pill gq-pill-action" id="studio-rag-refresh-btn">Refresh</button>';
     echo '          </div>';
     echo '        </div>';
+    echo '        <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">';
+    echo '          <span id="studio-rag-summary" style="color: #64748b; font-size: 0.78rem;"></span>';
+    echo '        </div>';
     echo '        <div id="studio-rag-checkboxes-container" class="studio-rag-container">';
-    echo '          <div class="studio-rag-item" data-source="auto">';
+    echo '          <div class="studio-rag-item" data-source="auto" data-category="auto">';
     echo '            <div class="studio-rag-item-left">';
     echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto">';
+    echo '              <span class="gq-type-pill type-auto">Auto</span>';
     echo '              <label for="rag_src_auto">Auto-detect (Current / Preceding Course Activity)</label>';
     echo '            </div>';
     echo '            <div class="studio-rag-item-right">';
@@ -384,13 +399,14 @@ if ($is_teacher) {
     echo '            </div>';
     echo '          </div>';
     if (!empty($rag_sections)) {
-        echo '          <div class="studio-rag-group-header">Course Chapters / Sections</div>';
+        echo '          <div class="studio-rag-group-header" data-header="chapter">Course Chapters / Sections</div>';
         foreach ($rag_sections as $sec) {
             $sid = 'rag_src_sec_' . (int)$sec['number'];
             $src_key = 'section_' . (int)$sec['number'];
-            echo '          <div class="studio-rag-item" data-source="' . $src_key . '">';
+            echo '          <div class="studio-rag-item" data-source="' . $src_key . '" data-category="chapter">';
             echo '            <div class="studio-rag-item-left">';
             echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="' . $src_key . '" id="' . $sid . '">';
+            echo '              <span class="gq-type-pill type-chapter">Chapter</span>';
             echo '              <label for="' . $sid . '">Chapter: ' . s($sec['name']) . '</label>';
             echo '            </div>';
             echo '            <div class="studio-rag-item-right">';
@@ -401,15 +417,33 @@ if ($is_teacher) {
         }
     }
     if (!empty($rag_sources)) {
-        echo '          <div class="studio-rag-group-header">Individual Course Activities / Files</div>';
+        echo '          <div class="studio-rag-group-header" data-header="module">Individual Course Materials &amp; Media</div>';
         foreach ($rag_sources as $src) {
             $type_label = ucfirst($src['type']);
             $cid = 'rag_src_cm_' . (int)$src['id'];
             $src_key = 'cmid_' . (int)$src['id'];
-            echo '          <div class="studio-rag-item" data-source="' . $src_key . '">';
+
+            $cat = 'other';
+            $pill_class = 'type-file';
+            $pill_label = $type_label;
+            if (in_array($src['type'], ['lesson', 'page', 'book'])) {
+                $cat = 'lesson';
+                $pill_class = 'type-' . $src['type'];
+            } else if (in_array($src['type'], ['resource', 'folder'])) {
+                $cat = 'file';
+                $pill_class = 'type-file';
+                $pill_label = $src['type'] === 'folder' ? 'Folder' : 'File';
+            } else if ($src['type'] === 'label') {
+                $cat = 'label';
+                $pill_class = 'type-label';
+                $pill_label = 'Label & Media';
+            }
+
+            echo '          <div class="studio-rag-item" data-source="' . $src_key . '" data-category="' . $cat . '">';
             echo '            <div class="studio-rag-item-left">';
             echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="' . $src_key . '" id="' . $cid . '">';
-            echo '              <label for="' . $cid . '">' . s($src['name']) . ' (' . $type_label . ')</label>';
+            echo '              <span class="gq-type-pill ' . $pill_class . '">' . $pill_label . '</span>';
+            echo '              <label for="' . $cid . '">' . s($src['name']) . '</label>';
             echo '            </div>';
             echo '            <div class="studio-rag-item-right">';
             echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
@@ -419,7 +453,7 @@ if ($is_teacher) {
         }
     }
     echo '        </div>';
-    echo '        <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Select one or more sources to retrieve and ground questions. Badge indicates SHA-256 embedding status.</small>';
+    echo '        <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Select one or more sources to retrieve and ground questions. Use filter pills above to browse by type.</small>';
 
     // Dynamic SHA-256 Embedding Cache Status Card
     echo '        <div id="embedding-cache-card" class="cache-none">';
@@ -443,11 +477,19 @@ if ($is_teacher) {
     echo '        <input type="text" id="studio-topic-input" class="form-control" style="width: 100%; border-radius: 8px; font-size: 0.95rem; padding: 8px 12px;" value="' . s($gamifiedquiz->topic) . '" placeholder="e.g. Python Loops, While, Range, Break/Continue">';
     echo '      </div>';
 
-    // Row: Count, Difficulty, Language
-    echo '      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 14px;">';
+    // Row: Count, Difficulty, Language with Pill Select Design
+    echo '      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 14px;">';
     echo '        <div>';
-    echo '          <label for="studio-count-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Number of Questions:</label>';
-    echo '          <select id="studio-count-select" class="form-select form-control" style="width: 100%; border-radius: 8px; padding: 8px 12px;">';
+    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Number of Questions:</label>';
+    echo '          <div class="gq-pill-select" data-target="studio-count-select">';
+    echo '            <button type="button" class="gq-pill-btn" data-value="1">1</button>';
+    echo '            <button type="button" class="gq-pill-btn" data-value="3">3</button>';
+    echo '            <button type="button" class="gq-pill-btn active" data-value="5">5</button>';
+    echo '            <button type="button" class="gq-pill-btn" data-value="10">10</button>';
+    echo '            <button type="button" class="gq-pill-btn" data-value="15">15</button>';
+    echo '            <button type="button" class="gq-pill-btn" data-value="20">20</button>';
+    echo '          </div>';
+    echo '          <select id="studio-count-select" class="form-select form-control" style="display: none;">';
     echo '            <option value="1">1 Question (Quick test)</option>';
     echo '            <option value="3">3 Questions</option>';
     echo '            <option value="5" selected>5 Questions</option>';
@@ -457,18 +499,29 @@ if ($is_teacher) {
     echo '          </select>';
     echo '        </div>';
     echo '        <div>';
-    echo '          <label for="studio-difficulty-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Difficulty Level:</label>';
-    echo '          <select id="studio-difficulty-select" class="form-select form-control" style="width: 100%; border-radius: 8px; padding: 8px 12px;">';
-    echo '            <option value="easy"' . ($gamifiedquiz->difficulty === 'easy' ? ' selected' : '') . '>Easy (Knowledge & Syntax)</option>';
-    echo '            <option value="medium"' . ($gamifiedquiz->difficulty === 'medium' ? ' selected' : '') . '>Medium (Tracing & Output)</option>';
-    echo '            <option value="hard"' . ($gamifiedquiz->difficulty === 'hard' ? ' selected' : '') . '>Hard (Edge Cases & Reasoning)</option>';
+    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Difficulty Level:</label>';
+    $curr_diff = !empty($gamifiedquiz->difficulty) ? $gamifiedquiz->difficulty : 'medium';
+    echo '          <div class="gq-pill-select" data-target="studio-difficulty-select">';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'easy' ? ' active' : '') . '" data-value="easy">Easy (Syntax)</button>';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'medium' ? ' active' : '') . '" data-value="medium">Medium (Tracing)</button>';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'hard' ? ' active' : '') . '" data-value="hard">Hard (Edge Cases)</button>';
+    echo '          </div>';
+    echo '          <select id="studio-difficulty-select" class="form-select form-control" style="display: none;">';
+    echo '            <option value="easy"' . ($curr_diff === 'easy' ? ' selected' : '') . '>Easy (Knowledge & Syntax)</option>';
+    echo '            <option value="medium"' . ($curr_diff === 'medium' ? ' selected' : '') . '>Medium (Tracing & Output)</option>';
+    echo '            <option value="hard"' . ($curr_diff === 'hard' ? ' selected' : '') . '>Hard (Edge Cases & Reasoning)</option>';
     echo '          </select>';
     echo '        </div>';
     echo '        <div>';
-    echo '          <label for="studio-language-select" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Language:</label>';
-    echo '          <select id="studio-language-select" class="form-select form-control" style="width: 100%; border-radius: 8px; padding: 8px 12px;">';
-    echo '            <option value="en"' . ($gamifiedquiz->language === 'en' ? ' selected' : '') . '>English</option>';
-    echo '            <option value="km"' . ($gamifiedquiz->language === 'km' ? ' selected' : '') . '>Khmer (ភាសាខ្មែរ)</option>';
+    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Language:</label>';
+    $curr_lang = !empty($gamifiedquiz->language) ? $gamifiedquiz->language : 'en';
+    echo '          <div class="gq-pill-select" data-target="studio-language-select">';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_lang === 'en' ? ' active' : '') . '" data-value="en">English</button>';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_lang === 'km' ? ' active' : '') . '" data-value="km">Khmer (ភាសាខ្មែរ)</button>';
+    echo '          </div>';
+    echo '          <select id="studio-language-select" class="form-select form-control" style="display: none;">';
+    echo '            <option value="en"' . ($curr_lang === 'en' ? ' selected' : '') . '>English</option>';
+    echo '            <option value="km"' . ($curr_lang === 'km' ? ' selected' : '') . '>Khmer (ភាសាខ្មែរ)</option>';
     echo '          </select>';
     echo '        </div>';
     echo '      </div>';

@@ -95,7 +95,7 @@ try {
                 foreach ($sec_cmids as $scm) {
                     if (isset($modinfo->cms[$scm])) {
                         $cm_item = $modinfo->cms[$scm];
-                        if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+                        if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
                             $section_has_rag = true;
                             break;
                         }
@@ -107,7 +107,7 @@ try {
             }
             // Course activities / files
             foreach ($modinfo->cms as $cm_item) {
-                if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+                if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
                     $items['cmid_' . $cm_item->id] = gamifiedquiz_get_module_text_content($cm_item->id);
                 }
             }
@@ -175,7 +175,7 @@ try {
                     $source_keys[] = 'section_' . $secnum;
                 }
                 foreach ($modinfo->cms as $cm_item) {
-                    if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource'])) {
+                    if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
                         $source_keys[] = 'cmid_' . $cm_item->id;
                     }
                 }

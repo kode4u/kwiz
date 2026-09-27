@@ -1516,8 +1516,27 @@ def extract_text_from_file_bytes(file_bytes: bytes, filename: str) -> str:
         except ImportError:
             raise RuntimeError("python-docx is not installed. Please run 'pip install python-docx'.")
             
+    elif ext in ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.gif'):
+        try:
+            import base64
+            img_b64 = base64.b64encode(file_bytes).decode('utf-8')
+            resp = requests.post(f"{LOCAL_LLM_URL}/api/generate", json={
+                "model": "qwen2.5vl:3b",
+                "prompt": "Transcribe all text, code, formulas, diagrams, labels, and key educational concepts visible in this image clearly and concisely.",
+                "images": [img_b64],
+                "stream": False
+            }, timeout=60)
+            if resp.status_code == 200:
+                transcription = resp.json().get('response', '').strip()
+                if transcription:
+                    return f"=== Image: {filename} ===\n{transcription}"
+            return f"[Image: {filename}]"
+        except Exception as e:
+            logger.warning(f"Image vision transcription error for {filename}: {e}")
+            return f"[Image: {filename}]"
+
     else:
-        # Default plain text decode for .txt, .md, .py, .html, .json
+        # Default plain text decode for .txt, .md, .py, .c, .cpp, .java, .json, .csv, .html
         return file_bytes.decode('utf-8', errors='replace')
 
 
