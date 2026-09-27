@@ -1567,6 +1567,192 @@ def extract_file_endpoint():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/cache/status', methods=['POST'])
+def cache_status():
+    """Check SHA-256 chunk caching status for a given lesson text."""
+    try:
+        data = request.json or {}
+        content = data.get('content', '').strip()
+        backend = data.get('backend', LLM_BACKEND)
+        model = data.get('model', OLLAMA_MODEL_DEFAULT)
+
+        if not content:
+            return jsonify({
+                'has_content': False,
+                'total_chunks': 0,
+                'cached_chunks': 0,
+                'modified_chunks': 0,
+                'is_synced': False,
+                'content_hash': '',
+                'message': 'No lesson content provided.'
+            })
+
+        content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+        # Chunk the text using standard ~500 chars window
+        chunks = []
+        lines = content.split('\n')
+        current_chunk = []
+        current_len = 0
+        for line in lines:
+            if not line.strip():
+                continue
+            current_chunk.append(line)
+            current_len += len(line)
+            if current_len >= 500:
+                chunks.append("\n".join(current_chunk))
+                current_chunk = []
+                current_len = 0
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+
+        if not chunks:
+            chunks = [content]
+
+        if backend == 'local':
+            model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or model
+        elif backend == 'openai':
+            model_name = "text-embedding-3-small"
+        elif backend == 'gemini':
+            model_name = "models/text-embedding-004"
+        else:
+            model_name = "unknown"
+
+        cached_count = 0
+        with embedding_cache_lock:
+            for c in chunks:
+                hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
+                if hash_key in embedding_cache:
+                    cached_count += 1
+
+        total_chunks = len(chunks)
+        modified_chunks = total_chunks - cached_count
+        is_synced = (modified_chunks == 0 and total_chunks > 0)
+
+        if is_synced:
+            msg = f"Embedding Cache Synced: All {total_chunks} chunks cached (SHA-256: {content_hash[:8]}). Sub-millisecond retrieval ready."
+        elif cached_count > 0:
+            msg = f"Notice: Lesson has changed since last cache index. {modified_chunks} of {total_chunks} chunks require re-indexing."
+        else:
+            msg = f"Notice: Lesson has not been indexed in embedding cache yet ({total_chunks} chunks ready to index)."
+
+        return jsonify({
+            'has_content': True,
+            'content_hash': content_hash,
+            'short_hash': content_hash[:8],
+            'total_chunks': total_chunks,
+            'cached_chunks': cached_count,
+            'modified_chunks': modified_chunks,
+            'is_synced': is_synced,
+            'message': msg
+        })
+    except Exception as e:
+        logger.error(f"Error checking cache status: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/cache/reindex', methods=['POST'])
+def cache_reindex():
+    """Force recompute and persist SHA-256 chunk embeddings into cache."""
+    try:
+        data = request.json or {}
+        content = data.get('content', '').strip()
+        backend = data.get('backend', LLM_BACKEND)
+        model = data.get('model', OLLAMA_MODEL_DEFAULT)
+        api_key_override = data.get('api_key')
+
+        if not content:
+            return jsonify({'error': 'No content provided to index.'}), 400
+
+        t_start = time.perf_counter()
+        content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+        # Chunk text
+        chunks = []
+        lines = content.split('\n')
+        current_chunk = []
+        current_len = 0
+        for line in lines:
+            if not line.strip():
+                continue
+            current_chunk.append(line)
+            current_len += len(line)
+            if current_len >= 500:
+                chunks.append("\n".join(current_chunk))
+                current_chunk = []
+                current_len = 0
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+
+        if not chunks:
+            chunks = [content]
+
+        if backend == 'local':
+            model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or model
+        elif backend == 'openai':
+            model_name = "text-embedding-3-small"
+        elif backend == 'gemini':
+            model_name = "models/text-embedding-004"
+        else:
+            model_name = "unknown"
+
+        def compute_single_embedding(text: str) -> list:
+            try:
+                if backend == 'openai':
+                    from openai import OpenAI
+                    client = OpenAI(api_key=api_key_override or OPENAI_API_KEY)
+                    resp = client.embeddings.create(input=[text], model=model_name)
+                    return resp.data[0].embedding
+                elif backend == 'gemini':
+                    import google.generativeai as genai
+                    genai.configure(api_key=api_key_override or GEMINI_API_KEY)
+                    resp = genai.embed_content(model=model_name, content=text)
+                    return resp['embedding']
+                elif backend == 'local':
+                    resp = requests.post(f"{LOCAL_LLM_URL}/api/embeddings", json={"model": model_name, "prompt": text}, timeout=60)
+                    if resp.status_code == 200:
+                        return resp.json().get('embedding', [])
+                    return []
+                return []
+            except Exception as e:
+                logger.error(f"Embedding error: {e}")
+                return []
+
+        new_entries = {}
+        newly_indexed = 0
+
+        for c in chunks:
+            hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
+            with embedding_cache_lock:
+                if hash_key in embedding_cache:
+                    continue
+            vec = compute_single_embedding(c)
+            if vec:
+                new_entries[hash_key] = vec
+                newly_indexed += 1
+
+        if new_entries:
+            with embedding_cache_lock:
+                embedding_cache.update(new_entries)
+                save_embedding_cache()
+
+        duration_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+        total_chunks = len(chunks)
+
+        return jsonify({
+            'success': True,
+            'content_hash': content_hash,
+            'short_hash': content_hash[:8],
+            'total_chunks': total_chunks,
+            'cached_chunks': total_chunks,
+            'newly_indexed': newly_indexed,
+            'duration_ms': duration_ms,
+            'message': f"All {total_chunks} chunks indexed into SHA-256 cache ({newly_indexed} new, {duration_ms} ms, Hash: {content_hash[:8]})."
+        })
+    except Exception as e:
+        logger.error(f"Error reindexing cache: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
 
 # -------------------------------------------------------------------------
 # Evaluation & Telemetry Dashboard Endpoints

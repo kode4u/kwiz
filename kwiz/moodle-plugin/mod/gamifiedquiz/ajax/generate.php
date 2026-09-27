@@ -170,25 +170,50 @@ try {
     $predefined_data = !empty($data) ? $data : '';
     $learning_outcomes = !empty($learning_outcomes) ? $learning_outcomes : (isset($gamifiedquiz->learning_outcomes) ? $gamifiedquiz->learning_outcomes : '');
 
-    // Fetch RAG content if requested
+    // Fetch RAG content if requested (supports multiple comma-separated sources or array)
+    $rag_sources_list = [];
     if (!empty($rag_source)) {
-        $rag_text = '';
-        if ($rag_source === 'auto') {
-            $preceding_cmid = gamifiedquiz_get_preceding_activity_cmid($cmid ?: $quizid);
-            if ($preceding_cmid) {
-                $rag_text = gamifiedquiz_get_module_text_content($preceding_cmid);
+        $rag_sources_list = array_filter(array_map('trim', explode(',', $rag_source)));
+    }
+    $rag_sources_arr = optional_param_array('rag_sources', [], PARAM_TEXT);
+    if (!empty($rag_sources_arr)) {
+        $rag_sources_list = array_unique(array_merge($rag_sources_list, $rag_sources_arr));
+    }
+
+    if (!empty($rag_sources_list)) {
+        $combined_rag_parts = [];
+        foreach ($rag_sources_list as $single_src) {
+            $single_src = trim($single_src);
+            if (empty($single_src)) continue;
+
+            $single_rag_text = '';
+            if ($single_src === 'auto') {
+                $preceding_cmid = gamifiedquiz_get_preceding_activity_cmid($cmid ?: $quizid);
+                if ($preceding_cmid) {
+                    $single_rag_text = gamifiedquiz_get_module_text_content($preceding_cmid);
+                }
+            } else if (strpos($single_src, 'cmid_') === 0) {
+                $source_cmid = (int) substr($single_src, 5);
+                if ($source_cmid > 0) {
+                    $single_rag_text = gamifiedquiz_get_module_text_content($source_cmid, $rag_topic_id, $rag_subitem_id);
+                }
+            } else if (strpos($single_src, 'section_') === 0) {
+                $section_num = (int) substr($single_src, 8);
+                $single_rag_text = gamifiedquiz_get_section_text_content($course->id, $section_num);
             }
-        } else if (strpos($rag_source, 'cmid_') === 0) {
-            $source_cmid = (int) substr($rag_source, 5);
-            if ($source_cmid > 0) {
-                $rag_text = gamifiedquiz_get_module_text_content($source_cmid, $rag_topic_id, $rag_subitem_id);
+
+            if (!empty($single_rag_text)) {
+                $combined_rag_parts[] = $single_rag_text;
             }
-        } else if (strpos($rag_source, 'section_') === 0) {
-            $section_num = (int) substr($rag_source, 8);
-            $rag_text = gamifiedquiz_get_section_text_content($course->id, $section_num);
         }
-        if (!empty($rag_text)) {
-            $predefined_data = $rag_text;
+
+        if (!empty($combined_rag_parts)) {
+            $aggregated_text = implode("\n\n---\n\n", $combined_rag_parts);
+            if (!empty($predefined_data)) {
+                $predefined_data = $aggregated_text . "\n\n" . $predefined_data;
+            } else {
+                $predefined_data = $aggregated_text;
+            }
         }
     }
 

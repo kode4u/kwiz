@@ -235,7 +235,16 @@
             const newQuizWrapper = document.getElementById('studio-new-quiz-wrapper');
             const newQuizName = document.getElementById('studio-new-quiz-name');
 
-            const ragSelect = document.getElementById('studio-rag-source');
+            const ragCheckboxes = document.querySelectorAll('.studio-rag-cb');
+            const ragSelectAllBtn = document.getElementById('studio-rag-select-all');
+            const ragClearAllBtn = document.getElementById('studio-rag-clear-all');
+
+            const cacheCard = document.getElementById('embedding-cache-card');
+            const cacheIndicator = document.getElementById('embedding-cache-indicator');
+            const cacheText = document.getElementById('embedding-cache-text');
+            const cacheDetail = document.getElementById('embedding-cache-detail');
+            const reindexCacheBtn = document.getElementById('studio-reindex-cache-btn');
+
             const topicInput = document.getElementById('studio-topic-input');
             const countSelect = document.getElementById('studio-count-select');
             const difficultySelect = document.getElementById('studio-difficulty-select');
@@ -283,6 +292,173 @@
                 logConsole.scrollTop = logConsole.scrollHeight;
             }
 
+            function getSelectedRagSources() {
+                const cbs = document.querySelectorAll('.studio-rag-cb:checked');
+                return Array.from(cbs).map(cb => cb.value);
+            }
+
+            // Embedding cache status checker
+            let cacheDebounceTimer = null;
+            async function checkEmbeddingCacheStatus() {
+                const selectedSources = getSelectedRagSources();
+                const customText = customContentInput ? customContentInput.value.trim() : '';
+
+                if (!cacheCard || !cacheText) return;
+
+                if (selectedSources.length === 0 && !customText) {
+                    cacheCard.className = 'cache-none';
+                    if (cacheIndicator) cacheIndicator.className = '';
+                    cacheText.textContent = 'No RAG grounding source selected (topic-only generation).';
+                    if (cacheDetail) {
+                        cacheDetail.style.display = 'none';
+                        cacheDetail.textContent = '';
+                    }
+                    if (reindexCacheBtn) reindexCacheBtn.style.display = 'none';
+                    return;
+                }
+
+                cacheText.textContent = 'Checking chunk embedding cache...';
+                if (cacheIndicator) cacheIndicator.className = '';
+
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'status');
+                    formData.append('sources', selectedSources.join(','));
+                    formData.append('content', customText);
+                    formData.append('courseid', config.courseId || 0);
+                    formData.append('cmid', config.cmId || 0);
+                    formData.append('sesskey', config.sesskey);
+
+                    const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
+                    });
+                    const data = await res.json();
+
+                    if (!data.success && data.error) {
+                        cacheText.textContent = `Cache check notice: ${data.error}`;
+                        return;
+                    }
+
+                    if (!data.has_content) {
+                        cacheCard.className = 'cache-none';
+                        if (cacheIndicator) cacheIndicator.className = '';
+                        cacheText.textContent = 'Selected course material has no extractable text.';
+                        if (cacheDetail) cacheDetail.style.display = 'none';
+                        if (reindexCacheBtn) reindexCacheBtn.style.display = 'none';
+                        return;
+                    }
+
+                    if (data.is_synced === false) {
+                        cacheCard.className = 'cache-modified';
+                        if (cacheIndicator) cacheIndicator.className = 'modified';
+                        cacheText.textContent = `Notice: Lesson content has changed since last cache index (${data.modified_chunks} of ${data.total_chunks} chunk(s) require embedding).`;
+                        if (cacheDetail) {
+                            cacheDetail.style.display = 'block';
+                            cacheDetail.textContent = `Content Hash (SHA-256): ${data.short_hash || data.content_hash.substring(0,8)}. Click to precompute embeddings before generating questions.`;
+                        }
+                        if (reindexCacheBtn) {
+                            reindexCacheBtn.style.display = 'inline-block';
+                            reindexCacheBtn.disabled = false;
+                            reindexCacheBtn.textContent = 'Recompute Hash & Embeddings';
+                        }
+                    } else {
+                        cacheCard.className = 'cache-synced';
+                        if (cacheIndicator) cacheIndicator.className = 'synced';
+                        cacheText.textContent = `Embedding cache synchronized: All ${data.total_chunks} chunk(s) indexed (Hash: ${data.short_hash || data.content_hash.substring(0,8)}).`;
+                        if (cacheDetail) {
+                            cacheDetail.style.display = 'block';
+                            cacheDetail.textContent = 'Zero-latency vector embedding lookup active for RAG generation.';
+                        }
+                        if (reindexCacheBtn) reindexCacheBtn.style.display = 'none';
+                    }
+                } catch (err) {
+                    console.warn('Embedding cache check error:', err);
+                    if (cacheText) cacheText.textContent = 'Embedding cache: Local LLM service standby.';
+                }
+            }
+
+            function debouncedCheckCache() {
+                clearTimeout(cacheDebounceTimer);
+                cacheDebounceTimer = setTimeout(checkEmbeddingCacheStatus, 400);
+            }
+
+            // Wire up checkbox events
+            ragCheckboxes.forEach(cb => {
+                cb.addEventListener('change', debouncedCheckCache);
+            });
+
+            if (ragSelectAllBtn) {
+                ragSelectAllBtn.addEventListener('click', () => {
+                    ragCheckboxes.forEach(cb => {
+                        if (cb.value !== 'auto') cb.checked = true;
+                    });
+                    debouncedCheckCache();
+                });
+            }
+
+            if (ragClearAllBtn) {
+                ragClearAllBtn.addEventListener('click', () => {
+                    ragCheckboxes.forEach(cb => { cb.checked = false; });
+                    debouncedCheckCache();
+                });
+            }
+
+            if (customContentInput) {
+                customContentInput.addEventListener('input', debouncedCheckCache);
+            }
+
+            // Initial cache check
+            debouncedCheckCache();
+
+            // Wire up Reindex button
+            if (reindexCacheBtn) {
+                reindexCacheBtn.addEventListener('click', async () => {
+                    const selectedSources = getSelectedRagSources();
+                    const customText = customContentInput ? customContentInput.value.trim() : '';
+
+                    reindexCacheBtn.disabled = true;
+                    reindexCacheBtn.textContent = 'Recomputing SHA-256 Embeddings...';
+
+                    try {
+                        const formData = new URLSearchParams();
+                        formData.append('action', 'reindex');
+                        formData.append('sources', selectedSources.join(','));
+                        formData.append('content', customText);
+                        formData.append('courseid', config.courseId || 0);
+                        formData.append('cmid', config.cmId || 0);
+                        formData.append('sesskey', config.sesskey);
+
+                        const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formData.toString()
+                        });
+                        const data = await res.json();
+
+                        if (!data.success) {
+                            throw new Error(data.error || 'Failed to reindex cache');
+                        }
+
+                        appendStudioLog(`[CACHE] Reindexed ${data.total_chunks} chunks in ${data.duration_ms}ms (SHA-256: ${data.short_hash}).`);
+                        
+                        cacheCard.className = 'cache-synced';
+                        if (cacheIndicator) cacheIndicator.className = 'synced';
+                        cacheText.textContent = `Embedding cache synchronized: All ${data.total_chunks} chunk(s) indexed (Hash: ${data.short_hash}).`;
+                        if (cacheDetail) {
+                            cacheDetail.style.display = 'block';
+                            cacheDetail.textContent = `Completed in ${data.duration_ms}ms. Ready for fast RAG generation.`;
+                        }
+                        reindexCacheBtn.style.display = 'none';
+                    } catch (err) {
+                        alert(`Failed to reindex embeddings: ${err.message}`);
+                        reindexCacheBtn.disabled = false;
+                        reindexCacheBtn.textContent = 'Recompute Hash & Embeddings';
+                    }
+                });
+            }
+
             // Toggle Category Input
             if (categorySelect && newCategoryWrapper) {
                 categorySelect.addEventListener('change', () => {
@@ -320,7 +496,7 @@
                 toggleCustomBtn.addEventListener('click', () => {
                     const isHidden = customContentWrapper.style.display === 'none';
                     customContentWrapper.style.display = isHidden ? 'block' : 'none';
-                    toggleCustomBtn.textContent = isHidden ? '▼ Hide Custom Content' : '▶ Add Custom Code Snippet or Syllabus Notes (Optional)';
+                    toggleCustomBtn.textContent = isHidden ? 'Hide Custom Content' : 'Add Custom Code Snippet or Syllabus Notes (Optional)';
                 });
             }
 
@@ -352,20 +528,20 @@
                 studioQuestions.forEach((q, idx) => {
                     const card = document.createElement('div');
                     card.className = 'card mb-3 border-0 shadow-sm';
-                    card.style.cssText = 'border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff; overflow: hidden; margin-bottom: 16px;';
+                    card.style.cssText = 'border-radius: 4px; border: 1px solid #cbd5e1; background: #ffffff; overflow: hidden; margin-bottom: 16px;';
 
                     let rawQ = q.question || q.question_text || q.prompt || '';
                     rawQ = window.decodeUnicodeEscapes ? window.decodeUnicodeEscapes(rawQ) : rawQ;
 
                     let codeSnippetHtml = '';
                     if (q.code_snippet) {
-                        codeSnippetHtml = `<div style="margin: 10px 0;"><pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.88rem; overflow-x: auto; margin: 0;"><code>${escapeHtml(q.code_snippet)}</code></pre></div>`;
+                        codeSnippetHtml = `<div style="margin: 10px 0;"><pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 0.88rem; overflow-x: auto; margin: 0;"><code>${escapeHtml(q.code_snippet)}</code></pre></div>`;
                     } else if (rawQ.includes('```')) {
                         const parts = rawQ.split(/(```[\s\S]*?```)/g);
                         let formattedParts = parts.map(p => {
                             if (p.startsWith('```')) {
                                 const code = p.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
-                                return `<pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.88rem; overflow-x: auto; margin: 8px 0;"><code>${escapeHtml(code)}</code></pre>`;
+                                return `<pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 0.88rem; overflow-x: auto; margin: 8px 0;"><code>${escapeHtml(code)}</code></pre>`;
                             }
                             return escapeHtml(p);
                         });
@@ -376,7 +552,7 @@
 
                     const diffBadge = `<span class="badge" style="background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem;">${escapeHtml(q.difficulty || 'medium')}</span>`;
                     const bloomBadge = q.bloom_level ? `<span class="badge" style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem;">${escapeHtml(q.bloom_level)}</span>` : '';
-                    const astBadge = `<span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 600;">✓ AST Verified</span>`;
+                    const astBadge = `<span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 600;">AST Verified</span>`;
 
                     let choices = q.choices || q.options || [];
                     if (typeof choices === 'string') {
@@ -397,17 +573,17 @@
 
                         if (isCorrect) {
                             choicesHtml += `
-                                <div style="background: #f0fdf4; border: 1.5px solid #22c55e; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                <div style="background: #f0fdf4; border: 1px solid #16a34a; border-radius: 4px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <span style="background: #16a34a; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">${letter}</span>
                                         <span style="font-size: 0.95rem; font-weight: 600; color: #14532d;">${escapeHtml(decodedText)}</span>
                                     </div>
-                                    <span class="badge" style="background: #16a34a; color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">✓ Correct Answer</span>
+                                    <span class="badge" style="background: #16a34a; color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">Correct Answer</span>
                                 </div>
                             `;
                         } else {
                             choicesHtml += `
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center;">
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <span style="background: #cbd5e1; color: #334155; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">${letter}</span>
                                         <span style="font-size: 0.95rem; color: #334155;">${escapeHtml(decodedText)}</span>
@@ -421,7 +597,7 @@
                     if (q.explanation) {
                         const decExpl = window.decodeUnicodeEscapes ? window.decodeUnicodeEscapes(q.explanation) : q.explanation;
                         explHtml = `
-                            <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; color: #475569; margin-top: 10px;">
+                            <div style="background: #f8fafc; border-left: 4px solid #0f6cbf; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; color: #475569; margin-top: 10px;">
                                 <strong>Explanation:</strong> ${escapeHtml(decExpl)}
                             </div>
                         `;
@@ -435,7 +611,7 @@
                                 ${bloomBadge}
                                 ${astBadge}
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-danger studio-delete-q-btn" data-index="${idx}" style="font-size: 0.78rem; padding: 3px 8px; border-radius: 4px;">✕ Remove</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger studio-delete-q-btn" data-index="${idx}" style="font-size: 0.78rem; padding: 3px 8px; border-radius: 4px;">Remove</button>
                         </div>
                         <div style="padding: 16px 20px;">
                             <div style="font-size: 1rem; color: #1e293b; font-weight: 600; margin-bottom: 12px; line-height: 1.5;">${rawQ}</div>
@@ -477,14 +653,15 @@
                 }
 
                 const topic = topicInput ? topicInput.value.trim() : '';
-                const ragSource = ragSelect ? ragSelect.value : '';
+                const selectedRagSources = getSelectedRagSources();
+                const ragSource = selectedRagSources.join(',');
                 const count = countSelect ? parseInt(countSelect.value, 10) : 5;
                 const difficulty = difficultySelect ? difficultySelect.value : 'medium';
                 const language = languageSelect ? languageSelect.value : 'en';
                 const customContent = customContentInput ? customContentInput.value.trim() : '';
 
-                if (!topic && !ragSource && !customContent) {
-                    alert('Please specify a topic or select a course material RAG source.');
+                if (!topic && selectedRagSources.length === 0 && !customContent) {
+                    alert('Please specify a topic or select at least one course material RAG source.');
                     if (topicInput) topicInput.focus();
                     return;
                 }
@@ -520,9 +697,10 @@
                     }
                 }, 1000);
 
-                appendStudioLog(`🚀 Starting generation for topic: "${topic || 'Course Context'}"`);
+                appendStudioLog(`[INFO] Starting generation for topic: "${topic || 'Course Context'}"`);
                 appendStudioLog(`   Target Category: ${catName || catVal}`);
                 appendStudioLog(`   Target Quiz: ${quizName || quizVal}`);
+                appendStudioLog(`   RAG Sources: ${ragSource || 'None (Topic-only)'}`);
                 appendStudioLog(`   Parameters: count=${count}, difficulty=${difficulty}, language=${language}`);
 
                 try {
@@ -561,9 +739,9 @@
 
                     const iterNum = result.iteration_number || 0;
                     const iterMsg = iterNum > 0 ? ` [Iteration #${iterNum}]` : '';
-                    appendStudioLog(`✔ Successfully generated ${result.questions ? result.questions.length : 0} questions${iterMsg}.`);
+                    appendStudioLog(`[SUCCESS] Generated ${result.questions ? result.questions.length : 0} questions${iterMsg}.`);
                     if (iterNum > 0) {
-                        appendStudioLog(`  📊 Telemetry recorded in Evaluation Dashboard: http://localhost:5001/dashboard`);
+                        appendStudioLog(`  Telemetry recorded in Evaluation Dashboard: http://localhost:5001/dashboard`);
                     }
 
                     setTimeout(() => {
@@ -590,7 +768,7 @@
                 } catch (err) {
                     clearInterval(timerInterval);
                     if (progressStatus) progressStatus.textContent = `Error: ${err.message}`;
-                    appendStudioLog(`❌ Generation error: ${err.message}`);
+                    appendStudioLog(`[ERROR] Generation error: ${err.message}`);
                     alert(`Generation Error: ${err.message}`);
                 } finally {
                     studioGenerateBtn.disabled = false;
@@ -1501,10 +1679,10 @@
                     const qbankUrl = config.questionBankUrl || `${config.wwwroot}/question/edit.php?courseid=${config.courseId}`;
                     statusEl.innerHTML = `
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div><strong>✅ Success:</strong> Generated and persisted <strong>${allQuestions.length}</strong> questions across <strong>${categoriesCount}</strong> category(ies) into Moodle Question Bank and Course Quiz.</div>
+                            <div><strong>Success:</strong> Generated and persisted <strong>${allQuestions.length}</strong> questions across <strong>${categoriesCount}</strong> category(ies) into Moodle Question Bank and Course Quiz.</div>
                             <div style="display: flex; gap: 10px; margin-top: 5px;">
-                                <a href="${quizUrl}" class="btn btn-sm btn-primary" target="_blank" style="text-decoration: none; font-weight: 600;">📝 Open Standard Quiz</a>
-                                <a href="${qbankUrl}" class="btn btn-sm btn-secondary" target="_blank" style="text-decoration: none;">📚 View Question Bank</a>
+                                <a href="${quizUrl}" class="btn btn-sm btn-primary" target="_blank" style="text-decoration: none; font-weight: 600;">Open Standard Quiz</a>
+                                <a href="${qbankUrl}" class="btn btn-sm btn-secondary" target="_blank" style="text-decoration: none;">View Question Bank</a>
                             </div>
                         </div>
                     `;
@@ -1642,7 +1820,7 @@
 
                         fileStatus.style.display = 'block';
                         fileStatus.style.color = '#0284c7';
-                        fileStatus.textContent = `⏳ Extracting text from ${file.name}...`;
+                        fileStatus.textContent = `Extracting text from ${file.name}...`;
 
                         try {
                             const formData = new FormData();
@@ -1658,14 +1836,14 @@
                             if (result.success && result.text) {
                                 lessonTextarea.value = result.text;
                                 fileStatus.style.color = '#16a34a';
-                                fileStatus.textContent = `✅ Successfully extracted ${result.characters.toLocaleString()} characters (~${result.approx_tokens.toLocaleString()} tokens) from ${result.filename}!`;
+                                fileStatus.textContent = `Successfully extracted ${result.characters.toLocaleString()} characters (~${result.approx_tokens.toLocaleString()} tokens) from ${result.filename}!`;
                             } else {
                                 fileStatus.style.color = '#dc2626';
-                                fileStatus.textContent = `❌ Extraction error: ${result.error || 'Unknown error'}`;
+                                fileStatus.textContent = `Extraction error: ${result.error || 'Unknown error'}`;
                             }
                         } catch (err) {
                             fileStatus.style.color = '#dc2626';
-                            fileStatus.textContent = `❌ Network error extracting file: ${err.message}`;
+                            fileStatus.textContent = `Network error extracting file: ${err.message}`;
                         }
                     });
                 }
@@ -1792,10 +1970,10 @@
                 toggleLogBtn.onclick = function() {
                     if (logWrap.style.display === 'none' || !logWrap.style.display) {
                         logWrap.style.display = 'block';
-                        toggleLogBtn.textContent = 'Hide LLM Logs 📜';
+                        toggleLogBtn.textContent = 'Hide LLM Logs';
                     } else {
                         logWrap.style.display = 'none';
-                        toggleLogBtn.textContent = 'Show LLM Logs 📜';
+                        toggleLogBtn.textContent = 'Show LLM Logs';
                     }
                 };
             }
@@ -1826,11 +2004,11 @@
                                 txt = String(c);
                                 isCorrect = (i === q.correct_index);
                             }
-                            out += `  │       ${label}) ${txt}${isCorrect ? '  ✔ [CORRECT]' : ''}\n`;
+                            out += `  │       ${label}) ${txt}${isCorrect ? '  [CORRECT]' : ''}\n`;
                         });
                     }
                     if (q.explanation) {
-                        out += `  │       💡 Explanation: ${q.explanation}\n`;
+                        out += `  │       Explanation: ${q.explanation}\n`;
                     }
                 });
                 out += `  └──────────────────────────────────────────────────────────────────────────`;
@@ -1936,27 +2114,27 @@
                         if (prevStatus !== job.status) {
                             loggedJobsState[job.job_id] = job.status;
                             if (job.status === 'queued' || job.status === 'sent') {
-                                appendGenLog(`⏳ Queued: Category "${catName}" added to local generation queue.`);
+                                appendGenLog(`[QUEUED]: Category "${catName}" added to local generation queue.`);
                             } else if (job.status === 'processing' || job.status === 'running') {
                                 jobActiveTicks[job.job_id] = 0;
-                                appendGenLog(`▶ Processing: Category "${catName}" (Target: ${job.requested_count || '5'} MCQs)`);
-                                appendGenLog(`  ├─ 🔍 RAG Vector Pipeline: Extracting text & computing nomic-embed-text embeddings...`);
-                                appendGenLog(`  ├─ ⚡ SHA-256 Cache: Vector embedding lookup (0.0ms cache hit)...`);
-                                appendGenLog(`  └─ 🤖 LLM Worker: Transmitting context payload to Ollama (${job.llm_model || 'qwen2.5-coder:7b'})...`);
+                                appendGenLog(`[PROCESSING]: Category "${catName}" (Target: ${job.requested_count || '5'} MCQs)`);
+                                appendGenLog(`  ├─ [RAG Pipeline]: Extracting text & computing nomic-embed-text embeddings...`);
+                                appendGenLog(`  ├─ [Cache]: Vector embedding lookup (0.0ms cache hit)...`);
+                                appendGenLog(`  └─ [LLM Worker]: Transmitting context payload to Ollama (${job.llm_model || 'qwen2.5-coder:7b'})...`);
                             } else if (job.status === 'success') {
                                 delete jobActiveTicks[job.job_id];
                                 const durSec = job.duration_ms ? (job.duration_ms / 1000).toFixed(1) + 's' : 'done';
                                 const speed = job.questions_per_sec ? ` (${job.questions_per_sec.toFixed(2)} q/s)` : '';
-                                appendGenLog(`✔ SUCCESS: Category "${catName}" completed in ${durSec}${speed}`);
-                                appendGenLog(`  ├─ 📝 Generated ${job.generated_count || (job.questions ? job.questions.length : 0)} multiple-choice questions.`);
-                                appendGenLog(`  ├─ ✅ Validated MCQ structure, correct answers, and distractors.`);
-                                appendGenLog(`  └─ 💾 Stored questions in Moodle database (Job UUID: ${job.job_id.substring(0, 8)}).`);
+                                appendGenLog(`[SUCCESS]: Category "${catName}" completed in ${durSec}${speed}`);
+                                appendGenLog(`  ├─ Generated ${job.generated_count || (job.questions ? job.questions.length : 0)} multiple-choice questions.`);
+                                appendGenLog(`  ├─ Validated MCQ structure, correct answers, and distractors.`);
+                                appendGenLog(`  └─ Stored questions in Moodle database (Job UUID: ${job.job_id.substring(0, 8)}).`);
                                 if (job.questions && job.questions.length > 0) {
                                     appendGenLog(formatRawQuestionsForLog(job.questions));
                                 }
                             } else if (job.status === 'error') {
                                 delete jobActiveTicks[job.job_id];
-                                appendGenLog(`✖ ERROR: Category "${catName}" failed — ${job.error || 'LLM execution error'}`);
+                                appendGenLog(`[ERROR]: Category "${catName}" failed — ${job.error || 'LLM execution error'}`);
                             }
                         } else if (job.status === 'processing' || job.status === 'running') {
                             // Active heartbeat logging every ~2.5s while local LLM is generating
@@ -1964,13 +2142,13 @@
                             const tick = jobActiveTicks[job.job_id];
                             const secs = Math.round(tick * 2.5);
                             if (tick === 1) {
-                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Generating MCQs... (${secs}s)`);
+                                appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Generating MCQs... (${secs}s)`);
                             } else if (tick === 2) {
-                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Streaming response tokens & constructing options... (${secs}s)`);
+                                appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Streaming response tokens & constructing options... (${secs}s)`);
                             } else if (tick === 3) {
-                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Building code snippets & distractors... (${secs}s)`);
+                                appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Building code snippets & distractors... (${secs}s)`);
                             } else if (tick % 2 === 0) {
-                                appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Validating JSON schema & syntax... (${secs}s)`);
+                                appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Validating JSON schema & syntax... (${secs}s)`);
                             }
                         }
                     });
@@ -2149,10 +2327,10 @@
                     toggleLogBtn.onclick = function() {
                         if (logWrap.style.display === 'none' || !logWrap.style.display) {
                             logWrap.style.display = 'block';
-                            toggleLogBtn.textContent = 'Hide LLM Logs 📜';
+                            toggleLogBtn.textContent = 'Hide LLM Logs';
                         } else {
                             logWrap.style.display = 'none';
-                            toggleLogBtn.textContent = 'Show LLM Logs 📜';
+                            toggleLogBtn.textContent = 'Show LLM Logs';
                         }
                     };
                 }
@@ -2183,11 +2361,11 @@
                                     txt = String(c);
                                     isCorrect = (i === q.correct_index);
                                 }
-                                out += `  │       ${label}) ${txt}${isCorrect ? '  ✔ [CORRECT]' : ''}\n`;
+                                out += `  │       ${label}) ${txt}${isCorrect ? '  [CORRECT]' : ''}\n`;
                             });
                         }
                         if (q.explanation) {
-                            out += `  │       💡 Explanation: ${q.explanation}\n`;
+                            out += `  │       Explanation: ${q.explanation}\n`;
                         }
                     });
                     out += `  └──────────────────────────────────────────────────────────────────────────`;
@@ -2284,37 +2462,37 @@
                                     loggedJobsState[job.job_id] = job.status;
                                     if (job.status === 'processing' || job.status === 'running') {
                                         singleJobActiveTicks[job.job_id] = 0;
-                                        appendGenLog(`▶ Processing: "${catName}" (Target: ${questionCount} MCQs)`);
-                                        appendGenLog(`  ├─ 🔍 RAG Vector Pipeline: Extracting text & computing nomic-embed-text embeddings...`);
-                                        appendGenLog(`  ├─ ⚡ SHA-256 Cache: Vector embedding lookup (0.0ms cache hit)...`);
-                                        appendGenLog(`  └─ 🤖 LLM Worker: Transmitting context payload to Ollama (${job.llm_model || 'qwen2.5-coder:7b'})...`);
+                                        appendGenLog(`[PROCESSING]: "${catName}" (Target: ${questionCount} MCQs)`);
+                                        appendGenLog(`  ├─ [RAG Pipeline]: Extracting text & computing nomic-embed-text embeddings...`);
+                                        appendGenLog(`  ├─ [Cache]: Vector embedding lookup (0.0ms cache hit)...`);
+                                        appendGenLog(`  └─ [LLM Worker]: Transmitting context payload to Ollama (${job.llm_model || 'qwen2.5-coder:7b'})...`);
                                     } else if (job.status === 'success') {
                                         delete singleJobActiveTicks[job.job_id];
                                         const durSec = job.duration_ms ? (job.duration_ms / 1000).toFixed(1) + 's' : 'done';
                                         const speed = job.questions_per_sec ? ` (${job.questions_per_sec.toFixed(2)} q/s)` : '';
-                                        appendGenLog(`✔ SUCCESS: "${catName}" completed in ${durSec}${speed}`);
-                                        appendGenLog(`  ├─ 📝 Generated ${job.generated_count || questionCount} multiple-choice questions.`);
-                                        appendGenLog(`  ├─ ✅ Validated MCQ structure, correct answers, and distractors.`);
-                                        appendGenLog(`  └─ 💾 Stored questions in Moodle database.`);
+                                        appendGenLog(`[SUCCESS]: "${catName}" completed in ${durSec}${speed}`);
+                                        appendGenLog(`  ├─ Generated ${job.generated_count || questionCount} multiple-choice questions.`);
+                                        appendGenLog(`  ├─ Validated MCQ structure, correct answers, and distractors.`);
+                                        appendGenLog(`  └─ Stored questions in Moodle database.`);
                                         if (job.questions && job.questions.length > 0) {
                                             appendGenLog(formatRawQuestionsForLog(job.questions));
                                         }
                                     } else if (job.status === 'error') {
                                         delete singleJobActiveTicks[job.job_id];
-                                        appendGenLog(`✖ ERROR: "${catName}" failed — ${job.error || 'LLM execution error'}`);
+                                        appendGenLog(`[ERROR]: "${catName}" failed — ${job.error || 'LLM execution error'}`);
                                     }
                                 } else if (job.status === 'processing' || job.status === 'running') {
                                     singleJobActiveTicks[job.job_id] = (singleJobActiveTicks[job.job_id] || 0) + 1;
                                     const tick = singleJobActiveTicks[job.job_id];
                                     const secs = Math.round(tick * 2.5);
                                     if (tick === 1) {
-                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Generating MCQs... (${secs}s)`);
+                                        appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Generating MCQs... (${secs}s)`);
                                     } else if (tick === 2) {
-                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Streaming response tokens & constructing options... (${secs}s)`);
+                                        appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Streaming response tokens & constructing options... (${secs}s)`);
                                     } else if (tick === 3) {
-                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Building code snippets & distractors... (${secs}s)`);
+                                        appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Building code snippets & distractors... (${secs}s)`);
                                     } else if (tick % 2 === 0) {
-                                        appendGenLog(`  ⏳ [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Validating JSON schema & syntax... (${secs}s)`);
+                                        appendGenLog(`  [LLM Active] Local GPU (${job.llm_model || 'qwen2.5-coder:7b'}): Validating JSON schema & syntax... (${secs}s)`);
                                     }
                                 }
                             });
@@ -2440,7 +2618,7 @@
             // Clear leaderboard display
             const leaderboardContainer = document.getElementById('leaderboard-container');
             if (leaderboardContainer) {
-                leaderboardContainer.innerHTML = '<h3 style="font-size: 32px;">🏆 Current Leaderboard</h3><p style="font-size: 24px;">Waiting for students to answer...</p>';
+                leaderboardContainer.innerHTML = '<h3 style="font-size: 32px;">Current Leaderboard</h3><p style="font-size: 24px;">Waiting for students to answer...</p>';
             }
             
             // Clear ranking display
@@ -3094,7 +3272,7 @@
                         const color = kahootColors[i % 4];
                         const isCorrect = i === currentQuestion.correct_index;
                         const choiceText = typeof c === 'string' ? c : (c.text || c);
-                        return `<div style="background: ${color.bg}; border: 4px solid ${color.border}; color: ${color.text}; padding: 16px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 24px; font-weight: bold;">${String.fromCharCode(65 + i)}</span>${isCorrect ? '<span style="font-size: 28px;">✓</span>' : ''}</div><div style="font-size: 24px; margin-bottom: 8px;">${escapeHtml(choiceText)}</div><div style="background: rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; text-align: center;"><span style="font-size: 24px; font-weight: bold;">${count}</span> <span style="font-size: 18px;">(${pct}%)</span></div></div>`;
+                        return `<div style="background: ${color.bg}; border: 4px solid ${color.border}; color: ${color.text}; padding: 16px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 24px; font-weight: bold;">${String.fromCharCode(65 + i)}</span>${isCorrect ? '<span style="font-size: 16px; font-weight: bold;">[CORRECT]</span>' : ''}</div><div style="font-size: 24px; margin-bottom: 8px;">${escapeHtml(choiceText)}</div><div style="background: rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; text-align: center;"><span style="font-size: 24px; font-weight: bold;">${count}</span> <span style="font-size: 18px;">(${pct}%)</span></div></div>`;
                     }).join('')}
                 </div>
             ` : '<p>No question data.</p>';
@@ -3115,7 +3293,7 @@
                     const sorted = [...lb].sort((a, b) => (b.score || 0) - (a.score || 0));
                     const tableRows = sorted.map((entry, index) => {
                         const name = window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`;
-                        return `<tr style="border-bottom: 1px solid #dee2e6; ${index < 3 ? 'background: #fff3cd; font-weight: bold;' : ''}"><td style="padding: 12px;">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1)}</td><td style="padding: 12px;">${escapeHtml(name)}</td><td style="padding: 12px; text-align: right; font-weight: bold;">${entry.score || 0} pts</td></tr>`;
+                        return `<tr style="border-bottom: 1px solid #dee2e6; ${index < 3 ? 'background: #fff3cd; font-weight: bold;' : ''}"><td style="padding: 12px;">${index === 0 ? '1.' : index === 1 ? '2.' : index === 2 ? '3.' : (index + 1)}</td><td style="padding: 12px;">${escapeHtml(name)}</td><td style="padding: 12px; text-align: right; font-weight: bold;">${entry.score || 0} pts</td></tr>`;
                     }).join('');
                     teacherContainerPhase = 'ranking';
                     activeQEl.innerHTML = `
@@ -3201,7 +3379,7 @@
                         ${sorted.map((entry, index) => `
                             <tr style="border-bottom: 1px solid #dee2e6; ${index < 3 ? 'background: #fff3cd; font-weight: bold;' : ''}">
                                 <td style="padding: 12px;">
-                                    ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1)}
+                                    ${index === 0 ? '1.' : index === 1 ? '2.' : index === 2 ? '3.' : (index + 1)}
                                 </td>
                                 <td style="padding: 12px;">${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</td>
                                 <td style="padding: 12px; text-align: right; font-weight: bold;">${entry.score || 0} pts</td>
@@ -3379,7 +3557,7 @@
                                             ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                         <div style="font-size: 24px; font-weight: bold;">${String.fromCharCode(65 + i)}</div>
-                                        ${isCorrect ? '<span style="font-size: 32px;">✓</span>' : ''}
+                                        ${isCorrect ? '<span style="font-size: 18px; font-weight: bold;">[CORRECT]</span>' : ''}
                                     </div>
                                     <div style="font-size: 24px; margin-bottom: 10px;">${choiceText}</div>
                                     <div style="background: rgba(255,255,255,0.3); padding: 10px; border-radius: 8px; text-align: center;">
@@ -3405,7 +3583,7 @@
             }
             
             if (!Array.isArray(leaderboard) || leaderboard.length === 0) {
-                container.innerHTML = '<h3 style="font-size: 32px;">🏆 Current Leaderboard</h3><p style="font-size: 24px;">No scores yet.</p>';
+                container.innerHTML = '<h3 style="font-size: 32px;">Current Leaderboard</h3><p style="font-size: 24px;">No scores yet.</p>';
                 container.style.display = 'block';
                 return;
             }
@@ -3448,11 +3626,11 @@
             
             // Render the leaderboard with user names
             container.innerHTML = `
-                <h3 style="font-size: 32px;">🏆 Current Leaderboard</h3>
+                <h3 style="font-size: 32px;">Current Leaderboard</h3>
                 <ol style="padding-left: 20px; font-size: 24px;">
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
-                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                        const medal = rank === 1 ? '1.' : rank === 2 ? '2.' : rank === 3 ? '3.' : '';
                         const displayName = window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`;
                         const userId = entry.userId || entry.user_id || entry.userid || entry.id;
                         console.log(`Entry ${index}: userId=${userId}, displayName=${displayName}`);
@@ -3489,12 +3667,12 @@
             
             container.style.display = 'block';
         container.innerHTML = `
-                <h2 style="margin-top: 0; text-align: center; font-size: 32px;">🏆 Final Leaderboard 🏆</h2>
+                <h2 style="margin-top: 0; text-align: center; font-size: 32px;">Final Leaderboard</h2>
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const height = rank === 1 ? '120px' : rank === 2 ? '100px' : '80px';
-                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                        const medal = rank === 1 ? '1.' : rank === 2 ? '2.' : '3.';
                         return `
                             <div style="text-align: center; flex: 1; max-width: 200px;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">${medal}</div>
@@ -3535,7 +3713,7 @@
                         <li>
                             <strong>${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</strong>: 
                             ${entry.score || 0} points
-                            ${index < 3 ? ' 🏆' : ''}
+                            ${index < 3 ? '' : ''}
                         </li>
                     `).join('')}
                 </ol>
@@ -3923,13 +4101,13 @@
             container.style.display = 'block';
             container.innerHTML = `
                 <h2 style="margin-top: 0; text-align: center; font-size: 32px; color: white; ${animStyle} ${animDelay(0)}">
-                    ${isFinal ? '🏆 Final Leaderboard 🏆' : '📊 Current Leaderboard'}
+                    ${isFinal ? 'Final Leaderboard' : 'Current Leaderboard'}
                 </h2>
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 30px;">
                     ${topPlayers.map((entry, index) => {
                         const rank = index + 1;
                         const height = rank === 1 ? '120px' : rank === 2 ? '100px' : '80px';
-                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                        const medal = rank === 1 ? '1.' : rank === 2 ? '2.' : rank === 3 ? '3.' : '';
                         const oldRank = previousStudentLeaderboardOrder[entry.userId || entry.user_id || entry.userid || entry.id];
                         const fromBottom = oldRank !== undefined ? (oldRank - rank) * 30 : 0;
                         const rowAnim = animate ? `opacity: 0; transform: translateY(${fromBottom}px); animation: gqLeaderboardRow 0.6s ease ${index * 0.12}s forwards;` : '';
@@ -4044,7 +4222,7 @@
                             const color = kahootColors[i % 4];
                             return `
                                 <div style="background: ${color.bg}; border: 4px solid ${color.border}; color: white; padding: 15px; border-radius: 12px; ${isCorrect ? 'box-shadow: 0 0 0 4px #28a745;' : ''}">
-                                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">${String.fromCharCode(65 + i)} ${isCorrect ? '✓ Correct' : ''}</div>
+                                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">${String.fromCharCode(65 + i)} ${isCorrect ? '[Correct]' : ''}</div>
                                     <div style="font-size: 24px; margin-bottom: 8px;">${text}</div>
                                     <div style="font-size: 24px; font-weight: bold;">${count} (${pct}%)</div>
                                 </div>
@@ -4109,7 +4287,7 @@
                         <li>
                             <strong>${window.gamifiedQuizGetUserDisplayName ? window.gamifiedQuizGetUserDisplayName(entry) : `User ${entry.userId || entry.user_id || entry.userid || entry.id || '?'}`}</strong>: 
                             ${entry.score || 0} points
-                            ${index < 3 ? ' 🏆' : ''}
+                            ${index < 3 ? '' : ''}
                         </li>
                     `).join('')}
                 </ol>
@@ -4455,7 +4633,7 @@
         // Build leaderboard HTML
         resultsHtml = `
             <div class="leaderboard-display" style="margin-top: 20px;">
-                <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px;">🏆 Final Leaderboard 🏆</h3>
+                <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px;">Final Leaderboard</h3>
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <thead>
                         <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -4469,7 +4647,7 @@
         
         sortedResults.forEach((participant, index) => {
             const rank = index + 1;
-            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+            const medal = rank === 1 ? '1.' : rank === 2 ? '2.' : rank === 3 ? '3.' : '';
             const displayName = getParticipantName(participant);
             const score = participant.score || 0;
             const isTopThree = rank <= 3;

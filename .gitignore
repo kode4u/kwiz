@@ -17,6 +17,7 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+embeddings_cache.json
 
 # Node.js
 node_modules/

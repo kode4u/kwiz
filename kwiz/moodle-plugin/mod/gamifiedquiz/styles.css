@@ -242,10 +242,9 @@
 
 /* Template: Kahoot Style */
 .gq-template-kahoot .gamifiedquiz-container {
-    background: linear-gradient(135deg, var(--gq-primary) 0%, var(--gq-secondary) 100%);
-    border-radius: 12px;
+    background: #f8fafc;
+    border-radius: 4px;
     padding: 0;
-    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); */
 }
 
 .gq-template-kahoot .gq-container,
@@ -298,8 +297,8 @@
 
 /* Template: Modern */
 .gq-template-modern .gamifiedquiz-container {
-    background: linear-gradient(to bottom, #f8f9fa, white);
-    border-radius: 12px;
+    background: #f8fafc;
+    border-radius: 4px;
     padding: 0;
 }
 
@@ -716,22 +715,22 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 25px;
+    padding: 10px 16px;
+    background: #0f6cbf;
+    border-radius: 4px;
     color: white;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     flex: 0 1 auto;
     min-width: 0;
 }
 
 .quiz-info-badge:hover {
-    transform: translateY(-2px);
+    transform: none;
 }
 
 .quiz-info-icon {
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
 }
 
@@ -750,25 +749,25 @@
 
 /* Topic Badge */
 .quiz-info-topic {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0f6cbf;
 }
 
 /* Difficulty Badges - Different colors for each level */
 .quiz-info-difficulty-easy {
-    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    background: #198754;
 }
 
 .quiz-info-difficulty-medium {
-    background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+    background: #d97706;
 }
 
 .quiz-info-difficulty-hard {
-    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    background: #dc2626;
 }
 
 /* Language Badge */
 .quiz-info-language {
-    background: linear-gradient(135deg, #3494e6 0%, #ec6ead 100%);
+    background: #475569;
 }
 
 /* Responsive Design */
@@ -869,4 +868,201 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ==========================================================================
+   ACADEMIC UI REFINEMENT - CONSISTENT INPUTS, FLAT BUTTONS, NO AI GIMMICKS
+   ========================================================================== */
+
+/* Universal Form Input Consistency */
+.gamifiedquiz-container input[type="text"],
+.gamifiedquiz-container input[type="file"],
+.gamifiedquiz-container select,
+.gamifiedquiz-container textarea,
+.gamifiedquiz-container .form-control,
+.gamifiedquiz-container .form-select,
+.question-editor-content input[type="text"],
+.question-editor-content select,
+.question-editor-content textarea {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    font-size: 0.92rem !important;
+    line-height: 1.5 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.gamifiedquiz-container input[type="text"]:focus,
+.gamifiedquiz-container select:focus,
+.gamifiedquiz-container textarea:focus,
+.gamifiedquiz-container .form-control:focus,
+.gamifiedquiz-container .form-select:focus,
+.question-editor-content input[type="text"]:focus,
+.question-editor-content select:focus,
+.question-editor-content textarea:focus {
+    border-color: #0f6cbf !important;
+    box-shadow: 0 0 0 2px rgba(15, 108, 191, 0.2) !important;
+    outline: none !important;
+}
+
+/* Flat Academic Button Styling - Clean, solid borders, no gradients */
+.gamifiedquiz-container .btn,
+.gamifiedquiz-container .gq-btn,
+.question-editor-content .btn,
+.question-editor-content .gq-btn {
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.gamifiedquiz-container .btn-primary,
+.gamifiedquiz-container .gq-btn-primary {
+    background: #0f6cbf !important;
+    border: 1px solid #0d5ca3 !important;
+    color: #ffffff !important;
+}
+.gamifiedquiz-container .btn-primary:hover,
+.gamifiedquiz-container .gq-btn-primary:hover {
+    background: #0d5ca3 !important;
+    border-color: #0b4e8c !important;
+}
+
+.gamifiedquiz-container .btn-success,
+.gamifiedquiz-container .gq-btn-success {
+    background: #198754 !important;
+    border: 1px solid #157347 !important;
+    color: #ffffff !important;
+}
+.gamifiedquiz-container .btn-success:hover,
+.gamifiedquiz-container .gq-btn-success:hover {
+    background: #157347 !important;
+    border-color: #146c43 !important;
+}
+
+.gamifiedquiz-container .btn-secondary,
+.gamifiedquiz-container .gq-btn-secondary {
+    background: #64748b !important;
+    border: 1px solid #475569 !important;
+    color: #ffffff !important;
+}
+.gamifiedquiz-container .btn-secondary:hover,
+.gamifiedquiz-container .gq-btn-secondary:hover {
+    background: #475569 !important;
+    border-color: #334155 !important;
+}
+
+.gamifiedquiz-container .btn-outline-primary {
+    background: transparent !important;
+    border: 1px solid #0f6cbf !important;
+    color: #0f6cbf !important;
+}
+.gamifiedquiz-container .btn-outline-primary:hover {
+    background: #0f6cbf !important;
+    color: #ffffff !important;
+}
+
+.gamifiedquiz-container .btn-outline-secondary {
+    background: transparent !important;
+    border: 1px solid #94a3b8 !important;
+    color: #475569 !important;
+}
+.gamifiedquiz-container .btn-outline-secondary:hover {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+/* RAG Grounding Checkbox Container */
+.studio-rag-container {
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+    padding: 10px 14px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.studio-rag-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.studio-rag-item:last-child {
+    border-bottom: none;
+}
+.studio-rag-item input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #0f6cbf;
+}
+.studio-rag-item label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #334155;
+    user-select: none;
+}
+.studio-rag-group-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.studio-rag-group-header:first-child {
+    margin-top: 0;
+}
+
+/* SHA-256 Embedding Cache Status Card */
+#embedding-cache-card {
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.88rem;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+#embedding-cache-card.cache-synced {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+#embedding-cache-card.cache-modified {
+    background: #fffbeb;
+    border-color: #fde047;
+}
+#embedding-cache-card.cache-none {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+#embedding-cache-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #94a3b8;
+    flex-shrink: 0;
+}
+#embedding-cache-indicator.synced {
+    background-color: #16a34a;
+}
+#embedding-cache-indicator.modified {
+    background-color: #d97706;
 }
