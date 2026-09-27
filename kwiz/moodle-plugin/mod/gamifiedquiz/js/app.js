@@ -249,6 +249,7 @@
             const reembedAllBtn = document.getElementById('studio-reembed-all-btn');
 
             const topicInput = document.getElementById('studio-topic-input');
+            const countInput = document.getElementById('studio-count-input');
             const countSelect = document.getElementById('studio-count-select');
             const difficultySelect = document.getElementById('studio-difficulty-select');
             const languageSelect = document.getElementById('studio-language-select');
@@ -515,8 +516,8 @@
             // Pill Select Design for Generation Parameters (Count, Difficulty, Language)
             document.querySelectorAll('.gq-pill-select').forEach(group => {
                 const targetId = group.dataset.target;
-                const targetSelect = document.getElementById(targetId);
-                if (!targetSelect) return;
+                const targetEl = document.getElementById(targetId);
+                if (!targetEl) return;
 
                 const btns = group.querySelectorAll('.gq-pill-btn');
                 btns.forEach(btn => {
@@ -524,20 +525,42 @@
                         e.preventDefault();
                         btns.forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
-                        targetSelect.value = btn.dataset.value;
-                        targetSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        targetEl.value = btn.dataset.value;
+                        targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        targetEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        if (targetId === 'studio-count-input' && countSelect) {
+                            countSelect.value = btn.dataset.value;
+                        }
                     });
                 });
 
-                if (targetSelect.value) {
+                if (targetEl.value) {
                     btns.forEach(btn => {
-                        if (btn.dataset.value === targetSelect.value) {
+                        if (btn.dataset.value === String(targetEl.value)) {
                             btns.forEach(b => b.classList.remove('active'));
                             btn.classList.add('active');
                         }
                     });
                 }
             });
+
+            // Wire up number input sync with quick count pills
+            if (countInput) {
+                countInput.addEventListener('input', () => {
+                    const val = countInput.value.trim();
+                    const countPills = document.querySelectorAll('.gq-pill-select[data-target="studio-count-input"] .gq-pill-btn');
+                    countPills.forEach(btn => {
+                        if (btn.dataset.value === val) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    if (countSelect) {
+                        countSelect.value = val;
+                    }
+                });
+            }
 
             // Quick Filter Pills for RAG Sources (supporting hierarchical section tree)
             document.querySelectorAll('.gq-pill-filter').forEach(filterBtn => {
@@ -1334,7 +1357,7 @@
                 const topic = topicInput ? topicInput.value.trim() : '';
                 const selectedRagSources = getSelectedRagSources();
                 const ragSource = selectedRagSources.join(',');
-                const count = countSelect ? parseInt(countSelect.value, 10) : 5;
+                const count = countInput ? (parseInt(countInput.value, 10) || 10) : (countSelect ? (parseInt(countSelect.value, 10) || 10) : 10);
                 const difficulty = difficultySelect ? difficultySelect.value : 'medium';
                 const language = languageSelect ? languageSelect.value : 'en';
                 const customContent = customContentInput ? customContentInput.value.trim() : '';

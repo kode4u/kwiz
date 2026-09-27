@@ -405,16 +405,19 @@ if ($is_teacher) {
     echo '      <div style="margin-bottom: 16px;">';
     echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">';
     echo '          <label style="font-weight: 600; color: #1e293b; margin: 0;">Course Context Grounding (RAG Sources):</label>';
-    echo '          <div class="gq-pill-filter-group">';
-    echo '            <button type="button" class="gq-pill gq-pill-filter active" data-filter="all">All</button>';
-    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="chapter">Chapters</button>';
-    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="lesson">Lessons &amp; Pages</button>';
-    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="file">Files &amp; Docs</button>';
-    echo '            <button type="button" class="gq-pill gq-pill-filter" data-filter="label">Labels &amp; Media</button>';
-    echo '            <span class="gq-pill-separator"></span>';
-    echo '            <button type="button" class="gq-pill gq-pill-action" id="studio-rag-select-all">Select All</button>';
-    echo '            <button type="button" class="gq-pill gq-pill-action" id="studio-rag-clear-all">Clear</button>';
-    echo '            <button type="button" class="gq-pill gq-pill-action" id="studio-rag-refresh-btn">Refresh</button>';
+    echo '          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">';
+    echo '            <div class="gq-pill-filter-group">';
+    echo '              <button type="button" class="gq-pill gq-pill-filter active" data-filter="all">All</button>';
+    echo '              <button type="button" class="gq-pill gq-pill-filter" data-filter="chapter">Chapters</button>';
+    echo '              <button type="button" class="gq-pill gq-pill-filter" data-filter="lesson">Lessons &amp; Pages</button>';
+    echo '              <button type="button" class="gq-pill gq-pill-filter" data-filter="file">Files &amp; Docs</button>';
+    echo '              <button type="button" class="gq-pill gq-pill-filter" data-filter="label">Labels &amp; Media</button>';
+    echo '            </div>';
+    echo '            <div class="gq-pill-actions-group">';
+    echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-select-all">Select All</button>';
+    echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-clear-all">Clear</button>';
+    echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-refresh-btn">Refresh</button>';
+    echo '            </div>';
     echo '          </div>';
     echo '        </div>';
     echo '        <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">';
@@ -500,20 +503,23 @@ if ($is_teacher) {
     // Row: Count, Difficulty, Language with Pill Select Design
     echo '      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 14px;">';
     echo '        <div>';
-    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Number of Questions:</label>';
-    echo '          <div class="gq-pill-select" data-target="studio-count-select">';
-    echo '            <button type="button" class="gq-pill-btn" data-value="1">1</button>';
-    echo '            <button type="button" class="gq-pill-btn" data-value="3">3</button>';
-    echo '            <button type="button" class="gq-pill-btn active" data-value="5">5</button>';
-    echo '            <button type="button" class="gq-pill-btn" data-value="10">10</button>';
-    echo '            <button type="button" class="gq-pill-btn" data-value="15">15</button>';
-    echo '            <button type="button" class="gq-pill-btn" data-value="20">20</button>';
+    echo '          <label for="studio-count-input" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Number of Questions:</label>';
+    echo '          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
+    echo '            <input type="number" id="studio-count-input" class="form-control gq-count-input" min="1" max="50" value="10" style="width: 76px; height: 32px; text-align: center; font-weight: 600; font-size: 0.9rem; border-radius: 9999px; border: 1px solid #cbd5e1; background: #ffffff; padding: 2px 8px;" title="Enter question count (1-50)">';
+    echo '            <div class="gq-pill-select" data-target="studio-count-input">';
+    echo '              <button type="button" class="gq-pill-btn" data-value="1">1</button>';
+    echo '              <button type="button" class="gq-pill-btn" data-value="3">3</button>';
+    echo '              <button type="button" class="gq-pill-btn" data-value="5">5</button>';
+    echo '              <button type="button" class="gq-pill-btn active" data-value="10">10</button>';
+    echo '              <button type="button" class="gq-pill-btn" data-value="15">15</button>';
+    echo '              <button type="button" class="gq-pill-btn" data-value="20">20</button>';
+    echo '            </div>';
     echo '          </div>';
     echo '          <select id="studio-count-select" class="form-select form-control" style="display: none;">';
     echo '            <option value="1">1 Question (Quick test)</option>';
     echo '            <option value="3">3 Questions</option>';
-    echo '            <option value="5" selected>5 Questions</option>';
-    echo '            <option value="10">10 Questions</option>';
+    echo '            <option value="5">5 Questions</option>';
+    echo '            <option value="10" selected>10 Questions</option>';
     echo '            <option value="15">15 Questions</option>';
     echo '            <option value="20">20 Questions</option>';
     echo '          </select>';
@@ -527,21 +533,19 @@ if ($is_teacher) {
     echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'hard' ? ' active' : '') . '" data-value="hard">Hard (Edge Cases)</button>';
     echo '          </div>';
     echo '          <select id="studio-difficulty-select" class="form-select form-control" style="display: none;">';
-    echo '            <option value="easy"' . ($curr_diff === 'easy' ? ' selected' : '') . '>Easy (Knowledge & Syntax)</option>';
-    echo '            <option value="medium"' . ($curr_diff === 'medium' ? ' selected' : '') . '>Medium (Tracing & Output)</option>';
-    echo '            <option value="hard"' . ($curr_diff === 'hard' ? ' selected' : '') . '>Hard (Edge Cases & Reasoning)</option>';
+    echo '            <option value="easy"' . ($curr_diff === 'easy' ? ' selected' : '') . '>Easy (Knowledge &amp; Syntax)</option>';
+    echo '            <option value="medium"' . ($curr_diff === 'medium' ? ' selected' : '') . '>Medium (Tracing &amp; Output)</option>';
+    echo '            <option value="hard"' . ($curr_diff === 'hard' ? ' selected' : '') . '>Hard (Edge Cases &amp; Reasoning)</option>';
     echo '          </select>';
     echo '        </div>';
     echo '        <div>';
     echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Language:</label>';
     $curr_lang = !empty($gamifiedquiz->language) ? $gamifiedquiz->language : 'en';
     echo '          <div class="gq-pill-select" data-target="studio-language-select">';
-    echo '            <button type="button" class="gq-pill-btn' . ($curr_lang === 'en' ? ' active' : '') . '" data-value="en">English</button>';
-    echo '            <button type="button" class="gq-pill-btn' . ($curr_lang === 'km' ? ' active' : '') . '" data-value="km">Khmer (ភាសាខ្មែរ)</button>';
+    echo '            <button type="button" class="gq-pill-btn active" data-value="en">English</button>';
     echo '          </div>';
     echo '          <select id="studio-language-select" class="form-select form-control" style="display: none;">';
-    echo '            <option value="en"' . ($curr_lang === 'en' ? ' selected' : '') . '>English</option>';
-    echo '            <option value="km"' . ($curr_lang === 'km' ? ' selected' : '') . '>Khmer (ភាសាខ្មែរ)</option>';
+    echo '            <option value="en" selected>English</option>';
     echo '          </select>';
     echo '        </div>';
     echo '      </div>';
@@ -900,11 +904,84 @@ if ($is_teacher) {
     echo '  </div>';
     echo '</div>';
 
-    // Add spinner animation CSS
+    // Add spinner animation and round grouped pill CSS
     echo '<style>
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+    }
+    /* Modern Grouped Pill Controls */
+    .gq-pill-select,
+    .gq-pill-filter-group,
+    .gq-pill-actions-group {
+        display: inline-flex !important;
+        align-items: center !important;
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 9999px !important;
+        padding: 3px !important;
+        gap: 2px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .gq-pill-actions-group {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    button.gq-pill-btn,
+    button.gq-pill {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        color: #475569 !important;
+        padding: 5px 13px !important;
+        border-radius: 9999px !important;
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        line-height: 1.25 !important;
+        transition: all 0.15s ease !important;
+        user-select: none !important;
+        box-shadow: none !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        margin: 0 !important;
+    }
+    button.gq-pill-btn:hover,
+    button.gq-pill:hover {
+        background: #ffffff !important;
+        color: #0f6cbf !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    button.gq-pill-btn.active,
+    button.gq-pill.active {
+        background: #0f6cbf !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        box-shadow: 0 1px 3px rgba(15, 108, 191, 0.3) !important;
+    }
+    button.gq-pill-action {
+        color: #0f6cbf !important;
+    }
+    button.gq-pill-action:hover {
+        background: #e0f2fe !important;
+        color: #0369a1 !important;
+    }
+    .gq-count-input {
+        border-radius: 9999px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+        outline: none !important;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    }
+    .gq-count-input:focus {
+        border-color: #0f6cbf !important;
+        box-shadow: 0 0 0 2px rgba(15, 108, 191, 0.2) !important;
     }
     </style>';
 }
