@@ -539,41 +539,51 @@
                 }
             });
 
-            // Quick Filter Pills for RAG Sources
+            // Quick Filter Pills for RAG Sources (supporting hierarchical section tree)
             document.querySelectorAll('.gq-pill-filter').forEach(filterBtn => {
                 filterBtn.addEventListener('click', () => {
                     document.querySelectorAll('.gq-pill-filter').forEach(b => b.classList.remove('active'));
                     filterBtn.classList.add('active');
 
                     const filter = filterBtn.dataset.filter || 'all';
-                    const items = document.querySelectorAll('.studio-rag-item');
-                    const headers = document.querySelectorAll('.studio-rag-group-header');
 
-                    items.forEach(item => {
-                        const cat = item.dataset.category || '';
+                    // Auto-detect item
+                    const autoItem = document.querySelector('.studio-rag-item[data-source="auto"]');
+                    if (autoItem) {
+                        autoItem.style.display = (filter === 'all') ? 'flex' : 'none';
+                    }
+
+                    // Section blocks & child items
+                    const sectionBlocks = document.querySelectorAll('.studio-rag-section-block');
+                    sectionBlocks.forEach(block => {
+                        const header = block.querySelector('.studio-rag-section-header');
+                        const children = block.querySelectorAll('.studio-rag-child-item');
+
                         if (filter === 'all') {
-                            item.style.display = 'flex';
+                            block.style.display = 'block';
+                            if (header) header.style.display = 'flex';
+                            children.forEach(c => c.style.display = 'flex');
                         } else if (filter === 'chapter') {
-                            item.style.display = (cat === 'chapter') ? 'flex' : 'none';
-                        } else if (filter === 'lesson') {
-                            item.style.display = (cat === 'lesson') ? 'flex' : 'none';
-                        } else if (filter === 'file') {
-                            item.style.display = (cat === 'file') ? 'flex' : 'none';
-                        } else if (filter === 'label') {
-                            item.style.display = (cat === 'label') ? 'flex' : 'none';
+                            block.style.display = 'block';
+                            if (header) header.style.display = 'flex';
+                            children.forEach(c => c.style.display = 'none');
                         } else {
-                            item.style.display = 'flex';
-                        }
-                    });
-
-                    headers.forEach(h => {
-                        const htype = h.dataset.header || '';
-                        if (filter === 'all') {
-                            h.style.display = 'block';
-                        } else if (filter === 'chapter') {
-                            h.style.display = (htype === 'chapter') ? 'block' : 'none';
-                        } else if (filter === 'lesson' || filter === 'file' || filter === 'label') {
-                            h.style.display = (htype === 'module') ? 'block' : 'none';
+                            let visibleChildren = 0;
+                            children.forEach(c => {
+                                const cat = c.dataset.category || '';
+                                if (cat === filter) {
+                                    c.style.display = 'flex';
+                                    visibleChildren++;
+                                } else {
+                                    c.style.display = 'none';
+                                }
+                            });
+                            if (visibleChildren > 0) {
+                                block.style.display = 'block';
+                                if (header) header.style.display = 'flex';
+                            } else {
+                                block.style.display = 'none';
+                            }
                         }
                     });
                 });
@@ -590,8 +600,38 @@
                 }
             }
 
-            // Wire up checkbox events
-            ragCheckboxes.forEach(cb => {
+            // Sync Section header checkbox with child checkboxes
+            document.querySelectorAll('.studio-rag-sec-cb').forEach(secCb => {
+                secCb.addEventListener('change', () => {
+                    const secNum = secCb.dataset.section;
+                    const childCbs = document.querySelectorAll(`.studio-rag-item-cb[data-section="${secNum}"]`);
+                    childCbs.forEach(childCb => {
+                        childCb.checked = secCb.checked;
+                        updateRowSelectionState(childCb);
+                    });
+                    updateRowSelectionState(secCb);
+                    debouncedCheckCache();
+                });
+            });
+
+            // Sync Child checkbox with parent section header checkbox
+            document.querySelectorAll('.studio-rag-item-cb').forEach(itemCb => {
+                itemCb.addEventListener('change', () => {
+                    const secNum = itemCb.dataset.section;
+                    const parentSecCb = document.querySelector(`.studio-rag-sec-cb[data-section="${secNum}"]`);
+                    if (parentSecCb) {
+                        const allSiblings = document.querySelectorAll(`.studio-rag-item-cb[data-section="${secNum}"]`);
+                        const checkedSiblings = document.querySelectorAll(`.studio-rag-item-cb[data-section="${secNum}"]:checked`);
+                        parentSecCb.checked = (allSiblings.length > 0 && allSiblings.length === checkedSiblings.length);
+                        updateRowSelectionState(parentSecCb);
+                    }
+                    updateRowSelectionState(itemCb);
+                    debouncedCheckCache();
+                });
+            });
+
+            // Wire up all checkbox changes
+            document.querySelectorAll('.studio-rag-cb').forEach(cb => {
                 updateRowSelectionState(cb);
                 cb.addEventListener('change', () => {
                     updateRowSelectionState(cb);
@@ -601,7 +641,7 @@
 
             if (ragSelectAllBtn) {
                 ragSelectAllBtn.addEventListener('click', () => {
-                    ragCheckboxes.forEach(cb => {
+                    document.querySelectorAll('.studio-rag-cb').forEach(cb => {
                         const itemRow = cb.closest('.studio-rag-item');
                         if (itemRow && itemRow.style.display === 'none') return;
                         if (cb.value !== 'auto') {
@@ -615,11 +655,323 @@
 
             if (ragClearAllBtn) {
                 ragClearAllBtn.addEventListener('click', () => {
-                    ragCheckboxes.forEach(cb => {
+                    document.querySelectorAll('.studio-rag-cb').forEach(cb => {
                         cb.checked = false;
                         updateRowSelectionState(cb);
                     });
                     debouncedCheckCache();
+                });
+            }
+
+            // RAG Source Details & Embedding Inspector Modal Logic
+            const detailsModal = document.getElementById('studio-rag-details-modal');
+            const detailTitle = document.getElementById('rag-detail-title');
+            const detailSourceId = document.getElementById('rag-detail-source-id');
+            const detailSectionName = document.getElementById('rag-detail-section-name');
+            const detailTypePill = document.getElementById('rag-detail-type-pill');
+            const detailStatus = document.getElementById('rag-detail-status');
+            const detailChunksCount = document.getElementById('rag-detail-chunks-count');
+            const detailVectorDim = document.getElementById('rag-detail-vector-dim');
+            const detailModel = document.getElementById('rag-detail-model');
+            const detailChars = document.getElementById('rag-detail-chars');
+            const detailChunksList = document.getElementById('rag-detail-chunks-list');
+            const detailFullHash = document.getElementById('rag-detail-full-hash');
+            const detailRawText = document.getElementById('rag-detail-raw-text');
+            const detailFooterMsg = document.getElementById('rag-detail-footer-msg');
+            const detailReembedBtn = document.getElementById('rag-detail-reembed-btn');
+            const detailCopyRawBtn = document.getElementById('rag-detail-copy-raw-btn');
+
+            let currentDetailSource = '';
+
+            function escapeRagHtml(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function closeDetailsModal() {
+                if (detailsModal) {
+                    detailsModal.style.display = 'none';
+                }
+            }
+
+            document.querySelectorAll('.studio-details-close-btn').forEach(btn => {
+                btn.addEventListener('click', closeDetailsModal);
+            });
+
+            if (detailsModal) {
+                detailsModal.addEventListener('click', (e) => {
+                    if (e.target === detailsModal) {
+                        closeDetailsModal();
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && detailsModal && detailsModal.style.display !== 'none') {
+                    closeDetailsModal();
+                }
+            });
+
+            // Tab switching in details modal
+            if (detailsModal) {
+                detailsModal.querySelectorAll('.studio-tab-btn').forEach(tabBtn => {
+                    tabBtn.addEventListener('click', () => {
+                        detailsModal.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
+                        tabBtn.classList.add('active');
+
+                        const targetTab = tabBtn.dataset.tab;
+                        const paneChunks = document.getElementById('rag-detail-tab-chunks');
+                        const paneRaw = document.getElementById('rag-detail-tab-raw');
+
+                        if (targetTab === 'chunks') {
+                            if (paneChunks) paneChunks.style.display = 'block';
+                            if (paneRaw) paneRaw.style.display = 'none';
+                        } else {
+                            if (paneChunks) paneChunks.style.display = 'none';
+                            if (paneRaw) paneRaw.style.display = 'block';
+                        }
+                    });
+                });
+            }
+
+            // Copy Raw Content Button
+            if (detailCopyRawBtn) {
+                detailCopyRawBtn.addEventListener('click', () => {
+                    if (!detailRawText) return;
+                    navigator.clipboard.writeText(detailRawText.textContent).then(() => {
+                        detailCopyRawBtn.textContent = 'Copied!';
+                        setTimeout(() => { detailCopyRawBtn.textContent = 'Copy Content'; }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                });
+            }
+
+            // Copy Vector delegation inside chunks list
+            if (detailChunksList) {
+                detailChunksList.addEventListener('click', (e) => {
+                    const copyVecBtn = e.target.closest('.rag-copy-vector-btn');
+                    if (copyVecBtn) {
+                        const vecData = copyVecBtn.dataset.vector || '';
+                        navigator.clipboard.writeText(vecData).then(() => {
+                            copyVecBtn.textContent = 'Vector Copied!';
+                            setTimeout(() => { copyVecBtn.textContent = 'Copy Vector'; }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy vector: ', err);
+                        });
+                    }
+                });
+            }
+
+            // Click Handler for "Details" Buttons
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.studio-details-btn');
+                if (!btn) return;
+                e.preventDefault();
+
+                const source = btn.dataset.source;
+                const sourceName = btn.dataset.name || source;
+                currentDetailSource = source;
+
+                if (!detailsModal) return;
+                detailsModal.style.display = 'flex';
+
+                // Initial loading state
+                if (detailTitle) detailTitle.textContent = sourceName;
+                if (detailSourceId) detailSourceId.textContent = source;
+                if (detailSectionName) detailSectionName.textContent = 'Loading source hierarchy...';
+                if (detailTypePill) {
+                    detailTypePill.textContent = 'Source';
+                    detailTypePill.className = 'gq-type-pill type-auto';
+                }
+                if (detailStatus) {
+                    detailStatus.textContent = 'Analyzing...';
+                    detailStatus.style.color = '#0f6cbf';
+                }
+                if (detailChunksCount) detailChunksCount.textContent = '...';
+                if (detailChars) detailChars.textContent = '...';
+                if (detailChunksList) {
+                    detailChunksList.innerHTML = '<div style="text-align: center; padding: 30px; color: #64748b;">Extracting text content and reading vector embeddings from cache...</div>';
+                }
+                if (detailFullHash) detailFullHash.textContent = '...';
+                if (detailRawText) detailRawText.textContent = 'Loading extracted text...';
+                if (detailFooterMsg) detailFooterMsg.textContent = '';
+                if (detailReembedBtn) {
+                    detailReembedBtn.disabled = true;
+                    detailReembedBtn.textContent = 'Re-embed This Source';
+                }
+
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'source_details');
+                    formData.append('source', source);
+                    formData.append('courseid', config.courseId || 0);
+                    formData.append('cmid', config.cmId || 0);
+                    formData.append('sesskey', config.sesskey);
+
+                    const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
+                    });
+                    const data = await res.json();
+
+                    if (!data.success && data.error) {
+                        if (detailStatus) {
+                            detailStatus.textContent = 'Error';
+                            detailStatus.style.color = '#dc2626';
+                        }
+                        if (detailChunksList) {
+                            detailChunksList.innerHTML = `<div style="color: #dc2626; padding: 20px;">Failed to inspect source details: ${data.error}</div>`;
+                        }
+                        if (detailRawText) detailRawText.textContent = `Error: ${data.error}`;
+                        return;
+                    }
+
+                    // Populate metadata
+                    if (detailTitle) detailTitle.textContent = data.source_name || sourceName;
+                    if (detailSectionName) detailSectionName.textContent = data.section_name || 'Course Content';
+                    if (detailTypePill) {
+                        const st = (data.source_type || 'Source').toLowerCase();
+                        let pclass = 'type-file';
+                        if (st.includes('lesson')) pclass = 'type-lesson';
+                        else if (st.includes('page')) pclass = 'type-page';
+                        else if (st.includes('label')) pclass = 'type-label';
+                        else if (st.includes('chapter') || st.includes('section')) pclass = 'type-chapter';
+                        else if (st.includes('auto')) pclass = 'type-auto';
+                        detailTypePill.textContent = data.source_type || 'Source';
+                        detailTypePill.className = `gq-type-pill ${pclass}`;
+                    }
+
+                    if (detailStatus) {
+                        if (data.status === 'synced') {
+                            detailStatus.textContent = `Cached (Synced)`;
+                            detailStatus.style.color = '#15803d';
+                        } else if (data.status === 'modified') {
+                            detailStatus.textContent = `Modified (${data.modified_chunks} need re-embed)`;
+                            detailStatus.style.color = '#b45309';
+                        } else if (data.status === 'uncached') {
+                            detailStatus.textContent = `Uncached (${data.total_chunks} chunks ready)`;
+                            detailStatus.style.color = '#b45309';
+                        } else {
+                            detailStatus.textContent = `Empty (No Content)`;
+                            detailStatus.style.color = '#64748b';
+                        }
+                    }
+
+                    if (detailChunksCount) detailChunksCount.textContent = `${data.cached_chunks || 0} / ${data.total_chunks || 0}`;
+                    if (detailVectorDim) detailVectorDim.textContent = `${data.vector_dim || 768} float32`;
+                    if (detailModel) detailModel.textContent = data.embedding_model || 'nomic-embed-text';
+                    if (detailChars) detailChars.textContent = `${data.total_chars || 0} / ~${data.estimated_tokens || 0}`;
+                    if (detailFullHash) detailFullHash.textContent = data.content_hash || '(None)';
+                    if (detailRawText) detailRawText.textContent = data.raw_content || '(No extractable text found in this source)';
+
+                    if (detailReembedBtn) {
+                        detailReembedBtn.disabled = false;
+                        detailReembedBtn.textContent = (data.status === 'synced') ? 'Force Re-embed' : 'Re-embed Now';
+                    }
+
+                    if (detailFooterMsg) {
+                        detailFooterMsg.textContent = data.message || `SHA-256 fingerprint: ${data.short_hash || 'none'}`;
+                    }
+
+                    // Render Chunks list
+                    const chunks = data.chunks || [];
+                    if (chunks.length === 0) {
+                        detailChunksList.innerHTML = '<div style="text-align: center; padding: 25px; color: #64748b; background: #f8fafc; border-radius: 6px;">No chunks created because this item contains no extractable text.</div>';
+                    } else {
+                        let html = '';
+                        chunks.forEach(c => {
+                            const sampleStr = (c.vector_sample && c.vector_sample.length > 0)
+                                ? `[${c.vector_sample.join(', ')}${c.vector_dim > 10 ? ', ... +' + (c.vector_dim - 10) + ' dims' : ''}]`
+                                : '(Vector embedding not in cache — click Re-embed Now)';
+                            const fullVectorJson = JSON.stringify(c.vector_full || []);
+
+                            html += `
+                            <div class="rag-chunk-card">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <div>
+                                        <strong>Chunk #${c.index}</strong>
+                                        <span style="color: #64748b; font-size: 0.78rem; margin-left: 8px;">${c.char_length} chars (~${c.estimated_tokens} tokens)</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="rag-source-badge ${c.is_cached ? 'rag-badge-synced' : 'rag-badge-modified'}">${c.is_cached ? 'Cached' : 'Uncached'}</span>
+                                        <span style="font-family: monospace; font-size: 0.72rem; color: #64748b;">${c.short_sha256}...</span>
+                                    </div>
+                                </div>
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px; font-size: 0.82rem; color: #334155; line-height: 1.4; margin-bottom: 10px; white-space: pre-wrap; max-height: 120px; overflow-y: auto;">${escapeRagHtml(c.text)}</div>
+                                <div style="background: #f1f5f9; border-radius: 4px; padding: 8px 10px; font-size: 0.78rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                        <span style="font-weight: 600; color: #475569;">Embedding Vector (${c.vector_dim}-D Float32 | Cosine Space | Norm: ${c.vector_norm || '0.0'}):</span>
+                                        ${c.is_cached ? `<button type="button" class="btn btn-sm btn-link p-0 rag-copy-vector-btn" data-vector='${fullVectorJson}' style="font-size: 0.72rem; text-decoration: none; color: #0f6cbf;">Copy Vector</button>` : ''}
+                                    </div>
+                                    <div class="rag-vector-box">${sampleStr}</div>
+                                </div>
+                            </div>`;
+                        });
+                        detailChunksList.innerHTML = html;
+                    }
+
+                } catch (err) {
+                    if (detailStatus) {
+                        detailStatus.textContent = 'Error';
+                        detailStatus.style.color = '#dc2626';
+                    }
+                    if (detailChunksList) {
+                        detailChunksList.innerHTML = `<div style="color: #dc2626; padding: 20px;">Connection error: ${err.message}</div>`;
+                    }
+                }
+            });
+
+            // Re-embed button inside Details Modal
+            if (detailReembedBtn) {
+                detailReembedBtn.addEventListener('click', async () => {
+                    if (!currentDetailSource) return;
+                    detailReembedBtn.disabled = true;
+                    detailReembedBtn.textContent = 'Re-embedding...';
+                    if (detailFooterMsg) detailFooterMsg.textContent = 'Computing SHA-256 chunk embeddings via Ollama nomic-embed-text...';
+
+                    try {
+                        const formData = new URLSearchParams();
+                        formData.append('action', 'reindex_single');
+                        formData.append('source', currentDetailSource);
+                        formData.append('courseid', config.courseId || 0);
+                        formData.append('cmid', config.cmId || 0);
+                        formData.append('sesskey', config.sesskey);
+
+                        const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formData.toString()
+                        });
+                        const data = await res.json();
+
+                        if (!data.success && data.error) {
+                            alert('Re-embedding failed: ' + data.error);
+                            detailReembedBtn.disabled = false;
+                            detailReembedBtn.textContent = 'Re-embed Now';
+                            return;
+                        }
+
+                        // Re-trigger details fetch to refresh views
+                        const triggerBtn = document.querySelector(`.studio-details-btn[data-source="${currentDetailSource}"]`);
+                        if (triggerBtn) {
+                            triggerBtn.click();
+                        }
+
+                        // Refresh background course status
+                        loadAllSourcesCacheStatus();
+
+                    } catch (err) {
+                        alert('Re-embedding error: ' + err.message);
+                        detailReembedBtn.disabled = false;
+                        detailReembedBtn.textContent = 'Re-embed Now';
+                    }
                 });
             }
 

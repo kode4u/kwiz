@@ -97,13 +97,51 @@ if ($background_style) {
     $background_style = 'background-image: ' . $background_style . '; background-size: cover; background-position: center;';
 }
 
-// Find RAG sources and Labels in the current course
+// Find RAG sources, Sections, and Labels organized by Course Section / Chapter
 $modinfo = get_fast_modinfo($course->id);
+$course_sections_tree = [];
 $rag_sources = [];
+$rag_sections = [];
 $course_labels = [];
-foreach ($modinfo->cms as $cm_item) {
-    if ($cm_item->uservisible) {
+
+foreach ($modinfo->get_section_info_all() as $secnum => $secinfo) {
+    if (empty($modinfo->sections[$secnum])) {
+        continue;
+    }
+
+    $sec_items = [];
+    foreach ($modinfo->sections[$secnum] as $sec_cmid) {
+        if (!isset($modinfo->cms[$sec_cmid])) {
+            continue;
+        }
+        $cm_item = $modinfo->cms[$sec_cmid];
+        if (!$cm_item->uservisible) {
+            continue;
+        }
+
         if (in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder'])) {
+            $cat = 'other';
+            $pill_class = 'type-file';
+            $pill_label = ucfirst($cm_item->modname);
+            if (in_array($cm_item->modname, ['lesson', 'page', 'book'])) {
+                $cat = 'lesson';
+                $pill_class = ($cm_item->modname === 'lesson') ? 'type-lesson' : 'type-page';
+            } else if (in_array($cm_item->modname, ['resource', 'folder'])) {
+                $cat = 'file';
+                $pill_class = 'type-file';
+                $pill_label = ($cm_item->modname === 'folder') ? 'Folder' : 'File';
+            }
+
+            $item_data = array(
+                'id' => $cm_item->id,
+                'name' => $cm_item->name,
+                'type' => $cm_item->modname,
+                'category' => $cat,
+                'pill_class' => $pill_class,
+                'pill_label' => $pill_label,
+                'section' => $secnum
+            );
+            $sec_items[] = $item_data;
             $rag_sources[] = array(
                 'id' => $cm_item->id,
                 'name' => $cm_item->name,
@@ -117,6 +155,17 @@ foreach ($modinfo->cms as $cm_item) {
                 $clean_text = trim(preg_replace('/\s+/', ' ', $clean_text));
             }
             $display_name = !empty($clean_text) ? (strlen($clean_text) > 60 ? substr($clean_text, 0, 60) . '...' : $clean_text) : 'Course Note / Label';
+
+            $item_data = array(
+                'id' => $cm_item->id,
+                'name' => $display_name,
+                'type' => 'label',
+                'category' => 'label',
+                'pill_class' => 'type-label',
+                'pill_label' => 'Label & Media',
+                'section' => $secnum
+            );
+            $sec_items[] = $item_data;
             $rag_sources[] = array(
                 'id' => $cm_item->id,
                 'name' => $display_name,
@@ -131,32 +180,17 @@ foreach ($modinfo->cms as $cm_item) {
             }
         }
     }
-}
 
-// Find RAG sections/chapters
-$rag_sections = [];
-foreach ($modinfo->sections as $sectionnum => $cmids) {
-    $section_has_rag = false;
-    foreach ($cmids as $sec_cmid) {
-        if (isset($modinfo->cms[$sec_cmid])) {
-            $cm_item = $modinfo->cms[$sec_cmid];
-            if ($cm_item->uservisible && in_array($cm_item->modname, ['page', 'lesson', 'book', 'resource', 'folder', 'label'])) {
-                $section_has_rag = true;
-                break;
-            }
-        }
-    }
-    if ($section_has_rag) {
-        $sectioninfo = $modinfo->get_section_info($sectionnum);
-        $name = '';
-        if ($sectioninfo && !empty($sectioninfo->name)) {
-            $name = $sectioninfo->name;
-        } else {
-            $name = 'Section ' . $sectionnum;
-        }
+    if (!empty($sec_items)) {
+        $sec_name = ($secinfo && !empty($secinfo->name)) ? $secinfo->name : ('Section ' . $secnum);
+        $course_sections_tree[] = array(
+            'number' => $secnum,
+            'name' => $sec_name,
+            'items' => $sec_items
+        );
         $rag_sections[] = array(
-            'number' => $sectionnum,
-            'name' => $name
+            'number' => $secnum,
+            'name' => $sec_name
         );
     }
 }
@@ -395,59 +429,45 @@ if ($is_teacher) {
     echo '            </div>';
     echo '            <div class="studio-rag-item-right">';
     echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-auto">Checking...</span>';
+    echo '              <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="auto" data-name="Auto-detect (Preceding Activity)">Details</button>';
     echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="auto" id="rag-reembed-auto" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
     echo '            </div>';
     echo '          </div>';
-    if (!empty($rag_sections)) {
-        echo '          <div class="studio-rag-group-header" data-header="chapter">Course Chapters / Sections</div>';
-        foreach ($rag_sections as $sec) {
+    if (!empty($course_sections_tree)) {
+        foreach ($course_sections_tree as $sec) {
             $sid = 'rag_src_sec_' . (int)$sec['number'];
             $src_key = 'section_' . (int)$sec['number'];
-            echo '          <div class="studio-rag-item" data-source="' . $src_key . '" data-category="chapter">';
-            echo '            <div class="studio-rag-item-left">';
-            echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="' . $src_key . '" id="' . $sid . '">';
-            echo '              <span class="gq-type-pill type-chapter">Chapter</span>';
-            echo '              <label for="' . $sid . '">Chapter: ' . s($sec['name']) . '</label>';
+            echo '          <div class="studio-rag-section-block" data-section="' . (int)$sec['number'] . '">';
+            echo '            <div class="studio-rag-section-header studio-rag-item" data-source="' . $src_key . '" data-category="chapter">';
+            echo '              <div class="studio-rag-item-left">';
+            echo '                <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb studio-rag-sec-cb" value="' . $src_key . '" id="' . $sid . '" data-section="' . (int)$sec['number'] . '">';
+            echo '                <span class="gq-type-pill type-chapter">Chapter</span>';
+            echo '                <label for="' . $sid . '"><strong>' . s($sec['name']) . '</strong><span class="studio-rag-count-pill">' . count($sec['items']) . ' items</span></label>';
+            echo '              </div>';
+            echo '              <div class="studio-rag-item-right">';
+            echo '                <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
+            echo '                <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="' . $src_key . '" data-name="' . s($sec['name']) . '">Details</button>';
+            echo '                <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+            echo '              </div>';
             echo '            </div>';
-            echo '            <div class="studio-rag-item-right">';
-            echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
-            echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
-            echo '            </div>';
-            echo '          </div>';
-        }
-    }
-    if (!empty($rag_sources)) {
-        echo '          <div class="studio-rag-group-header" data-header="module">Individual Course Materials &amp; Media</div>';
-        foreach ($rag_sources as $src) {
-            $type_label = ucfirst($src['type']);
-            $cid = 'rag_src_cm_' . (int)$src['id'];
-            $src_key = 'cmid_' . (int)$src['id'];
-
-            $cat = 'other';
-            $pill_class = 'type-file';
-            $pill_label = $type_label;
-            if (in_array($src['type'], ['lesson', 'page', 'book'])) {
-                $cat = 'lesson';
-                $pill_class = 'type-' . $src['type'];
-            } else if (in_array($src['type'], ['resource', 'folder'])) {
-                $cat = 'file';
-                $pill_class = 'type-file';
-                $pill_label = $src['type'] === 'folder' ? 'Folder' : 'File';
-            } else if ($src['type'] === 'label') {
-                $cat = 'label';
-                $pill_class = 'type-label';
-                $pill_label = 'Label & Media';
+            echo '            <div class="studio-rag-section-children">';
+            foreach ($sec['items'] as $item) {
+                $cid = 'rag_src_cm_' . (int)$item['id'];
+                $item_key = 'cmid_' . (int)$item['id'];
+                echo '              <div class="studio-rag-item studio-rag-child-item" data-source="' . $item_key . '" data-category="' . $item['category'] . '" data-section="' . (int)$sec['number'] . '">';
+                echo '                <div class="studio-rag-item-left">';
+                echo '                  <span class="studio-rag-tree-indicator">└─</span>';
+                echo '                  <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb studio-rag-item-cb" value="' . $item_key . '" id="' . $cid . '" data-section="' . (int)$sec['number'] . '">';
+                echo '                  <span class="gq-type-pill ' . $item['pill_class'] . '">' . $item['pill_label'] . '</span>';
+                echo '                  <label for="' . $cid . '">' . s($item['name']) . '</label>';
+                echo '                </div>';
+                echo '                <div class="studio-rag-item-right">';
+                echo '                  <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $item_key . '">Checking...</span>';
+                echo '                  <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="' . $item_key . '" data-name="' . s($item['name']) . '">Details</button>';
+                echo '                  <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $item_key . '" id="rag-reembed-' . $item_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+                echo '                </div>';
+                echo '              </div>';
             }
-
-            echo '          <div class="studio-rag-item" data-source="' . $src_key . '" data-category="' . $cat . '">';
-            echo '            <div class="studio-rag-item-left">';
-            echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="' . $src_key . '" id="' . $cid . '">';
-            echo '              <span class="gq-type-pill ' . $pill_class . '">' . $pill_label . '</span>';
-            echo '              <label for="' . $cid . '">' . s($src['name']) . '</label>';
-            echo '            </div>';
-            echo '            <div class="studio-rag-item-right">';
-            echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
-            echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
             echo '            </div>';
             echo '          </div>';
         }
@@ -808,7 +828,78 @@ if ($is_teacher) {
 
     echo '</div>';
     echo '</div>';
-    
+
+    // RAG Source Details & Embedding Inspector Modal
+    echo '<div id="studio-rag-details-modal" class="question-editor-modal" style="display: none; align-items: center; justify-content: center;">';
+    echo '  <div class="question-editor-content" style="max-width: 900px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.18); background: #ffffff;">';
+    echo '    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 16px;">';
+    echo '      <div>';
+    echo '        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">';
+    echo '          <span id="rag-detail-type-pill" class="gq-type-pill type-lesson">Source</span>';
+    echo '          <h4 id="rag-detail-title" style="margin: 0; font-weight: 700; color: #1e293b; font-size: 1.15rem;">Source Title</h4>';
+    echo '        </div>';
+    echo '        <div style="font-size: 0.8rem; color: #64748b;">';
+    echo '          <span id="rag-detail-source-id">source_key</span> &bull; <span id="rag-detail-section-name">Section</span>';
+    echo '        </div>';
+    echo '      </div>';
+    echo '      <button type="button" class="studio-details-close-btn" style="border: 1px solid #cbd5e1; background: #ffffff; border-radius: 4px; font-size: 1.3rem; line-height: 1; padding: 2px 8px; cursor: pointer; color: #64748b;">&times;</button>';
+    echo '    </div>';
+
+    // Summary Metric Cards
+    echo '    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;">';
+    echo '      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; text-align: center;">';
+    echo '        <div style="font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Status</div>';
+    echo '        <div id="rag-detail-status" style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-top: 2px;">Loading...</div>';
+    echo '      </div>';
+    echo '      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; text-align: center;">';
+    echo '        <div style="font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Chunks</div>';
+    echo '        <div id="rag-detail-chunks-count" style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-top: 2px;">-</div>';
+    echo '      </div>';
+    echo '      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; text-align: center;">';
+    echo '        <div style="font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Vector Dim</div>';
+    echo '        <div id="rag-detail-vector-dim" style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-top: 2px;">768 float32</div>';
+    echo '      </div>';
+    echo '      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; text-align: center;">';
+    echo '        <div style="font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Embed Model</div>';
+    echo '        <div id="rag-detail-model" style="font-weight: 700; font-size: 0.85rem; color: #1e293b; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">nomic-embed-text</div>';
+    echo '      </div>';
+    echo '      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; text-align: center;">';
+    echo '        <div style="font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Chars / Tokens</div>';
+    echo '        <div id="rag-detail-chars" style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-top: 2px;">-</div>';
+    echo '      </div>';
+    echo '    </div>';
+
+    // Tabs Header
+    echo '    <div style="display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 14px;">';
+    echo '      <button type="button" class="studio-tab-btn active" data-tab="chunks">Chunks &amp; Vector Embeddings</button>';
+    echo '      <button type="button" class="studio-tab-btn" data-tab="raw">Raw Extracted Data</button>';
+    echo '    </div>';
+
+    // Tab Panes Area
+    echo '    <div style="flex: 1 1 auto; overflow-y: auto; max-height: calc(90vh - 280px); padding-right: 4px;">';
+    echo '      <div id="rag-detail-tab-chunks" class="studio-tab-pane">';
+    echo '        <div id="rag-detail-chunks-list" style="display: flex; flex-direction: column; gap: 14px;"></div>';
+    echo '      </div>';
+    echo '      <div id="rag-detail-tab-raw" class="studio-tab-pane" style="display: none;">';
+    echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">';
+    echo '          <span style="font-size: 0.8rem; color: #64748b;">SHA-256 Fingerprint: <code id="rag-detail-full-hash" style="color: #0f6cbf;"></code></span>';
+    echo '          <button type="button" class="btn btn-sm btn-outline-secondary" id="rag-detail-copy-raw-btn" style="font-size: 0.75rem; padding: 2px 8px;">Copy Content</button>';
+    echo '        </div>';
+    echo '        <pre id="rag-detail-raw-text" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px; font-size: 0.82rem; font-family: monospace; white-space: pre-wrap; word-break: break-word; max-height: 360px; overflow-y: auto; color: #1e293b;"></pre>';
+    echo '      </div>';
+    echo '    </div>';
+
+    // Modal Footer
+    echo '    <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">';
+    echo '      <div id="rag-detail-footer-msg" style="font-size: 0.82rem; color: #64748b;"></div>';
+    echo '      <div style="display: flex; gap: 8px;">';
+    echo '        <button type="button" class="btn btn-sm btn-outline-primary" id="rag-detail-reembed-btn">Re-embed This Source</button>';
+    echo '        <button type="button" class="btn btn-sm btn-secondary studio-details-close-btn">Close</button>';
+    echo '      </div>';
+    echo '    </div>';
+    echo '  </div>';
+    echo '</div>';
+
     // Add spinner animation CSS
     echo '<style>
     @keyframes spin {

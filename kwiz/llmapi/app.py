@@ -1728,6 +1728,137 @@ def cache_batch_status():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/cache/details', methods=['POST'])
+def cache_details():
+    """Return in-depth chunking, embedding vector samples, and cache metrics for a source."""
+    try:
+        data = request.json or {}
+        content = (data.get('content') or '').strip()
+        source_id = data.get('source_id', '')
+        backend = data.get('backend', LLM_BACKEND)
+        model = data.get('model', OLLAMA_MODEL_DEFAULT)
+
+        if backend == 'local':
+            embed_model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or 'nomic-embed-text'
+            default_dim = 768
+        elif backend == 'openai':
+            embed_model_name = "text-embedding-3-small"
+            default_dim = 1536
+        elif backend == 'gemini':
+            embed_model_name = "models/text-embedding-004"
+            default_dim = 768
+        else:
+            embed_model_name = "nomic-embed-text"
+            default_dim = 768
+
+        if not content:
+            return jsonify({
+                'success': True,
+                'source_id': source_id,
+                'has_content': False,
+                'status': 'empty',
+                'content_hash': '',
+                'short_hash': '',
+                'total_chars': 0,
+                'estimated_tokens': 0,
+                'total_chunks': 0,
+                'cached_chunks': 0,
+                'modified_chunks': 0,
+                'is_synced': True,
+                'embedding_model': embed_model_name,
+                'vector_dim': default_dim,
+                'distance_metric': 'Cosine Similarity',
+                'chunks': [],
+                'raw_content': '',
+                'message': 'No content extractable for this source.'
+            })
+
+        content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+        # Chunk the text using standard ~500 chars window
+        chunks = []
+        lines = content.split('\n')
+        current_chunk = []
+        current_len = 0
+        for line in lines:
+            if not line.strip():
+                continue
+            current_chunk.append(line)
+            current_len += len(line)
+            if current_len >= 500:
+                chunks.append("\n".join(current_chunk))
+                current_chunk = []
+                current_len = 0
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+        if not chunks:
+            chunks = [content]
+
+        chunks_detail = []
+        cached_count = 0
+
+        with embedding_cache_lock:
+            for idx, c in enumerate(chunks):
+                hash_key = hashlib.sha256(f"{embed_model_name}:{c}".encode('utf-8')).hexdigest()
+                is_cached = hash_key in embedding_cache
+                vec = embedding_cache.get(hash_key)
+
+                if is_cached and vec:
+                    cached_count += 1
+                    vec_len = len(vec)
+                    vec_sample = [round(float(x), 4) for x in vec[:10]]
+                    vec_norm = round(sum(float(x)**2 for x in vec)**0.5, 4)
+                    vec_full = [round(float(x), 5) for x in vec]
+                else:
+                    vec_len = default_dim
+                    vec_sample = []
+                    vec_norm = 0.0
+                    vec_full = []
+
+                chunks_detail.append({
+                    'index': idx + 1,
+                    'sha256': hash_key,
+                    'short_sha256': hash_key[:12],
+                    'char_length': len(c),
+                    'estimated_tokens': max(1, round(len(c) / 4)),
+                    'is_cached': is_cached,
+                    'text': c,
+                    'vector_dim': vec_len,
+                    'vector_sample': vec_sample,
+                    'vector_norm': vec_norm,
+                    'vector_full': vec_full
+                })
+
+        total_chunks = len(chunks)
+        modified_chunks = total_chunks - cached_count
+        is_synced = (modified_chunks == 0 and total_chunks > 0)
+        status = 'synced' if is_synced else ('modified' if cached_count > 0 else 'uncached')
+
+        return jsonify({
+            'success': True,
+            'source_id': source_id,
+            'has_content': True,
+            'status': status,
+            'content_hash': content_hash,
+            'short_hash': content_hash[:8],
+            'total_chars': len(content),
+            'estimated_tokens': max(1, round(len(content) / 4)),
+            'total_chunks': total_chunks,
+            'cached_chunks': cached_count,
+            'modified_chunks': modified_chunks,
+            'is_synced': is_synced,
+            'embedding_model': embed_model_name,
+            'vector_dim': default_dim,
+            'distance_metric': 'Cosine Similarity',
+            'chunks': chunks_detail,
+            'raw_content': content,
+            'message': f"Analysis complete: {cached_count}/{total_chunks} chunks cached."
+        })
+    except Exception as e:
+        logger.error(f"Error fetching cache details: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/cache/reindex', methods=['POST'])
 def cache_reindex():
     """Force recompute and persist SHA-256 chunk embeddings into cache (single or batch)."""

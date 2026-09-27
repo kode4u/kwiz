@@ -122,6 +122,77 @@ try {
         exit;
     }
 
+    // 1b. Inspect source embedding details (vectors, chunks, raw text)
+    if ($action === 'source_details') {
+        if (empty($source)) {
+            throw new Exception('No source specified for details inspection.');
+        }
+
+        $single_text = '';
+        $source_name = '';
+        $source_type = '';
+        $section_name = '';
+
+        $modinfo = !empty($courseid) ? get_fast_modinfo($courseid) : null;
+
+        if (strpos($source, 'section_') === 0 && !empty($courseid)) {
+            $sec_num = (int)substr($source, 8);
+            if ($modinfo) {
+                $secinfo = $modinfo->get_section_info($sec_num);
+                $section_name = ($secinfo && !empty($secinfo->name)) ? $secinfo->name : ('Section ' . $sec_num);
+            } else {
+                $section_name = 'Section ' . $sec_num;
+            }
+            $source_name = $section_name;
+            $source_type = 'Chapter / Section';
+            $single_text = gamifiedquiz_get_section_text_content($courseid, $sec_num);
+        } else if (strpos($source, 'cmid_') === 0 && !empty($courseid)) {
+            $cm_id = (int)substr($source, 5);
+            if ($modinfo && isset($modinfo->cms[$cm_id])) {
+                $cm = $modinfo->cms[$cm_id];
+                $source_name = $cm->name;
+                $source_type = ucfirst($cm->modname);
+                $secinfo = $modinfo->get_section_info($cm->sectionnum);
+                $section_name = ($secinfo && !empty($secinfo->name)) ? $secinfo->name : ('Section ' . $cm->sectionnum);
+            } else {
+                $source_name = 'Module #' . $cm_id;
+                $source_type = 'Module';
+            }
+            $single_text = gamifiedquiz_get_module_text_content($cm_id);
+        } else if ($source === 'auto') {
+            $source_type = 'Auto-detect';
+            if (!empty($cmid)) {
+                $preceding_cmid = gamifiedquiz_get_preceding_activity_cmid($cmid);
+                if ($preceding_cmid && $modinfo && isset($modinfo->cms[$preceding_cmid])) {
+                    $pcm = $modinfo->cms[$preceding_cmid];
+                    $source_name = 'Auto: ' . $pcm->name;
+                    $secinfo = $modinfo->get_section_info($pcm->sectionnum);
+                    $section_name = ($secinfo && !empty($secinfo->name)) ? $secinfo->name : ('Section ' . $pcm->sectionnum);
+                    $single_text = gamifiedquiz_get_module_text_content($preceding_cmid);
+                } else {
+                    $source_name = 'Auto-detect (No preceding activity)';
+                    $single_text = '';
+                }
+            } else {
+                $source_name = 'Auto-detect';
+                $single_text = '';
+            }
+        }
+
+        $res = gamifiedquiz_llmapi_cache_call($api_url . '/cache/details', array(
+            'content' => $single_text,
+            'source_id' => $source,
+            'backend' => 'local'
+        ), 30);
+
+        $res['source'] = $source;
+        $res['source_name'] = $source_name;
+        $res['source_type'] = $source_type;
+        $res['section_name'] = $section_name;
+        echo json_encode($res);
+        exit;
+    }
+
     // 2. Re-embed a single source
     if ($action === 'reindex_single') {
         if (empty($source)) {
