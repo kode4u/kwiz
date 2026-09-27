@@ -110,7 +110,7 @@ $prompt = optional_param('prompt', '', PARAM_TEXT);
 $data = optional_param('data', '', PARAM_TEXT);
 $difficulty = optional_param('difficulty', '', PARAM_TEXT);
 $count = optional_param('count', 5, PARAM_INT);
-$async = optional_param('async', 1, PARAM_INT);
+$async = optional_param('async', 0, PARAM_INT);
 $batchid = optional_param('batch_id', '', PARAM_TEXT);
 $categoryname = optional_param('category_name', '', PARAM_TEXT);
 $learning_outcomes = optional_param('learning_outcomes', '', PARAM_TEXT);
@@ -195,8 +195,9 @@ try {
     $llmmodel = property_exists($gamifiedquiz, 'llm_model') ? $gamifiedquiz->llm_model : '';
     $userapikey = gamifiedquiz_get_user_llm_api_key($backend, $USER->id);
 
-    // Background generation (default): queue job and return immediately.
-    if ($async) {
+    // Background generation: only if requested and a websocket worker is configured.
+    $ws_url = get_config('mod_gamifiedquiz', 'websocket_url');
+    if ($async && !empty($ws_url)) {
         if (empty($batchid)) {
             $batchid = gamifiedquiz_new_uuid();
         }

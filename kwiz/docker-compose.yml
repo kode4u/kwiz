@@ -1,5 +1,5 @@
-# Docker Compose configuration
-# Uses docker/.env as the single source for all environment variables
+# Kwiz Docker Compose configuration
+# Streamlined architecture for on-premise RAG MCQ generation & Moodle LMS
 
 services:
   # MySQL Database for Moodle
@@ -24,24 +24,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # Redis for caching and pub/sub
-  redis:
-    image: redis:7-alpine
-    container_name: jica-redis
-    ports:
-      - "6380:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - jica-network
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  # LLM API Service
+  # LLM API Service (RAG & Deterministic AST Validation)
   llmapi:
     build:
       context: ./llmapi
@@ -73,52 +56,15 @@ services:
       - "${LLM_API_PORT:-5001}:5001"
     networks:
       - jica-network
-    # Allow container to reach Ollama on host (Mac/Windows: built-in; Linux: needs this)
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    depends_on:
-      redis:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # WebSocket Server
-  websocket-server:
-    build:
-      context: ./websocket-server
-      dockerfile: Dockerfile
-    container_name: jica-websocket
-    environment:
-      PORT: ${WS_PORT:-3001}
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
-      NODE_ENV: production
-      GENERATION_WORKER_SECRET: ${GENERATION_WORKER_SECRET:-gamified-generation-secret}
-      MOODLE_INTERNAL_URL: http://moodle
-      GENERATION_QUEUE_KEY: gamifiedquiz:generation:queue
-      LOCAL_GENERATION_BATCH_SIZE: 3
-      LLM_FETCH_TIMEOUT_MS: ${LLM_FETCH_TIMEOUT_MS:-1200000}
-    ports:
-      - "${WS_PORT:-3001}:3001"
-    networks:
-      - jica-network
-    depends_on:
-      redis:
-        condition: service_healthy
-      llmapi:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Moodle with Plugin
-  # Using custom Dockerfile since bitnami/moodle image is not available
+  # Moodle with Kwiz Assessment Plugin
   moodle:
     build:
       context: ./docker/moodle
@@ -131,8 +77,6 @@ services:
       MOODLE_DATABASE_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
       MOODLE_DATABASE_NAME: ${MYSQL_DATABASE:-moodle}
       MOODLE_HOST: ${MOODLE_URL:-http://localhost:8080}
-      # Used by complete_generation_job.php to match $CFG->wwwroot for worker callbacks
-      GAMIFIEDQUIZ_WORKER_TOKEN: ${GENERATION_WORKER_SECRET:-gamified-generation-secret}
       GAMIFIEDQUIZ_METRICS_LOG: /logs/evaluation/metrics.jsonl
     ports:
       - "8080:80"
@@ -169,11 +113,9 @@ services:
 
 volumes:
   mysql_data:
-  redis_data:
   moodle_data:
   moodle_data_dir:
 
 networks:
   jica-network:
     driver: bridge
-
