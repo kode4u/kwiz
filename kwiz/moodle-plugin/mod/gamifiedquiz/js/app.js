@@ -1021,15 +1021,17 @@
                             throw new Error(data.error || 'Failed to re-embed source');
                         }
 
-                        if (badge) {
-                            badge.className = 'rag-source-badge rag-badge-synced';
-                            badge.textContent = `Cached (${data.short_hash || 'OK'})`;
-                            badge.title = `SHA-256: ${data.content_hash} (${data.total_chunks} chunk(s) indexed)`;
+                        if (data.is_synced || data.status === 'synced') {
+                            if (badge) {
+                                badge.className = 'rag-source-badge rag-badge-synced';
+                                badge.textContent = `Cached (${data.short_hash || 'OK'})`;
+                                badge.title = `SHA-256: ${data.content_hash} (${data.total_chunks} chunk(s) indexed)`;
+                            }
+                            btn.style.display = 'none';
                         }
-                        btn.style.display = 'none';
-                        appendStudioLog(`[CACHE] Re-embedded ${sourceKey}: ${data.total_chunks} chunks indexed in ${data.duration_ms}ms (SHA-256: ${data.short_hash}).`);
+                        appendStudioLog(`[CACHE] Re-embedded ${sourceKey}: ${data.cached_chunks || data.total_chunks}/${data.total_chunks} chunks indexed in ${data.duration_ms}ms (SHA-256: ${data.short_hash}).`);
 
-                        refreshSummaryFromBadges();
+                        await loadAllSourcesCacheStatus();
                         debouncedCheckCache();
                     } catch (err) {
                         alert(`Failed to re-embed source: ${err.message}`);

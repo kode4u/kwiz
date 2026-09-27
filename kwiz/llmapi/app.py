@@ -12,6 +12,7 @@ import requests
 import hashlib
 import io
 import base64
+import re
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -52,6 +53,67 @@ def save_embedding_cache():
             json.dump(embedding_cache, fh)
     except Exception as e:
         logger.warning(f"Failed to save embedding cache: {e}")
+
+def chunk_text(content: str, target_size: int = 500, max_size: int = 800) -> list:
+    """Robust text chunker that guarantees chunk size <= max_size even for texts without newlines."""
+    content = (content or '').strip()
+    if not content:
+        return []
+
+    # Normalize line endings
+    content = content.replace('\r\n', '\n').replace('\r', '\n')
+
+    # Split into logical blocks: paragraphs, lines, or sentences
+    raw_blocks = re.split(r'(\n{2,}|\n|(?<=[.!?])\s+)', content)
+
+    chunks = []
+    current_chunk = []
+    current_len = 0
+
+    for block in raw_blocks:
+        if not block:
+            continue
+
+        # If a single block exceeds max_size (e.g. giant unpunctuated string), slice by words
+        if len(block) > max_size:
+            words = block.split(' ')
+            sub_chunk = []
+            sub_len = 0
+            for w in words:
+                if sub_len + len(w) + 1 > target_size and sub_chunk:
+                    chunks.append(' '.join(sub_chunk).strip())
+                    sub_chunk = []
+                    sub_len = 0
+                sub_chunk.append(w)
+                sub_len += len(w) + 1
+            if sub_chunk:
+                chunks.append(' '.join(sub_chunk).strip())
+            continue
+
+        if current_len + len(block) > max_size and current_chunk:
+            combined = ''.join(current_chunk).strip()
+            if combined:
+                chunks.append(combined)
+            current_chunk = []
+            current_len = 0
+
+        current_chunk.append(block)
+        current_len += len(block)
+
+        if current_len >= target_size:
+            combined = ''.join(current_chunk).strip()
+            if combined:
+                chunks.append(combined)
+            current_chunk = []
+            current_len = 0
+
+    if current_chunk:
+        combined = ''.join(current_chunk).strip()
+        if combined:
+            chunks.append(combined)
+
+    cleaned = [c for c in chunks if c.strip()]
+    return cleaned if cleaned else [content[:max_size]]
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -277,21 +339,7 @@ def retrieve_relevant_context(
 
     # 2. T_chunk: Semantic / sliding window chunking
     t_chunk_start = time.perf_counter()
-    chunks = []
-    lines = clean_text.split('\n')
-    current_chunk = []
-    current_len = 0
-    for line in lines:
-        if not line.strip():
-            continue
-        current_chunk.append(line)
-        current_len += len(line)
-        if current_len >= 500:
-            chunks.append("\n".join(current_chunk))
-            current_chunk = []
-            current_len = 0
-    if current_chunk:
-        chunks.append("\n".join(current_chunk))
+    chunks = chunk_text(clean_text)
     metrics['t_chunk_ms'] = (time.perf_counter() - t_chunk_start) * 1000.0
     metrics['chunks_count'] = len(chunks)
 
@@ -1603,26 +1651,7 @@ def check_content_cache_status(content: str, backend: str = LLM_BACKEND, model: 
         }
 
     content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
-
-    # Chunk the text using standard ~500 chars window
-    chunks = []
-    lines = content.split('\n')
-    current_chunk = []
-    current_len = 0
-    for line in lines:
-        if not line.strip():
-            continue
-        current_chunk.append(line)
-        current_len += len(line)
-        if current_len >= 500:
-            chunks.append("\n".join(current_chunk))
-            current_chunk = []
-            current_len = 0
-    if current_chunk:
-        chunks.append("\n".join(current_chunk))
-
-    if not chunks:
-        chunks = [content]
+    chunks = chunk_text(content)
 
     if backend == 'local':
         model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or model
@@ -1774,25 +1803,7 @@ def cache_details():
             })
 
         content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
-
-        # Chunk the text using standard ~500 chars window
-        chunks = []
-        lines = content.split('\n')
-        current_chunk = []
-        current_len = 0
-        for line in lines:
-            if not line.strip():
-                continue
-            current_chunk.append(line)
-            current_len += len(line)
-            if current_len >= 500:
-                chunks.append("\n".join(current_chunk))
-                current_chunk = []
-                current_len = 0
-        if current_chunk:
-            chunks.append("\n".join(current_chunk))
-        if not chunks:
-            chunks = [content]
+        chunks = chunk_text(content)
 
         chunks_detail = []
         cached_count = 0
@@ -1917,24 +1928,7 @@ def cache_reindex():
                 if not txt:
                     continue
 
-                chunks = []
-                lines = txt.split('\n')
-                curr_c = []
-                curr_len = 0
-                for line in lines:
-                    if not line.strip():
-                        continue
-                    curr_c.append(line)
-                    curr_len += len(line)
-                    if curr_len >= 500:
-                        chunks.append("\n".join(curr_c))
-                        curr_c = []
-                        curr_len = 0
-                if curr_c:
-                    chunks.append("\n".join(curr_c))
-                if not chunks:
-                    chunks = [txt]
-
+                chunks = chunk_text(txt)
                 total_chunks_all += len(chunks)
                 for c in chunks:
                     hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
@@ -1967,26 +1961,7 @@ def cache_reindex():
 
         # Single content reindexing
         content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
-
-        # Chunk text
-        chunks = []
-        lines = content.split('\n')
-        current_chunk = []
-        current_len = 0
-        for line in lines:
-            if not line.strip():
-                continue
-            current_chunk.append(line)
-            current_len += len(line)
-            if current_len >= 500:
-                chunks.append("\n".join(current_chunk))
-                current_chunk = []
-                current_len = 0
-        if current_chunk:
-            chunks.append("\n".join(current_chunk))
-
-        if not chunks:
-            chunks = [content]
+        chunks = chunk_text(content)
 
         new_entries = {}
         newly_indexed = 0
@@ -2009,15 +1984,25 @@ def cache_reindex():
         duration_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
         total_chunks = len(chunks)
 
+        with embedding_cache_lock:
+            cached_count = sum(1 for c in chunks if hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest() in embedding_cache)
+
+        modified_chunks = total_chunks - cached_count
+        is_synced = (modified_chunks == 0 and total_chunks > 0)
+        status = 'synced' if is_synced else ('modified' if cached_count > 0 else 'uncached')
+
         return jsonify({
-            'success': True,
+            'success': is_synced,
+            'status': status,
+            'is_synced': is_synced,
             'content_hash': content_hash,
             'short_hash': content_hash[:8],
             'total_chunks': total_chunks,
-            'cached_chunks': total_chunks,
+            'cached_chunks': cached_count,
+            'modified_chunks': modified_chunks,
             'newly_indexed': newly_indexed,
             'duration_ms': duration_ms,
-            'message': f"All {total_chunks} chunks indexed into SHA-256 cache ({newly_indexed} new, {duration_ms} ms, Hash: {content_hash[:8]})."
+            'message': f"All {total_chunks} chunks indexed into SHA-256 cache ({newly_indexed} new, {duration_ms} ms, Hash: {content_hash[:8]})." if is_synced else f"Indexed {cached_count}/{total_chunks} chunks ({newly_indexed} new, {duration_ms} ms)."
         })
     except Exception as e:
         logger.error(f"Error reindexing cache: {e}", exc_info=True)
