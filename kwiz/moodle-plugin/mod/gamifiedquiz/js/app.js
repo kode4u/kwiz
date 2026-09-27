@@ -238,12 +238,15 @@
             const ragCheckboxes = document.querySelectorAll('.studio-rag-cb');
             const ragSelectAllBtn = document.getElementById('studio-rag-select-all');
             const ragClearAllBtn = document.getElementById('studio-rag-clear-all');
+            const ragSummary = document.getElementById('studio-rag-summary');
+            const ragRefreshBtn = document.getElementById('studio-rag-refresh-btn');
 
             const cacheCard = document.getElementById('embedding-cache-card');
             const cacheIndicator = document.getElementById('embedding-cache-indicator');
             const cacheText = document.getElementById('embedding-cache-text');
             const cacheDetail = document.getElementById('embedding-cache-detail');
             const reindexCacheBtn = document.getElementById('studio-reindex-cache-btn');
+            const reembedAllBtn = document.getElementById('studio-reembed-all-btn');
 
             const topicInput = document.getElementById('studio-topic-input');
             const countSelect = document.getElementById('studio-count-select');
@@ -299,6 +302,131 @@
 
             // Embedding cache status checker
             let cacheDebounceTimer = null;
+
+            function refreshSummaryFromBadges() {
+                if (!ragSummary) return;
+                const badges = document.querySelectorAll('.rag-source-badge');
+                let total = 0, synced = 0, modified = 0, uncached = 0, empty = 0;
+                let changedKeys = [];
+
+                badges.forEach(b => {
+                    const id = b.id || '';
+                    const key = id.replace('rag-badge-', '');
+                    if (!key) return;
+                    total++;
+                    if (b.classList.contains('rag-badge-synced')) {
+                        synced++;
+                    } else if (b.classList.contains('rag-badge-modified')) {
+                        modified++;
+                        changedKeys.push(key);
+                    } else if (b.classList.contains('rag-badge-uncached')) {
+                        uncached++;
+                        changedKeys.push(key);
+                    } else if (b.classList.contains('rag-badge-empty')) {
+                        empty++;
+                    }
+                });
+
+                const actionable = total - empty;
+                const needUpdate = modified + uncached;
+
+                if (needUpdate > 0) {
+                    ragSummary.textContent = `${synced}/${actionable} sources cached (${needUpdate} changed/uncached)`;
+                    ragSummary.style.color = '#b45309';
+                    if (reembedAllBtn) {
+                        reembedAllBtn.style.display = 'inline-block';
+                        reembedAllBtn.disabled = false;
+                        reembedAllBtn.textContent = `Re-embed All Changed (${needUpdate})`;
+                        reembedAllBtn.dataset.changedSources = changedKeys.join(',');
+                    }
+                } else if (actionable > 0) {
+                    ragSummary.textContent = `All ${synced} sources cached`;
+                    ragSummary.style.color = '#15803d';
+                    if (reembedAllBtn) reembedAllBtn.style.display = 'none';
+                } else {
+                    ragSummary.textContent = 'No course content detected';
+                    ragSummary.style.color = '#64748b';
+                    if (reembedAllBtn) reembedAllBtn.style.display = 'none';
+                }
+            }
+
+            async function loadAllSourcesCacheStatus() {
+                if (ragSummary) {
+                    ragSummary.textContent = 'Checking course sources...';
+                    ragSummary.style.color = '#64748b';
+                }
+
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'check_all_sources');
+                    formData.append('courseid', config.courseId || 0);
+                    formData.append('cmid', config.cmId || 0);
+                    formData.append('sesskey', config.sesskey);
+
+                    const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
+                    });
+                    const data = await res.json();
+
+                    if (!data.success && data.error) {
+                        console.warn('Batch cache check notice:', data.error);
+                        if (ragSummary) ragSummary.textContent = 'Cache status offline';
+                        return;
+                    }
+
+                    const sources = data.sources || {};
+                    let changedKeys = [];
+
+                    for (const [key, s] of Object.entries(sources)) {
+                        const badge = document.getElementById(`rag-badge-${key}`);
+                        const reembedBtn = document.getElementById(`rag-reembed-${key}`);
+                        if (!badge) continue;
+
+                        if (s.status === 'synced') {
+                            badge.className = 'rag-source-badge rag-badge-synced';
+                            badge.textContent = `Cached (${s.short_hash || 'OK'})`;
+                            badge.title = `SHA-256: ${s.content_hash} (${s.total_chunks} chunk(s) indexed)`;
+                            if (reembedBtn) reembedBtn.style.display = 'none';
+                        } else if (s.status === 'modified') {
+                            badge.className = 'rag-source-badge rag-badge-modified';
+                            badge.textContent = `Modified (${s.modified_chunks}/${s.total_chunks} chunks)`;
+                            badge.title = `Content changed since last cache index (${s.modified_chunks} chunk(s) require embedding)`;
+                            changedKeys.push(key);
+                            if (reembedBtn) {
+                                reembedBtn.style.display = 'inline-block';
+                                reembedBtn.disabled = false;
+                                reembedBtn.textContent = 'Re-embed';
+                            }
+                        } else if (s.status === 'uncached') {
+                            badge.className = 'rag-source-badge rag-badge-uncached';
+                            badge.textContent = `Not Cached (${s.total_chunks} chunks)`;
+                            badge.title = `Not yet indexed in embedding cache (${s.total_chunks} chunk(s) ready to index)`;
+                            changedKeys.push(key);
+                            if (reembedBtn) {
+                                reembedBtn.style.display = 'inline-block';
+                                reembedBtn.disabled = false;
+                                reembedBtn.textContent = 'Re-embed';
+                            }
+                        } else if (s.status === 'empty') {
+                            badge.className = 'rag-source-badge rag-badge-empty';
+                            badge.textContent = 'Empty';
+                            badge.title = 'No extractable text content found.';
+                            if (reembedBtn) reembedBtn.style.display = 'none';
+                        }
+                    }
+
+                    refreshSummaryFromBadges();
+                } catch (err) {
+                    console.warn('Error loading all sources cache status:', err);
+                    if (ragSummary) {
+                        ragSummary.textContent = 'Cache status check error';
+                        ragSummary.style.color = '#dc2626';
+                    }
+                }
+            }
+
             async function checkEmbeddingCacheStatus() {
                 const selectedSources = getSelectedRagSources();
                 const customText = customContentInput ? customContentInput.value.trim() : '';
@@ -353,20 +481,20 @@
                     if (data.is_synced === false) {
                         cacheCard.className = 'cache-modified';
                         if (cacheIndicator) cacheIndicator.className = 'modified';
-                        cacheText.textContent = `Notice: Lesson content has changed since last cache index (${data.modified_chunks} of ${data.total_chunks} chunk(s) require embedding).`;
+                        cacheText.textContent = `Notice: Selected lesson content has changed since last cache index (${data.modified_chunks} of ${data.total_chunks} chunk(s) require embedding).`;
                         if (cacheDetail) {
                             cacheDetail.style.display = 'block';
-                            cacheDetail.textContent = `Content Hash (SHA-256): ${data.short_hash || data.content_hash.substring(0,8)}. Click to precompute embeddings before generating questions.`;
+                            cacheDetail.textContent = `Content Hash (SHA-256): ${data.short_hash || data.content_hash.substring(0,8)}. Precompute embeddings before generating questions.`;
                         }
                         if (reindexCacheBtn) {
                             reindexCacheBtn.style.display = 'inline-block';
                             reindexCacheBtn.disabled = false;
-                            reindexCacheBtn.textContent = 'Recompute Hash & Embeddings';
+                            reindexCacheBtn.textContent = 'Recompute Selected Embeddings';
                         }
                     } else {
                         cacheCard.className = 'cache-synced';
                         if (cacheIndicator) cacheIndicator.className = 'synced';
-                        cacheText.textContent = `Embedding cache synchronized: All ${data.total_chunks} chunk(s) indexed (Hash: ${data.short_hash || data.content_hash.substring(0,8)}).`;
+                        cacheText.textContent = `Selected material cache synchronized: All ${data.total_chunks} chunk(s) indexed (Hash: ${data.short_hash || data.content_hash.substring(0,8)}).`;
                         if (cacheDetail) {
                             cacheDetail.style.display = 'block';
                             cacheDetail.textContent = 'Zero-latency vector embedding lookup active for RAG generation.';
@@ -405,14 +533,115 @@
                 });
             }
 
+            if (ragRefreshBtn) {
+                ragRefreshBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadAllSourcesCacheStatus();
+                    debouncedCheckCache();
+                });
+            }
+
             if (customContentInput) {
                 customContentInput.addEventListener('input', debouncedCheckCache);
             }
 
-            // Initial cache check
-            debouncedCheckCache();
+            // Wire up Individual Re-embed buttons
+            document.querySelectorAll('.studio-reembed-single-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const sourceKey = btn.dataset.source;
+                    if (!sourceKey) return;
 
-            // Wire up Reindex button
+                    btn.disabled = true;
+                    btn.textContent = 'Embedding...';
+                    const badge = document.getElementById(`rag-badge-${sourceKey}`);
+                    if (badge) {
+                        badge.className = 'rag-source-badge rag-badge-checking';
+                        badge.textContent = 'Embedding...';
+                    }
+
+                    try {
+                        const formData = new URLSearchParams();
+                        formData.append('action', 'reindex_single');
+                        formData.append('source', sourceKey);
+                        formData.append('courseid', config.courseId || 0);
+                        formData.append('cmid', config.cmId || 0);
+                        formData.append('sesskey', config.sesskey);
+
+                        const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formData.toString()
+                        });
+                        const data = await res.json();
+
+                        if (!data.success) {
+                            throw new Error(data.error || 'Failed to re-embed source');
+                        }
+
+                        if (badge) {
+                            badge.className = 'rag-source-badge rag-badge-synced';
+                            badge.textContent = `Cached (${data.short_hash || 'OK'})`;
+                            badge.title = `SHA-256: ${data.content_hash} (${data.total_chunks} chunk(s) indexed)`;
+                        }
+                        btn.style.display = 'none';
+                        appendStudioLog(`[CACHE] Re-embedded ${sourceKey}: ${data.total_chunks} chunks indexed in ${data.duration_ms}ms (SHA-256: ${data.short_hash}).`);
+
+                        refreshSummaryFromBadges();
+                        debouncedCheckCache();
+                    } catch (err) {
+                        alert(`Failed to re-embed source: ${err.message}`);
+                        btn.disabled = false;
+                        btn.textContent = 'Re-embed';
+                        if (badge) {
+                            badge.className = 'rag-source-badge rag-badge-modified';
+                            badge.textContent = 'Error';
+                        }
+                    }
+                });
+            });
+
+            // Wire up Re-embed All Changed button
+            if (reembedAllBtn) {
+                reembedAllBtn.addEventListener('click', async () => {
+                    const changedSources = reembedAllBtn.dataset.changedSources || '';
+                    if (!changedSources) return;
+
+                    reembedAllBtn.disabled = true;
+                    reembedAllBtn.textContent = 'Re-embedding all changed...';
+                    appendStudioLog(`[CACHE] Starting batch re-embedding of changed sources...`);
+
+                    try {
+                        const formData = new URLSearchParams();
+                        formData.append('action', 'reindex_all_changed');
+                        formData.append('sources', changedSources);
+                        formData.append('courseid', config.courseId || 0);
+                        formData.append('cmid', config.cmId || 0);
+                        formData.append('sesskey', config.sesskey);
+
+                        const res = await fetch(`${config.wwwroot}/mod/gamifiedquiz/ajax/cache_status.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formData.toString()
+                        });
+                        const data = await res.json();
+
+                        if (!data.success) {
+                            throw new Error(data.error || 'Batch re-index failed');
+                        }
+
+                        appendStudioLog(`[CACHE] ${data.message || 'Batch re-indexing completed.'}`);
+                        await loadAllSourcesCacheStatus();
+                        debouncedCheckCache();
+                    } catch (err) {
+                        alert(`Failed to re-embed all sources: ${err.message}`);
+                        reembedAllBtn.disabled = false;
+                        reembedAllBtn.textContent = 'Re-embed All Changed';
+                    }
+                });
+            }
+
+            // Wire up Reindex button for selected sources / custom content
             if (reindexCacheBtn) {
                 reindexCacheBtn.addEventListener('click', async () => {
                     const selectedSources = getSelectedRagSources();
@@ -445,19 +674,25 @@
                         
                         cacheCard.className = 'cache-synced';
                         if (cacheIndicator) cacheIndicator.className = 'synced';
-                        cacheText.textContent = `Embedding cache synchronized: All ${data.total_chunks} chunk(s) indexed (Hash: ${data.short_hash}).`;
+                        cacheText.textContent = `Selected material cache synchronized: All ${data.total_chunks} chunk(s) indexed (Hash: ${data.short_hash}).`;
                         if (cacheDetail) {
                             cacheDetail.style.display = 'block';
                             cacheDetail.textContent = `Completed in ${data.duration_ms}ms. Ready for fast RAG generation.`;
                         }
                         reindexCacheBtn.style.display = 'none';
+
+                        await loadAllSourcesCacheStatus();
                     } catch (err) {
                         alert(`Failed to reindex embeddings: ${err.message}`);
                         reindexCacheBtn.disabled = false;
-                        reindexCacheBtn.textContent = 'Recompute Hash & Embeddings';
+                        reindexCacheBtn.textContent = 'Recompute Selected Embeddings';
                     }
                 });
             }
+
+            // Initial load of all source cache statuses and selected status
+            loadAllSourcesCacheStatus();
+            debouncedCheckCache();
 
             // Toggle Category Input
             if (categorySelect && newCategoryWrapper) {

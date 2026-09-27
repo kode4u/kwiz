@@ -365,23 +365,38 @@ if ($is_teacher) {
     echo '      <div style="margin-bottom: 16px;">';
     echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">';
     echo '          <label style="font-weight: 600; color: #1e293b; margin: 0;">Course Context Grounding (RAG Sources):</label>';
-    echo '          <div style="font-size: 0.8rem;">';
+    echo '          <div style="font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">';
+    echo '            <span id="studio-rag-summary" style="color: #64748b; font-size: 0.78rem;"></span>';
+    echo '            <button type="button" id="studio-rag-refresh-btn" class="btn btn-link btn-sm" style="padding: 0 4px; font-size: 0.8rem; color: #0f6cbf; text-decoration: none;">Refresh</button> | ';
     echo '            <button type="button" id="studio-rag-select-all" class="btn btn-link btn-sm" style="padding: 0 4px; font-size: 0.8rem; color: #0f6cbf; text-decoration: none;">Select All</button> | ';
     echo '            <button type="button" id="studio-rag-clear-all" class="btn btn-link btn-sm" style="padding: 0 4px; font-size: 0.8rem; color: #64748b; text-decoration: none;">Clear</button>';
     echo '          </div>';
     echo '        </div>';
     echo '        <div id="studio-rag-checkboxes-container" class="studio-rag-container">';
-    echo '          <div class="studio-rag-item">';
-    echo '            <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto">';
-    echo '            <label for="rag_src_auto">Auto-detect (Current / Preceding Course Activity)</label>';
+    echo '          <div class="studio-rag-item" data-source="auto">';
+    echo '            <div class="studio-rag-item-left">';
+    echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto">';
+    echo '              <label for="rag_src_auto">Auto-detect (Current / Preceding Course Activity)</label>';
+    echo '            </div>';
+    echo '            <div class="studio-rag-item-right">';
+    echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-auto">Checking...</span>';
+    echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="auto" id="rag-reembed-auto" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+    echo '            </div>';
     echo '          </div>';
     if (!empty($rag_sections)) {
         echo '          <div class="studio-rag-group-header">Course Chapters / Sections</div>';
         foreach ($rag_sections as $sec) {
             $sid = 'rag_src_sec_' . (int)$sec['number'];
-            echo '          <div class="studio-rag-item">';
-            echo '            <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="section_' . (int)$sec['number'] . '" id="' . $sid . '">';
-            echo '            <label for="' . $sid . '">Chapter: ' . s($sec['name']) . '</label>';
+            $src_key = 'section_' . (int)$sec['number'];
+            echo '          <div class="studio-rag-item" data-source="' . $src_key . '">';
+            echo '            <div class="studio-rag-item-left">';
+            echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="' . $src_key . '" id="' . $sid . '">';
+            echo '              <label for="' . $sid . '">Chapter: ' . s($sec['name']) . '</label>';
+            echo '            </div>';
+            echo '            <div class="studio-rag-item-right">';
+            echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
+            echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+            echo '            </div>';
             echo '          </div>';
         }
     }
@@ -390,14 +405,21 @@ if ($is_teacher) {
         foreach ($rag_sources as $src) {
             $type_label = ucfirst($src['type']);
             $cid = 'rag_src_cm_' . (int)$src['id'];
-            echo '          <div class="studio-rag-item">';
-            echo '            <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="cmid_' . (int)$src['id'] . '" id="' . $cid . '">';
-            echo '            <label for="' . $cid . '">' . s($src['name']) . ' (' . $type_label . ')</label>';
+            $src_key = 'cmid_' . (int)$src['id'];
+            echo '          <div class="studio-rag-item" data-source="' . $src_key . '">';
+            echo '            <div class="studio-rag-item-left">';
+            echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="' . $src_key . '" id="' . $cid . '">';
+            echo '              <label for="' . $cid . '">' . s($src['name']) . ' (' . $type_label . ')</label>';
+            echo '            </div>';
+            echo '            <div class="studio-rag-item-right">';
+            echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
+            echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+            echo '            </div>';
             echo '          </div>';
         }
     }
     echo '        </div>';
-    echo '        <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Select one or more sources to retrieve and ground questions. Leave unselected to generate from topic only.</small>';
+    echo '        <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Select one or more sources to retrieve and ground questions. Badge indicates SHA-256 embedding status.</small>';
 
     // Dynamic SHA-256 Embedding Cache Status Card
     echo '        <div id="embedding-cache-card" class="cache-none">';
@@ -408,7 +430,10 @@ if ($is_teacher) {
     echo '              <div id="embedding-cache-detail" style="font-size: 0.78rem; color: #64748b; margin-top: 2px; display: none;"></div>';
     echo '            </div>';
     echo '          </div>';
-    echo '          <button type="button" id="studio-reindex-cache-btn" class="btn btn-sm btn-outline-secondary" style="display: none; font-size: 0.82rem; white-space: nowrap;">Recompute Hash &amp; Embeddings</button>';
+    echo '          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">';
+    echo '            <button type="button" id="studio-reembed-all-btn" class="btn btn-sm btn-primary" style="display: none; font-size: 0.82rem; white-space: nowrap; background: #0f6cbf; color: #ffffff; border: 1px solid #0f6cbf; border-radius: 4px; padding: 4px 10px;">Re-embed All Changed</button>';
+    echo '            <button type="button" id="studio-reindex-cache-btn" class="btn btn-sm btn-outline-secondary" style="display: none; font-size: 0.82rem; white-space: nowrap;">Recompute Selected Embeddings</button>';
+    echo '          </div>';
     echo '        </div>';
     echo '      </div>';
 

@@ -2381,8 +2381,12 @@ function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id 
             $page = $DB->get_record('page', array('id' => $cm->instance));
             if ($page) {
                 $content = $page->content;
+                if (!empty($page->intro)) {
+                    $content = $page->intro . "\n\n" . $content;
+                }
             }
         } else if ($cm->modname === 'lesson') {
+            $lesson = $DB->get_record('lesson', array('id' => $cm->instance));
             if ($topic_id > 0) {
                 $page = $DB->get_record('lesson_pages', array('id' => $topic_id));
                 if ($page) {
@@ -2394,6 +2398,9 @@ function gamifiedquiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id 
                     foreach ($pages as $p) {
                         $content .= $p->contents . "\n\n";
                     }
+                }
+                if ($lesson && !empty($lesson->intro)) {
+                    $content = $lesson->intro . "\n\n" . $content;
                 }
             }
         } else if ($cm->modname === 'book') {

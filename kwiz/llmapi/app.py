@@ -1567,6 +1567,87 @@ def extract_file_endpoint():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+def check_content_cache_status(content: str, backend: str = LLM_BACKEND, model: str = OLLAMA_MODEL_DEFAULT) -> dict:
+    """Helper to check SHA-256 chunk caching status for a given text."""
+    content = (content or '').strip()
+    if not content:
+        return {
+            'has_content': False,
+            'status': 'empty',
+            'total_chunks': 0,
+            'cached_chunks': 0,
+            'modified_chunks': 0,
+            'is_synced': True,
+            'content_hash': '',
+            'short_hash': '',
+            'message': 'No content provided.'
+        }
+
+    content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+    # Chunk the text using standard ~500 chars window
+    chunks = []
+    lines = content.split('\n')
+    current_chunk = []
+    current_len = 0
+    for line in lines:
+        if not line.strip():
+            continue
+        current_chunk.append(line)
+        current_len += len(line)
+        if current_len >= 500:
+            chunks.append("\n".join(current_chunk))
+            current_chunk = []
+            current_len = 0
+    if current_chunk:
+        chunks.append("\n".join(current_chunk))
+
+    if not chunks:
+        chunks = [content]
+
+    if backend == 'local':
+        model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or model
+    elif backend == 'openai':
+        model_name = "text-embedding-3-small"
+    elif backend == 'gemini':
+        model_name = "models/text-embedding-004"
+    else:
+        model_name = "unknown"
+
+    cached_count = 0
+    with embedding_cache_lock:
+        for c in chunks:
+            hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
+            if hash_key in embedding_cache:
+                cached_count += 1
+
+    total_chunks = len(chunks)
+    modified_chunks = total_chunks - cached_count
+    is_synced = (modified_chunks == 0 and total_chunks > 0)
+
+    if is_synced:
+        status = 'synced'
+        msg = f"Embedding Cache Synced: All {total_chunks} chunks cached (SHA-256: {content_hash[:8]}). Sub-millisecond retrieval ready."
+    elif cached_count > 0:
+        status = 'modified'
+        msg = f"Notice: Lesson has changed since last cache index. {modified_chunks} of {total_chunks} chunks require re-indexing."
+    else:
+        status = 'uncached'
+        msg = f"Notice: Lesson has not been indexed in embedding cache yet ({total_chunks} chunks ready to index)."
+
+    return {
+        'has_content': True,
+        'status': status,
+        'content_hash': content_hash,
+        'short_hash': content_hash[:8],
+        'total_chunks': total_chunks,
+        'cached_chunks': cached_count,
+        'modified_chunks': modified_chunks,
+        'is_synced': is_synced,
+        'message': msg
+    }
+
+
 @app.route('/cache/status', methods=['POST'])
 def cache_status():
     """Check SHA-256 chunk caching status for a given lesson text."""
@@ -1576,116 +1657,73 @@ def cache_status():
         backend = data.get('backend', LLM_BACKEND)
         model = data.get('model', OLLAMA_MODEL_DEFAULT)
 
-        if not content:
-            return jsonify({
-                'has_content': False,
-                'total_chunks': 0,
-                'cached_chunks': 0,
-                'modified_chunks': 0,
-                'is_synced': False,
-                'content_hash': '',
-                'message': 'No lesson content provided.'
-            })
-
-        content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
-
-        # Chunk the text using standard ~500 chars window
-        chunks = []
-        lines = content.split('\n')
-        current_chunk = []
-        current_len = 0
-        for line in lines:
-            if not line.strip():
-                continue
-            current_chunk.append(line)
-            current_len += len(line)
-            if current_len >= 500:
-                chunks.append("\n".join(current_chunk))
-                current_chunk = []
-                current_len = 0
-        if current_chunk:
-            chunks.append("\n".join(current_chunk))
-
-        if not chunks:
-            chunks = [content]
-
-        if backend == 'local':
-            model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or model
-        elif backend == 'openai':
-            model_name = "text-embedding-3-small"
-        elif backend == 'gemini':
-            model_name = "models/text-embedding-004"
-        else:
-            model_name = "unknown"
-
-        cached_count = 0
-        with embedding_cache_lock:
-            for c in chunks:
-                hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
-                if hash_key in embedding_cache:
-                    cached_count += 1
-
-        total_chunks = len(chunks)
-        modified_chunks = total_chunks - cached_count
-        is_synced = (modified_chunks == 0 and total_chunks > 0)
-
-        if is_synced:
-            msg = f"Embedding Cache Synced: All {total_chunks} chunks cached (SHA-256: {content_hash[:8]}). Sub-millisecond retrieval ready."
-        elif cached_count > 0:
-            msg = f"Notice: Lesson has changed since last cache index. {modified_chunks} of {total_chunks} chunks require re-indexing."
-        else:
-            msg = f"Notice: Lesson has not been indexed in embedding cache yet ({total_chunks} chunks ready to index)."
-
-        return jsonify({
-            'has_content': True,
-            'content_hash': content_hash,
-            'short_hash': content_hash[:8],
-            'total_chunks': total_chunks,
-            'cached_chunks': cached_count,
-            'modified_chunks': modified_chunks,
-            'is_synced': is_synced,
-            'message': msg
-        })
+        res = check_content_cache_status(content, backend, model)
+        return jsonify(res)
     except Exception as e:
         logger.error(f"Error checking cache status: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/cache/batch_status', methods=['POST'])
+def cache_batch_status():
+    """Check SHA-256 chunk caching status for multiple lesson texts at once."""
+    try:
+        data = request.json or {}
+        items = data.get('items', {})
+        backend = data.get('backend', LLM_BACKEND)
+        model = data.get('model', OLLAMA_MODEL_DEFAULT)
+
+        results = {}
+        all_synced = True
+        synced_count = 0
+        modified_count = 0
+        uncached_count = 0
+        empty_count = 0
+
+        for key, text in items.items():
+            st = check_content_cache_status(text, backend, model)
+            results[key] = st
+            if st['status'] == 'synced':
+                synced_count += 1
+            elif st['status'] == 'modified':
+                modified_count += 1
+                all_synced = False
+            elif st['status'] == 'uncached':
+                uncached_count += 1
+                all_synced = False
+            elif st['status'] == 'empty':
+                empty_count += 1
+
+        return jsonify({
+            'success': True,
+            'sources': results,
+            'all_synced': (modified_count == 0 and uncached_count == 0),
+            'total_sources': len(items),
+            'synced_sources': synced_count,
+            'modified_sources': modified_count,
+            'uncached_sources': uncached_count,
+            'empty_sources': empty_count
+        })
+    except Exception as e:
+        logger.error(f"Error checking batch cache status: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/cache/reindex', methods=['POST'])
 def cache_reindex():
-    """Force recompute and persist SHA-256 chunk embeddings into cache."""
+    """Force recompute and persist SHA-256 chunk embeddings into cache (single or batch)."""
     try:
         data = request.json or {}
         content = data.get('content', '').strip()
+        items = data.get('items', {})
         backend = data.get('backend', LLM_BACKEND)
         model = data.get('model', OLLAMA_MODEL_DEFAULT)
         api_key_override = data.get('api_key')
 
-        if not content:
+        if not content and not items:
             return jsonify({'error': 'No content provided to index.'}), 400
 
         t_start = time.perf_counter()
-        content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
-
-        # Chunk text
-        chunks = []
-        lines = content.split('\n')
-        current_chunk = []
-        current_len = 0
-        for line in lines:
-            if not line.strip():
-                continue
-            current_chunk.append(line)
-            current_len += len(line)
-            if current_len >= 500:
-                chunks.append("\n".join(current_chunk))
-                current_chunk = []
-                current_len = 0
-        if current_chunk:
-            chunks.append("\n".join(current_chunk))
-
-        if not chunks:
-            chunks = [content]
 
         if backend == 'local':
             model_name = os.getenv('OLLAMA_EMBED_MODEL', 'nomic-embed-text') or model
@@ -1717,6 +1755,88 @@ def cache_reindex():
             except Exception as e:
                 logger.error(f"Embedding error: {e}")
                 return []
+
+        # If items dict provided, process each source item in batch
+        if items:
+            total_chunks_all = 0
+            newly_indexed_all = 0
+            new_entries = {}
+
+            for sid, text_content in items.items():
+                txt = (text_content or '').strip()
+                if not txt:
+                    continue
+
+                chunks = []
+                lines = txt.split('\n')
+                curr_c = []
+                curr_len = 0
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    curr_c.append(line)
+                    curr_len += len(line)
+                    if curr_len >= 500:
+                        chunks.append("\n".join(curr_c))
+                        curr_c = []
+                        curr_len = 0
+                if curr_c:
+                    chunks.append("\n".join(curr_c))
+                if not chunks:
+                    chunks = [txt]
+
+                total_chunks_all += len(chunks)
+                for c in chunks:
+                    hash_key = hashlib.sha256(f"{model_name}:{c}".encode('utf-8')).hexdigest()
+                    with embedding_cache_lock:
+                        if hash_key in embedding_cache or hash_key in new_entries:
+                            continue
+                    vec = compute_single_embedding(c)
+                    if vec:
+                        new_entries[hash_key] = vec
+                        newly_indexed_all += 1
+
+            if new_entries:
+                with embedding_cache_lock:
+                    embedding_cache.update(new_entries)
+                    save_embedding_cache()
+
+            source_results = {}
+            for sid, text_content in items.items():
+                source_results[sid] = check_content_cache_status(text_content, backend, model)
+
+            duration_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+            return jsonify({
+                'success': True,
+                'sources': source_results,
+                'total_chunks': total_chunks_all,
+                'newly_indexed': newly_indexed_all,
+                'duration_ms': duration_ms,
+                'message': f"Batch indexed {len(items)} sources ({newly_indexed_all} new chunks, {duration_ms} ms)."
+            })
+
+        # Single content reindexing
+        content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+        # Chunk text
+        chunks = []
+        lines = content.split('\n')
+        current_chunk = []
+        current_len = 0
+        for line in lines:
+            if not line.strip():
+                continue
+            current_chunk.append(line)
+            current_len += len(line)
+            if current_len >= 500:
+                chunks.append("\n".join(current_chunk))
+                current_chunk = []
+                current_len = 0
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+
+        if not chunks:
+            chunks = [content]
 
         new_entries = {}
         newly_indexed = 0
