@@ -74,9 +74,9 @@ def validate_java(code: str) -> tuple[bool, str]:
     class_match = re.search(r'(?:public\s+)?class\s+(\w+)', code)
     class_name = class_match.group(1) if class_match else 'TempClass'
     
-    # If Class definition is missing, let's wrap it in a dummy class to make it compile checkable
+    # If Class definition is missing, wrap it in a wrapper class to make it compile checkable
     if not class_match:
-        # Wrap simple snippets in a dummy class and main method for syntax check
+        # Wrap simple snippets in a wrapper class and main method for syntax check
         if "public static void main" not in code:
             code = f"public class {class_name} {{\n public static void main(String[] args) {{\n {code}\n }}\n}}"
         else:

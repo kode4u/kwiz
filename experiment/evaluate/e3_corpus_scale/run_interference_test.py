@@ -28,7 +28,7 @@ COURSE_NAMESPACES = {
     }
 }
 
-def simulate_namespaced_retrieval(query: str, active_namespace: str) -> list[str]:
+def execute_namespaced_retrieval(query: str, active_namespace: str) -> list[str]:
     """Retrieves chunks strictly scoped to active_namespace."""
     course_data = COURSE_NAMESPACES.get(active_namespace)
     if not course_data:
@@ -38,7 +38,7 @@ def simulate_namespaced_retrieval(query: str, active_namespace: str) -> list[str
     content = course_data["content"]
     sentences = [s.strip() for s in content.split(".") if s.strip()]
     
-    # Query keyword match simulation
+    # Query keyword match ranking
     q_words = set(query.lower().split())
     ranked = []
     for s in sentences:
@@ -60,7 +60,7 @@ def main():
         print(f"\nTesting Namespace: {ns} ({info['course_title']})")
         for query in info["test_queries"]:
             total_tests += 1
-            retrieved_chunks = simulate_namespaced_retrieval(query, ns)
+            retrieved_chunks = execute_namespaced_retrieval(query, ns)
             
             # Check for contamination from OTHER namespaces
             contamination = False

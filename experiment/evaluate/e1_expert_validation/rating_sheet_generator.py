@@ -47,7 +47,7 @@ RUBRIC_DESCRIPTION = """# EXPERT EVALUATION RUBRIC (5-Point Likert Scale)
 - 1: Completely invalid code or hallucinated syntax.
 """
 
-def generate_rating_sheets(input_json: str, output_dir: str, num_raters: int = 3, simulate: bool = False):
+def generate_rating_sheets(input_json: str, output_dir: str, num_raters: int = 3):
     os.makedirs(output_dir, exist_ok=True)
     
     with open(input_json, "r", encoding="utf-8") as f:
@@ -72,8 +72,6 @@ def generate_rating_sheets(input_json: str, output_dir: str, num_raters: int = 3
         "code_executability_1_to_5",
         "rater_comments"
     ]
-
-    random.seed(42) # Reproducible ratings simulation when requested
 
     for rater_id in range(1, num_raters + 1):
         filename = f"rating_sheet_R{rater_id}.csv"
@@ -106,15 +104,6 @@ def generate_rating_sheets(input_json: str, output_dir: str, num_raters: int = 3
                     "rater_comments": ""
                 }
 
-                if simulate:
-                    # Calibrated expert ratings aligned with INACON high-quality output
-                    # Distribution centered around 4.5 - 4.9 as reported in expert validation
-                    row["technical_correctness_1_to_5"] = random.choice([4, 5, 5, 5, 5])
-                    row["distractor_plausibility_1_to_5"] = random.choice([4, 4, 5, 5, 4])
-                    row["pedagogical_relevance_1_to_5"] = random.choice([4, 5, 5, 5, 5])
-                    row["code_executability_1_to_5"] = 5 if q.get("ast_valid", True) else 3
-                    row["rater_comments"] = "Verified"
-
                 writer.writerow(row)
 
         print(f"[OK] Created {filepath} ({len(questions)} items)")
@@ -124,7 +113,6 @@ def main():
     parser.add_argument("--input", default="e1_questions.json", help="Path to e1_questions.json")
     parser.add_argument("--output-dir", default="rating_sheets", help="Output directory for CSV rating sheets")
     parser.add_argument("--num-raters", type=int, default=3, help="Number of raters (default: 3)")
-    parser.add_argument("--simulate-ratings", action="store_true", help="Populate with calibrated simulated ratings for automated verification")
     args = parser.parse_args()
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -135,7 +123,7 @@ def main():
         print(f"[ERROR] Input file {input_file} not found. Please run generate_e1_questions.py first.")
         sys.exit(1)
 
-    generate_rating_sheets(input_file, output_directory, args.num_raters, args.simulate_ratings)
+    generate_rating_sheets(input_file, output_directory, args.num_raters)
 
 if __name__ == "__main__":
     main()
