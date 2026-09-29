@@ -270,12 +270,9 @@ def create_blinded_manuscript(md_path, docx_path):
             if img_match:
                 img_path = img_match.group(2)
                 fig_dir = os.path.join(os.path.dirname(md_path), 'figures')
-                if 'pipeline_architecture' in img_path:
-                    png_path = os.path.join(fig_dir, 'pipeline_architecture.png')
-                elif 'cache_decision_flow' in img_path:
-                    png_path = os.path.join(fig_dir, 'cache_decision_flow.png')
-                else:
-                    png_path = os.path.join(fig_dir, os.path.basename(img_path))
+                base_file = os.path.basename(img_path)
+                name_without_ext = os.path.splitext(base_file)[0]
+                png_path = os.path.join(fig_dir, f"{name_without_ext}.png")
 
                 if os.path.exists(png_path):
                     p_img = doc.add_paragraph()

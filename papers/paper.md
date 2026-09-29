@@ -244,6 +244,11 @@ For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$
 | Python Data Structures | 4.43 ± 1.18 | 4.72 ± 0.48 | 4.81 ± 0.43 | 4.99 ± 0.12 | 3.89 ± 1.01 |
 | Variables, Data Types & Type Casting | 3.70 ± 1.78 | 4.67 ± 0.57 | 4.95 ± 0.22 | 4.93 ± 0.41 | 4.18 ± 1.00 |
 
+Figure 3 presents the multi-judge evaluation profile, overall pedagogical usability breakdown, and topic-level scores across curriculum modules.
+
+![Figure 3: Multi-Judge Pedagogical Quality Validation and Inter-Rater Reliability](figures/e1_quality_evaluation.svg)
+*Figure 3: Multi-judge pedagogical quality validation across 100 generated Python MCQs (Experiment 1). (a) Mean Likert scores across the five evaluation dimensions evaluated by OpenAI GPT-4o, Google Gemini 2.5 Flash, and senior CS faculty, plotted against the 4.0 proficiency benchmark with Intraclass Correlation Coefficients (ICC). (b) Overall usability distribution showing an 80.0% acceptance rate without major revision. (c) Pedagogical score breakdown across curriculum modules.*
+
 ### 5.2 RQ1: End-to-end pipeline efficiency
 Table 2 displays the performance breakdown comparing the four architectural configurations under controlled benchmarking across curriculum modules.
 
@@ -275,6 +280,11 @@ The ablation results in Table 2 demonstrate the operational and pedagogical trad
 
 A vital empirical insight from our component attribution is the necessary distinction between subsystem acceleration and net end-to-end speedup. Although incremental SHA-256 caching accelerates Knowledge Base indexing by **537.0×** (from 53.7 ms to 0.1 ms in Table 2, and up to **37,008.4×** under the 7-module scale in Table 3), the net end-to-end speedup for single-item generation is **1.06×** (from 1551.0 ms to 1462.7 ms, representing an absolute latency reduction of 88.3 ms). This behavior is directly governed by Amdahl's Law: in the baseline configuration, local autoregressive LLM decoding ($T_{\text{LLM}} \approx 1.46\text{ s}$) accounts for 96.5% of total pipeline latency ($1497.3 / 1551.0$), and in the optimized steady-state pipeline, LLM generation dominates end-to-end latency (>99%), limiting the effect of further preprocessing optimization on interactive response time. The practical value of incremental indexing is therefore resource preservation—reducing GPU forward passes by 99.8% to keep compute cores and VRAM bus bandwidth open for autoregressive generation—rather than dramatically compressing isolated single-item response times.
 
+Figure 4 illustrates the component-level latency decomposition and context budgeting trade-offs across configurations.
+
+![Figure 4: Pipeline Component Ablation and Latency Decomposition](figures/e2_pipeline_ablation.svg)
+*Figure 4: Pipeline component ablation and latency breakdown (Experiment 2). (a) Component-level latency decomposition ($T_{\text{E2E}}$) across baseline (Config A), proposed INACON pipeline (Config B), static context (Config C), and zero-shot generation (Config D), illustrating Amdahl's Law constraint where local LLM autoregressive decoding dominates >96.5% of execution time. (b) Trade-off between prompt context tokens and SHA-256 chunk embedding cache-hit rates, highlighting the 72.2% context compression achieved by bounded semantic retrieval.*
+
 ### 5.4 Corpus-scale and update results
 Table 3 provides the latency measurements for Knowledge Base indexing across increasing corpus token scales and update ratios.
 
@@ -288,6 +298,11 @@ Table 3 provides the latency measurements for Knowledge Base indexing across inc
 
 Across all corpus scales, incremental change detection through SHA-256 chunk hashing reduced steady-state indexing overhead to sub-millisecond per-chunk retrieval, demonstrating a 4921.1× to 37008.4× acceleration over cold rebuilds. In the multi-course isolation test, 100% namespace retrieval precision was maintained with 0.0% cross-course bleed.
 
+Figure 5 plots the indexing latency scaling curves and acceleration factors under incremental updates.
+
+![Figure 5: Knowledge Base Indexing Latency and Scalability](figures/e3_indexing_scalability.svg)
+*Figure 5: Knowledge Base indexing latency and scalability across curriculum progression scales and update ratios (Experiment 3). (a) Indexing latency $T_{\text{KB}}$ (log scale) from 1 to 7 modules under update conditions $U_0$ through $U_{100}$, showing sub-millisecond steady-state performance ($T_{\text{KB}} \leq 0.28\text{ ms}$). (b) Empirical speedup factor of SHA-256 incremental embedding reuse over cold rebuilds ($U_{100} / U_0$), scaling from 4,921.1× to 37,008.4×.*
+
 ### 5.5 RQ3: Concurrent instructor generation
 Table 4 reports the system performance and resource envelope across concurrency levels $C \in \{1, 2, 5, 10, 20\}$ simultaneous instructor requests on the dedicated RTX 3090 GPU host.
 
@@ -299,6 +314,11 @@ Table 4 reports the system performance and resource envelope across concurrency 
 | **5** | 0.82 | 49.2 | 3.56 | 5.91 | 85.8% | 13.44 GB | 100.0% |
 | **10** | 0.75 | 45.0 | 6.76 | 12.75 | 81.0% | 13.44 GB | 100.0% |
 | **20** | 0.76 | 45.6 | 13.95 | 25.00 | 88.3% | 13.44 GB | 100.0% |
+
+Figure 6 delineates the throughput ceiling, latency scaling envelope, and hardware resource footprint under concurrent load.
+
+![Figure 6: Single-GPU Concurrency Operating Envelope and Resource Saturation](figures/e4_concurrency_envelope.svg)
+*Figure 6: Single-GPU concurrency operating envelope and resource headroom on a dedicated NVIDIA RTX 3090 host (Experiment 4). (a) Aggregate throughput in questions/min across concurrency tiers $C = 1 \dots 20$ under standardized 5-question request batches, showing saturation at 43.8–49.2 Q/min. (b) Median (P50) and tail (P95) latency scaling, highlighting the interactive faculty authoring envelope ($C \le 5$, latency $\le 3.56\text{ s}$) versus queued batch saturation ($C \ge 10$). (c) Host resource allocation showing mean GPU compute utilization and peak VRAM safely contained at 13.44 GB against the 24 GB hardware ceiling.*
 
 ### 5.6 Reliability
 | Failure Category | Count | Occurrence Rate (%) | Mitigating Mechanism |
