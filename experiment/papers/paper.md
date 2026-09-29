@@ -54,7 +54,7 @@ Course materials → incremental knowledge-base maintenance → retrieval → co
 
 Figure 1 illustrates the complete architectural workflow across its five core operational stages.
 
-![Figure 1: End-to-End Self-Hosted Assessment Authoring and Validation Pipeline](figures/pipeline_architecture.svg)
+![End-to-End Self-Hosted Assessment Authoring and Validation Pipeline](figures/pipeline_architecture.svg)
 *Figure 1: End-to-end self-hosted assessment authoring and validation pipeline for Moodle, illustrating the sequential stages from incremental course indexing ($T_{KB}$) through dense semantic retrieval, local LLM generation, two-tier deterministic verification, and transactional Moodle Question Bank persistence.*
 
 ### 3.1 Course-material processing and incremental indexing
@@ -65,7 +65,7 @@ The refresh-time decomposition is defined as: $T_{KB} = T_{extract} + T_{chunk} 
 
 Figure 2 outlines the per-chunk cache decision logic and knowledge-base refresh time ($T_{KB}$) attribution.
 
-![Figure 2: Incremental Course Indexing and SHA-256 Embedding Reuse Decision Flow](figures/cache_decision_flow.svg)
+![Incremental Course Indexing and SHA-256 Embedding Reuse Decision Flow](figures/cache_decision_flow.svg)
 *Figure 2: Incremental course indexing and SHA-256 embedding reuse decision flow, detailing the per-chunk cache lookup mechanism and the corresponding latency attribution between full re-indexing and incremental refresh.*
 
 ### 3.2 Retrieval and context control
@@ -246,7 +246,7 @@ For the Technical Correctness dimension, the panel achieved an $\text{ICC}(2,k)$
 
 Figure 3 presents the multi-judge evaluation profile, overall pedagogical usability breakdown, and topic-level scores across curriculum modules.
 
-![Figure 3: Multi-Judge Pedagogical Quality Validation and Inter-Rater Reliability](figures/e1_quality_evaluation.svg)
+![Multi-Judge Pedagogical Quality Validation and Inter-Rater Reliability](figures/e1_quality_evaluation.svg)
 *Figure 3: Multi-judge pedagogical quality validation across 100 generated Python MCQs (Experiment 1). (a) Mean Likert scores across the five evaluation dimensions evaluated by OpenAI GPT-4o, Google Gemini 2.5 Flash, and senior CS faculty, plotted against the 4.0 proficiency benchmark with Intraclass Correlation Coefficients (ICC). (b) Overall usability distribution showing an 80.0% acceptance rate without major revision. (c) Pedagogical score breakdown across curriculum modules.*
 
 ### 5.2 RQ1: End-to-end pipeline efficiency
@@ -282,7 +282,7 @@ A vital empirical insight from our component attribution is the necessary distin
 
 Figure 4 illustrates the component-level latency decomposition and context budgeting trade-offs across configurations.
 
-![Figure 4: Pipeline Component Ablation and Latency Decomposition](figures/e2_pipeline_ablation.svg)
+![Pipeline Component Ablation and Latency Decomposition](figures/e2_pipeline_ablation.svg)
 *Figure 4: Pipeline component ablation and latency breakdown (Experiment 2). (a) Component-level latency decomposition ($T_{\text{E2E}}$) across baseline (Config A), proposed INACON pipeline (Config B), static context (Config C), and zero-shot generation (Config D), illustrating Amdahl's Law constraint where local LLM autoregressive decoding dominates >96.5% of execution time. (b) Trade-off between prompt context tokens and SHA-256 chunk embedding cache-hit rates, highlighting the 72.2% context compression achieved by bounded semantic retrieval.*
 
 ### 5.4 Corpus-scale and update results
@@ -300,7 +300,7 @@ Across all corpus scales, incremental change detection through SHA-256 chunk has
 
 Figure 5 plots the indexing latency scaling curves and acceleration factors under incremental updates.
 
-![Figure 5: Knowledge Base Indexing Latency and Scalability](figures/e3_indexing_scalability.svg)
+![Knowledge Base Indexing Latency and Scalability](figures/e3_indexing_scalability.svg)
 *Figure 5: Knowledge Base indexing latency and scalability across curriculum progression scales and update ratios (Experiment 3). (a) Indexing latency $T_{\text{KB}}$ (log scale) from 1 to 7 modules under update conditions $U_0$ through $U_{100}$, showing sub-millisecond steady-state performance ($T_{\text{KB}} \leq 0.28\text{ ms}$). (b) Empirical speedup factor of SHA-256 incremental embedding reuse over cold rebuilds ($U_{100} / U_0$), scaling from 4,921.1× to 37,008.4×.*
 
 ### 5.5 RQ3: Concurrent instructor generation
@@ -317,7 +317,7 @@ Table 4 reports the system performance and resource envelope across concurrency 
 
 Figure 6 delineates the throughput ceiling, latency scaling envelope, and hardware resource footprint under concurrent load.
 
-![Figure 6: Single-GPU Concurrency Operating Envelope and Resource Saturation](figures/e4_concurrency_envelope.svg)
+![Single-GPU Concurrency Operating Envelope and Resource Saturation](figures/e4_concurrency_envelope.svg)
 *Figure 6: Single-GPU concurrency operating envelope and resource headroom on a dedicated NVIDIA RTX 3090 host (Experiment 4). (a) Aggregate throughput in questions/min across concurrency tiers $C = 1 \dots 20$ under standardized 5-question request batches, showing saturation at 43.8–49.2 Q/min. (b) Median (P50) and tail (P95) latency scaling, highlighting the interactive faculty authoring envelope ($C \le 5$, latency $\le 3.56\text{ s}$) versus queued batch saturation ($C \ge 10$). (c) Host resource allocation showing mean GPU compute utilization and peak VRAM safely contained at 13.44 GB against the 24 GB hardware ceiling.*
 
 ### 5.6 Reliability
