@@ -245,6 +245,8 @@
             const ragToggleIcon = document.getElementById('studio-rag-toggle-icon');
             const ragToggleText = document.getElementById('studio-rag-toggle-text');
             const ragSelectedChip = document.getElementById('studio-rag-selected-chip');
+            const ragAutoExternalCb = document.getElementById('studio-rag-auto-external-cb');
+            const ragAutoExternalLabel = document.getElementById('studio-rag-auto-external-label');
             const ragAutoBtn = document.getElementById('studio-rag-auto-btn');
             const ragAutoCb = document.getElementById('rag_src_auto');
             const topicAutoBtn = document.getElementById('studio-topic-auto-btn');
@@ -636,7 +638,7 @@
                 if (!ragSelectedChip) return;
                 const checkedItems = document.querySelectorAll('.studio-rag-item-cb:checked');
                 const checkedSecs = document.querySelectorAll('.studio-rag-sec-cb:checked');
-                const autoChecked = ragAutoCb && ragAutoCb.checked;
+                const autoChecked = (ragAutoExternalCb && ragAutoExternalCb.checked) || (ragAutoCb && ragAutoCb.checked);
 
                 let count = checkedItems.length;
                 checkedSecs.forEach(secCb => {
@@ -686,6 +688,27 @@
                 return stems;
             }
 
+            function setAutoMode(enabled) {
+                if (ragAutoExternalCb) {
+                    ragAutoExternalCb.checked = enabled;
+                }
+                if (ragAutoCb) {
+                    ragAutoCb.checked = enabled;
+                    updateRowSelectionState(ragAutoCb);
+                }
+                if (ragAutoExternalLabel) {
+                    if (enabled) {
+                        ragAutoExternalLabel.style.background = '#f0f7ff';
+                        ragAutoExternalLabel.style.borderColor = '#bae6fd';
+                        ragAutoExternalLabel.style.color = '#0f6cbf';
+                    } else {
+                        ragAutoExternalLabel.style.background = '#f8fafc';
+                        ragAutoExternalLabel.style.borderColor = '#cbd5e1';
+                        ragAutoExternalLabel.style.color = '#64748b';
+                    }
+                }
+            }
+
             function autoSelectRagSourcesByTopic() {
                 const topic = topicInput ? topicInput.value.trim() : '';
                 if (!topic) {
@@ -698,10 +721,7 @@
                         topicMatchFeedback.style.borderRadius = '4px';
                         topicMatchFeedback.textContent = 'Please enter a Programming Topic or Target Concept first to auto-select matching documents.';
                     }
-                    if (ragAutoCb) {
-                        ragAutoCb.checked = true;
-                        updateRowSelectionState(ragAutoCb);
-                    }
+                    setAutoMode(true);
                     if (topicInput) topicInput.focus();
                     updateSelectedCountBadge();
                     debouncedCheckCache();
@@ -793,11 +813,8 @@
                     }
                 });
 
-                // Ensure Auto checkbox is checked
-                if (ragAutoCb) {
-                    ragAutoCb.checked = true;
-                    updateRowSelectionState(ragAutoCb);
-                }
+                // Ensure Auto checkboxes are checked and highlighted
+                setAutoMode(true);
 
                 // Update feedback UI
                 if (topicMatchFeedback) {
@@ -888,12 +905,55 @@
                 });
             });
 
-            // Auto checkbox change listener
-            if (ragAutoCb) {
-                ragAutoCb.addEventListener('change', () => {
-                    if (ragAutoCb.checked) {
+            // Auto checkbox change listener (External, outside collapsible)
+            if (ragAutoExternalCb) {
+                ragAutoExternalCb.addEventListener('change', () => {
+                    const isChecked = ragAutoExternalCb.checked;
+                    setAutoMode(isChecked);
+                    if (isChecked) {
                         autoSelectRagSourcesByTopic();
                     } else {
+                        // Deselect all course items
+                        document.querySelectorAll('.studio-rag-cb').forEach(cb => {
+                            cb.checked = false;
+                            updateRowSelectionState(cb);
+                        });
+                        document.querySelectorAll('.studio-rag-sec-cb').forEach(secCb => {
+                            secCb.indeterminate = false;
+                        });
+                        if (topicMatchFeedback) {
+                            topicMatchFeedback.style.display = 'block';
+                            topicMatchFeedback.style.color = '#475569';
+                            topicMatchFeedback.style.background = '#f8fafc';
+                            topicMatchFeedback.style.border = '1px solid #cbd5e1';
+                            topicMatchFeedback.style.padding = '6px 10px';
+                            topicMatchFeedback.style.borderRadius = '4px';
+                            topicMatchFeedback.textContent = 'Auto-selection disabled. Generating with topic-only conceptual grounding.';
+                        }
+                        updateSelectedCountBadge();
+                        debouncedCheckCache();
+                    }
+                });
+            }
+
+            // Auto checkbox change listener (Internal, inside collapsible)
+            if (ragAutoCb) {
+                ragAutoCb.addEventListener('change', () => {
+                    const isChecked = ragAutoCb.checked;
+                    setAutoMode(isChecked);
+                    if (isChecked) {
+                        autoSelectRagSourcesByTopic();
+                    } else {
+                        document.querySelectorAll('.studio-rag-cb').forEach(cb => {
+                            cb.checked = false;
+                            updateRowSelectionState(cb);
+                        });
+                        document.querySelectorAll('.studio-rag-sec-cb').forEach(secCb => {
+                            secCb.indeterminate = false;
+                        });
+                        if (topicMatchFeedback) {
+                            topicMatchFeedback.style.display = 'none';
+                        }
                         updateSelectedCountBadge();
                         debouncedCheckCache();
                     }
@@ -904,6 +964,7 @@
             if (ragAutoBtn) {
                 ragAutoBtn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    setAutoMode(true);
                     autoSelectRagSourcesByTopic();
                 });
             }
@@ -911,6 +972,7 @@
             if (topicAutoBtn) {
                 topicAutoBtn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    setAutoMode(true);
                     autoSelectRagSourcesByTopic();
                 });
             }
@@ -919,7 +981,8 @@
             let topicAutoSyncTimer = null;
             if (topicInput) {
                 topicInput.addEventListener('input', () => {
-                    if (ragAutoCb && ragAutoCb.checked) {
+                    const isAuto = (ragAutoExternalCb && ragAutoExternalCb.checked) || (ragAutoCb && ragAutoCb.checked);
+                    if (isAuto) {
                         clearTimeout(topicAutoSyncTimer);
                         topicAutoSyncTimer = setTimeout(() => {
                             autoSelectRagSourcesByTopic();
@@ -930,6 +993,7 @@
 
             if (ragSelectAllBtn) {
                 ragSelectAllBtn.addEventListener('click', () => {
+                    setAutoMode(false);
                     document.querySelectorAll('.studio-rag-cb').forEach(cb => {
                         const itemRow = cb.closest('.studio-rag-item');
                         if (itemRow && itemRow.style.display === 'none') return;
@@ -945,9 +1009,13 @@
 
             if (ragClearAllBtn) {
                 ragClearAllBtn.addEventListener('click', () => {
+                    setAutoMode(false);
                     document.querySelectorAll('.studio-rag-cb').forEach(cb => {
                         cb.checked = false;
                         updateRowSelectionState(cb);
+                    });
+                    document.querySelectorAll('.studio-rag-sec-cb').forEach(secCb => {
+                        secCb.indeterminate = false;
                     });
                     if (topicMatchFeedback) {
                         topicMatchFeedback.style.display = 'none';
@@ -1432,7 +1500,12 @@
             // Initial load of all source cache statuses and selected status
             loadAllSourcesCacheStatus();
             debouncedCheckCache();
-            updateSelectedCountBadge();
+            if ((ragAutoExternalCb && ragAutoExternalCb.checked) || (ragAutoCb && ragAutoCb.checked)) {
+                setAutoMode(true);
+                autoSelectRagSourcesByTopic();
+            } else {
+                updateSelectedCountBadge();
+            }
 
             // Toggle Category Input
             if (categorySelect && newCategoryWrapper) {

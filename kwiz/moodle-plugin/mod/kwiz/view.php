@@ -398,12 +398,16 @@ if ($is_teacher) {
     echo '        2. Generation Parameters';
     echo '      </h6>';
 
-    // RAG sources multi-select checkboxes (Collapsible by default)
+    // RAG sources multi-select checkboxes (Collapsible by default, Auto enabled by default)
     echo '      <div style="margin-bottom: 16px;">';
     echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">';
-    echo '          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
+    echo '          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">';
     echo '            <label style="font-weight: 600; color: #1e293b; margin: 0;">Course Context Grounding (RAG Sources):</label>';
-    echo '            <span id="studio-rag-selected-chip" style="font-size: 0.78rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 9999px; font-weight: 600;">0 selected</span>';
+    echo '            <label id="studio-rag-auto-external-label" style="display: inline-flex; align-items: center; gap: 6px; margin: 0; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #0f6cbf; background: #f0f7ff; border: 1px solid #bae6fd; padding: 3px 10px; border-radius: 4px; user-select: none;" title="Toggle automatic course document selection">';
+    echo '              <input type="checkbox" id="studio-rag-auto-external-cb" checked style="margin: 0; cursor: pointer; accent-color: #0f6cbf;">';
+    echo '              <span>Auto (Topic Matching)</span>';
+    echo '            </label>';
+    echo '            <span id="studio-rag-selected-chip" style="font-size: 0.78rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 9999px; font-weight: 600;">Auto matching</span>';
     echo '          </div>';
     echo '          <button type="button" id="studio-rag-toggle-collapse-btn" class="btn btn-sm btn-outline-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 0.82rem; font-weight: 600; border-radius: 4px; border: 1px solid #0f6cbf; color: #0f6cbf; background: #ffffff; cursor: pointer;">';
     echo '            <span id="studio-rag-toggle-icon">▶</span> <span id="studio-rag-toggle-text">Select RAG Documents (Expand)</span>';
@@ -431,9 +435,9 @@ if ($is_teacher) {
     echo '            <span id="studio-rag-summary" style="color: #64748b; font-size: 0.78rem;"></span>';
     echo '          </div>';
     echo '          <div id="studio-rag-checkboxes-container" class="studio-rag-container">';
-    echo '            <div class="studio-rag-item" data-source="auto" data-category="auto">';
+    echo '            <div class="studio-rag-item selected" data-source="auto" data-category="auto">';
     echo '              <div class="studio-rag-item-left">';
-    echo '                <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto">';
+    echo '                <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto" checked>';
     echo '                <span class="gq-type-pill type-auto">Auto</span>';
     echo '                <label for="rag_src_auto">Auto-select all related to Target Concepts / Topic</label>';
     echo '              </div>';
