@@ -302,6 +302,74 @@ def format_learning_outcomes(learning_outcomes: Optional[str]) -> str:
     return f"- Target Learning Outcomes: {learning_outcomes}\n"
 
 
+def strip_json_fences(content: str) -> str:
+    """Safely strip outer markdown code fences (e.g. ```json ... ```) without affecting inner code blocks."""
+    if not content:
+        return ''
+    text = content.strip()
+    if text.startswith('```'):
+        text = re.sub(r'^```(?:json|JSON)?\s*\n?', '', text)
+        text = re.sub(r'\n?```\s*$', '', text)
+    return text.strip()
+
+
+def parse_llm_json(content: str) -> List[dict]:
+    """Robustly parse JSON response from LLM, handling markdown fences, extra text, and trailing commas."""
+    cleaned = strip_json_fences(content)
+    
+    # Attempt 1: Direct JSON decode
+    try:
+        data = json.loads(cleaned)
+        if isinstance(data, dict) and 'questions' in data and isinstance(data['questions'], list):
+            return data['questions']
+        if isinstance(data, dict):
+            return [data]
+        if isinstance(data, list):
+            return data
+    except json.JSONDecodeError:
+        pass
+        
+    # Attempt 2: Extract outermost matching bracket/brace
+    start_bracket = cleaned.find('[')
+    start_brace = cleaned.find('{')
+    start_idx = -1
+    if start_bracket != -1 and start_brace != -1:
+        start_idx = min(start_bracket, start_brace)
+    elif start_bracket != -1:
+        start_idx = start_bracket
+    elif start_brace != -1:
+        start_idx = start_brace
+        
+    if start_idx != -1:
+        end_idx = max(cleaned.rfind(']'), cleaned.rfind('}'))
+        if end_idx > start_idx:
+            sub = cleaned[start_idx:end_idx + 1]
+            try:
+                data = json.loads(sub)
+                if isinstance(data, dict) and 'questions' in data and isinstance(data['questions'], list):
+                    return data['questions']
+                if isinstance(data, dict):
+                    return [data]
+                if isinstance(data, list):
+                    return data
+            except json.JSONDecodeError:
+                # Attempt 3: Strip trailing commas before closing braces/brackets
+                sub_fixed = re.sub(r',\s*([\]}])', r'\1', sub)
+                try:
+                    data = json.loads(sub_fixed)
+                    if isinstance(data, dict) and 'questions' in data and isinstance(data['questions'], list):
+                        return data['questions']
+                    if isinstance(data, dict):
+                        return [data]
+                    if isinstance(data, list):
+                        return data
+                except json.JSONDecodeError:
+                    pass
+
+    preview = cleaned[:250] if cleaned else '(empty response from model)'
+    raise Exception(f"Invalid JSON from LLM: Expecting value. Response preview: {preview}")
+
+
 import math
 
 def dot_product(v1, v2):
@@ -503,7 +571,14 @@ def generate_with_openai(topic: str, level: str, n_questions: int, language: str
         api_key = api_key_override or OPENAI_API_KEY
         client = OpenAI(api_key=api_key)
         
-        prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
+        is_code = 'code' in (question_type or 'code').lower() and 'conceptual' not in (question_type or 'code').lower()
+        q_example = (
+            "What is the output of the following code snippet?\\n```python\\nx = 10\\nfor i in range(3):\\n    x += i\\nprint(x)\\n```"
+            if is_code
+            else "Which of the following statements is true regarding Python loops?"
+        )
+
+        prompt = f"""Generate a JSON array of exactly {n_questions} multiple-choice question(s) on the topic: "{topic}"
 
 Requirements:
 - Difficulty level: {level}
@@ -514,17 +589,19 @@ Requirements:
 {format_lesson_context(context)}
 
 For each question, provide:
-1. A clear question text (including executable ```python ... ``` code block if code-centric)
+1. Clear question text (for code-centric questions, the executable Python snippet MUST be embedded inside ```python ... ``` within the question string)
 2. Exactly 4 answer choices (only one correct)
 3. The index (0-3) of the correct answer
 4. A brief explanation
 
-CRITICAL: Return ONLY valid JSON array. No markdown, no code blocks, no explanations outside JSON.
+CRITICAL INSTRUCTIONS:
+- Return ONLY a valid JSON array. Do not wrap the JSON output in markdown code fences or conversational text.
+- Escape all internal quotation marks and newlines inside JSON strings properly.
 
 Format as JSON array:
 [
   {{
-    "question": "Question text",
+    "question": "{q_example}",
     "choices": [
       {{"text": "Choice 1", "is_correct": true}},
       {{"text": "Choice 2", "is_correct": false}},
@@ -536,13 +613,7 @@ Format as JSON array:
     "bloom_level": "{bloom_level or 'comprehension'}",
     "explanation": "Brief explanation"
   }}
-]
-
-IMPORTANT: 
-- Ensure all strings are properly escaped
-- No trailing commas
-- Valid JSON syntax only
-- Return the array directly, nothing else."""
+]"""
 
         response = client.chat.completions.create(
             model=OPENAI_MODEL,
@@ -554,15 +625,8 @@ IMPORTANT:
             max_tokens=2000
         )
         
-        content = response.choices[0].message.content.strip()
-        # Remove markdown code blocks if present
-        if content.startswith("```"):
-            content = content.split("```")[1]
-            if content.startswith("json"):
-                content = content[4:]
-        content = content.strip()
-        
-        questions_data = json.loads(content)
+        content = response.choices[0].message.content or ""
+        questions_data = parse_llm_json(content)
         questions = []
         
         for q_data in questions_data:
@@ -603,7 +667,14 @@ def generate_with_gemini(topic: str, level: str, n_questions: int, language: str
         genai.configure(api_key=effective_api_key)
         model = genai.GenerativeModel(GEMINI_MODEL)
         
-        prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
+        is_code = 'code' in (question_type or 'code').lower() and 'conceptual' not in (question_type or 'code').lower()
+        q_example = (
+            "What is the output of the following code snippet?\\n```python\\nx = 10\\nfor i in range(3):\\n    x += i\\nprint(x)\\n```"
+            if is_code
+            else "Which of the following statements is true regarding Python loops?"
+        )
+
+        prompt = f"""Generate a JSON array of exactly {n_questions} multiple-choice question(s) on the topic: "{topic}"
 
 Requirements:
 - Difficulty level: {level}
@@ -614,17 +685,19 @@ Requirements:
 {format_lesson_context(context)}
 
 For each question, provide:
-1. A clear question text (including executable ```python ... ``` code block if code-centric)
+1. Clear question text (for code-centric questions, the executable Python snippet MUST be embedded inside ```python ... ``` within the question string)
 2. Exactly 4 answer choices (only one correct)
 3. The index (0-3) of the correct answer
 4. A brief explanation
 
-CRITICAL: Return ONLY valid JSON array. No markdown, no code blocks, no explanations outside JSON.
+CRITICAL INSTRUCTIONS:
+- Return ONLY a valid JSON array. Do not wrap the JSON output in markdown code fences or conversational text.
+- Escape all internal quotation marks and newlines inside JSON strings properly.
 
 Format as JSON array:
 [
   {{
-    "question": "Question text",
+    "question": "{q_example}",
     "choices": [
       {{"text": "Choice 1", "is_correct": true}},
       {{"text": "Choice 2", "is_correct": false}},
@@ -636,25 +709,11 @@ Format as JSON array:
     "bloom_level": "{bloom_level or 'comprehension'}",
     "explanation": "Brief explanation"
   }}
-]
-
-IMPORTANT: 
-- Ensure all strings are properly escaped
-- No trailing commas
-- Valid JSON syntax only
-- Return the array directly, nothing else."""
+]"""
         
         response = model.generate_content(prompt)
-        content = response.text.strip()
-        
-        # Remove markdown code blocks if present
-        if content.startswith('```'):
-            content = content.split('```')[1]
-            if content.startswith('json'):
-                content = content[4:]
-            content = content.strip()
-        
-        questions_data = json.loads(content)
+        content = response.text or ""
+        questions_data = parse_llm_json(content)
         questions = []
         
         for q_data in questions_data:
@@ -685,7 +744,14 @@ def generate_with_local_llm(topic: str, level: str, n_questions: int, language: 
         ollama_model = model or os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:7b')
         logger.info(f"Connecting to Ollama at {LOCAL_LLM_URL} with model {ollama_model}")
         
-        prompt = f"""Generate {n_questions} multiple-choice question(s) on the topic: "{topic}"
+        is_code = 'code' in (question_type or 'code').lower() and 'conceptual' not in (question_type or 'code').lower()
+        q_example = (
+            "What is the output of the following code snippet?\\n```python\\nx = 10\\nfor i in range(3):\\n    x += i\\nprint(x)\\n```"
+            if is_code
+            else "Which of the following statements is true regarding Python loops?"
+        )
+
+        prompt = f"""Generate a JSON array of exactly {n_questions} multiple-choice question(s) on the topic: "{topic}"
 
 Requirements:
 - Difficulty level: {level}
@@ -696,17 +762,19 @@ Requirements:
 {format_lesson_context(context)}
 
 For each question, provide:
-1. A clear question text (including executable ```python ... ``` code block if code-centric)
+1. Clear question text (for code-centric questions, the executable Python snippet MUST be embedded inside ```python ... ``` within the question string)
 2. Exactly 4 answer choices (only one correct)
 3. The index (0-3) of the correct answer
 4. A brief explanation
 
-CRITICAL: Return ONLY valid JSON array. No markdown, no code blocks, no explanations outside JSON.
+CRITICAL INSTRUCTIONS:
+- Return ONLY a valid JSON array. Do not wrap the JSON output in markdown code fences or conversational text.
+- Escape all internal quotation marks and newlines inside JSON strings properly.
 
 Format as JSON array:
 [
   {{
-    "question": "Question text",
+    "question": "{q_example}",
     "choices": [
       {{"text": "Choice 1", "is_correct": true}},
       {{"text": "Choice 2", "is_correct": false}},
@@ -718,13 +786,7 @@ Format as JSON array:
     "bloom_level": "{bloom_level or 'comprehension'}",
     "explanation": "Brief explanation"
   }}
-]
-
-IMPORTANT: 
-- Ensure all strings are properly escaped
-- No trailing commas
-- Valid JSON syntax only
-- Return the array directly, nothing else."""
+]"""
         
         # Use Ollama API
         response = requests.post(
@@ -732,7 +794,11 @@ IMPORTANT:
             json={
                 "model": ollama_model,
                 "prompt": prompt,
-                "stream": False
+                "stream": False,
+                "options": {
+                    "temperature": 0.2,
+                    "top_p": 0.9,
+                }
             },
             timeout=LOCAL_LLM_TIMEOUT
         )
@@ -746,72 +812,7 @@ IMPORTANT:
         
         result = response.json()
         content = result.get('response', '').strip()
-        
-        # Remove markdown code blocks if present
-        if content.startswith('```'):
-            content = content.split('```')[1]
-            if content.startswith('json'):
-                content = content[4:]
-            content = content.strip()
-        
-        # Try to extract JSON from the response if it contains extra text
-        # Look for JSON array or object patterns
-        import re
-        json_match = re.search(r'(\[[\s\S]*\]|\{[\s\S]*\})', content)
-        if json_match:
-            content = json_match.group(1)
-        
-        # Try to parse JSON with better error handling
-        try:
-            questions_data = json.loads(content)
-        except json.JSONDecodeError as e:
-            # Try to fix common JSON issues
-            # Remove trailing commas before closing brackets/braces
-            content = re.sub(r',\s*}', '}', content)
-            content = re.sub(r',\s*]', ']', content)
-            # Fix unescaped quotes in strings (basic attempt)
-            # Remove any text before first [ or {
-            content = re.sub(r'^[^[{]*', '', content)
-            # Remove any text after last ] or }
-            content = re.sub(r'[^}\]]*$', '', content)
-            # Try parsing again
-            try:
-                questions_data = json.loads(content)
-            except json.JSONDecodeError as e2:
-                # Try to extract just the array/object part more aggressively
-                # Find the first complete JSON structure
-                bracket_count = 0
-                brace_count = 0
-                start_idx = -1
-                for i, char in enumerate(content):
-                    if char in '[{':
-                        if start_idx == -1:
-                            start_idx = i
-                        if char == '[':
-                            bracket_count += 1
-                        else:
-                            brace_count += 1
-                    elif char in ']}':
-                        if char == ']':
-                            bracket_count -= 1
-                        else:
-                            brace_count -= 1
-                        if start_idx != -1 and bracket_count == 0 and brace_count == 0:
-                            # Found complete structure
-                            content = content[start_idx:i+1]
-                            try:
-                                questions_data = json.loads(content)
-                                break
-                            except:
-                                pass
-                
-                # Final attempt
-                try:
-                    questions_data = json.loads(content)
-                except json.JSONDecodeError as e3:
-                    # Log the problematic content for debugging
-                    error_msg = f"Invalid JSON from LLM: {str(e3)}. Position: line {e3.lineno}, col {e3.colno}. Response preview: {content[max(0, e3.pos-100):e3.pos+100]}"
-                    raise Exception(error_msg)
+        questions_data = parse_llm_json(content)
         
         # Handle both single object and array responses
         if not isinstance(questions_data, list):
