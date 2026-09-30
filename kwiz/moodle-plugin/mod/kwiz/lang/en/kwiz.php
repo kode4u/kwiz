@@ -18,12 +18,8 @@ $string['kwiz:view'] = 'View AI Quiz Generator';
 $string['kwiz:attempt'] = 'Attempt AI Quiz';
 
 // Settings
-$string['websocket_url'] = 'WebSocket Server URL';
-$string['websocket_url_desc'] = 'URL of the WebSocket server (e.g., ws://localhost:3001 or wss://example.com)';
 $string['llmapi_url'] = 'LLM API URL';
-$string['llmapi_url_desc'] = 'URL of the LLM API service (e.g., http://localhost:5001)';
-$string['jwt_secret'] = 'JWT Secret';
-$string['jwt_secret_desc'] = 'Secret key for JWT token generation (must match WebSocket server)';
+$string['llmapi_url_desc'] = 'URL of the LLM API service (e.g., http://localhost:5001 or http://llmapi:5001 in Docker)';
 
 // Activity form
 $string['name'] = 'Quiz Name';
