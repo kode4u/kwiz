@@ -240,6 +240,15 @@
             const ragClearAllBtn = document.getElementById('studio-rag-clear-all');
             const ragSummary = document.getElementById('studio-rag-summary');
             const ragRefreshBtn = document.getElementById('studio-rag-refresh-btn');
+            const ragToggleCollapseBtn = document.getElementById('studio-rag-toggle-collapse-btn');
+            const ragCollapsibleWrapper = document.getElementById('studio-rag-collapsible-wrapper');
+            const ragToggleIcon = document.getElementById('studio-rag-toggle-icon');
+            const ragToggleText = document.getElementById('studio-rag-toggle-text');
+            const ragSelectedChip = document.getElementById('studio-rag-selected-chip');
+            const ragAutoBtn = document.getElementById('studio-rag-auto-btn');
+            const ragAutoCb = document.getElementById('rag_src_auto');
+            const topicAutoBtn = document.getElementById('studio-topic-auto-btn');
+            const topicMatchFeedback = document.getElementById('studio-topic-match-feedback');
 
             const cacheCard = document.getElementById('embedding-cache-card');
             const cacheIndicator = document.getElementById('embedding-cache-indicator');
@@ -623,6 +632,219 @@
                 }
             }
 
+            function updateSelectedCountBadge() {
+                if (!ragSelectedChip) return;
+                const checkedItems = document.querySelectorAll('.studio-rag-item-cb:checked');
+                const checkedSecs = document.querySelectorAll('.studio-rag-sec-cb:checked');
+                const autoChecked = ragAutoCb && ragAutoCb.checked;
+
+                let count = checkedItems.length;
+                checkedSecs.forEach(secCb => {
+                    const secNum = secCb.dataset.section;
+                    const childCbs = document.querySelectorAll(`.studio-rag-item-cb[data-section="${secNum}"]`);
+                    if (childCbs.length === 0) {
+                        count++;
+                    }
+                });
+
+                if (autoChecked && count > 0) {
+                    ragSelectedChip.textContent = `Auto (${count} doc${count === 1 ? '' : 's'} matching)`;
+                    ragSelectedChip.style.background = '#e0f2fe';
+                    ragSelectedChip.style.color = '#0284c7';
+                } else if (autoChecked && count === 0) {
+                    ragSelectedChip.textContent = 'Auto (Topic-related)';
+                    ragSelectedChip.style.background = '#e0f2fe';
+                    ragSelectedChip.style.color = '#0284c7';
+                } else if (count > 0) {
+                    ragSelectedChip.textContent = `${count} doc${count === 1 ? '' : 's'} selected`;
+                    ragSelectedChip.style.background = '#e0f2fe';
+                    ragSelectedChip.style.color = '#0284c7';
+                } else {
+                    ragSelectedChip.textContent = '0 selected (Topic-only)';
+                    ragSelectedChip.style.background = '#e2e8f0';
+                    ragSelectedChip.style.color = '#475569';
+                }
+            }
+
+            function getStems(word) {
+                const w = word.toLowerCase().trim();
+                const stems = [w];
+                if (w.endsWith('ies') && w.length > 4) {
+                    stems.push(w.slice(0, -3) + 'y');
+                } else if (w.endsWith('es') && w.length > 3) {
+                    stems.push(w.slice(0, -2));
+                    stems.push(w.slice(0, -1));
+                } else if (w.endsWith('s') && w.length > 2) {
+                    stems.push(w.slice(0, -1));
+                } else if (w.endsWith('ing') && w.length > 4) {
+                    stems.push(w.slice(0, -3));
+                } else if (w.endsWith('ed') && w.length > 3) {
+                    stems.push(w.slice(0, -2));
+                } else if (w.endsWith('tion') && w.length > 5) {
+                    stems.push(w.slice(0, -4));
+                }
+                return stems;
+            }
+
+            function autoSelectRagSourcesByTopic() {
+                const topic = topicInput ? topicInput.value.trim() : '';
+                if (!topic) {
+                    if (topicMatchFeedback) {
+                        topicMatchFeedback.style.display = 'block';
+                        topicMatchFeedback.style.color = '#b45309';
+                        topicMatchFeedback.style.background = '#fef3c7';
+                        topicMatchFeedback.style.border = '1px solid #fde68a';
+                        topicMatchFeedback.style.padding = '6px 10px';
+                        topicMatchFeedback.style.borderRadius = '4px';
+                        topicMatchFeedback.textContent = 'Please enter a Programming Topic or Target Concept first to auto-select matching documents.';
+                    }
+                    if (ragAutoCb) {
+                        ragAutoCb.checked = true;
+                        updateRowSelectionState(ragAutoCb);
+                    }
+                    if (topicInput) topicInput.focus();
+                    updateSelectedCountBadge();
+                    debouncedCheckCache();
+                    return;
+                }
+
+                // Tokenize topic string
+                const rawTokens = topic.toLowerCase().split(/[\s,\.\/\-_:;\(\)\[\]\{\}、，。]+/).filter(t => t.length >= 2);
+                const stopWords = new Set([
+                    'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from',
+                    'about', 'intro', 'introduction', 'basics', 'basic', 'concept', 'concepts', 'topic',
+                    'topics', 'lecture', 'chapter', 'slide', 'slides', 'module', 'unit', 'part', 'week',
+                    'day', 'lab', 'exercise', 'exercises', 'tutorial', 'test', 'exam', 'quiz', 'overview',
+                    'learning', 'objective', 'objectives'
+                ]);
+
+                let filteredTokens = rawTokens.filter(t => !stopWords.has(t));
+                if (filteredTokens.length === 0) {
+                    filteredTokens = rawTokens.filter(t => t.length >= 3);
+                }
+                if (filteredTokens.length === 0) {
+                    filteredTokens = rawTokens;
+                }
+
+                // Generate stem variations for matching
+                const allStems = [];
+                filteredTokens.forEach(token => {
+                    getStems(token).forEach(s => {
+                        if (s.length >= 2 && !allStems.includes(s)) {
+                            allStems.push(s);
+                        }
+                    });
+                });
+
+                let matchedCount = 0;
+                const matchedTitles = [];
+
+                // Check section blocks and items
+                const sectionBlocks = document.querySelectorAll('.studio-rag-section-block');
+                sectionBlocks.forEach(block => {
+                    const secCb = block.querySelector('.studio-rag-sec-cb');
+                    const secLabel = block.querySelector('.studio-rag-section-header label');
+                    const secText = (secLabel ? secLabel.textContent : '').toLowerCase();
+
+                    // Check if section header itself matches topic
+                    const secMatches = allStems.some(stem => secText.includes(stem));
+
+                    const childItems = block.querySelectorAll('.studio-rag-child-item');
+                    let childMatchedCount = 0;
+
+                    childItems.forEach(childRow => {
+                        const childCb = childRow.querySelector('.studio-rag-item-cb');
+                        const childLabel = childRow.querySelector('label');
+                        const childText = (childLabel ? childLabel.textContent : '').toLowerCase();
+
+                        // Item matches if item text matches stem OR parent section matches
+                        const itemMatches = secMatches || allStems.some(stem => childText.includes(stem));
+
+                        if (childCb) {
+                            childCb.checked = itemMatches;
+                            updateRowSelectionState(childCb);
+                            if (itemMatches) {
+                                childMatchedCount++;
+                                matchedCount++;
+                                const cleanTitle = childLabel ? childLabel.textContent.trim() : '';
+                                if (cleanTitle && matchedTitles.length < 3) {
+                                    matchedTitles.push(cleanTitle);
+                                }
+                            }
+                        }
+                    });
+
+                    // If section has no children, evaluate the section checkbox itself
+                    if (childItems.length === 0 && secCb) {
+                        secCb.checked = secMatches;
+                        updateRowSelectionState(secCb);
+                        if (secMatches) {
+                            matchedCount++;
+                            const cleanSecTitle = secLabel ? secLabel.textContent.trim() : '';
+                            if (cleanSecTitle && matchedTitles.length < 3) {
+                                matchedTitles.push(cleanSecTitle);
+                            }
+                        }
+                    } else if (secCb) {
+                        // Section has children: checked if all children checked, indeterminate if partial
+                        secCb.checked = (childItems.length > 0 && childMatchedCount === childItems.length);
+                        secCb.indeterminate = (childMatchedCount > 0 && childMatchedCount < childItems.length);
+                        updateRowSelectionState(secCb);
+                    }
+                });
+
+                // Ensure Auto checkbox is checked
+                if (ragAutoCb) {
+                    ragAutoCb.checked = true;
+                    updateRowSelectionState(ragAutoCb);
+                }
+
+                // Update feedback UI
+                if (topicMatchFeedback) {
+                    topicMatchFeedback.style.display = 'block';
+                    if (matchedCount > 0) {
+                        topicMatchFeedback.style.color = '#0369a1';
+                        topicMatchFeedback.style.background = '#f0f9ff';
+                        topicMatchFeedback.style.border = '1px solid #bae6fd';
+                        topicMatchFeedback.style.padding = '6px 10px';
+                        topicMatchFeedback.style.borderRadius = '4px';
+
+                        let summaryList = matchedTitles.join(', ');
+                        if (matchedCount > matchedTitles.length) {
+                            summaryList += ` (+${matchedCount - matchedTitles.length} more)`;
+                        }
+                        topicMatchFeedback.textContent = `Auto-selected ${matchedCount} matching course document${matchedCount === 1 ? '' : 's'} for "${topic}" (${summaryList}).`;
+                    } else {
+                        topicMatchFeedback.style.color = '#b45309';
+                        topicMatchFeedback.style.background = '#fef3c7';
+                        topicMatchFeedback.style.border = '1px solid #fde68a';
+                        topicMatchFeedback.style.padding = '6px 10px';
+                        topicMatchFeedback.style.borderRadius = '4px';
+                        topicMatchFeedback.textContent = `No course documents specifically matched "${topic}". Auto mode will use direct target concept grounding.`;
+                    }
+                }
+
+                updateSelectedCountBadge();
+                debouncedCheckCache();
+            }
+
+            // Collapsible RAG Documents Wrapper Toggle
+            if (ragToggleCollapseBtn && ragCollapsibleWrapper) {
+                ragToggleCollapseBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isHidden = (ragCollapsibleWrapper.style.display === 'none' || window.getComputedStyle(ragCollapsibleWrapper).display === 'none');
+                    if (isHidden) {
+                        ragCollapsibleWrapper.style.display = 'block';
+                        if (ragToggleIcon) ragToggleIcon.textContent = '▼';
+                        if (ragToggleText) ragToggleText.textContent = 'Hide RAG Documents (Collapse)';
+                    } else {
+                        ragCollapsibleWrapper.style.display = 'none';
+                        if (ragToggleIcon) ragToggleIcon.textContent = '▶';
+                        if (ragToggleText) ragToggleText.textContent = 'Select RAG Documents (Expand)';
+                    }
+                });
+            }
+
             // Sync Section header checkbox with child checkboxes
             document.querySelectorAll('.studio-rag-sec-cb').forEach(secCb => {
                 secCb.addEventListener('change', () => {
@@ -633,6 +855,7 @@
                         updateRowSelectionState(childCb);
                     });
                     updateRowSelectionState(secCb);
+                    updateSelectedCountBadge();
                     debouncedCheckCache();
                 });
             });
@@ -646,9 +869,11 @@
                         const allSiblings = document.querySelectorAll(`.studio-rag-item-cb[data-section="${secNum}"]`);
                         const checkedSiblings = document.querySelectorAll(`.studio-rag-item-cb[data-section="${secNum}"]:checked`);
                         parentSecCb.checked = (allSiblings.length > 0 && allSiblings.length === checkedSiblings.length);
+                        parentSecCb.indeterminate = (checkedSiblings.length > 0 && checkedSiblings.length < allSiblings.length);
                         updateRowSelectionState(parentSecCb);
                     }
                     updateRowSelectionState(itemCb);
+                    updateSelectedCountBadge();
                     debouncedCheckCache();
                 });
             });
@@ -658,9 +883,50 @@
                 updateRowSelectionState(cb);
                 cb.addEventListener('change', () => {
                     updateRowSelectionState(cb);
+                    updateSelectedCountBadge();
                     debouncedCheckCache();
                 });
             });
+
+            // Auto checkbox change listener
+            if (ragAutoCb) {
+                ragAutoCb.addEventListener('change', () => {
+                    if (ragAutoCb.checked) {
+                        autoSelectRagSourcesByTopic();
+                    } else {
+                        updateSelectedCountBadge();
+                        debouncedCheckCache();
+                    }
+                });
+            }
+
+            // Auto-Select Buttons
+            if (ragAutoBtn) {
+                ragAutoBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    autoSelectRagSourcesByTopic();
+                });
+            }
+
+            if (topicAutoBtn) {
+                topicAutoBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    autoSelectRagSourcesByTopic();
+                });
+            }
+
+            // Dynamic sync topic changes when Auto is active
+            let topicAutoSyncTimer = null;
+            if (topicInput) {
+                topicInput.addEventListener('input', () => {
+                    if (ragAutoCb && ragAutoCb.checked) {
+                        clearTimeout(topicAutoSyncTimer);
+                        topicAutoSyncTimer = setTimeout(() => {
+                            autoSelectRagSourcesByTopic();
+                        }, 500);
+                    }
+                });
+            }
 
             if (ragSelectAllBtn) {
                 ragSelectAllBtn.addEventListener('click', () => {
@@ -672,6 +938,7 @@
                             updateRowSelectionState(cb);
                         }
                     });
+                    updateSelectedCountBadge();
                     debouncedCheckCache();
                 });
             }
@@ -682,6 +949,11 @@
                         cb.checked = false;
                         updateRowSelectionState(cb);
                     });
+                    if (topicMatchFeedback) {
+                        topicMatchFeedback.style.display = 'none';
+                        topicMatchFeedback.textContent = '';
+                    }
+                    updateSelectedCountBadge();
                     debouncedCheckCache();
                 });
             }
@@ -1160,6 +1432,7 @@
             // Initial load of all source cache statuses and selected status
             loadAllSourcesCacheStatus();
             debouncedCheckCache();
+            updateSelectedCountBadge();
 
             // Toggle Category Input
             if (categorySelect && newCategoryWrapper) {

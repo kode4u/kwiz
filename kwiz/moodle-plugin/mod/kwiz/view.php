@@ -398,11 +398,21 @@ if ($is_teacher) {
     echo '        2. Generation Parameters';
     echo '      </h6>';
 
-    // RAG sources multi-select checkboxes
+    // RAG sources multi-select checkboxes (Collapsible by default)
     echo '      <div style="margin-bottom: 16px;">';
     echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">';
-    echo '          <label style="font-weight: 600; color: #1e293b; margin: 0;">Course Context Grounding (RAG Sources):</label>';
-    echo '          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">';
+    echo '          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
+    echo '            <label style="font-weight: 600; color: #1e293b; margin: 0;">Course Context Grounding (RAG Sources):</label>';
+    echo '            <span id="studio-rag-selected-chip" style="font-size: 0.78rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 9999px; font-weight: 600;">0 selected</span>';
+    echo '          </div>';
+    echo '          <button type="button" id="studio-rag-toggle-collapse-btn" class="btn btn-sm btn-outline-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 0.82rem; font-weight: 600; border-radius: 4px; border: 1px solid #0f6cbf; color: #0f6cbf; background: #ffffff; cursor: pointer;">';
+    echo '            <span id="studio-rag-toggle-icon">▶</span> <span id="studio-rag-toggle-text">Select RAG Documents (Expand)</span>';
+    echo '          </button>';
+    echo '        </div>';
+
+    // Collapsible document selector wrapper - collapsed by default
+    echo '        <div id="studio-rag-collapsible-wrapper" style="display: none; border: 1px solid #cbd5e1; border-radius: 4px; padding: 12px; background: #ffffff; margin-bottom: 10px;">';
+    echo '          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">';
     echo '            <div class="gq-pill-filter-group">';
     echo '              <button type="button" class="gq-pill gq-pill-filter active" data-filter="all">All</button>';
     echo '              <button type="button" class="gq-pill gq-pill-filter" data-filter="chapter">Chapters</button>';
@@ -411,69 +421,70 @@ if ($is_teacher) {
     echo '              <button type="button" class="gq-pill gq-pill-filter" data-filter="label">Labels &amp; Media</button>';
     echo '            </div>';
     echo '            <div class="gq-pill-actions-group">';
+    echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-auto-btn" style="font-weight: 600; color: #0f6cbf; border-color: #0f6cbf; background: #f0f7ff;">Auto-Select by Topic</button>';
     echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-select-all">Select All</button>';
     echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-clear-all">Clear</button>';
     echo '              <button type="button" class="gq-pill gq-pill-action" id="studio-rag-refresh-btn">Refresh</button>';
     echo '            </div>';
     echo '          </div>';
-    echo '        </div>';
-    echo '        <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">';
-    echo '          <span id="studio-rag-summary" style="color: #64748b; font-size: 0.78rem;"></span>';
-    echo '        </div>';
-    echo '        <div id="studio-rag-checkboxes-container" class="studio-rag-container">';
-    echo '          <div class="studio-rag-item" data-source="auto" data-category="auto">';
-    echo '            <div class="studio-rag-item-left">';
-    echo '              <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto">';
-    echo '              <span class="gq-type-pill type-auto">Auto</span>';
-    echo '              <label for="rag_src_auto">Auto-detect (Current / Preceding Course Activity)</label>';
-    echo '            </div>';
-    echo '            <div class="studio-rag-item-right">';
-    echo '              <span class="rag-source-badge rag-badge-checking" id="rag-badge-auto">Checking...</span>';
-    echo '              <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="auto" data-name="Auto-detect (Preceding Activity)">Details</button>';
-    echo '              <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="auto" id="rag-reembed-auto" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
-    echo '            </div>';
+    echo '          <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">';
+    echo '            <span id="studio-rag-summary" style="color: #64748b; font-size: 0.78rem;"></span>';
     echo '          </div>';
+    echo '          <div id="studio-rag-checkboxes-container" class="studio-rag-container">';
+    echo '            <div class="studio-rag-item" data-source="auto" data-category="auto">';
+    echo '              <div class="studio-rag-item-left">';
+    echo '                <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb" value="auto" id="rag_src_auto">';
+    echo '                <span class="gq-type-pill type-auto">Auto</span>';
+    echo '                <label for="rag_src_auto">Auto-select all related to Target Concepts / Topic</label>';
+    echo '              </div>';
+    echo '              <div class="studio-rag-item-right">';
+    echo '                <span class="rag-source-badge rag-badge-checking" id="rag-badge-auto">Checking...</span>';
+    echo '                <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="auto" data-name="Auto-select (Topic-related)">Details</button>';
+    echo '                <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="auto" id="rag-reembed-auto" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+    echo '              </div>';
+    echo '            </div>';
     if (!empty($course_sections_tree)) {
         foreach ($course_sections_tree as $sec) {
             $sid = 'rag_src_sec_' . (int)$sec['number'];
             $src_key = 'section_' . (int)$sec['number'];
-            echo '          <div class="studio-rag-section-block" data-section="' . (int)$sec['number'] . '">';
-            echo '            <div class="studio-rag-section-header studio-rag-item" data-source="' . $src_key . '" data-category="chapter">';
-            echo '              <div class="studio-rag-item-left">';
-            echo '                <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb studio-rag-sec-cb" value="' . $src_key . '" id="' . $sid . '" data-section="' . (int)$sec['number'] . '">';
-            echo '                <span class="gq-type-pill type-chapter">Chapter</span>';
-            echo '                <label for="' . $sid . '"><strong>' . s($sec['name']) . '</strong><span class="studio-rag-count-pill">' . count($sec['items']) . ' items</span></label>';
+            echo '            <div class="studio-rag-section-block" data-section="' . (int)$sec['number'] . '">';
+            echo '              <div class="studio-rag-section-header studio-rag-item" data-source="' . $src_key . '" data-category="chapter">';
+            echo '                <div class="studio-rag-item-left">';
+            echo '                  <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb studio-rag-sec-cb" value="' . $src_key . '" id="' . $sid . '" data-section="' . (int)$sec['number'] . '">';
+            echo '                  <span class="gq-type-pill type-chapter">Chapter</span>';
+            echo '                  <label for="' . $sid . '"><strong>' . s($sec['name']) . '</strong><span class="studio-rag-count-pill">' . count($sec['items']) . ' items</span></label>';
+            echo '                </div>';
+            echo '                <div class="studio-rag-item-right">';
+            echo '                  <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
+            echo '                  <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="' . $src_key . '" data-name="' . s($sec['name']) . '">Details</button>';
+            echo '                  <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+            echo '                </div>';
             echo '              </div>';
-            echo '              <div class="studio-rag-item-right">';
-            echo '                <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $src_key . '">Checking...</span>';
-            echo '                <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="' . $src_key . '" data-name="' . s($sec['name']) . '">Details</button>';
-            echo '                <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $src_key . '" id="rag-reembed-' . $src_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
-            echo '              </div>';
-            echo '            </div>';
-            echo '            <div class="studio-rag-section-children">';
+            echo '              <div class="studio-rag-section-children">';
             foreach ($sec['items'] as $item) {
                 $cid = 'rag_src_cm_' . (int)$item['id'];
                 $item_key = 'cmid_' . (int)$item['id'];
-                echo '              <div class="studio-rag-item studio-rag-child-item" data-source="' . $item_key . '" data-category="' . $item['category'] . '" data-section="' . (int)$sec['number'] . '">';
-                echo '                <div class="studio-rag-item-left">';
-                echo '                  <span class="studio-rag-tree-indicator">└─</span>';
-                echo '                  <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb studio-rag-item-cb" value="' . $item_key . '" id="' . $cid . '" data-section="' . (int)$sec['number'] . '">';
-                echo '                  <span class="gq-type-pill ' . $item['pill_class'] . '">' . $item['pill_label'] . '</span>';
-                echo '                  <label for="' . $cid . '">' . s($item['name']) . '</label>';
+                echo '                <div class="studio-rag-item studio-rag-child-item" data-source="' . $item_key . '" data-category="' . $item['category'] . '" data-section="' . (int)$sec['number'] . '">';
+                echo '                  <div class="studio-rag-item-left">';
+                echo '                    <span class="studio-rag-tree-indicator">└─</span>';
+                echo '                    <input type="checkbox" name="studio_rag_sources[]" class="studio-rag-cb studio-rag-item-cb" value="' . $item_key . '" id="' . $cid . '" data-section="' . (int)$sec['number'] . '">';
+                echo '                    <span class="gq-type-pill ' . $item['pill_class'] . '">' . $item['pill_label'] . '</span>';
+                echo '                    <label for="' . $cid . '">' . s($item['name']) . '</label>';
+                echo '                  </div>';
+                echo '                  <div class="studio-rag-item-right">';
+                echo '                    <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $item_key . '">Checking...</span>';
+                echo '                    <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="' . $item_key . '" data-name="' . s($item['name']) . '">Details</button>';
+                echo '                    <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $item_key . '" id="rag-reembed-' . $item_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
+                echo '                  </div>';
                 echo '                </div>';
-                echo '                <div class="studio-rag-item-right">';
-                echo '                  <span class="rag-source-badge rag-badge-checking" id="rag-badge-' . $item_key . '">Checking...</span>';
-                echo '                  <button type="button" class="btn btn-sm btn-outline-secondary studio-details-btn" data-source="' . $item_key . '" data-name="' . s($item['name']) . '">Details</button>';
-                echo '                  <button type="button" class="btn btn-sm btn-outline-primary studio-reembed-single-btn" data-source="' . $item_key . '" id="rag-reembed-' . $item_key . '" style="display: none; padding: 2px 8px; font-size: 0.75rem; line-height: 1.2;">Re-embed</button>';
-                echo '                </div>';
-                echo '              </div>';
             }
+            echo '              </div>';
             echo '            </div>';
-            echo '          </div>';
         }
     }
+    echo '          </div>';
+    echo '          <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 6px;">Select one or more sources to retrieve and ground questions. Use "Auto" to select all documents matching your target topic.</small>';
     echo '        </div>';
-    echo '        <small style="color: #64748b; font-size: 0.82rem; display: block; margin-top: 4px;">Select one or more sources to retrieve and ground questions. Use filter pills above to browse by type.</small>';
 
     // Dynamic SHA-256 Embedding Cache Status Card
     echo '        <div id="embedding-cache-card" class="cache-none">';
@@ -493,8 +504,14 @@ if ($is_teacher) {
 
     // Topic input
     echo '      <div style="margin-bottom: 14px;">';
-    echo '        <label for="studio-topic-input" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Programming Topic / Target Concepts:</label>';
+    echo '        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">';
+    echo '          <label for="studio-topic-input" style="display: block; font-weight: 600; color: #1e293b; margin: 0;">Programming Topic / Target Concepts:</label>';
+    echo '          <button type="button" id="studio-topic-auto-btn" class="btn btn-sm" style="font-size: 0.78rem; font-weight: 600; color: #0f6cbf; background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 3px 10px; cursor: pointer;" title="Auto-select course documents matching this topic">';
+    echo '            Auto-Select Matching Sources';
+    echo '          </button>';
+    echo '        </div>';
     echo '        <input type="text" id="studio-topic-input" class="form-control" style="width: 100%; border-radius: 8px; font-size: 0.95rem; padding: 8px 12px;" value="' . s($kwiz->topic) . '" placeholder="e.g. Python Loops, While, Range, Break/Continue">';
+    echo '        <div id="studio-topic-match-feedback" style="display: none; font-size: 0.8rem; margin-top: 4px; color: #0284c7; font-weight: 500;"></div>';
     echo '      </div>';
 
     // Row: Count, Difficulty, Language with Pill Select Design
