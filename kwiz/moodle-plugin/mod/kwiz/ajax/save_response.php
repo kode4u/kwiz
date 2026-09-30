@@ -57,7 +57,7 @@ try {
         ));
     } catch (Exception $grade_error) {
         // If grade calculation fails, still return success for the response save
-        error_log("Gamified Quiz: Error calculating grade: " . $grade_error->getMessage());
+        error_log("Kwiz: Error calculating grade: " . $grade_error->getMessage());
         echo json_encode(array(
             'success' => true,
             'responseid' => $responseid,

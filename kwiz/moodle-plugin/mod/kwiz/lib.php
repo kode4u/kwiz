@@ -12,45 +12,8 @@ defined('MOODLE_INTERNAL') || die();
  * Auto-sync JWT secret from docker/.env file on first load
  * Uses docker/.env as the single source of truth
  * This ensures the secret is always in sync
- */
 function mod_kwiz_auto_sync_jwt_secret() {
-    global $CFG;
-    
-    // Only sync if config is empty or matches default
-    $current_secret = get_config('mod_kwiz', 'jwt_secret');
-    $default_secret = 'change-me-in-production-use-strong-random-key';
-    
-    // If empty or still using default, try to sync from .env
-    if (empty($current_secret) || $current_secret === 'change-me-in-production' || $current_secret === $default_secret) {
-        $env_secret = null;
-        
-        // Try environment variable first (set by Docker)
-        $env_secret = getenv('JWT_SECRET');
-        
-        // Try docker/.env file (single source of truth)
-        if (empty($env_secret)) {
-            $env_file = $CFG->dirroot . '/../docker/.env';
-            if (file_exists($env_file)) {
-                $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (strpos($line, '#') === 0) continue; // Skip comments
-                    if (strpos($line, 'JWT_SECRET=') === 0) {
-                        $env_secret = trim(substr($line, strlen('JWT_SECRET=')));
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // If found, save to config
-        if (!empty($env_secret)) {
-            set_config('jwt_secret', $env_secret, 'mod_kwiz');
-            return $env_secret;
-        }
-    }
-    
-    return $current_secret;
+    return '';
 }
 
 /**
@@ -284,46 +247,7 @@ function kwiz_grade_item_delete($kwiz) {
  * @return string JWT token
  */
 function kwiz_generate_jwt($userid, $sessionid, $role) {
-    global $DB;
-    
-    // Auto-sync JWT secret from .env file
-    $secret = mod_kwiz_auto_sync_jwt_secret();
-    
-    // If still empty, use default
-    if (empty($secret)) {
-        $secret = 'change-me-in-production-use-strong-random-key';
-    }
-
-    // Get user's full name
-    $user = $DB->get_record('user', array('id' => $userid), 'firstname, lastname, username');
-    $username = '';
-    if ($user) {
-        $username = trim($user->firstname . ' ' . $user->lastname);
-        if (empty($username)) {
-            $username = $user->username;
-        }
-    }
-
-    $payload = array(
-        'user_id' => $userid,
-        'session_id' => $sessionid,
-        'role' => $role,
-        'username' => $username,
-        'exp' => time() + 3600 // 1 hour
-    );
-
-    // JWT encoding with URL-safe base64 (required for JWT standard)
-    // Convert standard base64 to URL-safe base64
-    function base64url_encode($data) {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-    }
-
-    $header = base64url_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
-    $payload_encoded = base64url_encode(json_encode($payload));
-    $signature = hash_hmac('sha256', "$header.$payload_encoded", $secret, true);
-    $signature_encoded = base64url_encode($signature);
-
-    return "$header.$payload_encoded.$signature_encoded";
+    return '';
 }
 
 /**
@@ -354,15 +278,15 @@ function kwiz_fetch_ollama_models() {
     if ($response === false || $http_code !== 200) {
         // Log error for debugging (only if error logging is enabled)
         if ($response === false) {
-            error_log("Gamified Quiz: Failed to fetch Ollama models from {$url}. cURL error: " . ($curl_error ?: 'Unknown error'));
+            error_log("Kwiz: Failed to fetch Ollama models from {$url}. cURL error: " . ($curl_error ?: 'Unknown error'));
         } else {
-            error_log("Gamified Quiz: Failed to fetch Ollama models from {$url}. HTTP {$http_code}. Response: " . substr($response, 0, 200));
+            error_log("Kwiz: Failed to fetch Ollama models from {$url}. HTTP {$http_code}. Response: " . substr($response, 0, 200));
         }
         return array();
     }
     $data = json_decode($response, true);
     if (!isset($data['models']) || !is_array($data['models'])) {
-        error_log("Gamified Quiz: Invalid response format from {$url}. Expected 'models' array. Got: " . substr($response, 0, 200));
+        error_log("Kwiz: Invalid response format from {$url}. Expected 'models' array. Got: " . substr($response, 0, 200));
         return array();
     }
     $names = array();
@@ -463,14 +387,14 @@ function kwiz_generate_questions_request($topic, $level, $n_questions, $language
 
     if ($curl_error) {
         $error_msg = "cURL error: " . $curl_error;
-        error_log("Gamified Quiz: " . $error_msg);
+        error_log("Kwiz: " . $error_msg);
         return array('error' => $error_msg . ". Please check if LLM API is accessible at " . $api_url);
     }
 
     if ($http_code === 200) {
         $result = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log("Gamified Quiz: JSON decode error: " . json_last_error_msg());
+            error_log("Kwiz: JSON decode error: " . json_last_error_msg());
             return array('error' => 'Invalid JSON response from LLM API');
         }
 
@@ -493,7 +417,7 @@ function kwiz_generate_questions_request($topic, $level, $n_questions, $language
     } else {
         $error_msg .= ": " . substr((string)$response, 0, 200);
     }
-    error_log("Gamified Quiz: " . $error_msg . " (API URL: " . $api_url . ")");
+    error_log("Kwiz: " . $error_msg . " (API URL: " . $api_url . ")");
     return array('error' => $error_msg);
 }
 
@@ -601,11 +525,7 @@ function kwiz_generation_webhook_url() {
  * @return string
  */
 function kwiz_websocket_internal_url() {
-    $url = get_config('mod_kwiz', 'websocket_internal_url');
-    if (!empty($url)) {
-        return rtrim($url, '/');
-    }
-    return 'http://websocket-server:3001';
+    return '';
 }
 
 /**
@@ -667,7 +587,7 @@ function kwiz_save_generated_questions($kwizid, $questions, $categoryname, $sess
         try {
             $standardquiz = kwiz_get_or_create_standard_quiz($kwiz);
         } catch (Throwable $e) {
-            error_log("Gamified Quiz: could not get/create standard quiz: " . $e->getMessage());
+            error_log("Kwiz: could not get/create standard quiz: " . $e->getMessage());
         }
     }
 
@@ -731,7 +651,7 @@ function kwiz_save_generated_questions($kwizid, $questions, $categoryname, $sess
                 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
                 quiz_add_quiz_question($qbank_qid, $standardquiz);
             } catch (Throwable $sqe) {
-                error_log("Gamified Quiz: Error linking question {$qbank_qid} to standard quiz: " . $sqe->getMessage());
+                error_log("Kwiz: Error linking question {$qbank_qid} to standard quiz: " . $sqe->getMessage());
             }
         }
 
@@ -740,7 +660,7 @@ function kwiz_save_generated_questions($kwizid, $questions, $categoryname, $sess
             try {
                 kwiz_add_quiz_question($qbank_qid, $kwiz);
             } catch (Throwable $gqe) {
-                error_log("Gamified Quiz: Error linking question {$qbank_qid} to kwiz slots: " . $gqe->getMessage());
+                error_log("Kwiz: Error linking question {$qbank_qid} to kwiz slots: " . $gqe->getMessage());
             }
         }
 
@@ -773,7 +693,7 @@ function kwiz_save_generated_questions($kwizid, $questions, $categoryname, $sess
             require_once($CFG->dirroot . '/mod/quiz/locallib.php');
             \mod_quiz\quiz_settings::create($standardquiz->id)->get_grade_calculator()->recompute_quiz_sumgrades();
         } catch (Throwable $rse) {
-            error_log("Gamified Quiz: Error recomputing quiz sumgrades: " . $rse->getMessage());
+            error_log("Kwiz: Error recomputing quiz sumgrades: " . $rse->getMessage());
         }
     }
 
@@ -965,7 +885,7 @@ function kwiz_sync_questions($kwizid, $questions, $targetcategoryid = 0, $target
                     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
                     quiz_add_quiz_question($qbank_qid, $stdquiz);
                 } catch (Throwable $sqe) {
-                    error_log("Gamified Quiz: Error syncing question to quiz: " . $sqe->getMessage());
+                    error_log("Kwiz: Error syncing question to quiz: " . $sqe->getMessage());
                 }
             }
         }
@@ -976,7 +896,7 @@ function kwiz_sync_questions($kwizid, $questions, $targetcategoryid = 0, $target
                 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
                 \mod_quiz\quiz_settings::create($stdquiz->id)->get_grade_calculator()->recompute_quiz_sumgrades();
             } catch (Throwable $rse) {
-                error_log("Gamified Quiz: Error recomputing quiz sumgrades: " . $rse->getMessage());
+                error_log("Kwiz: Error recomputing quiz sumgrades: " . $rse->getMessage());
             }
         }
     }
@@ -1169,36 +1089,7 @@ function kwiz_dispatch_llm_async_job($logid, $requestuuid, $apiurl, $topic, $lev
  * @return array Empty on success or error array
  */
 function kwiz_push_generation_queue(array $payload) {
-    $token = kwiz_worker_token();
-    if (empty($token)) {
-        return array('error' => 'Generation worker token is not configured (KWIZ_WORKER_TOKEN).');
-    }
-
-    $url = kwiz_websocket_internal_url() . '/internal/generation/enqueue';
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'X-Worker-Token: ' . $token,
-    ));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-
-    $response = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlerror = curl_error($ch);
-    curl_close($ch);
-
-    if ($curlerror) {
-        return array('error' => 'Failed to enqueue generation job: ' . $curlerror);
-    }
-    if ($code < 200 || $code >= 300) {
-        return array('error' => 'Failed to enqueue generation job (HTTP ' . $code . '): ' . substr((string)$response, 0, 200));
-    }
-
-    return array();
+    return array('error' => 'WebSocket background queue disabled; Kwiz runs in direct synchronous RAG mode.');
 }
 
 /**
@@ -1590,7 +1481,7 @@ function kwiz_create_question_bank_question($questiontext, $choices, $categoryid
 
         $question->id = $DB->insert_record('question', $question);
         if (!$question->id) {
-            error_log("Gamified Quiz: Failed to insert question into question table");
+            error_log("Kwiz: Failed to insert question into question table");
             return false;
         }
 
@@ -1657,7 +1548,7 @@ function kwiz_create_question_bank_question($questiontext, $choices, $categoryid
 
     } catch (Exception $e) {
         $info = ($e instanceof dml_exception) ? (" | Debug: " . $e->debuginfo) : "";
-        error_log("Gamified Quiz: Error creating question in question bank: " . $e->getMessage() . $info . " in " . $e->getFile() . ":" . $e->getLine());
+        error_log("Kwiz: Error creating question in question bank: " . $e->getMessage() . $info . " in " . $e->getFile() . ":" . $e->getLine());
         return false;
     }
 }
@@ -1793,16 +1684,16 @@ function kwiz_load_question_bank_questions($categoryid, $limit = 0) {
         
         return $result;
     } catch (Exception $e) {
-        error_log("Gamified Quiz: Error loading question bank questions: " . $e->getMessage());
+        error_log("Kwiz: Error loading question bank questions: " . $e->getMessage());
         return array(); // Return empty array on error
     } catch (Error $e) {
-        error_log("Gamified Quiz: Fatal error loading question bank questions: " . $e->getMessage());
+        error_log("Kwiz: Fatal error loading question bank questions: " . $e->getMessage());
         return array(); // Return empty array on fatal error
     }
 }
 
 /**
- * Get or create question category for gamified quiz
+ * Get or create question category for Kwiz
  *
  * @param int $courseid Course ID
  * @param int $quizid Quiz instance ID
@@ -1822,7 +1713,7 @@ function kwiz_get_question_category($courseid, $quizid) {
         // Verify course exists
         $course = $DB->get_record('course', array('id' => $courseid));
         if (!$course) {
-            error_log("Gamified Quiz: Course {$courseid} not found");
+            error_log("Kwiz: Course {$courseid} not found");
             return 0;
         }
         
@@ -1830,22 +1721,28 @@ function kwiz_get_question_category($courseid, $quizid) {
         try {
             $context = context_course::instance($courseid);
         } catch (Exception $ctx_error) {
-            error_log("Gamified Quiz: Error creating context for course {$courseid}: " . $ctx_error->getMessage());
+            error_log("Kwiz: Error creating context for course {$courseid}: " . $ctx_error->getMessage());
             return 0;
         }
         
         if (!$context || !$context->id) {
-            error_log("Gamified Quiz: Invalid context for course {$courseid}");
+            error_log("Kwiz: Invalid context for course {$courseid}");
             return 0;
         }
         
-        $categoryname = "Gamified Quiz #{$quizid}";
+        $categoryname = "Kwiz #{$quizid}";
         
-        // Try to find existing category
+        // Try to find existing category (support both Kwiz and legacy name)
         $category = $DB->get_record('question_categories', array(
             'contextid' => $context->id,
             'name' => $categoryname
         ));
+        if (!$category) {
+            $category = $DB->get_record('question_categories', array(
+                'contextid' => $context->id,
+                'name' => "Gamified Quiz #{$quizid}"
+            ));
+        }
         
         if ($category) {
             return $category->id;
@@ -1888,16 +1785,16 @@ function kwiz_get_question_category($courseid, $quizid) {
         
         return $DB->insert_record('question_categories', $category);
     } catch (Exception $e) {
-        error_log("Gamified Quiz: Error getting question category: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        error_log("Kwiz: Error getting question category: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
         return 0; // Return 0 on error
     } catch (Error $e) {
-        error_log("Gamified Quiz: Fatal error getting question category: " . $e->getMessage());
+        error_log("Kwiz: Fatal error getting question category: " . $e->getMessage());
         return 0; // Return 0 on fatal error
     }
 }
 
 /**
- * Add a question to gamified quiz (similar to quiz_add_quiz_question)
+ * Add a question to Kwiz (similar to quiz_add_quiz_question)
  *
  * @param int $questionid Question ID from question bank
  * @param stdClass $kwiz Quiz instance
@@ -2264,7 +2161,7 @@ function kwiz_get_session_grades($sessionid, $quizid) {
 }
 
 /**
- * Add random questions to gamified quiz (similar to quiz_add_random_questions)
+ * Add random questions to Kwiz (similar to quiz_add_random_questions)
  *
  * @param stdClass $kwiz Quiz instance
  * @param int $addonpage Page number to add questions
@@ -2511,7 +2408,7 @@ function kwiz_get_module_text_content($cmid, $topic_id = 0, $subitem_id = 0) {
             return html_to_text($content, 0, false);
         }
     } catch (Exception $e) {
-        error_log("Gamified Quiz RAG: Failed to retrieve content for cmid {$cmid}: " . $e->getMessage());
+        error_log("Kwiz RAG: Failed to retrieve content for cmid {$cmid}: " . $e->getMessage());
     }
     
     return '';
@@ -2562,7 +2459,7 @@ function kwiz_extract_file_content_via_api($file) {
             }
         }
     } catch (Exception $e) {
-        error_log("Gamified Quiz: File extraction error for " . $file->get_filename() . ": " . $e->getMessage());
+        error_log("Kwiz: File extraction error for " . $file->get_filename() . ": " . $e->getMessage());
     }
     return '';
 }
@@ -2600,7 +2497,7 @@ function kwiz_get_section_text_content($courseid, $sectionnum) {
 /**
  * Find the course module ID of the page/lesson/book/resource/label activity preceding this quiz in the course.
  *
- * @param int $current_cmid The course module ID of the gamified quiz
+ * @param int $current_cmid The course module ID of the Kwiz
  * @return int|null Preceding module ID or null if none
  */
 function kwiz_get_preceding_activity_cmid($current_cmid) {

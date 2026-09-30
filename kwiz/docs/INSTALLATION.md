@@ -97,7 +97,7 @@ The plugin should be automatically mounted. If not:
 
 ```bash
 # Copy plugin to Moodle
-docker exec -it moodle cp -r /var/www/html/mod/gamifiedquiz /var/www/html/moodle/mod/
+docker exec -it moodle cp -r /var/www/html/mod/kwiz /var/www/html/moodle/mod/
 docker exec -it moodle php /var/www/html/moodle/admin/cli/upgrade.php
 ```
 
@@ -165,7 +165,7 @@ npm start
 
 ```bash
 # Copy to Moodle mod directory
-cp -r moodle-plugin/mod/gamifiedquiz /path/to/moodle/mod/
+cp -r moodle-plugin/mod/kwiz /path/to/moodle/mod/
 
 # Run Moodle upgrade
 cd /path/to/moodle
@@ -177,7 +177,7 @@ php admin/cli/upgrade.php
 ### Moodle Plugin Configuration
 
 1. Login to Moodle as admin
-2. Go to: Site administration → Plugins → Activity modules → Gamified Quiz
+2. Go to: Site administration → Plugins → Activity modules → Kwiz
 3. Configure:
    - WebSocket Server URL: `ws://localhost:3001` (dev) or `wss://your-domain.com` (prod)
    - LLM API URL: `http://localhost:5001` (dev) or `https://your-domain.com/api` (prod)
@@ -229,7 +229,7 @@ docker-compose restart
 
 ```bash
 # Check plugin is mounted
-docker exec -it moodle ls -la /var/www/html/moodle/mod/gamifiedquiz
+docker exec -it moodle ls -la /var/www/html/moodle/mod/kwiz
 
 # Run Moodle upgrade
 docker exec -it moodle php /var/www/html/moodle/admin/cli/upgrade.php

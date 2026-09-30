@@ -140,13 +140,13 @@ If using WSL2 backend:
 1. **Use forward slashes or escaped backslashes**:
    ```yaml
    volumes:
-     - ./moodle-plugin/mod/gamifiedquiz:/bitnami/moodle/moodle/mod/gamifiedquiz
+     - ./moodle-plugin/mod/kwiz:/bitnami/moodle/moodle/mod/kwiz
    ```
 
 2. **Use absolute paths**:
    ```yaml
    volumes:
-     - C:/Users/Admin/Desktop/jica/moodle-plugin/mod/gamifiedquiz:/bitnami/moodle/moodle/mod/gamifiedquiz
+     - C:/Users/Admin/Desktop/jica/moodle-plugin/mod/kwiz:/bitnami/moodle/moodle/mod/kwiz
    ```
 
 ## General Issues
@@ -226,7 +226,7 @@ If using WSL2 backend:
 
 3. **Check plugin directory**:
    ```powershell
-   docker-compose exec moodle ls -la /bitnami/moodle/moodle/mod/gamifiedquiz
+   docker-compose exec moodle ls -la /bitnami/moodle/moodle/mod/kwiz
    ```
 
 4. **Verify plugin files**:

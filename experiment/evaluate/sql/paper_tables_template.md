@@ -3,7 +3,7 @@
 Use these templates with results from:
 
 - `evaluate/sql/generation_analysis.sql`
-- table `mdl_gamifiedquiz_generation_logs` (replace prefix if needed)
+- table `mdl_kwiz_generation_logs` (replace prefix if needed)
 
 ---
 
@@ -19,7 +19,7 @@ Use these templates with results from:
 | OS | [name + version] |
 | Docker / Compose | [version] |
 | Moodle version | [version] |
-| Plugin version | `mod_gamifiedquiz` [version] |
+| Plugin version | `mod_kwiz` [version] |
 | Ollama version | [version] |
 | Test period | [date range] |
 | Git commit hash | [hash] |

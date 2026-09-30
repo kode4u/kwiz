@@ -19,14 +19,14 @@ Welcome to the LBE JICA AI-Enhanced Gamified Moodle Quiz documentation!
 
 - **[LLM API README](../llmapi/README.md)** - LLM API service documentation
 - **[WebSocket Server README](../websocket-server/README.md)** - WebSocket server documentation
-- **[Moodle Plugin README](../moodle-plugin/mod/gamifiedquiz/README.md)** - Moodle plugin documentation
+- **[Moodle Plugin README](../moodle-plugin/mod/kwiz/README.md)** - Moodle plugin documentation
 
 ## Project Structure
 
 ```
 jica/
 ├── moodle-plugin/          # Moodle PHP plugin
-│   └── mod/gamifiedquiz/
+│   └── mod/kwiz/
 ├── websocket-server/       # Node.js real-time server
 ├── llmapi/                 # Python Flask LLM service
 ├── docker/                 # Docker configurations

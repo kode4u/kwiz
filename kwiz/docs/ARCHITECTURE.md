@@ -37,7 +37,7 @@ The AI-Enhanced Gamified Moodle Quiz system consists of three main components wo
 - MySQL/PostgreSQL (via Moodle)
 
 **Key Files:**
-- `mod/gamifiedquiz/` - Main plugin directory
+- `mod/kwiz/` - Main plugin directory
 - `lib.php` - Core functions
 - `view.php` - Student/teacher views
 - `classes/` - PHP classes
@@ -140,11 +140,11 @@ The AI-Enhanced Gamified Moodle Quiz system consists of three main components wo
 
 ### Moodle Tables (via Plugin)
 
-- `mdl_gamifiedquiz` - Quiz activity configuration instances
-- `mdl_gamifiedquiz_questions` - AI-generated multiple-choice questions
-- `mdl_gamifiedquiz_responses` - Student responses and response times
-- `mdl_gamifiedquiz_sessions` - Live multiplayer game rooms
-- `mdl_gamifiedquiz_generation_logs` - Research analytics (timing, tokens, and success rates)
+- `mdl_kwiz` - Quiz activity configuration instances
+- `mdl_kwiz_questions` - AI-generated multiple-choice questions
+- `mdl_kwiz_responses` - Student responses and response times
+- `mdl_kwiz_sessions` - Live multiplayer game rooms
+- `mdl_kwiz_generation_logs` - Research analytics (timing, tokens, and success rates)
 
 ### Redis Keys
 

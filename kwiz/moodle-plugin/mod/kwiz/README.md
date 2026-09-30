@@ -1,169 +1,107 @@
-# Moodle Gamified Quiz Plugin
+# Kwiz Moodle Activity Module (`mod_kwiz`)
 
-Moodle activity module for AI-enhanced real-time gamified quizzes.
+An AI-assisted, curriculum-grounded assessment authoring activity module for Moodle. Kwiz allows instructors to automatically generate high-quality, Bloom-aligned multiple-choice questions (MCQs) directly from course lecture materials (PDF, PPTX, DOCX, text) using local or cloud LLMs with deterministic AST syntax validation.
+
+---
 
 ## Features
 
-- Integration with Moodle user management
-- Teacher dashboard for quiz management
-- Real-time student participation
-- AI-powered question generation
-- Leaderboard and scoring
-- JWT-based authentication
+- **Course Material RAG Grounding**: Extract course slides (PDF, PPTX, DOCX) and ground questions in authentic curriculum content.
+- **On-Premise Privacy & Speed**: Direct integration with local Ollama LLMs (`qwen2.5-coder:7b`) and local embeddings (`nomic-embed-text`).
+- **Deterministic AST Syntax Validation**: Automated compilation checking of all generated code snippets before presentation to instructors.
+- **Direct Moodle Question Bank Integration**: Seamlessly saves generated questions into Moodle's native Question Bank categories.
+- **Standard Moodle Quiz Generation**: Instantly exports approved question sets into standard Moodle Quiz activities for examinations.
+- **Bloom's Taxonomy & Difficulty Control**: Configure targeted cognitive levels (Remembering, Understanding, Applying, Analyzing) and difficulty tiers.
+- **Audit & Research Telemetry**: Complete logging of generation latency, prompt token counts, and hit rates (`mdl_kwiz_generation_logs`).
+
+---
 
 ## Installation
 
-### Method 1: Docker (Recommended)
+### Method 1: Docker (Included in Kwiz Setup)
 
-The plugin is automatically mounted in the Docker Compose setup. After starting Moodle:
+When using the repository's `docker-compose.yml`, the plugin is pre-mounted into Moodle at `/var/www/html/mod/kwiz`.
+After starting containers, log in as administrator and complete the upgrade notification:
 
-1. Login as admin
-2. Go to Site administration → Notifications
-3. Complete the plugin installation
+```bash
+docker compose exec moodle php admin/cli/upgrade.php
+```
 
-### Method 2: Manual Installation
+### Method 2: Manual Installation on Existing Moodle Server
 
-1. Copy the `kwiz` folder to your Moodle installation:
+1. Copy the `kwiz` directory into your Moodle installation's `mod/` directory:
    ```bash
    cp -r moodle-plugin/mod/kwiz /path/to/moodle/mod/
    ```
 
-2. Run Moodle upgrade:
+2. Run the Moodle CLI upgrade command:
    ```bash
    php admin/cli/upgrade.php
    ```
 
-3. Configure plugin settings:
-   - Site administration → Plugins → Activity modules → Gamified Quiz
-   - Set WebSocket Server URL
-   - Set LLM API URL
-   - Set JWT Secret (must match WebSocket server)
+3. Configure the plugin in Site Administration:
+   - Navigate to: **Site administration -> Plugins -> Activity modules -> Kwiz**
+   - Set **LLM API URL** to your LLM API endpoint (e.g., `http://llmapi:5001` or `http://localhost:5001`).
+   - Select the default backend (e.g., `local` for Ollama).
+
+---
 
 ## Configuration
 
-### Plugin Settings
+### Plugin Settings (`settings.php`)
 
-1. **WebSocket Server URL**: URL of the WebSocket server
-   - Development: `ws://localhost:3001`
-   - Production: `wss://your-domain.com`
+| Setting | Configuration Key | Default Value | Description |
+|---|---|---|---|
+| **LLM API URL** | `mod_kwiz/llmapi_url` | `http://llmapi:5001` | Base URL of the Kwiz LLM & AST validation service |
+| **Default Backend** | `mod_kwiz/llm_backend` | `local` | Primary LLM backend (`local`, `openai`, `gemini`) |
 
-2. **LLM API URL**: URL of the LLM API service
-   - Development: `http://localhost:5001`
-   - Production: `https://your-domain.com/api`
+---
 
-3. **JWT Secret**: Secret key for JWT token generation
-   - Must match the `JWT_SECRET` in WebSocket server
-   - Use a strong random key in production
+## Instructor Workflow
 
-## Usage
+1. **Add Activity**: In your Moodle course, turn editing on and add a **Kwiz** activity.
+2. **Attach Course Content**: Upload lecture slides (PDF, PPTX) or paste course text into the RAG context box.
+3. **Configure Generation**:
+   - Choose topic and target Bloom's taxonomy level.
+   - Set question count and difficulty (easy, medium, hard).
+4. **Generate**: Click **Generate Questions**. The plugin communicates synchronously with the LLM API to retrieve context, generate distractors, and validate Python syntax.
+5. **Review & Publish**: Inspect questions in the interactive editor and export them directly to the Moodle Question Bank or create an assessment quiz.
 
-### Creating a Quiz
+---
 
-1. Go to your course
-2. Click "Add an activity or resource"
-3. Select "Gamified Quiz"
-4. Fill in:
-   - Quiz name
-   - Topic (for question generation)
-   - Difficulty level
-   - Language
-5. Save and display
+## Database Architecture
 
-### Teacher Workflow
+The plugin defines and manages the following database tables:
 
-1. Open the quiz activity
-2. Click "Generate Questions" (calls LLM API)
-3. Review generated questions
-4. Click "Start Session" to begin quiz
-5. Questions are pushed to students in real-time
-6. Monitor leaderboard
-7. Click "End Session" when done
+- `mdl_kwiz`: Main activity instances and course module configuration.
+- `mdl_kwiz_questions`: Cached generated question candidates with answer choices and explanations.
+- `mdl_kwiz_slots`: Question slot mappings for activity sessions.
+- `mdl_kwiz_sessions`: Active test delivery sessions.
+- `mdl_kwiz_responses`: Student response logs and submission timestamps.
+- `mdl_kwiz_grades`: Final aggregated student scores.
+- `mdl_kwiz_participants`: Session participation registry.
+- `mdl_kwiz_generation_logs`: Detailed empirical generation telemetry (latencies, token counts, error status).
 
-### Student Workflow
-
-1. Open the quiz activity
-2. Wait for teacher to start session
-3. Answer questions as they appear
-4. View immediate feedback
-5. See leaderboard updates
-
-## Database Schema
-
-The plugin creates the following tables:
-
-- `mdl_kwiz` - Quiz instances
-- `mdl_kwiz_sessions` - Active sessions
-- `mdl_kwiz_questions` - Generated questions
-- `mdl_kwiz_responses` - Student answers
-
-## API Functions
-
-### `kwiz_generate_jwt($userid, $sessionid, $role)`
-
-Generates JWT token for WebSocket authentication.
-
-### `kwiz_generate_questions($topic, $level, $n_questions, $language)`
-
-Calls LLM API to generate questions.
-
-## Frontend
-
-The plugin includes a JavaScript application (`js/app.js`) that:
-
-- Connects to WebSocket server
-- Handles teacher/student interactions
-- Displays questions and leaderboard
-- Manages real-time updates
-
-## Development
-
-### File Structure
-
-```
-mod/kwiz/
-├── version.php          # Plugin version
-├── lib.php              # Core functions
-├── view.php             # Activity view
-├── mod_form.php         # Activity form
-├── settings.php         # Plugin settings
-├── db/
-│   └── install.xml      # Database schema
-├── lang/
-│   └── en/
-│       └── kwiz.php  # Language strings
-└── js/
-    └── app.js           # Frontend application
-```
-
-### Adding Features
-
-1. Add database fields in `db/install.xml`
-2. Update `lib.php` with new functions
-3. Modify `view.php` for UI changes
-4. Update JavaScript in `js/app.js`
-5. Add language strings in `lang/en/kwiz.php`
+---
 
 ## Troubleshooting
 
-### Plugin not appearing
+### Plugin Upgrade / Installation
+If the plugin is not detected, clear the Moodle cache and run upgrade:
+```bash
+php admin/cli/purge_caches.php
+php admin/cli/upgrade.php
+```
 
-- Check plugin is in correct directory
-- Run `php admin/cli/upgrade.php`
-- Clear Moodle cache
+### Connection Issues with LLM API
+- Verify the LLM API container is healthy:
+  ```bash
+  curl http://localhost:5001/health
+  ```
+- If running Moodle in Docker, verify `http://llmapi:5001/health` is reachable from within the Moodle container.
 
-### WebSocket connection fails
-
-- Verify WebSocket URL in settings
-- Check JWT secret matches WebSocket server
-- Check browser console for errors
-
-### Questions not generating
-
-- Verify LLM API URL in settings
-- Check LLM API is running
-- Check API key is configured
+---
 
 ## License
 
-GPL v3 (Moodle compatibility)
-
+GNU General Public License v3.0 (GPL-3.0) - Compatible with Moodle core.

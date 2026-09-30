@@ -72,7 +72,7 @@ try {
             );
             $updated_count++;
         } catch (Exception $e) {
-            error_log("Gamified Quiz: Error updating grade for user {$grade_data['userid']}: " . $e->getMessage());
+            error_log("Kwiz: Error updating grade for user {$grade_data['userid']}: " . $e->getMessage());
         }
     }
     

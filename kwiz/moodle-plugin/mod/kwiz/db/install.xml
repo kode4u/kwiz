@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="kwiz" COMMENT="Gamified Quiz instances">
+    <TABLE NAME="kwiz" COMMENT="Kwiz instances">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -102,7 +102,7 @@
       </INDEXES>
     </TABLE>
 
-    <TABLE NAME="kwiz_slots" COMMENT="Stores questions linked to gamified quiz instances (similar to quiz_slots)">
+    <TABLE NAME="kwiz_slots" COMMENT="Stores questions linked to kwiz instances (similar to quiz_slots)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

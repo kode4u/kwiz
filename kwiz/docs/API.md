@@ -327,7 +327,7 @@ Health check endpoint.
 The plugin generates JWT tokens using the function:
 
 ```php
-gamifiedquiz_generate_jwt($userid, $sessionid, $role)
+kwiz_generate_jwt($userid, $sessionid, $role)
 ```
 
 **Parameters:**
@@ -340,7 +340,7 @@ gamifiedquiz_generate_jwt($userid, $sessionid, $role)
 ### Question Generation
 
 ```php
-gamifiedquiz_generate_questions($topic, $level, $n_questions, $language)
+kwiz_generate_questions($topic, $level, $n_questions, $language)
 ```
 
 **Parameters:**

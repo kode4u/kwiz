@@ -92,7 +92,7 @@
 2. **With Docker:**
    ```bash
    # Plugin is mounted as volume
-   # Edit files in moodle-plugin/mod/gamifiedquiz/
+   # Edit files in moodle-plugin/mod/kwiz/
    # Clear Moodle cache
    docker exec -it moodle php /var/www/html/moodle/admin/cli/purge_caches.php
    ```
@@ -100,7 +100,7 @@
 3. **Testing:**
    - Access Moodle at http://localhost:8080
    - Create test course
-   - Add Gamified Quiz activity
+   - Add Kwiz activity
    - Test teacher and student workflows
 
 ## Code Structure
@@ -136,7 +136,7 @@ websocket-server/
 ### Moodle Plugin (`moodle-plugin/`)
 
 ```
-moodle-plugin/mod/gamifiedquiz/
+moodle-plugin/mod/kwiz/
 ├── version.php        # Plugin version
 ├── lib.php            # Core functions
 ├── view.php           # Activity view
@@ -184,17 +184,17 @@ moodle-plugin/mod/gamifiedquiz/
    });
    ```
 
-2. Update client code in `moodle-plugin/mod/gamifiedquiz/js/app.js`
+2. Update client code in `moodle-plugin/mod/kwiz/js/app.js`
 
 3. Update API documentation
 
 ### Adding a New Moodle Feature
 
-1. Add database fields in `moodle-plugin/mod/gamifiedquiz/db/install.xml`
-2. Create upgrade script in `moodle-plugin/mod/gamifiedquiz/db/upgrade.php`
+1. Add database fields in `moodle-plugin/mod/kwiz/db/install.xml`
+2. Create upgrade script in `moodle-plugin/mod/kwiz/db/upgrade.php`
 3. Update `lib.php` with new functions
 4. Update `view.php` or create new pages
-5. Add language strings in `lang/en/gamifiedquiz.php`
+5. Add language strings in `lang/en/kwiz.php`
 
 ## Testing
 
@@ -216,7 +216,7 @@ npm test
 ```bash
 # Use PHPUnit
 php admin/tool/phpunit/cli/init.php
-php admin/tool/phpunit/cli/util.php --run mod_gamifiedquiz
+php admin/tool/phpunit/cli/util.php --run mod_kwiz
 ```
 
 ### Integration Tests

@@ -440,14 +440,14 @@ try {
             $updatelog->timemodified = $now;
             $DB->update_record('kwiz_generation_logs', $updatelog);
         } catch (Throwable $logexception) {
-            error_log('Gamified Quiz logging update failed: ' . $logexception->getMessage());
+            error_log('Kwiz logging update failed: ' . $logexception->getMessage());
         }
     }
     http_response_code(500);
     header('Content-Type: application/json');
     
     // Log the full error for debugging
-    $error_msg = 'Gamified Quiz AJAX Error: ' . $e->getMessage();
+    $error_msg = 'Kwiz AJAX Error: ' . $e->getMessage();
     $error_msg .= ' in ' . $e->getFile() . ':' . $e->getLine();
     error_log($error_msg);
     error_log('Stack trace: ' . $e->getTraceAsString());
@@ -475,13 +475,13 @@ try {
             $updatelog->timemodified = $now;
             $DB->update_record('kwiz_generation_logs', $updatelog);
         } catch (Throwable $logerror) {
-            error_log('Gamified Quiz logging update failed: ' . $logerror->getMessage());
+            error_log('Kwiz logging update failed: ' . $logerror->getMessage());
         }
     }
     http_response_code(500);
     header('Content-Type: application/json');
     
-    $error_msg = 'Gamified Quiz Fatal Error: ' . $e->getMessage();
+    $error_msg = 'Kwiz Fatal Error: ' . $e->getMessage();
     $error_msg .= ' in ' . $e->getFile() . ':' . $e->getLine();
     error_log($error_msg);
     error_log('Stack trace: ' . $e->getTraceAsString());
@@ -508,13 +508,13 @@ try {
             $updatelog->timemodified = $now;
             $DB->update_record('kwiz_generation_logs', $updatelog);
         } catch (Throwable $logthrowable) {
-            error_log('Gamified Quiz logging update failed: ' . $logthrowable->getMessage());
+            error_log('Kwiz logging update failed: ' . $logthrowable->getMessage());
         }
     }
     http_response_code(500);
     header('Content-Type: application/json');
     
-    error_log('Gamified Quiz Throwable: ' . $e->getMessage());
+    error_log('Kwiz Throwable: ' . $e->getMessage());
     
     echo json_encode(array(
         'success' => false,

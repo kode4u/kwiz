@@ -7,7 +7,7 @@
 // (at your option) any later version.
 
 /**
- * Page to edit gamified quiz questions
+ * Page to edit Kwiz questions
  * Uses same structure and UI as quiz/edit.php
  *
  * @package    mod_kwiz

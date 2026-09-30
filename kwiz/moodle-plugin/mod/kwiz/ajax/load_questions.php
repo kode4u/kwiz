@@ -99,7 +99,7 @@ try {
     
 } catch (Exception $e) {
     http_response_code(500);
-    error_log("Gamified Quiz load_questions error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+    error_log("Kwiz load_questions error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
     echo json_encode(array(
         'success' => false,
         'error' => $e->getMessage(),

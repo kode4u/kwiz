@@ -29,7 +29,7 @@ The proposed pipeline combines:
 
 | Component | Role |
 |-----------|------|
-| **Moodle Plugin** (`moodle-plugin/mod/gamifiedquiz`) | Instructor question authoring UI, course syllabus upload, and Moodle Question Bank integration |
+| **Moodle Plugin** (`moodle-plugin/mod/kwiz`) | Instructor question authoring UI, course syllabus upload, and Moodle Question Bank integration |
 | **LLM & RAG API** (`llmapi/`) | FastAPI service: SHA-256 embedding cache, vector search, two-tier AST validator, Ollama client |
 | **Local Inference Host** | Local Ollama instance serving `qwen2.5-coder:7b` and `nomic-embed-text` |
 | **Evaluation Suite** (`evaluate/`) | Reproducible benchmarking scripts for E1 (Quality), E2 (Ablation), E3 (Scale), and E4 (Concurrency) |

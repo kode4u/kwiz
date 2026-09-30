@@ -111,7 +111,7 @@
    - Complete installation wizard
 
 2. **Configure plugin:**
-   - Site administration → Plugins → Activity modules → Gamified Quiz
+   - Site administration → Plugins → Activity modules → Kwiz
    - Set WebSocket URL: `wss://your-domain.com`
    - Set LLM API URL: `https://your-domain.com/api`
    - Set JWT Secret (must match WebSocket server)

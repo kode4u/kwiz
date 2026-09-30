@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Analyze Moodle plugin generation logs from `mdl_gamifiedquiz_generation_logs` for:
+Analyze Moodle plugin generation logs from `mdl_kwiz_generation_logs` for:
 
 - LLM generation latency (`duration_ms`)
 - Throughput (`questions_per_sec`)
@@ -15,16 +15,16 @@ This module is for **paper/poster reporting** from production-like deployments.
 
 The table is populated by the Moodle endpoint:
 
-- `mod/gamifiedquiz/ajax/generate.php`
+- `mod/kwiz/ajax/generate.php`
 
 Log schema was added in plugin version `2025010116`:
 
-- `mod/gamifiedquiz/db/install.xml`
-- `mod/gamifiedquiz/db/upgrade.php`
+- `mod/kwiz/db/install.xml`
+- `mod/kwiz/db/upgrade.php`
 
 ## Prerequisites
 
-1. Upgrade Moodle plugin so `gamifiedquiz_generation_logs` exists.
+1. Upgrade Moodle plugin so `kwiz_generation_logs` exists.
 2. Run real generation requests from teacher UI (or API usage through the plugin).
 3. Confirm rows are being inserted in DB table.
 
@@ -48,7 +48,7 @@ Use either:
 
 Queries use `mdl_` prefix by default:
 
-- `mdl_gamifiedquiz_generation_logs`
+- `mdl_kwiz_generation_logs`
 
 If your Moodle DB prefix differs, replace `mdl_` in the SQL file.
 
@@ -172,13 +172,13 @@ Recommended practice:
 
 ## Migrating new generation log table
 
-The table `gamifiedquiz_generation_logs` is created by plugin upgrade version `2025010116`.
+The table `kwiz_generation_logs` is created by plugin upgrade version `2025010116`.
 
 ### Option A: Moodle UI
 
 1. Open **Site administration -> Notifications**.
 2. Run pending plugin upgrades.
-3. Confirm `mod_gamifiedquiz` upgrade completes.
+3. Confirm `mod_kwiz` upgrade completes.
 
 ### Option B: Moodle CLI (inside container)
 
@@ -189,7 +189,7 @@ docker compose exec moodle php admin/cli/upgrade.php --non-interactive
 Validate table exists:
 
 ```bash
-docker compose exec -T db mysql -umoodle -pmoodlepass moodle -e "SHOW TABLES LIKE 'mdl_gamifiedquiz_generation_logs';"
+docker compose exec -T db mysql -umoodle -pmoodlepass moodle -e "SHOW TABLES LIKE 'mdl_kwiz_generation_logs';"
 ```
 
 If your Moodle DB prefix is not `mdl_`, replace the table prefix in SQL checks and analytics queries.

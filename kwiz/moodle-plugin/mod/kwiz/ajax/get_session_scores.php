@@ -71,7 +71,7 @@ try {
     
     // Log for debugging (only if error logging is enabled)
     if (function_exists('error_log')) {
-        error_log("Gamified Quiz: Calculated scores for session {$sessionid}. Users: " . count($userScores) . ", Total responses: " . count($responses) . ", Unique responses: " . count($userResponses));
+        error_log("Kwiz: Calculated scores for session {$sessionid}. Users: " . count($userScores) . ", Total responses: " . count($responses) . ", Unique responses: " . count($userResponses));
     }
     
     // Sort by score descending

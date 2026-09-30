@@ -33,13 +33,10 @@ require_capability('mod/kwiz:view', $context);
 $is_teacher = has_capability('mod/kwiz:addinstance', $context);
 $role = $is_teacher ? 'teacher' : 'student';
 
-// Generate JWT token
+// Session identifier
 $session_id = 'session_' . $kwiz->id . '_' . $cm->id;
-$jwt_token = kwiz_generate_jwt($USER->id, $session_id, $role);
-
-// Get WebSocket URL (optional, only needed for live multiplayer quiz)
-$ws_url = get_config('mod_kwiz', 'websocket_url');
-$ws_url = !empty($ws_url) ? trim($ws_url) : '';
+$jwt_token = '';
+$ws_url = '';
 
 
 $PAGE->set_url('/mod/kwiz/view.php', array('id' => $cm->id));
@@ -245,7 +242,7 @@ $course_standard_quizzes = $DB->get_records_sql(
 
 // Set config before loading JS - use inline script to ensure it's available
 echo '<script>
-window.GAMIFIED_QUIZ_CONFIG = {
+window.KWIZ_CONFIG = window.GAMIFIED_QUIZ_CONFIG = {
     wsUrl: ' . json_encode($ws_url) . ',
     jwtToken: ' . json_encode($jwt_token) . ',
     sessionId: ' . json_encode($session_id) . ',

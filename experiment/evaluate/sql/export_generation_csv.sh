@@ -62,7 +62,13 @@ done
 
 if [[ -z "${MYSQL_CMD}" ]]; then
   if command -v docker >/dev/null 2>&1; then
-    MYSQL_CMD="docker compose exec -T db mysql -umoodle -pmoodlepass moodle"
+    if [[ -f "kwiz/docker-compose.yml" ]]; then
+      MYSQL_CMD="docker compose -f kwiz/docker-compose.yml exec -T db mysql -umoodle -pmoodlepass moodle"
+    elif [[ -f "docker-compose.yml" ]]; then
+      MYSQL_CMD="docker compose exec -T db mysql -umoodle -pmoodlepass moodle"
+    else
+      MYSQL_CMD="docker exec -i jica-mysql mysql -umoodle -pmoodlepass moodle"
+    fi
   elif command -v mysql >/dev/null 2>&1; then
     MYSQL_CMD="mysql -h 127.0.0.1 -P 3307 -umoodle -pmoodlepass moodle"
   else
@@ -72,7 +78,7 @@ if [[ -z "${MYSQL_CMD}" ]]; then
   fi
 fi
 
-TABLE="${PREFIX}gamifiedquiz_generation_logs"
+TABLE="${PREFIX}kwiz_generation_logs"
 mkdir -p "${OUT_DIR}"
 
 run_export() {

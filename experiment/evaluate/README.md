@@ -44,6 +44,6 @@ python3 evaluate/e4_concurrent_generation/analyze_concurrency_results.py
 
 ## Supplementary & Diagnostic Tools
 
-* [`sql/`](sql/): SQL analytics over Moodle generation telemetry logs (`mdl_gamifiedquiz_metrics`).
+* [`sql/`](sql/): SQL analytics over Moodle generation telemetry logs (`mdl_kwiz_generation_logs`).
 * [`llm-response-time/`](llm-response-time/): Raw micro-benchmarks for Ollama `/api/generate` latency.
 * [`quality-expert/`](quality-expert/): Historical 2-rater evaluation archive.
