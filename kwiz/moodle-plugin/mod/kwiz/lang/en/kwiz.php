@@ -110,7 +110,7 @@ $string['end_quiz'] = 'End Quiz';
 $string['questionbank'] = 'Question Bank';
 $string['questioncategory'] = 'Question Category';
 $string['questioncategory_help'] = 'Select a question category to use questions from the question bank. Questions generated will be added to this category.';
-$string['defaultcategory'] = 'Use default category (AI Quiz Generator #X)';
+$string['defaultcategory'] = 'Use default category (Kwiz #X)';
 
 // Background image for question screen
 $string['background_image'] = 'Question screen background';

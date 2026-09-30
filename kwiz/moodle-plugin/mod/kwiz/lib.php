@@ -72,6 +72,19 @@ function kwiz_add_instance($kwiz, $mform = null) {
     }
     unset($kwiz->background_image_url);
 
+    if (empty($kwiz->template)) {
+        $kwiz->template = 'default';
+    }
+    if (empty($kwiz->color_palette)) {
+        $kwiz->color_palette = 'default';
+    }
+    if (!isset($kwiz->time_limit_per_question)) {
+        $kwiz->time_limit_per_question = 60;
+    }
+    if (!isset($kwiz->leaderboard_top_n)) {
+        $kwiz->leaderboard_top_n = 3;
+    }
+
     if (!isset($kwiz->difficulty) || empty($kwiz->difficulty)) {
         $kwiz->difficulty = 'medium';
     }
@@ -101,6 +114,23 @@ function kwiz_update_instance($kwiz, $mform = null) {
 
     // Store per-user API keys in user preferences (not in activity table).
     kwiz_save_user_llm_api_keys_from_form($kwiz);
+
+    // Preserve existing database defaults for fields removed from form
+    $existing = $DB->get_record('kwiz', array('id' => $kwiz->instance));
+    if ($existing) {
+        if (!isset($kwiz->template)) {
+            $kwiz->template = $existing->template;
+        }
+        if (!isset($kwiz->color_palette)) {
+            $kwiz->color_palette = $existing->color_palette;
+        }
+        if (!isset($kwiz->time_limit_per_question)) {
+            $kwiz->time_limit_per_question = $existing->time_limit_per_question;
+        }
+        if (!isset($kwiz->leaderboard_top_n)) {
+            $kwiz->leaderboard_top_n = $existing->leaderboard_top_n;
+        }
+    }
 
     // Prefer custom URL over predefined background
     if (!empty($kwiz->background_image_url)) {
