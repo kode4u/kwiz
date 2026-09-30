@@ -263,6 +263,7 @@
             const countInput = document.getElementById('studio-count-input');
             const countSelect = document.getElementById('studio-count-select');
             const difficultySelect = document.getElementById('studio-difficulty-select');
+            const questionTypeSelect = document.getElementById('studio-question-type-select');
             const languageSelect = document.getElementById('studio-language-select');
             const toggleCustomBtn = document.getElementById('studio-toggle-custom-content');
             const customContentWrapper = document.getElementById('studio-custom-content-wrapper');
@@ -1705,6 +1706,7 @@
                 const ragSource = selectedRagSources.join(',');
                 const count = countInput ? (parseInt(countInput.value, 10) || 10) : (countSelect ? (parseInt(countSelect.value, 10) || 10) : 10);
                 const difficulty = difficultySelect ? difficultySelect.value : 'medium';
+                const questionType = questionTypeSelect ? questionTypeSelect.value : 'code';
                 const language = languageSelect ? languageSelect.value : 'en';
                 const customContent = customContentInput ? customContentInput.value.trim() : '';
 
@@ -1749,7 +1751,7 @@
                 appendStudioLog(`   Target Category: ${catName || catVal}`);
                 appendStudioLog(`   Target Quiz: ${quizName || quizVal}`);
                 appendStudioLog(`   RAG Sources: ${ragSource || 'None (Topic-only)'}`);
-                appendStudioLog(`   Parameters: count=${count}, difficulty=${difficulty}, language=${language}`);
+                appendStudioLog(`   Parameters: count=${count}, difficulty=${difficulty}, modality=${questionType}, language=${language}`);
 
                 try {
                     studioGenerateBtn.disabled = true;
@@ -1760,6 +1762,7 @@
                     params.append('data', customContent);
                     params.append('rag_source', ragSource);
                     params.append('difficulty', difficulty);
+                    params.append('question_type', questionType);
                     params.append('count', count);
                     params.append('async', 0);
                     params.append('category_id', catVal === '__new__' ? 0 : catVal);

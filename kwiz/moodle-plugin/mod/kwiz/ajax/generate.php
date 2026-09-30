@@ -109,6 +109,7 @@ $cmid = optional_param('cmid', 0, PARAM_INT);
 $prompt = optional_param('prompt', '', PARAM_TEXT);
 $data = optional_param('data', '', PARAM_TEXT);
 $difficulty = optional_param('difficulty', '', PARAM_TEXT);
+$question_type = optional_param('question_type', 'code', PARAM_ALPHA);
 $count = optional_param('count', 5, PARAM_INT);
 $async = optional_param('async', 0, PARAM_INT);
 $batchid = optional_param('batch_id', '', PARAM_TEXT);
@@ -293,7 +294,8 @@ try {
         $predefined_data,
         $llmmodel,
         $userapikey,
-        $learning_outcomes
+        $learning_outcomes,
+        $question_type
     );
 
     // Check if result contains an error

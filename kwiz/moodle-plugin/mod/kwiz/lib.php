@@ -364,7 +364,7 @@ function kwiz_local_generation_batch_size() {
  * @param string $userapikey Optional per-user API key
  * @return array Generated questions or array with 'error' key
  */
-function kwiz_generate_questions_request($topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes = '') {
+function kwiz_generate_questions_request($topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes = '', $question_type = 'code') {
     $api_url = get_config('mod_kwiz', 'llmapi_url');
     if (empty($api_url)) {
         $api_url = 'http://llmapi:5001';
@@ -380,6 +380,7 @@ function kwiz_generate_questions_request($topic, $level, $n_questions, $language
         'n_questions' => $n_questions,
         'language' => $language,
         'backend' => $backend,
+        'question_type' => $question_type,
     );
 
     if (!empty($learning_outcomes)) {
@@ -461,9 +462,12 @@ function kwiz_generate_questions_request($topic, $level, $n_questions, $language
  * @param string $backend LLM backend (openai, gemini, local)
  * @param string $predefined_data Optional predefined data/context for question generation
  * @param string $llmmodel Optional local LLM model name (for backend = local)
+ * @param string $userapikey Optional per-user API key
+ * @param string $learning_outcomes Optional target learning outcomes
+ * @param string $question_type Optional question modality: code, mixed, conceptual
  * @return array|false Generated questions or false on error
  */
-function kwiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '', $learning_outcomes = '') {
+function kwiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $language = 'en', $backend = 'openai', $predefined_data = '', $llmmodel = '', $userapikey = '', $learning_outcomes = '', $question_type = 'code') {
     $batchsize = kwiz_local_generation_batch_size();
     if ($backend === 'local' && $n_questions > $batchsize) {
         $all = array();
@@ -471,7 +475,7 @@ function kwiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $l
         while ($remaining > 0) {
             $batch = min($batchsize, $remaining);
             $chunk = kwiz_generate_questions_request(
-                $topic, $level, $batch, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes
+                $topic, $level, $batch, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes, $question_type
             );
             if (isset($chunk['error'])) {
                 if (!empty($all)) {
@@ -486,7 +490,7 @@ function kwiz_generate_questions($topic, $level = 'medium', $n_questions = 5, $l
     }
 
     return kwiz_generate_questions_request(
-        $topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes
+        $topic, $level, $n_questions, $language, $backend, $predefined_data, $llmmodel, $userapikey, $learning_outcomes, $question_type
     );
 }
 
@@ -1447,6 +1451,39 @@ function kwiz_create_standard_quiz_named($courseid, $quizname) {
 }
 
 /**
+ * Convert Markdown code blocks and formatting into styled HTML suitable for Moodle questions.
+ *
+ * @param string $text Markdown or plain text
+ * @return string Styled HTML
+ */
+function kwiz_format_markdown_to_moodle_html($text) {
+    if (empty($text)) {
+        return '';
+    }
+    if (strpos($text, '<pre') !== false) {
+        return $text;
+    }
+    $formatted = preg_replace_callback('/```([a-zA-Z0-9_\+\-]*)\s*\n?([\s\S]*?)\s*```/', function($matches) {
+        $lang = !empty($matches[1]) ? htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8') : 'python';
+        $code = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
+        return '<pre style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 0.9rem; overflow-x: auto; margin: 10px 0;"><code class="language-' . $lang . '">' . $code . '</code></pre>';
+    }, $text);
+    $formatted = preg_replace_callback('/`([^`\n]+)`/', function($matches) {
+        return '<code style="background: #f1f5f9; color: #0f172a; padding: 2px 5px; border-radius: 3px; font-family: monospace;">' . htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8') . '</code>';
+    }, $formatted);
+    $parts = explode('<pre', $formatted);
+    $result = nl2br($parts[0]);
+    for ($i = 1; $i < count($parts); $i++) {
+        $subparts = explode('</pre>', $parts[$i], 2);
+        $result .= '<pre' . $subparts[0] . '</pre>';
+        if (isset($subparts[1])) {
+            $result .= nl2br($subparts[1]);
+        }
+    }
+    return $result;
+}
+
+/**
  * Create a question in Moodle's native question bank (Moodle 4.0+ compliant).
  * Inserts into {question}, {question_bank_entries}, {question_versions},
  * {qtype_multichoice_options}, and {question_answers}.
@@ -1491,11 +1528,13 @@ function kwiz_create_question_bank_question($questiontext, $choices, $categoryid
 
         $userid = (!empty($USER) && !empty($USER->id)) ? $USER->id : 2; // Default to admin if CLI / webhook
 
+        $formatted_questiontext = kwiz_format_markdown_to_moodle_html($questiontext);
+
         // Create core question record (Moodle 4.0+ schema)
         $question = new stdClass();
         $question->parent = 0;
         $question->name = $qname;
-        $question->questiontext = $questiontext;
+        $question->questiontext = $formatted_questiontext;
         $question->questiontextformat = FORMAT_HTML;
         $question->generalfeedback = !empty($explanation) ? $explanation : '';
         $question->generalfeedbackformat = FORMAT_HTML;

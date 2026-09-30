@@ -171,6 +171,7 @@ class QuestionRequest(BaseModel):
     change_ratio: Optional[float] = Field(default=0.0, description="Corpus change ratio: 0.0 to 1.0")
     iteration_number: Optional[int] = Field(default=None, description="Explicit evaluation iteration number")
     request_uuid: Optional[str] = Field(default=None, description="Unique tracking UUID")
+    question_type: Optional[str] = Field(default="code", description="Question modality: code, mixed, conceptual")
 
 
 class Choice(BaseModel):
@@ -267,6 +268,31 @@ def format_lesson_context(context: Optional[str]) -> str:
         f"{text}\n"
         "---\n"
     )
+
+
+def format_question_type(question_type: Optional[str]) -> str:
+    """Format modality instructions for programming questions."""
+    qtype = (question_type or 'code').lower().strip()
+    if 'conceptual' in qtype or qtype == 'theory':
+        return (
+            "- Question Modality: CONCEPTUAL & THEORETICAL.\n"
+            "  * Test deep understanding of programming concepts, terminology, syntax rules, algorithms, and data structure characteristics without code snippets.\n"
+            "  * Do not include code blocks in the question text.\n"
+        )
+    elif 'mixed' in qtype:
+        return (
+            "- Question Modality: BALANCED MIX (Code-Centric and Conceptual).\n"
+            "  * Provide a balanced mix: questions with executable code snippets (```python ... ```) testing tracing/output prediction, and questions testing conceptual understanding.\n"
+        )
+    else:
+        return (
+            "- Question Modality: STRICTLY CODE-CENTRIC (Execution Tracing & Output Analysis).\n"
+            "  * Every single question MUST include an executable code snippet (3 to 10 lines) inside a ```python ... ``` block in the question text.\n"
+            "  * The question must require students to trace the code, predict the exact printed output, determine variable states, or find syntax/runtime bugs.\n"
+            "  * Ensure all code snippets are 100% syntactically valid Python 3 that can compile without SyntaxError.\n"
+            "  * Distractors (incorrect choices) must reflect realistic cognitive tracing mistakes (such as off-by-one errors, 0-indexing confusion, incorrect operator precedence, mutable reference misunderstandings).\n"
+            "  * DO NOT generate generic definitions or theory-only questions without code blocks.\n"
+        )
 
 
 def format_learning_outcomes(learning_outcomes: Optional[str]) -> str:
@@ -467,7 +493,7 @@ def retrieve_relevant_context(
     return retrieved_text, metrics
 
 
-def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
+def generate_with_openai(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None, question_type: Optional[str] = "code") -> List[Question]:
     """Generate questions using OpenAI API"""
     try:
         from openai import OpenAI
@@ -483,11 +509,12 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
+{format_question_type(question_type)}
 {format_learning_outcomes(learning_outcomes)}
 {format_lesson_context(context)}
 
 For each question, provide:
-1. A clear question text
+1. A clear question text (including executable ```python ... ``` code block if code-centric)
 2. Exactly 4 answer choices (only one correct)
 3. The index (0-3) of the correct answer
 4. A brief explanation
@@ -564,7 +591,7 @@ IMPORTANT:
         raise Exception(f"OpenAI generation error: {str(e)}")
 
 
-def generate_with_gemini(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
+def generate_with_gemini(topic: str, level: str, n_questions: int, language: str, bloom_level: Optional[str], context: Optional[str], api_key_override: Optional[str] = None, learning_outcomes: Optional[str] = None, question_type: Optional[str] = "code") -> List[Question]:
     """Generate questions using Google Gemini API"""
     try:
         import google.generativeai as genai
@@ -582,11 +609,12 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
+{format_question_type(question_type)}
 {format_learning_outcomes(learning_outcomes)}
 {format_lesson_context(context)}
 
 For each question, provide:
-1. A clear question text
+1. A clear question text (including executable ```python ... ``` code block if code-centric)
 2. Exactly 4 answer choices (only one correct)
 3. The index (0-3) of the correct answer
 4. A brief explanation
@@ -650,7 +678,8 @@ IMPORTANT:
 
 def generate_with_local_llm(topic: str, level: str, n_questions: int, language: str,
                             bloom_level: Optional[str], context: Optional[str],
-                            model: Optional[str] = None, learning_outcomes: Optional[str] = None) -> List[Question]:
+                            model: Optional[str] = None, learning_outcomes: Optional[str] = None,
+                            question_type: Optional[str] = "code") -> List[Question]:
     """Generate questions using local LLM (Ollama)"""
     try:
         ollama_model = model or os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:7b')
@@ -662,11 +691,12 @@ Requirements:
 - Difficulty level: {level}
 - Language: {language}
 - Bloom's taxonomy level: {bloom_level or 'comprehension'}
+{format_question_type(question_type)}
 {format_learning_outcomes(learning_outcomes)}
 {format_lesson_context(context)}
 
 For each question, provide:
-1. A clear question text
+1. A clear question text (including executable ```python ... ``` code block if code-centric)
 2. Exactly 4 answer choices (only one correct)
 3. The index (0-3) of the correct answer
 4. A brief explanation
@@ -1112,6 +1142,7 @@ def execute_generation_single(req: QuestionRequest) -> List[Question]:
             # T_LLM: LLM forward pass & token generation
             t_llm_start = time.perf_counter()
             questions = []
+            q_type = getattr(req, 'question_type', 'code') or 'code'
             if backend == 'openai':
                 effective_openai_key = req.openai_api_key or OPENAI_API_KEY
                 if not effective_openai_key:
@@ -1120,7 +1151,8 @@ def execute_generation_single(req: QuestionRequest) -> List[Question]:
                     req.topic, req.level, req.n_questions,
                     req.language, req.bloom_level, req.context,
                     api_key_override=req.openai_api_key,
-                    learning_outcomes=req.learning_outcomes
+                    learning_outcomes=req.learning_outcomes,
+                    question_type=q_type
                 )
             elif backend == 'gemini':
                 effective_gemini_key = req.gemini_api_key or GEMINI_API_KEY
@@ -1130,14 +1162,16 @@ def execute_generation_single(req: QuestionRequest) -> List[Question]:
                     req.topic, req.level, req.n_questions,
                     req.language, req.bloom_level, req.context,
                     api_key_override=req.gemini_api_key,
-                    learning_outcomes=req.learning_outcomes
+                    learning_outcomes=req.learning_outcomes,
+                    question_type=q_type
                 )
             elif backend == 'local':
                 questions = generate_with_local_llm(
                     req.topic, req.level, req.n_questions,
                     req.language, req.bloom_level, req.context,
                     model=req.model,
-                    learning_outcomes=req.learning_outcomes
+                    learning_outcomes=req.learning_outcomes,
+                    question_type=q_type
                 )
             else:
                 raise ValueError(f'Unknown backend: {backend}')
@@ -1154,7 +1188,8 @@ def execute_generation_single(req: QuestionRequest) -> List[Question]:
                     question_text=q.question,
                     choices=[c.text for c in q.choices],
                     correct_index=q.correct_index,
-                    topic=req.topic
+                    topic=req.topic,
+                    question_type=q_type
                 )
                 if is_valid:
                     valid_questions.append(q)

@@ -118,7 +118,7 @@ def validate_java(code: str) -> tuple[bool, str]:
         except Exception:
             pass
 
-def validate_question(question_text: str, choices: list[str], correct_index: int, topic: str) -> tuple[bool, str]:
+def validate_question(question_text: str, choices: list[str], correct_index: int, topic: str, question_type: str = "code") -> tuple[bool, str]:
     """
     Validates a question and its code blocks.
     Returns (is_valid, error_message).
@@ -132,14 +132,19 @@ def validate_question(question_text: str, choices: list[str], correct_index: int
         return False, f"Correct index {correct_index} is out of bounds for choices count {len(choices)}."
         
     # 2. Extract code blocks
-    # Match markdown code blocks: ```lang ... ```
-    blocks = re.findall(r'```(\w*)\n([\s\S]*?)\n```', question_text)
+    # Match markdown code blocks: ```lang ... ``` or ``` ... ```
+    blocks = re.findall(r'```([a-zA-Z0-9_\+\-]*)\s*\n?([\s\S]*?)```', question_text)
     
     # Also search inside choices
     for choice in choices:
-        choice_blocks = re.findall(r'```(\w*)\n([\s\S]*?)\n```', choice)
+        choice_blocks = re.findall(r'```([a-zA-Z0-9_\+\-]*)\s*\n?([\s\S]*?)```', choice)
         blocks.extend(choice_blocks)
         
+    qtype = (question_type or 'code').lower().strip()
+    if 'code' in qtype and 'mixed' not in qtype:
+        if not blocks:
+            return False, "Question must contain an executable code block (```python ... ```) in code-centric modality."
+
     if not blocks:
         return True, "" # No code blocks to validate
         
