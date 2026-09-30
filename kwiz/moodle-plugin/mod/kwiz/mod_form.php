@@ -1,0 +1,276 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/kwiz/lib.php');
+
+class mod_kwiz_mod_form extends moodleform_mod {
+
+    public function definition() {
+        global $CFG, $DB;
+        $mform = $this->_form;
+
+        // Name
+        $mform->addElement('text', 'name', get_string('name', 'mod_kwiz'), array('size' => '64'));
+        $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', null, 'required', null, 'client');
+
+        // Intro
+        $this->standard_intro_elements();
+
+        // Topic
+        $mform->addElement('text', 'topic', get_string('topic', 'mod_kwiz'), array('size' => '64'));
+        $mform->setType('topic', PARAM_TEXT);
+        $mform->addRule('topic', null, 'required', null, 'client');
+        $mform->addHelpButton('topic', 'topic', 'mod_kwiz');
+
+
+        // Language
+        $mform->addElement('select', 'language', get_string('language', 'mod_kwiz'), array(
+            'en' => get_string('language_en', 'mod_kwiz'),
+            'km' => get_string('language_km', 'mod_kwiz')
+        ));
+        $mform->setDefault('language', 'en');
+
+        // LLM Backend Selection
+        $mform->addElement('select', 'llm_backend', get_string('llm_backend', 'mod_kwiz'), array(
+            'openai' => 'OpenAI',
+            'gemini' => 'Google Gemini',
+            'local' => 'Local LLM'
+        ));
+        $mform->setDefault('llm_backend', 'openai');
+        $mform->addHelpButton('llm_backend', 'llm_backend', 'mod_kwiz');
+
+        // User-specific OpenAI API key (saved to user preferences, not activity record).
+        $mform->addElement('passwordunmask', 'openai_user_api_key', get_string('openai_user_api_key', 'mod_kwiz'));
+        $mform->setType('openai_user_api_key', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('openai_user_api_key', 'openai_user_api_key', 'mod_kwiz');
+        $mform->hideIf('openai_user_api_key', 'llm_backend', 'neq', 'openai');
+
+        // User-specific Gemini API key (saved to user preferences, not activity record).
+        $mform->addElement('passwordunmask', 'gemini_user_api_key', get_string('gemini_user_api_key', 'mod_kwiz'));
+        $mform->setType('gemini_user_api_key', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('gemini_user_api_key', 'gemini_user_api_key', 'mod_kwiz');
+        $mform->hideIf('gemini_user_api_key', 'llm_backend', 'neq', 'gemini');
+
+        // Local LLM model selection (dynamic from llmapi; same HTTP/URL logic as lib.php)
+        $llmmodeloptions = array('' => get_string('choose', 'moodle'));
+        $models = kwiz_fetch_ollama_models();
+        foreach ($models as $name => $label) {
+            $llmmodeloptions[$name] = $label;
+        }
+
+        $mform->addElement('select', 'llm_model', get_string('llm_model', 'mod_kwiz'), $llmmodeloptions);
+        $mform->setType('llm_model', PARAM_TEXT);
+        $mform->addHelpButton('llm_model', 'llm_model', 'mod_kwiz');
+        // Only relevant when backend is local.
+        $mform->hideIf('llm_model', 'llm_backend', 'neq', 'local');
+
+        // Question Bank Category Selector
+        $mform->addElement('header', 'questionbankheader', get_string('questionbank', 'mod_kwiz'));
+        $mform->setExpanded('questionbankheader', false);
+        
+        // Get course context for question categories
+        if (!empty($this->_cm)) {
+            $context = context_module::instance($this->_cm->id);
+            $coursecontext = context_course::instance($this->_course->id);
+        } else {
+            $coursecontext = context_course::instance($this->_course->id);
+            $context = $coursecontext;
+        }
+        
+        // Get question categories for this context
+        global $DB;
+        $categories = array(0 => get_string('defaultcategory', 'mod_kwiz'));
+        $catrecords = $DB->get_records('question_categories', array('contextid' => $coursecontext->id), 'name ASC');
+        foreach ($catrecords as $cat) {
+            $categories[$cat->id] = $cat->name;
+        }
+        
+        $mform->addElement('select', 'question_category', get_string('questioncategory', 'mod_kwiz'), $categories);
+        $mform->setType('question_category', PARAM_INT);
+        $mform->addHelpButton('question_category', 'questioncategory', 'mod_kwiz');
+        $mform->setDefault('question_category', 0);
+
+        // Template Selection
+        $mform->addElement('select', 'template', get_string('template', 'mod_kwiz'), array(
+            'default' => get_string('template_default', 'mod_kwiz'),
+            'kahoot' => get_string('template_kahoot', 'mod_kwiz'),
+            'minimal' => get_string('template_minimal', 'mod_kwiz'),
+            'modern' => get_string('template_modern', 'mod_kwiz')
+        ));
+        $mform->setDefault('template', 'default');
+        $mform->addHelpButton('template', 'template', 'mod_kwiz');
+
+        // Color Palette
+        $mform->addElement('select', 'color_palette', get_string('color_palette', 'mod_kwiz'), array(
+            'kahoot' => get_string('palette_kahoot', 'mod_kwiz'),
+            'blue' => get_string('palette_blue', 'mod_kwiz'),
+            'green' => get_string('palette_green', 'mod_kwiz'),
+            'purple' => get_string('palette_purple', 'mod_kwiz'),
+            'orange' => get_string('palette_orange', 'mod_kwiz'),
+            'red' => get_string('palette_red', 'mod_kwiz'),
+            'custom' => get_string('palette_custom', 'mod_kwiz')
+        ));
+        $mform->setDefault('color_palette', 'kahoot');
+        $mform->addHelpButton('color_palette', 'color_palette', 'mod_kwiz');
+
+        // Time Limit Per Question
+        $mform->addElement('text', 'time_limit_per_question', get_string('time_limit_per_question', 'mod_kwiz'), array('size' => '10'));
+        $mform->setType('time_limit_per_question', PARAM_INT);
+        $mform->setDefault('time_limit_per_question', 60);
+        $mform->addRule('time_limit_per_question', null, 'required', null, 'client');
+        $mform->addRule('time_limit_per_question', null, 'numeric', null, 'client');
+        $mform->addHelpButton('time_limit_per_question', 'time_limit_per_question', 'mod_kwiz');
+
+        // Leaderboard Top N
+        $mform->addElement('select', 'leaderboard_top_n', get_string('leaderboard_top_n', 'mod_kwiz'), array(
+            '3' => '3',
+            '5' => '5',
+            '10' => '10'
+        ));
+        $mform->setDefault('leaderboard_top_n', 3);
+        $mform->addHelpButton('leaderboard_top_n', 'leaderboard_top_n', 'mod_kwiz');
+
+        // Background image for question screen
+        $mform->addElement('header', 'backgroundheader', get_string('background_image', 'mod_kwiz'));
+        $mform->setExpanded('backgroundheader', false);
+        $predefined = array(
+            '' => get_string('background_none', 'mod_kwiz'),
+            'predefined:bg1' => get_string('background_bg', 'mod_kwiz', 1),
+            'predefined:bg2' => get_string('background_bg', 'mod_kwiz', 2),
+            'predefined:bg3' => get_string('background_bg', 'mod_kwiz', 3),
+            'predefined:bg4' => get_string('background_bg', 'mod_kwiz', 4),
+            'predefined:bg5' => get_string('background_bg', 'mod_kwiz', 5),
+            'predefined:gradient_blue' => get_string('background_gradient_blue', 'mod_kwiz'),
+            'predefined:gradient_purple' => get_string('background_gradient_purple', 'mod_kwiz'),
+            'predefined:gradient_green' => get_string('background_gradient_green', 'mod_kwiz'),
+            'predefined:gradient_orange' => get_string('background_gradient_orange', 'mod_kwiz'),
+            'predefined:gradient_teal' => get_string('background_gradient_teal', 'mod_kwiz')
+        );
+        $mform->addElement('select', 'background_image', get_string('background_predefined', 'mod_kwiz'), $predefined);
+        $mform->setType('background_image', PARAM_TEXT);
+        $mform->addHelpButton('background_image', 'background_image', 'mod_kwiz');
+        $mform->addElement('text', 'background_image_url', get_string('background_custom_url', 'mod_kwiz'), array('size' => '60'));
+        $mform->setType('background_image_url', PARAM_URL);
+        $mform->addHelpButton('background_image_url', 'background_custom_url', 'mod_kwiz');
+
+        // Preview box for selected background
+        global $CFG;
+        $previewlabel = get_string('background_preview', 'mod_kwiz');
+        $wwwroot = $CFG->wwwroot;
+        $bgbase = $wwwroot . '/mod/kwiz/pix/backgrounds/';
+        $mform->addElement('static', 'background_preview_static', $previewlabel,
+            '<div id="gq-background-preview-wrap" style="margin-top:8px;">
+                <div id="gq-background-preview" style="width:280px;height:160px;border:2px solid #ddd;border-radius:8px;background:#f5f5f5;background-size:cover;background-position:center;"></div>
+                <div id="gq-background-preview-label" style="margin-top:6px;font-size:12px;color:#666;"></div>
+            </div>');
+        $mform->addElement('html', '<script>
+(function() {
+    var wwwroot = ' . json_encode($wwwroot) . ';
+    var bgbase = ' . json_encode($bgbase) . ';
+    var gradients = {
+        "predefined:gradient_blue": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "predefined:gradient_purple": "linear-gradient(135deg, #764ba2 0%, #f093fb 100%)",
+        "predefined:gradient_green": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        "predefined:gradient_orange": "linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)",
+        "predefined:gradient_teal": "linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)"
+    };
+    var bgImages = { "predefined:bg1": "bg1.jpg", "predefined:bg2": "bg2.jpg", "predefined:bg3": "bg3.jpg", "predefined:bg4": "bg4.jpg", "predefined:bg5": "bg5.jpg" };
+    function updatePreview() {
+        var sel = document.getElementById("id_background_image");
+        var urlInput = document.getElementById("id_background_image_url");
+        var box = document.getElementById("gq-background-preview");
+        var label = document.getElementById("gq-background-preview-label");
+        if (!box) return;
+        var predefined = sel ? sel.value : "";
+        var customUrl = urlInput ? urlInput.value.trim() : "";
+        box.style.backgroundSize = "cover";
+        box.style.backgroundPosition = "center";
+        if (customUrl) {
+            box.style.backgroundImage = "url(" + customUrl.replace(/"/g, "\\\"") + ")";
+            box.style.background = "#f5f5f5";
+            if (label) label.textContent = customUrl;
+        } else if (predefined && predefined !== "") {
+            if (gradients[predefined]) {
+                box.style.background = gradients[predefined];
+                box.style.backgroundImage = "none";
+                if (label) label.textContent = sel ? sel.options[sel.selectedIndex].text : "";
+            } else if (bgImages[predefined]) {
+                var u = bgbase + bgImages[predefined];
+                box.style.backgroundImage = "url(" + u + ")";
+                box.style.background = "#f5f5f5";
+                if (label) label.textContent = sel ? sel.options[sel.selectedIndex].text : "";
+            } else {
+                box.style.background = "#f5f5f5";
+                box.style.backgroundImage = "none";
+                if (label) label.textContent = "";
+            }
+        } else {
+            box.style.background = "#f5f5f5";
+            box.style.backgroundImage = "none";
+            if (label) label.textContent = "";
+        }
+    }
+    function init() {
+        var sel = document.getElementById("id_background_image");
+        var urlInput = document.getElementById("id_background_image_url");
+        if (sel) sel.addEventListener("change", updatePreview);
+        if (urlInput) urlInput.addEventListener("input", updatePreview);
+        updatePreview();
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+})();
+</script>');
+
+        $this->standard_coursemodule_elements();
+        $this->add_action_buttons();
+    }
+
+    public function set_data($defaultvalues) {
+        global $USER;
+
+        // Load user-specific API keys into form (never saved on activity instance).
+        $defaultvalues->openai_user_api_key = get_user_preferences('mod_kwiz_openai_api_key', '', $USER->id);
+        $defaultvalues->gemini_user_api_key = get_user_preferences('mod_kwiz_gemini_api_key', '', $USER->id);
+
+        // When editing: if background_image is a URL, show it in the URL field
+        if (!empty($defaultvalues->background_image) && strpos($defaultvalues->background_image, 'http') === 0) {
+            $defaultvalues->background_image_url = $defaultvalues->background_image;
+            $defaultvalues->background_image = '';
+        }
+        parent::set_data($defaultvalues);
+    }
+
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if (!empty($data['llm_backend']) && $data['llm_backend'] === 'openai') {
+            $value = trim((string)($data['openai_user_api_key'] ?? ''));
+            if ($value === '') {
+                $errors['openai_user_api_key'] = get_string('apikey_required_openai', 'mod_kwiz');
+            }
+        } else if (!empty($data['llm_backend']) && $data['llm_backend'] === 'gemini') {
+            $value = trim((string)($data['gemini_user_api_key'] ?? ''));
+            if ($value === '') {
+                $errors['gemini_user_api_key'] = get_string('apikey_required_gemini', 'mod_kwiz');
+            }
+        } else if (!empty($data['llm_backend']) && $data['llm_backend'] === 'local') {
+            $value = trim((string)($data['llm_model'] ?? ''));
+            if ($value === '') {
+                $errors['llm_model'] = get_string('llm_model_required_local', 'mod_kwiz');
+            }
+        }
+
+        return $errors;
+    }
+}
+

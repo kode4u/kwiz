@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/kwiz/db" VERSION="20250101" COMMENT="XMLDB file for Moodle mod/kwiz"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="kwiz" COMMENT="Gamified Quiz instances">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="medium" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="en" SEQUENCE="false"/>
+        <FIELD NAME="llm_backend" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="openai" SEQUENCE="false"/>
+        <FIELD NAME="llm_model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Selected local LLM model (Ollama)"/>
+        <FIELD NAME="template" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="default" SEQUENCE="false"/>
+        <FIELD NAME="color_palette" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="kahoot" SEQUENCE="false"/>
+        <FIELD NAME="use_predefined" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="predefined_data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="questions_data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="categories_data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: saved multi-category generation form"/>
+        <FIELD NAME="learning_outcomes" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Target learning outcomes for the quiz"/>
+        <FIELD NAME="time_limit_per_question" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="60" SEQUENCE="false" COMMENT="Time limit per question in seconds"/>
+        <FIELD NAME="leaderboard_top_n" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="3" SEQUENCE="false" COMMENT="Number of top students to show in leaderboard"/>
+        <FIELD NAME="question_category" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Question bank category ID"/>
+        <FIELD NAME="background_image" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Background: empty, predefined:key, or URL"/>
+        <FIELD NAME="sumgrades" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Sum of all question marks"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <TABLE NAME="kwiz_sessions" COMMENT="Active quiz sessions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="started" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="participant_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="questions_data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="results_data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeended" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="kwiz" TYPE="foreign" FIELDS="kwizid" REFTABLE="kwiz" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="session_id" UNIQUE="true" FIELDS="session_id"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="kwiz_questions" COMMENT="Generated questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="question_text" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="choices" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON array of choices"/>
+        <FIELD NAME="correct_index" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="category_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Category name for this question"/>
+        <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Generation topic/prompt for this question"/>
+        <FIELD NAME="bloom_level" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="kwiz" TYPE="foreign" FIELDS="kwizid" REFTABLE="kwiz" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <TABLE NAME="kwiz_responses" COMMENT="Student responses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="username" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="answer_index" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="is_correct" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="score" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="time_spent" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Seconds"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="question" TYPE="foreign" FIELDS="questionid" REFTABLE="kwiz_questions" REFFIELDS="id"/>
+        <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="session_user" UNIQUE="false" FIELDS="session_id, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="kwiz_slots" COMMENT="Stores questions linked to gamified quiz instances (similar to quiz_slots)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="slot" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Order of question in quiz"/>
+        <FIELD NAME="page" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Page number"/>
+        <FIELD NAME="maxmark" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" DEFAULT="1.0" SEQUENCE="false" COMMENT="Maximum mark for this question"/>
+        <FIELD NAME="displaynumber" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Custom display number"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="kwiz" TYPE="foreign" FIELDS="kwizid" REFTABLE="kwiz" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quiz_slot" UNIQUE="false" FIELDS="kwizid, slot"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="kwiz_grades" COMMENT="Stores final grades for users (similar to quiz_grades)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" COMMENT="Final grade"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="kwiz" TYPE="foreign" FIELDS="kwizid" REFTABLE="kwiz" REFFIELDS="id"/>
+        <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quiz_user" UNIQUE="true" FIELDS="kwizid, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="kwiz_participants" COMMENT="Tracks students who joined a session">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="username" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timejoined" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="kwiz" TYPE="foreign" FIELDS="kwizid" REFTABLE="kwiz" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="session_user" UNIQUE="true" FIELDS="session_id, userid"/>
+        <INDEX NAME="session_id" UNIQUE="false" FIELDS="session_id"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="kwiz_generation_logs" COMMENT="LLM generation request logs for research and performance analysis">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kwizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User who triggered generation"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course module id if available"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Question save batch/session id"/>
+        <FIELD NAME="request_uuid" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false" COMMENT="Unique request id for traceability"/>
+        <FIELD NAME="batch_id" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="category_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="backend" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="llm_model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="api_url" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="requested_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="generated_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="saved_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="started_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp when generation started"/>
+        <FIELD NAME="ended_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Unix timestamp when generation finished"/>
+        <FIELD NAME="duration_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Total request duration in milliseconds"/>
+        <FIELD NAME="questions_per_sec" TYPE="number" LENGTH="10" DECIMALS="4" NOTNULL="false" SEQUENCE="false" COMMENT="Generated questions / second"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="started" SEQUENCE="false" COMMENT="started, success, error"/>
+        <FIELD NAME="error_message" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="kwiz" TYPE="foreign" FIELDS="kwizid" REFTABLE="kwiz" REFFIELDS="id"/>
+        <KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quiz_time" UNIQUE="false" FIELDS="kwizid, timecreated"/>
+        <INDEX NAME="request_uuid" UNIQUE="true" FIELDS="request_uuid"/>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
+

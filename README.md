@@ -1,24 +1,24 @@
 # Kwiz: Toward Efficient Course-Grounded Programming MCQ Generation
 
-This repository contains the software and research evaluation artifacts for **Kwiz**, an end-to-end self-hosted RAG pipeline integrated into Moodle (`mod_gamifiedquiz`).
+This repository contains the software and research evaluation artifacts for **Kwiz**, an end-to-end self-hosted RAG pipeline integrated into Moodle (`mod_kwiz`).
 
 The repository is organized into two primary directories:
 
 ```
 kwiz/
-├── kwiz/                 # 🚀 PRODUCTION & DEPLOYMENT (Install plugin, Docker backend, WebSocket)
-└── experiment/           # 🔬 RESEARCH & BENCHMARKS (Reproduce E1-E4, paper drafts, datasets)
+├── kwiz/                 # PRODUCTION & DEPLOYMENT (Install plugin, Docker backend, LLM API)
+└── experiment/           # RESEARCH & BENCHMARKS (Reproduce E1-E4, paper drafts, datasets)
 ```
 
 ---
 
-## 1. 🚀 `kwiz/` — Production Deployment & Moodle Plugin
+## 1. `kwiz/` — Production Deployment & Moodle Plugin
 
 If you are an **instructor, system administrator, or developer** wanting to use Kwiz:
 
-👉 **[Go to the `kwiz/` Directory](kwiz/)**
+* **[Go to the `kwiz/` Directory](kwiz/)**
 
-* **Moodle Activity Plugin** (`kwiz/moodle-plugin/mod/gamifiedquiz`): Ready to install into Moodle.
+* **Moodle Activity Plugin** (`kwiz/moodle-plugin/mod/kwiz`): Ready to install into Moodle.
 * **One-Command Docker Deployment** (`kwiz/docker-compose.yml`):
   ```bash
   cd kwiz
@@ -27,18 +27,17 @@ If you are an **instructor, system administrator, or developer** wanting to use 
   ```
 * **Services Launched**:
   * Python LLM & AST Validation API (`http://localhost:5001`) with automatic PDF/PPTX/DOCX extraction.
-  * Real-Time Multiplayer WebSocket Server (`http://localhost:3001`).
   * Bundled Moodle LMS with plugin pre-mounted (`http://localhost:8080`).
-  * MySQL 8.0 & Redis 7.
+  * MySQL 8.0 & phpMyAdmin (`http://localhost:8081`).
 * **Moodle Connection Instructions**: How to configure Moodle Site Administration to connect to the Docker container by IP and port.
 
 ---
 
-## 2. 🔬 `experiment/` — Research Evaluation & Paper Reproduction
+## 2. `experiment/` — Research Evaluation & Paper Reproduction
 
 If you are a **peer reviewer or researcher** seeking to inspect the methodology or reproduce benchmark results:
 
-👉 **[Go to the `experiment/` Directory](experiment/)**
+* **[Go to the `experiment/` Directory](experiment/)**
 
 * **Research Paper Drafts**:
   * Markdown: [`experiment/papers/paper.md`](experiment/papers/paper.md)

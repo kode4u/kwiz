@@ -1,21 +1,20 @@
 # Kwiz — AI-Powered Assessment System for Moodle
 
-Welcome to **Kwiz**, an end-to-end self-hosted system that brings course-grounded AI question generation and real-time gamified quizzes directly into Moodle.
+Welcome to **Kwiz**, an end-to-end self-hosted system that brings course-grounded AI question generation directly into Moodle.
 
 ---
 
-## 📁 What is in this Folder?
+## 1. What is in this Folder?
 
-* **`moodle-plugin/mod/gamifiedquiz/`**: The complete Moodle activity module.
+* **`moodle-plugin/mod/kwiz/`**: The complete Moodle activity module (`mod_kwiz`).
 * **`llmapi/`**: The self-hosted Python service (Flask + Ollama + AST compiler validation + PDF/PPTX/DOCX extractor).
-* **`websocket-server/`**: Node.js real-time multiplayer session server (Socket.IO + Redis).
 * **`docker/`**: Container configurations and Moodle build files.
 * **`docker-compose.yml`**: One-command Docker orchestration.
 * **`.env.example`**: Configuration template.
 
 ---
 
-## 🚀 Quick Start: Deploy Backend with Docker
+## 2. Quick Start: Deploy Backend with Docker
 
 ### Step 1: Clone and Enter `kwiz/`
 ```bash
@@ -58,54 +57,50 @@ docker compose ps
 
 Your services are now active:
 * **LLM API Service**: `http://<SERVER_IP>:5001` (Health check: `http://<SERVER_IP>:5001/health`)
-* **WebSocket Server**: `http://<SERVER_IP>:3001` (Health check: `http://<SERVER_IP>:3001/health`)
 * **Bundled Moodle LMS** (optional): `http://<SERVER_IP>:8080`
 * **phpMyAdmin**: `http://<SERVER_IP>:8081`
 
 ---
 
-## 🔌 Installing the Plugin in Moodle
+## 3. Installing the Plugin in Moodle
 
 ### If using the bundled Docker Moodle:
-The plugin is **already pre-installed and mounted** at `http://localhost:8080`! Simply log in and start using it.
+The plugin is **already pre-installed and mounted** at `http://localhost:8080`. Log in and start using it.
 
 ### If installing into an EXISTING Moodle server:
 
 #### Option A: Copy Folder (Fastest)
 Copy the plugin folder into your Moodle's `mod/` directory:
 ```bash
-cp -r moodle-plugin/mod/gamifiedquiz /path/to/your/moodle/mod/
+cp -r moodle-plugin/mod/kwiz /path/to/your/moodle/mod/
 ```
 
 #### Option B: Zip and Upload
-1. Zip the `moodle-plugin/mod/gamifiedquiz` folder so that `gamifiedquiz.zip` contains `gamifiedquiz/version.php` at its root.
+1. Zip the `moodle-plugin/mod/kwiz` folder so that `kwiz.zip` contains `kwiz/version.php` at its root.
 2. Log in to your Moodle as an Administrator.
-3. Navigate to: **Site Administration → Plugins → Install plugins**.
-4. Upload `gamifiedquiz.zip` and follow the on-screen upgrade prompts.
+3. Navigate to: **Site Administration -> Plugins -> Install plugins**.
+4. Upload `kwiz.zip` and follow the on-screen upgrade prompts.
 
 ---
 
-## ⚙️ Connecting Moodle Plugin to the Docker Backend
+## 4. Connecting Moodle Plugin to the Docker Backend
 
 Once the plugin is installed in Moodle:
 
 1. Log in as **Administrator**.
-2. Go to: **Site Administration → Plugins → Activity modules → Gamified Quiz**  
-   *(Direct URL: `http://your-moodle.com/admin/settings.php?section=modsettinggamifiedquiz`)*
+2. Go to: **Site Administration -> Plugins -> Activity modules -> Kwiz**  
+   *(Direct URL: `http://your-moodle.com/admin/settings.php?section=modsettingkwiz`)*
 3. Configure the connection fields:
    * **LLM API URL**: Set to the IP and port of your Docker host:
      * If Moodle and Docker run on the same machine: `http://localhost:5001`
      * If Moodle is inside the Docker compose network: `http://llmapi:5001`
      * If Moodle is on a different server: `http://<DOCKER_SERVER_IP>:5001`
-   * **WebSocket URL**: *(Optional)*
-     * If you want live multiplayer quiz games: `http://<DOCKER_SERVER_IP>:3001` (or `ws://<DOCKER_SERVER_IP>:3001`).
-     * **If you only want AI Question Generation**: **Leave this blank!** The system runs smoothly in standalone AI mode with zero WebSocket dependencies or warnings.
    * **Default LLM Backend**: Select `local` (Ollama).
 4. Click **Save changes**.
 
 ---
 
-## 🔒 Single-Port Internal Deployment (Expose Only 1 IP:Port)
+## 5. Single-Port Internal Deployment (Expose Only 1 IP:Port)
 
 If you want everything to run internally in Docker and expose **only one single IP:port**, this is fully supported and recommended:
 
@@ -113,8 +108,8 @@ If you want everything to run internally in Docker and expose **only one single 
 When running everything in Docker:
 * Moodle talks to the LLM API via internal Docker DNS: `http://llmapi:5001`.
 * Moodle talks to MySQL on internal port `db:3306`.
-* **Exposed Port**: You only open **Port `8080` (or `80`)** for Moodle to the outside world!
-* In `docker-compose.yml`, ports `3307`, `6380`, `5001`, and `3001` do not need to be mapped to the host firewall at all.
+* **Exposed Port**: You only open **Port `8080` (or `80`)** for Moodle to the outside world.
+* In `docker-compose.yml`, ports `3307`, `5001`, and `8081` do not need to be mapped to the host firewall at all.
 
 ### Setup 2: Connecting an Existing External Moodle to Docker (Only Expose Port 5001)
 If your university already has a Moodle server and Docker only runs the AI engine:
@@ -122,21 +117,19 @@ If your university already has a Moodle server and Docker only runs the AI engin
 * **Exposed Port**: You only open **Port `5001`** (`http://<GPU_SERVER_IP>:5001`).
 * In your Moodle settings:
   * **LLM API URL**: `http://<GPU_SERVER_IP>:5001`
-  * **WebSocket URL**: *Leave blank*
-* You do **not** need WebSocket, Redis, or MySQL running on the GPU host. Just one container and one single port!
-
+* You do not need Redis or MySQL running on the GPU host. Just one container and one single port.
 
 ---
 
-## 🎓 How to Generate Questions in Moodle
+## 6. How to Generate Questions in Moodle
 
 1. Enter any course and turn **Edit mode** ON.
-2. Click **Add an activity or resource** → Select **Gamified Quiz**.
+2. Click **Add an activity or resource** -> Select **Kwiz**.
 3. In the activity, click **"AI Question Generator"**:
    * **Select from Course**: Choose any Moodle **Lesson**, **Book**, **Page**, or **File Resource** from the dropdown.
-   * **Direct File Upload**: Click **"📁 Or upload course material directly"** and pick any `.pdf`, `.pptx`, `.docx`, or `.txt` slide deck. The system extracts the text automatically!
+   * **Direct File Upload**: Upload course material directly and pick any `.pdf`, `.pptx`, `.docx`, or `.txt` slide deck. The system extracts the text automatically.
    * **Specify Topics & Difficulty**: Add categories, pick difficulty (`easy`, `medium`, `hard`), and set question count.
 4. Click **"Generate All Questions"**:
    * The Python backend performs SHA-256 chunk caching, dense retrieval, local LLM generation, and Two-Tier AST compilation validation.
    * Validated questions are automatically inserted into the **Moodle Question Bank** (`mdl_question`).
-5. **Review & Publish**: Instructors can review, edit distractors/explanations inline, and publish them to quizzes!
+5. **Review & Publish**: Instructors can review, edit distractors/explanations inline, and publish them to quizzes.

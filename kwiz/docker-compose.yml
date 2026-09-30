@@ -77,13 +77,13 @@ services:
       MOODLE_DATABASE_PASSWORD: ${MYSQL_PASSWORD:-moodlepass}
       MOODLE_DATABASE_NAME: ${MYSQL_DATABASE:-moodle}
       MOODLE_HOST: ${MOODLE_URL:-http://localhost:8080}
-      GAMIFIEDQUIZ_METRICS_LOG: /logs/evaluation/metrics.jsonl
+      KWIZ_METRICS_LOG: /logs/evaluation/metrics.jsonl
     ports:
       - "8080:80"
     volumes:
       - moodle_data:/var/www/html
       - moodle_data_dir:/var/www/moodledata
-      - ./moodle-plugin/mod/gamifiedquiz:/var/www/html/mod/gamifiedquiz
+      - ./moodle-plugin/mod/kwiz:/var/www/html/mod/kwiz
       - ./logs:/logs
     networks:
       - jica-network

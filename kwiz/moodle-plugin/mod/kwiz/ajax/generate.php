@@ -1,0 +1,526 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Enable error reporting for debugging (remove in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display, but log
+ini_set('log_errors', 1);
+
+// Set JSON header early to ensure proper output
+header('Content-Type: application/json');
+
+// Local LLM generation can take several minutes (especially with lesson text).
+@set_time_limit(600);
+
+try {
+    require_once('../../../config.php');
+    require_once($CFG->dirroot . '/mod/kwiz/lib.php');
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Failed to load Moodle config: ' . $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine()
+    ));
+    exit;
+}
+
+// Ensure we have database access
+global $DB, $CFG, $USER;
+
+// Check for action
+$action = optional_param('action', '', PARAM_ALPHAEXT);
+if ($action === 'get_structure') {
+    try {
+        require_login();
+        $target_cmid = required_param('target_cmid', PARAM_INT);
+        $cm = get_coursemodule_from_id('', $target_cmid, 0, false, MUST_EXIST);
+        
+        $structure = [];
+        if ($cm->modname === 'book') {
+            $chapters = $DB->get_records('book_chapters', array('bookid' => $cm->instance), 'pagenum ASC');
+            if ($chapters) {
+                $structure_list = [];
+                foreach ($chapters as $ch) {
+                    $structure_list[] = array(
+                        'id' => (int)$ch->id,
+                        'title' => $ch->title,
+                        'subchapter' => (int)$ch->subchapter,
+                        'subitems' => []
+                    );
+                }
+                
+                $nested = [];
+                $last_main_idx = -1;
+                foreach ($structure_list as $item) {
+                    if (!$item['subchapter']) {
+                        $nested[] = $item;
+                        $last_main_idx = count($nested) - 1;
+                    } else {
+                        if ($last_main_idx >= 0) {
+                            $nested[$last_main_idx]['subitems'][] = array(
+                                'id' => $item['id'],
+                                'title' => $item['title']
+                            );
+                        } else {
+                            $nested[] = $item;
+                        }
+                    }
+                }
+                $structure = $nested;
+            }
+        } else if ($cm->modname === 'lesson') {
+            $pages = $DB->get_records('lesson_pages', array('lessonid' => $cm->instance), 'id ASC');
+            if ($pages) {
+                foreach ($pages as $p) {
+                    $structure[] = array(
+                        'id' => (int)$p->id,
+                        'title' => $p->title,
+                        'subitems' => []
+                    );
+                }
+            }
+        }
+        
+        echo json_encode(array(
+            'success' => true,
+            'structure' => $structure
+        ));
+        exit;
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(array(
+            'success' => false,
+            'error' => $e->getMessage()
+        ));
+        exit;
+    }
+}
+
+// Get parameters
+$quizid = required_param('quizid', PARAM_INT);
+$cmid = optional_param('cmid', 0, PARAM_INT);
+$prompt = optional_param('prompt', '', PARAM_TEXT);
+$data = optional_param('data', '', PARAM_TEXT);
+$difficulty = optional_param('difficulty', '', PARAM_TEXT);
+$count = optional_param('count', 5, PARAM_INT);
+$async = optional_param('async', 0, PARAM_INT);
+$batchid = optional_param('batch_id', '', PARAM_TEXT);
+$categoryname = optional_param('category_name', '', PARAM_TEXT);
+$learning_outcomes = optional_param('learning_outcomes', '', PARAM_TEXT);
+$rag_source = optional_param('rag_source', '', PARAM_TEXT);
+$rag_topic_id = optional_param('rag_topic_id', 0, PARAM_INT);
+$rag_subitem_id = optional_param('rag_subitem_id', 0, PARAM_INT);
+$category_id = optional_param('category_id', 0, PARAM_INT);
+$standard_quiz_id = optional_param('standard_quiz_id', 0, PARAM_INT);
+$new_quiz_name = optional_param('new_quiz_name', '', PARAM_TEXT);
+
+// Must match llmapi MAX_QUESTIONS (docker-compose / .env).
+$maxquestionsperrequest = 20;
+$count = min(max(1, (int)$count), $maxquestionsperrequest);
+
+// Get quiz instance
+$kwiz = $DB->get_record('kwiz', array('id' => $quizid), '*', MUST_EXIST);
+
+if ($cmid) {
+    $cm = get_coursemodule_from_id('kwiz', $cmid, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $context = context_module::instance($cm->id);
+    require_login($course, true, $cm);
+    require_capability('mod/kwiz:addinstance', $context);
+} else {
+    $course = $DB->get_record('course', array('id' => $kwiz->course), '*', MUST_EXIST);
+    require_login($course);
+    $context = context_course::instance($course->id);
+    require_capability('mod/kwiz:addinstance', $context);
+}
+
+// Track generation request lifecycle for research analytics.
+$requeststart = microtime(true);
+$requestuuid = sprintf(
+    '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+    mt_rand(0, 0xffff),
+    mt_rand(0, 0x0fff) | 0x4000,
+    mt_rand(0, 0x3fff) | 0x8000,
+    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+);
+$startedat = time();
+$generationlogid = null;
+
+// Generate questions
+try {
+    $api_url = get_config('mod_kwiz', 'llmapi_url');
+    if (empty($api_url)) {
+        $api_url = 'http://localhost:5001';
+    }
+    
+    // Get LLM backend from quiz instance, default to 'local' (Ollama)
+    $backend = isset($kwiz->llm_backend) ? $kwiz->llm_backend : 'local';
+    
+    // Use provided prompt/data/difficulty, or fall back to quiz instance values
+    $topic = !empty($prompt) ? $prompt : $kwiz->topic;
+    $level = !empty($difficulty) ? $difficulty : $kwiz->difficulty;
+    $predefined_data = !empty($data) ? $data : '';
+    $learning_outcomes = !empty($learning_outcomes) ? $learning_outcomes : (isset($kwiz->learning_outcomes) ? $kwiz->learning_outcomes : '');
+
+    // Fetch RAG content if requested (supports multiple comma-separated sources or array)
+    $rag_sources_list = [];
+    if (!empty($rag_source)) {
+        $rag_sources_list = array_filter(array_map('trim', explode(',', $rag_source)));
+    }
+    $rag_sources_arr = optional_param_array('rag_sources', [], PARAM_TEXT);
+    if (!empty($rag_sources_arr)) {
+        $rag_sources_list = array_unique(array_merge($rag_sources_list, $rag_sources_arr));
+    }
+
+    if (!empty($rag_sources_list)) {
+        $combined_rag_parts = [];
+        foreach ($rag_sources_list as $single_src) {
+            $single_src = trim($single_src);
+            if (empty($single_src)) continue;
+
+            $single_rag_text = '';
+            if ($single_src === 'auto') {
+                $preceding_cmid = kwiz_get_preceding_activity_cmid($cmid ?: $quizid);
+                if ($preceding_cmid) {
+                    $single_rag_text = kwiz_get_module_text_content($preceding_cmid);
+                }
+            } else if (strpos($single_src, 'cmid_') === 0) {
+                $source_cmid = (int) substr($single_src, 5);
+                if ($source_cmid > 0) {
+                    $single_rag_text = kwiz_get_module_text_content($source_cmid, $rag_topic_id, $rag_subitem_id);
+                }
+            } else if (strpos($single_src, 'section_') === 0) {
+                $section_num = (int) substr($single_src, 8);
+                $single_rag_text = kwiz_get_section_text_content($course->id, $section_num);
+            }
+
+            if (!empty($single_rag_text)) {
+                $combined_rag_parts[] = $single_rag_text;
+            }
+        }
+
+        if (!empty($combined_rag_parts)) {
+            $aggregated_text = implode("\n\n---\n\n", $combined_rag_parts);
+            if (!empty($predefined_data)) {
+                $predefined_data = $aggregated_text . "\n\n" . $predefined_data;
+            } else {
+                $predefined_data = $aggregated_text;
+            }
+        }
+    }
+
+    $llmmodel = property_exists($kwiz, 'llm_model') ? $kwiz->llm_model : '';
+    $userapikey = kwiz_get_user_llm_api_key($backend, $USER->id);
+
+    // Background generation: only if requested and a websocket worker is configured.
+    $ws_url = get_config('mod_kwiz', 'websocket_url');
+    if ($async && !empty($ws_url)) {
+        if (empty($batchid)) {
+            $batchid = kwiz_new_uuid();
+        }
+        $queued = kwiz_enqueue_generation_job(
+            $kwiz,
+            $USER->id,
+            $cmid,
+            $topic,
+            $level,
+            $count,
+            $kwiz->language,
+            $backend,
+            $predefined_data,
+            $llmmodel,
+            $userapikey,
+            $categoryname,
+            $batchid,
+            $learning_outcomes
+        );
+        if (isset($queued['error'])) {
+            http_response_code(500);
+            echo json_encode(array(
+                'success' => false,
+                'error' => $queued['error'],
+                'batch_id' => $batchid,
+            ));
+            exit;
+        }
+        echo json_encode(array(
+            'success' => true,
+            'async' => true,
+            'job_id' => $queued['job_id'],
+            'batch_id' => $batchid,
+            'status' => $queued['status'],
+            'status_label' => kwiz_generation_status_label($queued['status']),
+            'message' => get_string('generation_sent', 'mod_kwiz'),
+        ));
+        exit;
+    }
+
+    // Insert initial log row before calling LLM service (synchronous path).
+    $logrecord = new stdClass();
+    $logrecord->kwizid = $kwiz->id;
+    $logrecord->userid = $USER->id;
+    $logrecord->cmid = $cmid ?: null;
+    $logrecord->request_uuid = $requestuuid;
+    $logrecord->topic = core_text::substr((string)$topic, 0, 255);
+    $logrecord->difficulty = core_text::substr((string)$level, 0, 20);
+    $logrecord->language = core_text::substr((string)$kwiz->language, 0, 10);
+    $logrecord->backend = core_text::substr((string)$backend, 0, 20);
+    $logrecord->llm_model = !empty($llmmodel) ? core_text::substr((string)$llmmodel, 0, 100) : null;
+    $logrecord->api_url = core_text::substr((string)$api_url, 0, 255);
+    $logrecord->requested_count = max(0, (int)$count);
+    $logrecord->generated_count = 0;
+    $logrecord->saved_count = 0;
+    $logrecord->started_at = $startedat;
+    $logrecord->status = 'started';
+    $logrecord->timecreated = $startedat;
+    $logrecord->timemodified = $startedat;
+    $generationlogid = $DB->insert_record('kwiz_generation_logs', $logrecord);
+    
+    $questions = kwiz_generate_questions(
+        $topic,
+        $level,
+        $count, // Number of questions from form
+        $kwiz->language,
+        $backend,
+        $predefined_data,
+        $llmmodel,
+        $userapikey,
+        $learning_outcomes
+    );
+
+    // Check if result contains an error
+    if (is_array($questions) && isset($questions['error'])) {
+        if (!empty($generationlogid)) {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$questions['error'], 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('kwiz_generation_logs', $updatelog);
+        }
+        http_response_code(500);
+        echo json_encode(array(
+            'success' => false,
+            'error' => $questions['error'],
+            'api_url' => $api_url,
+            'request_uuid' => $requestuuid
+        ));
+        exit;
+    }
+    
+    if ($questions === false || empty($questions) || !is_array($questions)) {
+        if (!empty($generationlogid)) {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = 'No valid questions returned from LLM API';
+            $updatelog->timemodified = $now;
+            $DB->update_record('kwiz_generation_logs', $updatelog);
+        }
+        http_response_code(500);
+        $error_msg = 'Failed to generate questions. ';
+        $error_msg .= 'Please check:\n';
+        $error_msg .= '1. LLM API is running at: ' . $api_url . '\n';
+        $error_msg .= '2. LLM API URL is correct in plugin settings\n';
+        $error_msg .= '3. OpenAI API key is configured (if using OpenAI backend)\n';
+        $error_msg .= '4. Check Moodle error logs for details';
+        
+        echo json_encode(array(
+            'success' => false,
+            'error' => $error_msg,
+            'api_url' => $api_url,
+            'request_uuid' => $requestuuid
+        ));
+        exit;
+    }
+
+    $category_name = $categoryname;
+    $session_id = 'session_' . $kwiz->id . '_' . ($cmid ?: time());
+    $saved_count = kwiz_save_generated_questions(
+        $kwiz->id,
+        $questions,
+        $category_name,
+        $session_id,
+        $level,
+        $topic,
+        $category_id,
+        $standard_quiz_id,
+        $new_quiz_name
+    );
+
+    // Resolve quiz instance for client links
+    $stdquiz = null;
+    if ($standard_quiz_id > 0) {
+        $stdquiz = $DB->get_record('quiz', array('id' => $standard_quiz_id));
+    } else if (!empty($new_quiz_name)) {
+        $stdquiz = $DB->get_record('quiz', array('name' => $new_quiz_name, 'course' => $course->id));
+    } else {
+        $stdquiz = kwiz_get_or_create_standard_quiz($kwiz);
+    }
+    $stdquiz_cmid = 0;
+    if ($stdquiz) {
+        $cm_rec = get_coursemodule_from_instance('quiz', $stdquiz->id, $course->id);
+        $stdquiz_cmid = $cm_rec ? $cm_rec->id : 0;
+    }
+
+    $generatedcount = count($questions);
+    $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+    $durationsec = $durationms > 0 ? ($durationms / 1000.0) : 0.0;
+    $questionspersec = ($durationsec > 0 && $generatedcount > 0) ? ($generatedcount / $durationsec) : null;
+
+    if (!empty($generationlogid)) {
+        $now = time();
+        $updatelog = new stdClass();
+        $updatelog->id = $generationlogid;
+        $updatelog->session_id = $session_id;
+        $updatelog->generated_count = $generatedcount;
+        $updatelog->saved_count = $saved_count;
+        $updatelog->ended_at = $now;
+        $updatelog->duration_ms = $durationms;
+        $updatelog->questions_per_sec = $questionspersec;
+        $updatelog->status = 'success';
+        $updatelog->timemodified = $now;
+        $DB->update_record('kwiz_generation_logs', $updatelog);
+    }
+    
+    $last_meta = isset($GLOBALS['LAST_LLM_METADATA']) ? $GLOBALS['LAST_LLM_METADATA'] : array();
+    $iter_num = isset($last_meta['iteration_number']) ? (int)$last_meta['iteration_number'] : 0;
+    $iter_id = isset($last_meta['iteration_id']) ? $last_meta['iteration_id'] : '';
+    $timing_metrics = isset($last_meta['timing_metrics']) ? $last_meta['timing_metrics'] : null;
+
+    echo json_encode(array(
+        'success' => true,
+        'questions' => $questions,
+        'session_id' => $session_id,
+        'count' => $saved_count,
+        'category_name' => $category_name,
+        'quiz_id' => $stdquiz ? (int)$stdquiz->id : 0,
+        'quiz_cmid' => (int)$stdquiz_cmid,
+        'quiz_url' => $stdquiz_cmid ? (new moodle_url('/mod/quiz/view.php', array('id' => $stdquiz_cmid)))->out(false) : '',
+        'message' => 'Generated ' . $saved_count . ' questions for category: ' . ($category_name ?: 'Default'),
+        'request_uuid' => $requestuuid,
+        'iteration_number' => $iter_num,
+        'iteration_id' => $iter_id,
+        'timing_metrics' => $timing_metrics,
+        'metrics' => array(
+            'duration_ms' => $durationms,
+            'generated_count' => $generatedcount,
+            'saved_count' => $saved_count,
+            'questions_per_sec' => $questionspersec
+        )
+    ));
+    
+} catch (Exception $e) {
+    if (!empty($generationlogid)) {
+        try {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$e->getMessage(), 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('kwiz_generation_logs', $updatelog);
+        } catch (Throwable $logexception) {
+            error_log('Gamified Quiz logging update failed: ' . $logexception->getMessage());
+        }
+    }
+    http_response_code(500);
+    header('Content-Type: application/json');
+    
+    // Log the full error for debugging
+    $error_msg = 'Gamified Quiz AJAX Error: ' . $e->getMessage();
+    $error_msg .= ' in ' . $e->getFile() . ':' . $e->getLine();
+    error_log($error_msg);
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    
+    // Return detailed error (for debugging - remove sensitive info in production)
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Error generating questions: ' . $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine(),
+        'trace' => explode("\n", $e->getTraceAsString()),
+        'request_uuid' => $requestuuid
+    ));
+} catch (Error $e) {
+    if (!empty($generationlogid)) {
+        try {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$e->getMessage(), 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('kwiz_generation_logs', $updatelog);
+        } catch (Throwable $logerror) {
+            error_log('Gamified Quiz logging update failed: ' . $logerror->getMessage());
+        }
+    }
+    http_response_code(500);
+    header('Content-Type: application/json');
+    
+    $error_msg = 'Gamified Quiz Fatal Error: ' . $e->getMessage();
+    $error_msg .= ' in ' . $e->getFile() . ':' . $e->getLine();
+    error_log($error_msg);
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Fatal error: ' . $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine(),
+        'trace' => explode("\n", $e->getTraceAsString()),
+        'request_uuid' => $requestuuid
+    ));
+} catch (Throwable $e) {
+    if (!empty($generationlogid)) {
+        try {
+            $now = time();
+            $durationms = (int)round((microtime(true) - $requeststart) * 1000);
+            $updatelog = new stdClass();
+            $updatelog->id = $generationlogid;
+            $updatelog->ended_at = $now;
+            $updatelog->duration_ms = $durationms;
+            $updatelog->status = 'error';
+            $updatelog->error_message = core_text::substr((string)$e->getMessage(), 0, 1333);
+            $updatelog->timemodified = $now;
+            $DB->update_record('kwiz_generation_logs', $updatelog);
+        } catch (Throwable $logthrowable) {
+            error_log('Gamified Quiz logging update failed: ' . $logthrowable->getMessage());
+        }
+    }
+    http_response_code(500);
+    header('Content-Type: application/json');
+    
+    error_log('Gamified Quiz Throwable: ' . $e->getMessage());
+    
+    echo json_encode(array(
+        'success' => false,
+        'error' => 'Error: ' . $e->getMessage(),
+        'type' => get_class($e),
+        'request_uuid' => $requestuuid
+    ));
+}
+
