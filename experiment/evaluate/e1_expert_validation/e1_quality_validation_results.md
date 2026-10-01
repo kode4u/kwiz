@@ -9,18 +9,18 @@
 
 | Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability |
 |:---------------------|:---------:|:------------------:|:---------------:|:--------:|:-----------:|
-| Technical Correctness (TC) | 4.24 ± 1.36 | 0.610 | Moderate | 0.981 | Excellent |
-| Distractor Plausibility (DP) | 4.63 ± 0.61 | 0.571 | Moderate | 0.872 | Excellent |
-| Pedagogical Relevance (PR) | 4.86 ± 0.37 | 0.439 | Moderate | 0.764 | Excellent |
-| Code Executability (CE) | 4.94 ± 0.37 | 0.252 | Fair | 0.830 | Excellent |
-| Context Groundedness (CG) | 4.11 ± 0.98 | 0.599 | Moderate | 0.946 | Excellent |
+| Technical Correctness (TC) | 4.40 ± 1.28 | 0.263 | Fair | 0.684 | Good |
+| Distractor Plausibility (DP) | 4.71 ± 0.59 | 0.064 | Fair | 0.117 | Moderate |
+| Pedagogical Relevance (PR) | 4.93 ± 0.26 | 0.272 | Fair | 0.488 | Moderate |
+| Code Executability (CE) | 4.93 ± 0.42 | 0.113 | Fair | 0.410 | Moderate |
+| Context Groundedness (CG) | 4.37 ± 0.93 | 0.199 | Fair | 0.667 | Good |
 
 ### Topic-by-Topic Quality Breakdown
 
 | Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability | Context Groundedness |
 |:------|:---------------------:|:-----------------------:|:---------------------:|:------------------:|:--------------------:|
-| Conditionals & Boolean Control Flow | 3.64 ± 1.75 | 4.31 ± 0.67 | 4.87 ± 0.40 | 4.93 ± 0.25 | 4.51 ± 0.89 |
-| Functions & Scope | 4.68 ± 0.72 | 4.73 ± 0.52 | 4.87 ± 0.34 | 5.00 ± 0.00 | 3.83 ± 0.98 |
-| Loops & Iteration | 4.53 ± 0.91 | 4.60 ± 0.74 | 4.80 ± 0.40 | 4.82 ± 0.68 | 4.30 ± 0.85 |
-| Python Data Structures | 4.43 ± 1.18 | 4.72 ± 0.48 | 4.81 ± 0.43 | 4.99 ± 0.12 | 3.89 ± 1.01 |
-| Variables, Data Types & Type Casting | 3.70 ± 1.78 | 4.67 ± 0.57 | 4.95 ± 0.22 | 4.93 ± 0.41 | 4.18 ± 1.00 |
+| Conditionals & Boolean Control Flow | 4.29 ± 1.41 | 4.62 ± 0.58 | 4.96 ± 0.21 | 4.91 ± 0.36 | 4.69 ± 0.76 |
+| Functions & Scope | 4.78 ± 0.69 | 4.87 ± 0.34 | 4.93 ± 0.25 | 4.95 ± 0.39 | 4.30 ± 0.96 |
+| Loops & Iteration | 4.62 ± 0.92 | 4.78 ± 0.69 | 4.92 ± 0.28 | 4.83 ± 0.67 | 4.55 ± 0.70 |
+| Python Data Structures | 4.60 ± 1.05 | 4.77 ± 0.53 | 4.89 ± 0.35 | 4.99 ± 0.12 | 4.24 ± 1.01 |
+| Variables, Data Types & Type Casting | 3.62 ± 1.80 | 4.48 ± 0.68 | 4.98 ± 0.13 | 4.93 ± 0.41 | 4.17 ± 1.04 |

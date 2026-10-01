@@ -133,9 +133,9 @@ CORS(app)
 # Configuration
 LLM_BACKEND = os.getenv('LLM_BACKEND', 'local')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-6-astra')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.8-pro')
 LOCAL_LLM_URL = os.getenv('LOCAL_LLM_URL', 'http://localhost:11434')  # Ollama default
 MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', '20'))
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', 'en')

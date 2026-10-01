@@ -105,8 +105,8 @@ def verify_code_syntax(code_str: str) -> tuple[bool, str]:
     except SyntaxError as e:
         return False, f"SyntaxError: {e.msg} (line {e.lineno})"
 
-def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-4o") -> Optional[Dict[str, Any]]:
-    openai_models = [model, "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"]
+def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> Optional[Dict[str, Any]]:
+    openai_models = [model, "gpt-6-astra", "gpt-6.1-sol", "gpt-6-luna", "gpt-5.6", "gpt-4o"]
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -146,9 +146,9 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-4o") -> Optio
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-3.8-pro"
 ) -> Optional[Dict[str, Any]]:
-    gemini_models = [model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    gemini_models = [model, "gemini-3.8-pro", "gemini-3.8"]
     
     for g_model in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={api_key}"
@@ -504,12 +504,12 @@ def main():
     print(f"Loaded {len(questions)} questions from: {args.questions}")
     os.makedirs(RATING_SHEETS_DIR, exist_ok=True)
 
-    # 1. Setup R1 (OpenAI GPT-4o)
+    # 1. Setup R1 (OpenAI GPT-6: gpt-6-astra)
     r1_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R1.csv")
     r1_complete = is_sheet_complete(r1_csv, questions)
 
     if r1_complete and args.r1_backend == "auto":
-        print(f"[INFO] R1 (OpenAI GPT-4o) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R1 (OpenAI GPT-6: gpt-6-astra) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r1_backend == "ollama":
         evaluate_judge("R1", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r1_csv)
     elif args.r1_backend == "skip":
@@ -519,14 +519,14 @@ def main():
             print("\n[FATAL ERROR] OPENAI_API_KEY is missing! Evaluation requires a valid OpenAI API key.")
             print("Per instructions, fallback is disabled. Please export OPENAI_API_KEY='sk-...' or pass --openai-key.")
             sys.exit(1)
-        evaluate_judge("R1", "OpenAI GPT-4o", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
+        evaluate_judge("R1", "OpenAI GPT-6 (gpt-6-astra)", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
 
-    # 2. Setup R2 (Google Gemini 2.5 Flash)
+    # 2. Setup R2 (Google Gemini 3.8 Pro: gemini-3.8-pro)
     r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
     r2_complete = is_sheet_complete(r2_csv, questions)
 
     if r2_complete and args.r2_backend == "auto":
-        print(f"[INFO] R2 (Google Gemini 2.5 Flash) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R2 (Google Gemini 3.8 Pro: gemini-3.8-pro) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r2_backend == "ollama":
         evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     elif args.r2_backend == "skip":
@@ -541,7 +541,7 @@ def main():
             sys.exit(1)
         evaluate_judge(
             "R2",
-            "Google Gemini 2.5 Flash",
+            "Google Gemini 3.8 Pro (gemini-3.8-pro)",
             lambda p: judge_with_gemini(p, args.gemini_key),
             questions,
             r2_csv,
