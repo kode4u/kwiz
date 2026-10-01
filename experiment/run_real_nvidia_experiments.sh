@@ -15,11 +15,20 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+LLMAPI_DIR=""
+if [ -d "llmapi" ]; then
+    LLMAPI_DIR="llmapi"
+elif [ -d "../kwiz/llmapi" ]; then
+    LLMAPI_DIR="../kwiz/llmapi"
+elif [ -d "$SCRIPT_DIR/../kwiz/llmapi" ]; then
+    LLMAPI_DIR="$SCRIPT_DIR/../kwiz/llmapi"
+fi
+
 PYTHON_BIN="python3"
 if [ -f "venv/bin/python3" ]; then
     PYTHON_BIN="venv/bin/python3"
-elif [ -f "llmapi/venv/bin/python3" ]; then
-    PYTHON_BIN="llmapi/venv/bin/python3"
+elif [ -n "$LLMAPI_DIR" ] && [ -f "$LLMAPI_DIR/venv/bin/python3" ]; then
+    PYTHON_BIN="$LLMAPI_DIR/venv/bin/python3"
 fi
 
 RUN_E1=false
@@ -102,7 +111,7 @@ if [ "$RUN_E2" = true ] || [ "$RUN_E4" = true ]; then
         export OLLAMA_EMBED_MODEL=nomic-embed-text
         export FLASK_PORT=5001
         
-        $PYTHON_BIN llmapi/app.py > /tmp/llmapi_nvidia.log 2>&1 &
+        $PYTHON_BIN "${LLMAPI_DIR:-llmapi}/app.py" > /tmp/llmapi_nvidia.log 2>&1 &
         API_PID=$!
         API_STARTED=true
         
@@ -166,7 +175,9 @@ fi
 if [ "$RUN_E2" = true ]; then
     echo ""
     echo "[Step 3] Executing Experiment 2: Physical Pipeline Ablation (Table 2)..."
-    rm -f llmapi/embeddings_cache.json
+    if [ -n "$LLMAPI_DIR" ]; then
+        rm -f "$LLMAPI_DIR/embeddings_cache.json"
+    fi
     $PYTHON_BIN evaluate/e2_pipeline_ablation/run_ablation_experiment.py \
         --api-url http://localhost:5001 \
         --backend local \

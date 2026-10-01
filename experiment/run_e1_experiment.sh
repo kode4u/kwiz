@@ -11,11 +11,20 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+LLMAPI_DIR=""
+if [ -d "llmapi" ]; then
+    LLMAPI_DIR="llmapi"
+elif [ -d "../kwiz/llmapi" ]; then
+    LLMAPI_DIR="../kwiz/llmapi"
+elif [ -d "$SCRIPT_DIR/../kwiz/llmapi" ]; then
+    LLMAPI_DIR="$SCRIPT_DIR/../kwiz/llmapi"
+fi
+
 PYTHON_BIN="python3"
 if [ -f "venv/bin/python3" ]; then
     PYTHON_BIN="venv/bin/python3"
-elif [ -f "llmapi/venv/bin/python3" ]; then
-    PYTHON_BIN="llmapi/venv/bin/python3"
+elif [ -n "$LLMAPI_DIR" ] && [ -f "$LLMAPI_DIR/venv/bin/python3" ]; then
+    PYTHON_BIN="$LLMAPI_DIR/venv/bin/python3"
 fi
 
 echo "========================================================================"
