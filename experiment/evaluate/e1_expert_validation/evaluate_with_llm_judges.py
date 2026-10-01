@@ -115,13 +115,16 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> 
     for o_model in openai_models:
         payload = {
             "model": o_model,
-            "temperature": 0.1,
             "response_format": {"type": "json_object"},
             "messages": [
                 {"role": "system", "content": RUBRIC_PROMPT},
                 {"role": "user", "content": prompt}
             ]
         }
+        # Only include temperature for models that support non-default temperature values
+        if not (o_model.startswith("gpt-6") or o_model.startswith("o1") or o_model.startswith("o3")):
+            payload["temperature"] = 0.1
+
         for attempt in range(4):
             try:
                 resp = requests.post(url, headers=headers, json=payload, timeout=60)
@@ -129,6 +132,14 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> 
                     data = resp.json()
                     content = data["choices"][0]["message"]["content"]
                     return json.loads(content)
+                elif resp.status_code == 400 and "temperature" in resp.text:
+                    if "temperature" in payload:
+                        print(f" [OpenAI 400 on {o_model}: temperature unsupported, retrying without temperature]...", end="", flush=True)
+                        del payload["temperature"]
+                        continue
+                    else:
+                        print(f" [OpenAI Error {resp.status_code} on {o_model}]: {resp.text[:120]}")
+                        time.sleep(2)
                 elif resp.status_code == 429:
                     wait_time = 5 * (attempt + 1)
                     print(f" [OpenAI Rate Limit 429 on {o_model}: waiting {wait_time}s]...", end="", flush=True)

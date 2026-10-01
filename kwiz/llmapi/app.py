@@ -615,15 +615,18 @@ Format as JSON array:
   }}
 ]"""
 
-        response = client.chat.completions.create(
-            model=OPENAI_MODEL,
-            messages=[
+        openai_kwargs = {
+            "model": OPENAI_MODEL,
+            "messages": [
                 {"role": "system", "content": "You are an expert educational content generator. Always return valid JSON."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7,
-            max_tokens=2000
-        )
+            "max_tokens": 2000
+        }
+        if not (OPENAI_MODEL.startswith("gpt-6") or OPENAI_MODEL.startswith("o1") or OPENAI_MODEL.startswith("o3")):
+            openai_kwargs["temperature"] = 0.7
+
+        response = client.chat.completions.create(**openai_kwargs)
         
         content = response.choices[0].message.content or ""
         questions_data = parse_llm_json(content)

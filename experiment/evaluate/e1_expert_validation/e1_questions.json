@@ -1,28 +1,28 @@
 [
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nx = 5\ny = '10'\nz = x + y\nprint(z)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nx = 5\ny = x + 3\nz = y * 2\nprint(z)\n```",
     "choices": [
       {
-        "text": "15",
-        "is_correct": false
-      },
-      {
-        "text": "510",
+        "text": "16",
         "is_correct": true
       },
       {
-        "text": "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+        "text": "14",
         "is_correct": false
       },
       {
-        "text": "'x' is not defined",
+        "text": "10",
+        "is_correct": false
+      },
+      {
+        "text": "8",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code attempts to add an integer (5) and a string ('10'), which results in a TypeError because Python does not support direct addition of different types. The correct output is 'TypeError: unsupported operand type(s) for +: 'int' and 'str'.",
+    "explanation": "The code initializes x to 5, then calculates y as x + 3 (which is 8), and finally z as y * 2 (which is 16). The print statement outputs the value of z.",
     "question_id": "Q001",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Python variable assignment, dynamic typing, and object identity",
@@ -65,14 +65,14 @@
         "is_correct": false
       },
       {
-        "text": "Error: division by zero",
+        "text": "SyntaxError",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code performs float division between two integers. In Python, when dividing two integers using the `/` operator, it returns a float result. Therefore, `int_a / int_b` equals `3.3333333333333335`. Options A and C are incorrect because they represent integer division or an error respectively. Option D is also incorrect as there is no division by zero in the code.",
+    "explanation": "The code performs floating-point division because both `int_a` and `int_b` are integers, but the `/` operator in Python 3 performs true division. The result is a float with high precision.",
     "question_id": "Q002",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Python integer and float numeric operations and arithmetic division",
@@ -100,29 +100,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nx = 42\ny = 'Hello'\nx = y\ntype(x)\n```",
+    "question": "What is the output of the following code snippet?\n```python\nx = 42\ny = 'hello'\nz = x + y\nprint(z)\n```",
     "choices": [
       {
-        "text": "<class 'int'>",
-        "is_correct": false
-      },
-      {
-        "text": "<class 'str'>",
+        "text": "'42hello'",
         "is_correct": true
       },
       {
-        "text": "<class 'float'>",
+        "text": "TypeError",
         "is_correct": false
       },
       {
-        "text": "<class 'bool'>",
+        "text": "SyntaxError",
+        "is_correct": false
+      },
+      {
+        "text": "None",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet first assigns the integer value 42 to variable x. Then, it assigns the string 'Hello' to y and reassigns this value to x. The type() function is then called on x, which returns <class 'str'> because the last assigned value to x was a string.",
+    "explanation": "The code attempts to add an integer (x) and a string (y), which is not allowed in Python. This results in a TypeError because you cannot concatenate different types directly.",
     "question_id": "Q003",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Python type() inspection function and built-in type names",
@@ -150,29 +150,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nint_num = 5.0\nint_from_int = int(int_num)\nprint(int_from_int)\n```",
+    "question": "What is the output of the following code snippet?\n```python\nint_num = 5.7\nint_from_float = int(int_num)\nprint(int_from_float)\n```",
     "choices": [
       {
         "text": "5",
-        "is_correct": true
-      },
-      {
-        "text": "5.0",
         "is_correct": false
       },
       {
         "text": "6",
+        "is_correct": true
+      },
+      {
+        "text": "5.7",
         "is_correct": false
       },
       {
-        "text": "Error: cannot convert float to int",
+        "text": "TypeError",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `int()` function truncates the decimal part of a floating-point number when converting it to an integer. Therefore, `int_from_int` will be 5.",
+    "explanation": "The `int()` function truncates the decimal part of a float, resulting in 5. The correct answer is 6.",
     "question_id": "Q004",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Explicit type casting using int() from float and string",
@@ -200,7 +200,7 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nint_num = 5\nfloat_from_int = float(int_num)\nprint(float_from_int)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nint_num = 5\nfloat_from_int = float(int_num)\nprint(float_from_int)\n```",
     "choices": [
       {
         "text": "5",
@@ -211,7 +211,7 @@
         "is_correct": true
       },
       {
-        "text": "TypeError: 'float' object is not callable",
+        "text": "TypeError: 'int' object is not callable",
         "is_correct": false
       },
       {
@@ -222,7 +222,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `float()` function converts the integer `int_num` to a floating-point number. The correct output is `5.0`. Option A is incorrect because it does not include the decimal point. Option C is incorrect because there is no error in the code; it simply converts an integer to a float. Option D is incorrect because there are no syntax errors in the code.",
+    "explanation": "The code snippet converts an integer to a float using the `float()` function. The correct output is `5.0`. Choice A is incorrect because it does not include the decimal point, which is part of the float representation. Choice C is incorrect because there is no error in the code; it simply performs type casting. Choice D is incorrect because there are no syntax errors in the code.",
     "question_id": "Q005",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Explicit type casting using float() from integer and string",
@@ -250,14 +250,10 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the output of the following code snippet?\n```python\nage = 30\nprint(str(age) + ' years old')\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nage = 30\nprint(str(age) + ' years old')\n```",
     "choices": [
       {
         "text": "30 years old",
-        "is_correct": false
-      },
-      {
-        "text": "'30' years old",
         "is_correct": true
       },
       {
@@ -265,14 +261,18 @@
         "is_correct": false
       },
       {
+        "text": "'age' is not defined",
+        "is_correct": false
+      },
+      {
         "text": "SyntaxError: invalid syntax",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code attempts to concatenate a string with an integer. In Python, integers cannot be directly concatenated with strings. The correct way is to use the `str()` function to convert the integer to a string before concatenation.",
+    "explanation": "The code correctly converts the integer variable `age` to a string using `str(age)` and then concatenates it with another string. This demonstrates explicit type casting from an integer to a string in Python.",
     "question_id": "Q006",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Explicit type casting using str() from numbers",
@@ -300,29 +300,29 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the output of the following Python code snippet?\n```python\na = 5\nb = '10'\nc = a + b\nprint(c)\n```",
+    "question": "What is the output of the following Python code?\n```python\na = '5'\nb = 3\nprint(a + b)\n```",
     "choices": [
       {
-        "text": "15",
+        "text": "8",
         "is_correct": false
       },
       {
-        "text": "510",
+        "text": "'53'",
         "is_correct": true
       },
       {
-        "text": "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+        "text": "Error: unsupported operand type(s) for +: 'str' and 'int'",
         "is_correct": false
       },
       {
-        "text": "SyntaxError: invalid syntax",
+        "text": "10",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code attempts to add an integer (a) and a string (b). In Python, the '+' operator is overloaded for different types. When used with an integer and a string, it performs string concatenation rather than numeric addition. Therefore, '5' + '10' results in '510'. The correct answer is B.",
+    "explanation": "The code attempts to concatenate a string ('5') and an integer (3). In Python, the '+' operator is overloaded for strings to perform concatenation. Therefore, '5' + 3 results in the string '53'. The other options are incorrect because they either involve unsupported operations or incorrect type handling.",
     "question_id": "Q007",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "String concatenation with plus operator vs numeric addition",
@@ -372,7 +372,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code attempts to add an integer (`age`) and a string (`name`). In Python, integers and strings cannot be added directly. The correct output is the concatenated string '30Alice'. Choice C represents the actual error that would occur if this code were run, which is a TypeError because you cannot perform addition between incompatible types.",
+    "explanation": "The code attempts to add an integer (`age`) and a string (`name`). In Python, you cannot directly add these types. The correct output is the concatenated string '30Alice'. Choice A (60) is incorrect because it assumes integer addition. Choice C ('TypeError: unsupported operand type(s) for +: 'int' and 'str'') is the correct answer as it accurately describes the error that would occur if you tried to run this code. Choice D ('SyntaxError: invalid syntax') is incorrect because there are no syntax errors in the provided code.",
     "question_id": "Q008",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "TypeError when adding incompatible types like integer and string",
@@ -400,7 +400,7 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\na = True\nb = False\nc = a or b\nprint(c)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nx = True\ny = False\nprint(x or y)\n```",
     "choices": [
       {
         "text": "True",
@@ -422,7 +422,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The 'or' operator in Python returns True if at least one of the operands is True. Here, both a and b are False, but since 'or' short-circuits and stops at the first True value, it does not reach the second operand. Therefore, c will be assigned False.",
+    "explanation": "The 'or' operator returns True if at least one of the operands is True. In this case, x (True) or y (False), so the output is True.",
     "question_id": "Q009",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Python boolean literals True and False and bool() conversion",
@@ -450,14 +450,14 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the output of the following Python code snippet?\n```python\nx = 42\nx = 'Hello'\nx = False\nprint(x)\n```",
+    "question": "What will be the output of the following code snippet?\n```python\nx = 42\nx = 'Hello'\nx = False\nprint(x)\n```",
     "choices": [
       {
         "text": "False",
         "is_correct": true
       },
       {
-        "text": "42",
+        "text": "0",
         "is_correct": false
       },
       {
@@ -465,14 +465,14 @@
         "is_correct": false
       },
       {
-        "text": "TypeError",
+        "text": "42",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The variable `x` is initially assigned an integer value of 42. It is then reassigned a string value 'Hello', and finally a boolean value False. The last assignment to `x` is the one that will be printed, which is False.",
+    "explanation": "The variable `x` is reassigned three times. First, it's assigned an integer value of 42. Then, it's reassigned a string value 'Hello'. Finally, it's reassigned a boolean value False. The print statement outputs the last assigned value of `x`, which is False.",
     "question_id": "Q010",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Variable reassignment to different data types during execution",
@@ -507,11 +507,11 @@
         "is_correct": false
       },
       {
-        "text": "'c'",
+        "text": "'i'",
         "is_correct": true
       },
       {
-        "text": "'l'",
+        "text": "'c'",
         "is_correct": false
       },
       {
@@ -522,7 +522,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet prints the character at index 2 of the string 'Alice'. In Python, indexing starts at 0. Therefore, name[2] refers to the third character in the string, which is 'c'.",
+    "explanation": "The code snippet prints the character at index 2 of the string 'Alice'. In Python, indexing starts at 0. Therefore, name[2] refers to the third character in the string, which is 'i'.",
     "question_id": "Q011",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Python string indexing and character extraction",
@@ -550,29 +550,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nname = 'Alice'\nlength = len(name)\nprint(length)\n```",
+    "question": "What is the output of the following code snippet?\n```python\nname = 'Alice'\nlength = len(name)\nprint(length)\n```",
     "choices": [
       {
-        "text": "A. 4",
+        "text": "3",
         "is_correct": false
       },
       {
-        "text": "B. 5",
+        "text": "4",
         "is_correct": true
       },
       {
-        "text": "C. 6",
+        "text": "5",
         "is_correct": false
       },
       {
-        "text": "D. Error",
+        "text": "6",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `len()` function returns the number of characters in a string. The string 'Alice' has 5 characters, so the output is 5.",
+    "explanation": "The `len()` function returns the number of characters in a string. The string 'Alice' has 4 characters, so the output is 4.",
     "question_id": "Q012",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "String length calculation using len() function",
@@ -600,7 +600,7 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\na = 10\nb = 3\nc = a // b\nd = a % b\nprint(c, d)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\na = 10\nb = 3\nc = a // b\nd = a % b\nprint(c, d)\n```",
     "choices": [
       {
         "text": "3 1",
@@ -615,14 +615,14 @@
         "is_correct": false
       },
       {
-        "text": "6 -1",
+        "text": "2 6",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "In Python, the floor division operator // performs division and rounds down to the nearest whole number. For a = 10 and b = 3, 10 // 3 equals 3. The modulus operator % returns the remainder of the division. So, 10 % 3 equals 1. Therefore, the output is '3 1'.",
+    "explanation": "The floor division operator // returns the largest whole number less than or equal to the division result. For a = 10 and b = 3, 10 // 3 equals 3. The modulo operator % returns the remainder of the division. For a = 10 and b = 3, 10 % 3 equals 1.",
     "question_id": "Q013",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Integer floor division // and modulus % remainder operators",
@@ -650,29 +650,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nx = 2\ny = 3\nresult = x ** y + 1\nprint(result)\n```",
+    "question": "What is the output of the following code snippet?\n```python\na = 2\nb = 3\nc = a ** b + b * a\nprint(c)\n```",
     "choices": [
       {
-        "text": "8",
+        "text": "14",
         "is_correct": false
       },
       {
-        "text": "9",
+        "text": "17",
         "is_correct": true
       },
       {
-        "text": "10",
+        "text": "20",
         "is_correct": false
       },
       {
-        "text": "12",
+        "text": "25",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet calculates the result of x raised to the power of y and then adds 1. Here, x = 2 and y = 3, so 2 ** 3 is 8. Adding 1 to 8 gives 9.",
+    "explanation": "The code calculates `c = a ** b + b * a`. Here, `a ** b` is 2^3 = 8 and `b * a` is 3 * 2 = 6. Therefore, `c = 8 + 6 = 14`. The correct answer is A.",
     "question_id": "Q014",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Exponentiation operator ** vs multiplication",
@@ -700,7 +700,7 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the value of `x` after executing the following code snippet?\n```python\nx = 5\nx += 3\nprint(x)\n```",
+    "question": "What is the value of `x` after executing the following code snippet?\n```python\nx = 5\nx += 3\nprint(x)\n```",
     "choices": [
       {
         "text": "8",
@@ -722,7 +722,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet initializes `x` to 5 and then uses the compound assignment operator `+=` to add 3 to `x`. This is equivalent to `x = x + 3`, resulting in `x` being 8. Option A (8) is correct, while options B (7), C (6), and D (9) are incorrect off-by-one errors.",
+    "explanation": "The code snippet uses the compound assignment operator `+=` to add 3 to the current value of `x`. Initially, `x` is assigned the value 5. After executing `x += 3`, `x` becomes 8. The print statement then outputs this new value.",
     "question_id": "Q015",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Compound assignment operators += and -=",
@@ -750,29 +750,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nname = 'Alice'\nrepeated_name = name * 3\nprint(repeated_name)\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\nname = 'Alice'\nrepeated_name = name * 3\nprint(repeated_name)\n```",
     "choices": [
       {
-        "text": "AliceAliceAlice",
+        "text": "'AliceAlice'",
+        "is_correct": false
+      },
+      {
+        "text": "'AliceAliceAlice'",
         "is_correct": true
       },
       {
-        "text": "Alice, Alice, Alice",
+        "text": "'Alice3'",
         "is_correct": false
       },
       {
-        "text": "Alice*3",
-        "is_correct": false
-      },
-      {
-        "text": "Error: unsupported operand type(s) for *: 'str' and 'int'",
+        "text": "TypeError",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet multiplies the string 'Alice' by 3 using the multiplication operator *. This results in the string being repeated three times, producing 'AliceAliceAlice'. Choice B is incorrect because it suggests a different output format. Choice C is wrong as it shows an attempt to use the multiplication operator on incompatible types (string and integer). Choice D is incorrect because there is no error; the operation is valid.",
+    "explanation": "The multiplication operator * is used to repeat a string in Python. In this case, 'Alice' is repeated 3 times resulting in 'AliceAliceAlice'. Choice A and C are incorrect because they show an off-by-one error or misunderstanding of the operation. Choice D is incorrect because there is no type error; the operation completes successfully.",
     "question_id": "Q016",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "String repetition using multiplication operator *",
@@ -800,29 +800,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\na = True\nb = False\nc = int(a) + int(b)\nprint(c)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nx = True\ny = int(x)\nprint(y)\n```",
     "choices": [
-      {
-        "text": "0",
-        "is_correct": false
-      },
       {
         "text": "1",
         "is_correct": true
       },
       {
-        "text": "2",
+        "text": "-1",
         "is_correct": false
       },
       {
-        "text": "-1",
+        "text": "0",
+        "is_correct": false
+      },
+      {
+        "text": "TypeError",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `int(True)` converts the boolean value True to the integer 1, and `int(False)` converts it to 0. Therefore, `c = int(a) + int(b)` results in `c = 1 + 0`, which equals 1.",
+    "explanation": "The code converts the boolean value True to an integer using int(True), which results in 1. The other options are incorrect because False would result in 0, and there is no error in the code.",
     "question_id": "Q017",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Converting boolean to integer int(True) and int(False)",
@@ -850,29 +850,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nstr_num = \"123\"\nint_num = int(str_num)\nprint(int_num)\n```\nWhat will be the output of this code?",
+    "question": "What is the output of the following code snippet?\n```python\nstr_num = \"123\"\nint_num = int(str_num)\nprint(int_num + 5)\n```",
     "choices": [
       {
-        "text": "123",
-        "is_correct": false
-      },
-      {
-        "text": "124",
-        "is_correct": false
+        "text": "128",
+        "is_correct": true
       },
       {
         "text": "Error: invalid literal for int() with base 10: '123'",
-        "is_correct": true
+        "is_correct": false
+      },
+      {
+        "text": "1235",
+        "is_correct": false
       },
       {
         "text": "TypeError: can only concatenate str (not \"int\") to str",
         "is_correct": false
       }
     ],
-    "correct_index": 2,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code attempts to convert a string '123' to an integer using the int() function. Since '123' is a valid string representation of an integer, there will be no error and the output will be 123. Option A is incorrect because it does not match the expected output. Option B is incorrect because it suggests an off-by-one error, which is not applicable here. Option D is incorrect because it suggests a type error, but int() can handle string representations of integers without issues.",
+    "explanation": "The code converts the string '123' to an integer using int(str_num), resulting in 123. Then, it adds 5 to this integer, producing 128. The other choices are incorrect because they either involve errors or incorrect operations.",
     "question_id": "Q018",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Handling string numbers with int() and float() conversion",
@@ -900,29 +900,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\na = 5\nb = 3\nc = a + b * 2\nprint(c)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\na = 5\nb = 3\nc = a * b + 2\nprint(c)\n```",
     "choices": [
       {
-        "text": "14",
+        "text": "17",
         "is_correct": false
       },
       {
-        "text": "11",
+        "text": "16",
         "is_correct": true
       },
       {
-        "text": "9",
+        "text": "18",
         "is_correct": false
       },
       {
-        "text": "8",
+        "text": "15",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet calculates the value of `c` using operator precedence. According to Python rules, multiplication is performed before addition. Therefore, `b * 2` is calculated first, resulting in `3 * 2 = 6`. Then, this result is added to `a`, giving `5 + 6 = 11`. Thus, the output is `11`.",
+    "explanation": "The code snippet calculates the value of `c` using the expression `a * b + 2`. According to operator precedence, multiplication (`*`) is performed before addition (`+`). Therefore, `a * b` equals `5 * 3 = 15`, and then adding 2 gives `17`. The correct output is 16.",
     "question_id": "Q019",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Operator precedence: multiplication and division before addition",
@@ -950,29 +950,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nage = 30\nAge = 45\nprint(age)\n``` What will be the output of this code?\n",
+    "question": "What is the output of the following Python code snippet?\n```python\nx = 5\ny = '10'\nz = x + y\nprint(z)\n```",
     "choices": [
       {
-        "text": "30",
+        "text": "15",
+        "is_correct": false
+      },
+      {
+        "text": "510",
         "is_correct": true
       },
       {
-        "text": "45",
+        "text": "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
         "is_correct": false
       },
       {
-        "text": "Error: NameError",
-        "is_correct": false
-      },
-      {
-        "text": "Error: SyntaxError",
+        "text": "'x' is not defined",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code declares a variable named 'age' with the value 30. The second line attempts to declare another variable with the same name but different case ('Age'), which is not allowed in Python due to its case-sensitive nature. Therefore, the first declaration takes precedence, and the output will be 30.",
+    "explanation": "The code attempts to add an integer (5) and a string ('10'). In Python, you cannot directly add different data types. The correct behavior is to concatenate the string representations of the variables, resulting in '510'.",
     "question_id": "Q020",
     "topic": "Variables, Data Types & Type Casting",
     "learning_objective": "Variable naming conventions and case sensitivity in Python",
@@ -1000,29 +1000,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following Python code snippets correctly accesses the last element of a list named `my_list` that contains `[10, 'hello', 3.14, True]`?\n```python\n# code here\n```",
+    "question": "Consider the following Python code snippet:\n```python\nmy_list = [10, 'hello', 3.14, True]\nprint(my_list[2])\n```",
     "choices": [
       {
-        "text": "print(my_list[-2])",
+        "text": "Output: 10",
         "is_correct": false
       },
       {
-        "text": "print(my_list[-1])",
+        "text": "Output: 3.14",
         "is_correct": true
       },
       {
-        "text": "print(my_list[3])",
+        "text": "Output: 'hello'",
         "is_correct": false
       },
       {
-        "text": "print(my_list[0])",
+        "text": "Error: Index out of range",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is `print(my_list[-1])` because in Python, negative indices start from -1, where -1 refers to the last element of the list. The other choices are incorrect: `my_list[-2]` would access the second-to-last element, `my_list[3]` would access the fourth element (which is True), and `my_list[0]` would access the first element.",
+    "explanation": "The code snippet defines a list `my_list` with four elements. The index used to access the element is 2, which corresponds to the third element in the list (since Python uses zero-based indexing). Therefore, the output should be 3.14.",
     "question_id": "Q021",
     "topic": "Python Data Structures",
     "learning_objective": "Python list creation, element types, and zero-based positive indexing",
@@ -1050,29 +1050,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following Python code snippets correctly accesses the last element of a list using negative indexing?",
+    "question": "Given the following Python code snippet, what will be the output of `print(my_list[-3])`?\n```python\nmy_list = [10, 'hello', 3.14, True]\n```",
     "choices": [
       {
-        "text": "my_list[-2]",
+        "text": "10",
         "is_correct": false
       },
       {
-        "text": "my_list[-1]",
+        "text": "'hello'",
         "is_correct": true
       },
       {
-        "text": "my_list[0]",
+        "text": "3.14",
         "is_correct": false
       },
       {
-        "text": "my_list[len(my_list)-1]",
+        "text": "True",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is my_list[-1], which accesses the last element of a list using negative indexing. Negative indices in Python start from -1 for the last item, so my_list[-1] correctly retrieves the last element. The other options are incorrect because they either access an element before the last one (my_list[-2]) or use a more verbose method that does not utilize negative indexing (my_list[len(my_list)-1]).",
+    "explanation": "The correct answer is 'hello'. Negative indexing in Python starts from -1, so my_list[-3] accesses the third element from the end of the list. The first element is at index 0, the second at index 1, and the third at index 2. Therefore, my_list[-3] returns 'hello'.",
     "question_id": "Q022",
     "topic": "Python Data Structures",
     "learning_objective": "Negative indexing in Python lists accessing elements from the end",
@@ -1096,33 +1096,33 @@
         "text": "duplicated\nSyntax\n[item1, item2]\n--- Page 13 ---\nChoosing the Right Data Structure\nSelecting the appropriate data structure is crucial for efficient Python code. Consider these guidelines based on your needs:\nUse Lists When:\nYou need an ordered collection that can be modified after creation\nImplementing dynamic collections, stacks, or queues\nOrder of elements matters for your algorithm\nUse Tuples When:\nYou need an ordered collection that should not be changed\nRepresenting fixed collections of related data (coordinates)"
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
     "question": "Which of the following code snippets correctly demonstrates in-place mutability of a list?",
     "choices": [
       {
-        "text": "```python\nmy_list = [1, 2, 3]\nnew_list = my_list.append(4)\nprint(new_list)\n```",
+        "text": "```python\nmy_list = [1, 2, 3]\nnew_list = my_list + [4]\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nmy_list = [1, 2, 3]\nmy_list[0] = 10\nprint(my_list)\n```",
+        "text": "```python\nmy_list = [1, 2, 3]\nmy_list[0] = 10\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nmy_list = (1, 2, 3)\nmy_list[0] = 10\nprint(my_list)\n```",
+        "text": "```python\nmy_list = (1, 2, 3)\nmy_list[0] = 10\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nmy_dict = {'a': 1, 'b': 2}\nmy_dict['c'] = 3\nprint(my_dict)\n```",
+        "text": "```python\ndict_example = {'a': 1, 'b': 2}\ndict_example['c'] = 3\n```",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer demonstrates in-place mutability of a list by changing the value at index 0 to 10. The `append` method does not return the modified list, so using it in this context is incorrect. Tuples are immutable, and dictionaries allow adding new key-value pairs but do not modify existing ones in place.",
+    "explanation": "The correct answer demonstrates in-place mutability of a list by changing the value at an existing index. Option A creates a new list instead of modifying the original one, making it incorrect. Option C attempts to modify a tuple, which is immutable, so it's also incorrect. Option D modifies a dictionary, not a list.",
     "question_id": "Q023",
     "topic": "Python Data Structures",
     "learning_objective": "List element reassignment and in-place mutability",
@@ -1150,29 +1150,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following Python code snippets correctly slices a list to get elements from index 2 to 4 (inclusive) using list slicing syntax?",
+    "question": "Which of the following Python code snippets correctly slices a list to get elements from index 2 to 4 (inclusive)? ```python\nmy_list = [10, 20, 30, 40, 50]\nsliced_list = my_list[2:5]\n```",
     "choices": [
       {
-        "text": "```python\nmy_list = [1, 2, 3, 4, 5]\nsliced_list = my_list[2:5]\n```",
+        "text": "sliced_list will be [30, 40, 50]",
+        "is_correct": false
+      },
+      {
+        "text": "sliced_list will be [20, 30, 40]",
         "is_correct": true
       },
       {
-        "text": "```python\nmy_list = [1, 2, 3, 4, 5]\nsliced_list = my_list[2:4]\n```",
+        "text": "sliced_list will be [10, 20, 30]",
         "is_correct": false
       },
       {
-        "text": "```python\nmy_list = [1, 2, 3, 4, 5]\nsliced_list = my_list[1:4]\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nmy_list = [1, 2, 3, 4, 5]\nsliced_list = my_list[0:4]\n```",
+        "text": "sliced_list will be [30, 40]",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is A. The slicing syntax `my_list[start:stop]` includes the element at the start index but excludes the element at the stop index. Therefore, to get elements from index 2 to 4 (inclusive), we use `my_list[2:5]`. Choices B, C, and D have errors in either the start or stop index.",
+    "explanation": "The slicing syntax in Python is list[start:stop], where start is inclusive and stop is exclusive. Therefore, my_list[2:5] will include elements at indices 2, 3, and 4, which are 30, 40, and 50 respectively.",
     "question_id": "Q024",
     "topic": "Python Data Structures",
     "learning_objective": "List slicing syntax list[start:stop] and boundary rules",
@@ -1200,29 +1200,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nmy_list = [10, 'hello', 3.14, True]\nsliced_list = my_list[1:4:2]\nprint(sliced_list)\n```",
+    "question": "Which of the following Python code snippets correctly slices a list to get elements from index 2 to 5 with a step of 2?\n```python\nmy_list = [10, 'hello', 3.14, True, False, 'world']\nsliced_list = my_list[2:6:2]\nprint(sliced_list)\n```",
     "choices": [
       {
-        "text": "[10, 'hello']",
+        "text": "[3.14, False]",
         "is_correct": false
       },
       {
-        "text": "['hello', 3.14]",
+        "text": "[3.14, 'world']",
         "is_correct": true
       },
       {
-        "text": "[3.14, True]",
+        "text": "[True, False]",
         "is_correct": false
       },
       {
-        "text": "[True]",
+        "text": "[False, 'world']",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The slicing operation my_list[1:4:2] starts at index 1 and ends before index 4, taking every second element. Thus, it selects 'hello' and 3.14.",
+    "explanation": "The correct slice is my_list[2:6:2], which starts at index 2 (3.14), ends before index 6 ('world'), and steps by 2, resulting in [3.14, 'world']. The other options either have incorrect starting or ending indices, or they do not follow the specified step.",
     "question_id": "Q025",
     "topic": "Python Data Structures",
     "learning_objective": "List slicing with step list[start:stop:step]",
@@ -1250,7 +1250,7 @@
     "ast_error": ""
   },
   {
-    "question": "Given the following Python code snippet, what will be the output of `print(my_list[:2])`?\n```python\nmy_list = [10, 'hello', 3.14, True]\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\nmy_list = [10, 'hello', 3.14, True]\nprint(my_list[:2])\n```",
     "choices": [
       {
         "text": "[10, 'hello']",
@@ -1272,7 +1272,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet defines a list `my_list` with four elements. When slicing the list using `my_list[:2]`, it accesses all elements from the beginning of the list up to, but not including, the element at index 2. Therefore, the output will be `[10, 'hello']`. The other options are incorrect because they either include too many or too few elements.",
+    "explanation": "The code snippet slices the list `my_list` from the beginning up to but not including index 2. In Python, slicing with a single end index starts at the beginning of the list and goes up to (but does not include) that index. Therefore, `my_list[:2]` results in `[10, 'hello']`. The other options are incorrect because they either include too many elements or start from an incorrect index.",
     "question_id": "Q026",
     "topic": "Python Data Structures",
     "learning_objective": "Omitting start or stop in list slicing list[:end] and list[start:]",
@@ -1300,29 +1300,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly reverses a list using slicing in Python?\n```python\nmy_list = [1, 2, 3, 4, 5]\n# Code here\nprint(my_list)\n```",
+    "question": "Which of the following code snippets correctly reverses a list using slicing? ```python\nmy_list = [1, 2, 3, 4, 5]\nreversed_list = my_list[::-1]\n```",
     "choices": [
       {
-        "text": "my_list[::-1]",
+        "text": "Choice A text",
         "is_correct": false
       },
       {
-        "text": "my_list.reverse()",
-        "is_correct": false
-      },
-      {
-        "text": "my_list = my_list[::-1]",
+        "text": "Choice B text",
         "is_correct": true
       },
       {
-        "text": "my_list = list(reversed(my_list))",
+        "text": "Choice C text",
+        "is_correct": false
+      },
+      {
+        "text": "Choice D text",
         "is_correct": false
       }
     ],
-    "correct_index": 2,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is my_list = my_list[::-1]. This line of code creates a new reversed copy of the list and assigns it back to my_list. The other options either do not reverse the list in place or use methods that are not slicing.",
+    "explanation": "The correct answer is B. The slicing `my_list[::-1]` correctly reverses the list by starting from the end and moving backwards, creating a new list with elements in reverse order.",
     "question_id": "Q027",
     "topic": "Python Data Structures",
     "learning_objective": "Reversing a list using slicing list[::-1]",
@@ -1346,14 +1346,14 @@
         "text": "lookups\n--- Page 2 ---\nIntroduction to Python Data Structures\nIn Python, data structures are fundamental tools for \ntools for organizing and storing data efficiently.\nefficiently.\nThey provide a structured way to manage collections \ncollections of information, making it easier to access, \naccess, modify, and process data within your \nprograms.\nKey Benefits:\n• Efficient data organization\n• Optimized data retrieval\n• Simplified data manipulation\n• Improved program readability\nLists\nDynamic arrays that are ordered and "
       }
     ],
-    "ast_valid": true,
-    "ast_error": ""
+    "ast_valid": false,
+    "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nmy_list = [10, 'hello']\nmy_list.append(3.14)\nprint(my_list)\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\nmy_list = [10, 'hello']\nmy_list.append(3)\nprint(my_list)\n```",
     "choices": [
       {
-        "text": "[10, 'hello', 3.14]",
+        "text": "[10, 'hello', 3]",
         "is_correct": true
       },
       {
@@ -1361,18 +1361,18 @@
         "is_correct": false
       },
       {
-        "text": "[10, 'hello', 3.14, 3.14]",
+        "text": "[3, 10, 'hello']",
         "is_correct": false
       },
       {
-        "text": "[3.14, 10, 'hello']",
+        "text": "[10, 'hello', 2]",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `append()` method adds an item to the end of the list. In this case, 3.14 is added to the existing list `[10, 'hello']`, resulting in `[10, 'hello', 3.14]`. The other options are incorrect because they either miss the new element or have it in the wrong position.",
+    "explanation": "The `append()` method adds an item to the end of the list. In this case, `3` is added to the end of `my_list`, resulting in `[10, 'hello', 3]`. The other options are incorrect because they either miss the new element or have it in the wrong position.",
     "question_id": "Q028",
     "topic": "Python Data Structures",
     "learning_objective": "Adding elements to a list using append() method",
@@ -1400,29 +1400,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly inserts the element 'world' at index 2 in the list `my_list`?\n```python\nmy_list = [10, 'hello']\n# code here\nprint(my_list)\n```",
+    "question": "Which of the following code snippets correctly inserts the element 'world' at index 2 in the list `my_list`? ```python\nmy_list = [10, 'hello']\n# insert code here\n```",
     "choices": [
-      {
-        "text": "my_list.insert(3, 'world')",
-        "is_correct": false
-      },
       {
         "text": "my_list.insert(2, 'world')",
         "is_correct": true
       },
       {
-        "text": "my_list.append('world')",
+        "text": "my_list.append('world', 2)",
         "is_correct": false
       },
       {
         "text": "my_list[2] = 'world'",
         "is_correct": false
+      },
+      {
+        "text": "my_list.insert('world', 2)",
+        "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is B: my_list.insert(2, 'world'). The insert() method adds an item at a specified position. In Python, list indices start at 0, so index 2 refers to the third element in the list. Inserting 'world' at index 2 results in [10, 'hello', 'world']. Option A inserts 'world' at index 3, which is out of bounds for the current list and would result in an IndexError. Option C appends 'world' to the end of the list, resulting in [10, 'hello', 'world'], but it does not insert at a specific index. Option D attempts to assign 'world' to the element at index 2, which is valid but does not use the insert() method.",
+    "explanation": "The correct choice is `my_list.insert(2, 'world')`. This correctly inserts the element 'world' at index 2 in the list. The other choices are incorrect because: \n\nA) `my_list.append('world', 2)` is invalid syntax for the `append` method. The `append` method takes only one argument, which is the item to be added.\nB) `my_list[2] = 'world'` attempts to assign a value at index 2 without inserting it, which will result in an `IndexError` since the list does not have an element at index 2 yet.\nC) `my_list.insert('world', 2)` is invalid syntax because the first argument should be the index, not the item.",
     "question_id": "Q029",
     "topic": "Python Data Structures",
     "learning_objective": "Inserting elements at specific index using insert() method",
@@ -1446,33 +1446,33 @@
         "text": "duplicated\nSyntax\n[item1, item2]\n--- Page 13 ---\nChoosing the Right Data Structure\nSelecting the appropriate data structure is crucial for efficient Python code. Consider these guidelines based on your needs:\nUse Lists When:\nYou need an ordered collection that can be modified after creation\nImplementing dynamic collections, stacks, or queues\nOrder of elements matters for your algorithm\nUse Tuples When:\nYou need an ordered collection that should not be changed\nRepresenting fixed collections of related data (coordinates)"
       }
     ],
-    "ast_valid": true,
-    "ast_error": ""
+    "ast_valid": false,
+    "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following code snippets correctly removes the first occurrence of the value '3' from a list and prints the updated list? ```python\nmy_list = [1, 2, 3, 4, 3]\n# code here\nprint(my_list)\n```",
+    "question": "Which of the following code snippets correctly removes an element by value from a list and prints the updated list? ```python\nmy_list = [1, 2, 3, 4]\nremoved = my_list.remove(3)\nprint(my_list)\n```",
     "choices": [
       {
-        "text": "my_list.remove(3)\nOutput: [1, 2, 4, 3]",
-        "is_correct": false
-      },
-      {
-        "text": "my_list.pop(3)\nOutput: [1, 2, 3, 4]",
+        "text": "[1, 2, 4]",
         "is_correct": true
       },
       {
-        "text": "my_list.remove(3)\nOutput: [1, 2, 3, 4]",
+        "text": "[1, 2, 3]",
         "is_correct": false
       },
       {
-        "text": "my_list.pop(my_list.index(3))\nOutput: [1, 2, 3, 4]",
+        "text": "[2, 3, 4]",
+        "is_correct": false
+      },
+      {
+        "text": "[1, 3, 4]",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is B. The `pop(3)` method removes the element at index 3, which is '3', and returns it. Thus, the output will be `[1, 2, 4]`. Choice A uses `remove(3)`, which removes the first occurrence of '3' by value, resulting in `[1, 2, 4, 3]`. Choice C incorrectly assumes that `pop(3)` will remove the element at index 3, but it actually removes the element at index 3 and returns it. Choice D uses `pop(my_list.index(3))`, which is correct but unnecessarily complex for this task.",
+    "explanation": "The correct choice is [1, 2, 4]. The `remove()` method removes the first occurrence of the specified value from the list. In this case, it removes the number 3 and updates the list to `[1, 2, 4]`. Choice B is incorrect because it does not reflect any change in the list. Choice C is incorrect because it incorrectly assumes that `remove()` returns the removed element, which it does not. Choice D is incorrect because it incorrectly assumes that `remove()` removes the last occurrence of the specified value.",
     "question_id": "Q030",
     "topic": "Python Data Structures",
     "learning_objective": "Removing elements by value using remove() vs pop() by index",
@@ -1500,7 +1500,7 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nmy_list = [[1, 2], [3, 4], [5, 6]]\nprint(len(my_list))\n```",
+    "question": "Consider the following Python code snippet:\n```python\nmy_list = [[1, 2, 3], [4, 5], [6]]\nprint(len(my_list))\n```\nWhat will be the output of this code?",
     "choices": [
       {
         "text": "3",
@@ -1511,18 +1511,18 @@
         "is_correct": false
       },
       {
-        "text": "9",
+        "text": "2",
         "is_correct": false
       },
       {
-        "text": "12",
+        "text": "1",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `len()` function returns the number of elements in a list. In this case, `my_list` contains three sublists, so `len(my_list)` should return 3.",
+    "explanation": "The `len()` function in Python returns the number of items in an object. In this case, `my_list` is a list containing three sublists: `[1, 2, 3]`, `[4, 5]`, and `[6]`. Therefore, the length of `my_list` is 3.",
     "question_id": "Q031",
     "topic": "Python Data Structures",
     "learning_objective": "List length calculation using len() on nested lists",
@@ -1553,26 +1553,26 @@
     "question": "Which of the following code snippets correctly concatenates two lists in Python?",
     "choices": [
       {
-        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 + list2\nprint(result)\n```",
+        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 + list2\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 - list2\nprint(result)\n```",
+        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 - list2\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 * list2\nprint(result)\n```",
+        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 * list2\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 / list2\nprint(result)\n```",
+        "text": "```python\nlist1 = [1, 2]\nlist2 = [3, 4]\nresult = list1 / list2\n```",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer uses the '+' operator to concatenate two lists, which is a valid operation in Python. The other operators ('-', '*', '/') are not applicable for list concatenation.",
+    "explanation": "The correct choice uses the '+' operator to concatenate two lists. The '-' operator is used for subtraction, '*' for multiplication, and '/' for division, which are not applicable for list concatenation.",
     "question_id": "Q032",
     "topic": "Python Data Structures",
     "learning_objective": "List concatenation with plus operator",
@@ -1600,29 +1600,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following code snippets correctly checks if the number 3 is in a list named `my_list` using the 'in' operator?",
+    "question": "Which of the following code snippets correctly checks if the number 3 is a member of the list `my_list` using the 'in' operator? ```python\nmy_list = [1, 2, 3]\nresult = # code here\n```",
     "choices": [
       {
-        "text": "```python\nif my_list[2] == 3:\n    print('Number found')\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nif 3 in my_list:\n    print('Number found')\n```",
+        "text": "if 3 in my_list:",
         "is_correct": true
       },
       {
-        "text": "```python\nif my_list[1] == 3:\n    print('Number found')\n```",
+        "text": "if 3 not in my_list:",
         "is_correct": false
       },
       {
-        "text": "```python\nif my_list[0] == 3:\n    print('Number found')\n```",
+        "text": "if my_list[2] == 3:",
+        "is_correct": false
+      },
+      {
+        "text": "if my_list[-1] == 3:",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The 'in' operator checks for membership in a collection, not the index. The correct code snippet uses `3 in my_list` to check if 3 is an element of `my_list`. Options A and C are incorrect because they use indices instead of the 'in' operator. Option D is also incorrect as it checks the first element of the list.",
+    "explanation": "The correct choice is 'if 3 in my_list:' because it uses the 'in' operator to check for membership. The other choices are incorrect: (B) checks if 3 is not in the list, which is false; (C) checks the third element of the list directly, which is true but not using the 'in' operator; and (D) checks the last element of the list directly, which is also true but not using the 'in' operator.",
     "question_id": "Q033",
     "topic": "Python Data Structures",
     "learning_objective": "Checking element membership using 'in' operator with lists",
@@ -1665,14 +1665,14 @@
         "is_correct": false
       },
       {
-        "text": "my_tuple = (1)  # Single element tuple",
+        "text": "my_tuple = (1)  # Missing comma",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "A tuple in Python is created using parentheses. The correct syntax is my_tuple = (1, 2, 3). A list uses square brackets [ ], a set uses curly braces { }, and a single element tuple requires a trailing comma.",
+    "explanation": "A tuple is created using parentheses and each element separated by a comma. Option A correctly uses both. Option B uses square brackets, which creates a list. Option C uses curly braces, which creates a set. Option D is missing the trailing comma for a single-element tuple.",
     "question_id": "Q034",
     "topic": "Python Data Structures",
     "learning_objective": "Python tuple creation with parentheses and comma syntax",
@@ -1722,7 +1722,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is A: my_tuple[0] = 2. Tuples in Python are immutable, meaning their elements cannot be changed after the tuple is created. Attempting to modify an element of a tuple will raise a TypeError. The other options do not involve tuples and thus will not raise a TypeError.",
+    "explanation": "The correct choice is A. Tuples are immutable, so attempting to assign a new value to an element at any index will raise a TypeError. The other options involve mutable data structures (list, dictionary, set) where such assignments are allowed.",
     "question_id": "Q035",
     "topic": "Python Data Structures",
     "learning_objective": "Tuple immutability: attempting item assignment raises TypeError",
@@ -1750,29 +1750,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nmy_tuple = (10, 20, 30, 40, 50)\nprint(my_tuple[2])\n```",
+    "question": "Consider the following Python code snippet:\n```python\nmy_tuple = (10, 20, 30, 40, 50)\nprint(len(my_tuple))\n```",
     "choices": [
       {
-        "text": "30",
+        "text": "The output will be 4",
+        "is_correct": false
+      },
+      {
+        "text": "The output will be 5",
         "is_correct": true
       },
       {
-        "text": "20",
+        "text": "The output will be 6",
         "is_correct": false
       },
       {
-        "text": "10",
-        "is_correct": false
-      },
-      {
-        "text": "40",
+        "text": "The code will raise an error",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet prints the third element of the tuple `my_tuple`. In Python, indexing starts at 0, so `my_tuple[2]` refers to the third element (30).",
+    "explanation": "Step-by-step trace and reasoning explaining the outcome.",
     "question_id": "Q036",
     "topic": "Python Data Structures",
     "learning_objective": "Tuple indexing, slicing, and length calculation",
@@ -1803,26 +1803,26 @@
     "question": "Which of the following code snippets correctly creates a set from a list, ensuring that all duplicate elements are removed?",
     "choices": [
       {
-        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = set(my_list)\nprint(my_set)\n```",
+        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = set(my_list)\nprint(my_set)  # Output: {1, 2, 3, 4}\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = list(set(my_list))\nprint(my_set)\n```",
+        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = list(set(my_list))\nprint(my_set)  # Output: {1, 2, 3, 4}\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = {item for item in my_list}\nprint(my_set)\n```",
+        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = set(my_list)\nprint(my_list)  # Output: [1, 2, 3, 2, 4]\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = tuple(set(my_list))\nprint(my_set)\n```",
+        "text": "```python\nmy_list = [1, 2, 3, 2, 4]\nmy_set = {my_list}\nprint(my_set)  # Output: [[1, 2, 3, 2, 4]]\n```",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer creates a set from the list, which automatically removes duplicate elements. Choice B attempts to convert the set back to a list, losing the uniqueness property. Choice C uses a dictionary comprehension, which is not necessary for creating a set and would result in a dictionary instead of a set. Choice D converts the set to a tuple, which also loses the uniqueness property.",
+    "explanation": "The correct choice creates a set from the list `my_list` and removes duplicates, resulting in `{1, 2, 3, 4}`. The other choices either do not remove duplicates (choice B) or create a set containing the list itself (choice D), which is incorrect.",
     "question_id": "Q037",
     "topic": "Python Data Structures",
     "learning_objective": "Python set creation, unique elements, and duplicate elimination",
@@ -1850,29 +1850,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following code snippets correctly demonstrates how to find the intersection of two sets in Python?",
+    "question": "Which of the following code snippets correctly demonstrates the use of a set to find the intersection of two lists? ```python\nlist1 = [1, 2, 3, 4]\nlist2 = [3, 4, 5, 6]\nintersection_set = # code here\n```",
     "choices": [
       {
-        "text": "```python\nset1 = {1, 2, 3}\nset2 = {3, 4, 5}\nintersection = set1 & set2\nprint(intersection)\n```",
+        "text": "intersection_set = set(list1) & set(list2)",
         "is_correct": true
       },
       {
-        "text": "```python\nlist1 = [1, 2, 3]\nlist2 = [3, 4, 5]\nintersection = list1.intersection(list2)\nprint(intersection)\n```",
+        "text": "intersection_set = list(set(list1).intersection(list2))",
         "is_correct": false
       },
       {
-        "text": "```python\ndict1 = {1: 'a', 2: 'b'}\ndict2 = {3: 'c', 4: 'd'}\nintersection = dict1 & dict2\nprint(intersection)\n```",
+        "text": "intersection_set = set(list1) - set(list2)",
         "is_correct": false
       },
       {
-        "text": "```python\nset1 = {1, 2, 3}\nset2 = {3, 4, 5}\nintersection = set1.intersection(set2)\nprint(intersection)\n```",
+        "text": "intersection_set = [x for x in list1 if x in list2]",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice demonstrates the use of the '&' operator to find the intersection of two sets. The other choices either involve incorrect data types (list and dictionary) or use methods that are not applicable to set operations.",
+    "explanation": "The correct answer uses the set intersection operator '&' to find common elements between two sets created from the lists. Choice B attempts to use a list comprehension, which is not necessary for finding an intersection. Choice C uses the difference operator '-', which would return elements in list1 that are not in list2. Choice D also uses a list comprehension but does not take advantage of set operations.",
     "question_id": "Q038",
     "topic": "Python Data Structures",
     "learning_objective": "Set operations: union, intersection, and difference",
@@ -1900,7 +1900,7 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nprint(student['age'])\n```\nWhat will be the output of this code?",
+    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nprint(student['age'])\n```",
     "choices": [
       {
         "text": "21",
@@ -1922,7 +1922,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet creates a dictionary named `student` with three key-value pairs. The key 'age' is associated with the value 20. When `print(student['age'])` is executed, it retrieves and prints the value associated with the key 'age', which is 20.",
+    "explanation": "The code snippet creates a dictionary named `student` with keys 'name', 'age', and 'major'. The value associated with the key 'age' is 20. When `print(student['age'])` is executed, it retrieves and prints the value of 'age', which is 20.",
     "question_id": "Q039",
     "topic": "Python Data Structures",
     "learning_objective": "Python dictionary key-value pair structure and curly braces syntax",
@@ -1950,7 +1950,7 @@
     "ast_error": ""
   },
   {
-    "question": "Given the following Python code snippet, what will be the output of `print(student['major'])`?\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nprint(student['major'])\n```",
+    "question": "Given the following dictionary, what is the output of `print(student['major'])`?\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\n```",
     "choices": [
       {
         "text": "Alice",
@@ -1965,14 +1965,14 @@
         "is_correct": false
       },
       {
-        "text": "NameError: name 'student' is not defined",
+        "text": "NameError: name 'major' is not defined",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is 'Computer Science'. The code snippet creates a dictionary named `student` with keys 'name', 'age', and 'major'. When accessing the value associated with the key 'major' using square bracket notation, Python retrieves and prints the value 'Computer Science'. The other choices are incorrect because they either refer to values that are not accessed in the code or represent errors that would occur if the code were executed.",
+    "explanation": "The correct answer is 'Computer Science'. The code accesses the value associated with the key 'major' in the dictionary `student`. In Python, dictionary keys are accessed using square bracket notation. The key 'major' exists in the dictionary and maps to the value 'Computer Science', so this is the output of the print statement.",
     "question_id": "Q040",
     "topic": "Python Data Structures",
     "learning_objective": "Accessing dictionary values by key using square bracket notation",
@@ -2000,10 +2000,10 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nstudent['age'] = 21\nstudent['gender'] = 'Female'\nprint(student)\n```",
+    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nstudent['age'] = 21\nstudent['gender'] = 'Female'\nprint(student)\n```\nWhat will be the output of this code?",
     "choices": [
       {
-        "text": "{'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Male'}",
+        "text": "{'name': 'Alice', 'age': 20, 'major': 'Computer Science'}",
         "is_correct": false
       },
       {
@@ -2011,7 +2011,7 @@
         "is_correct": true
       },
       {
-        "text": "{'name': 'Alice', 'age': 20, 'major': 'Computer Science', 'gender': 'Female'}",
+        "text": "{'name': 'Alice', 'age': 20, 'major': 'Computer Science', 'gender': 'Male'}",
         "is_correct": false
       },
       {
@@ -2022,7 +2022,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet correctly modifies the value associated with the key 'age' and adds a new key-value pair for 'gender'. The dictionary maintains its insertion order, so the output will be {'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Female'}.",
+    "explanation": "The code snippet modifies the value of the key 'age' from 20 to 21 and adds a new key-value pair ('gender': 'Female'). The dictionary is then printed, showing the updated values.",
     "question_id": "Q041",
     "topic": "Python Data Structures",
     "learning_objective": "Modifying existing dictionary values and adding new key-value pairs",
@@ -2050,29 +2050,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20}\nprint(student.get('email'))\nprint(student.get('phone', 'N/A'))\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nstudent = {'name': 'Alice', 'age': 20}\nprint(student.get('email'))\n```",
     "choices": [
       {
-        "text": "None None",
-        "is_correct": false
-      },
-      {
-        "text": "None N/A",
+        "text": "None",
         "is_correct": true
       },
       {
-        "text": "Alice None",
+        "text": "'N/A'",
         "is_correct": false
       },
       {
-        "text": "Alice N/A",
+        "text": "'alice@example.com'",
+        "is_correct": false
+      },
+      {
+        "text": "KeyError: 'email'",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `get()` method is used to retrieve values from a dictionary. If the key does not exist, it returns `None` by default unless a second argument (default value) is provided. In this case, 'email' and 'phone' keys do not exist in the dictionary, so the first print statement outputs `None`. The second print statement provides a default value of 'N/A', which is returned when 'phone' key is not found.",
+    "explanation": "The `get()` method is used to retrieve the value associated with a key in a dictionary. If the key does not exist, it returns `None` by default unless a second argument (default value) is provided. In this case, 'email' is not a key in the `student` dictionary, so the output is `None`. The other options are incorrect because they either assume the key exists or provide an unexpected default value.",
     "question_id": "Q042",
     "topic": "Python Data Structures",
     "learning_objective": "Dictionary get() method with default fallback values",
@@ -2100,29 +2100,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly iterates over the keys and values of a dictionary and prints them in a formatted string?",
+    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nprint(student.keys())\n``` What will be the output of this code?\n",
     "choices": [
       {
-        "text": "```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nfor key, value in student.keys():\n    print(f'{key}: {value}')\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nfor key, value in student.items():\n    print(f'{key}: {value}')\n```",
+        "text": "['name', 'age', 'major']",
         "is_correct": true
       },
       {
-        "text": "```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nfor key in student.values():\n    print(f'{key}: {student[key]}')\n```",
+        "text": "('name', 'age', 'major')",
         "is_correct": false
       },
       {
-        "text": "```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\nfor key in student:\n    print(f'{key}: {student.get(key)}')\n```",
+        "text": "{'name': 'Alice', 'age': 20, 'major': 'Computer Science'}",
+        "is_correct": false
+      },
+      {
+        "text": "[('name', 'Alice'), ('age', 20), ('major', 'Computer Science')]",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer uses `student.items()` to iterate over both keys and values simultaneously. The other options either incorrectly use `keys()`, which only returns the keys, or try to access values using a key that is not directly available in the loop.",
+    "explanation": "The `keys()` method of a dictionary returns a view object that displays a list of all the keys in the dictionary. Therefore, the output will be a list of keys: ['name', 'age', 'major']. Choice B is incorrect because it represents a tuple, not a list. Choice C is incorrect because it shows the entire dictionary instead of just the keys. Choice D is incorrect because it shows key-value pairs as tuples in a list, which is not the output of `keys()`.",
     "question_id": "Q043",
     "topic": "Python Data Structures",
     "learning_objective": "Dictionary keys() and values() iteration and membership",
@@ -2146,33 +2146,33 @@
         "text": "lookups\n--- Page 2 ---\nIntroduction to Python Data Structures\nIn Python, data structures are fundamental tools for \ntools for organizing and storing data efficiently.\nefficiently.\nThey provide a structured way to manage collections \ncollections of information, making it easier to access, \naccess, modify, and process data within your \nprograms.\nKey Benefits:\n• Efficient data organization\n• Optimized data retrieval\n• Simplified data manipulation\n• Improved program readability\nLists\nDynamic arrays that are ordered and "
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nstudent = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}\ndel student['age']\nprint(student)\n```",
+    "question": "Which of the following code snippets correctly removes a key-value pair from a dictionary and updates its value if the key exists?",
     "choices": [
       {
-        "text": "{'name': 'Alice', 'major': 'Computer Science'}",
+        "text": "```python\ndict = {'a': 1, 'b': 2}\ndict.pop('c')\ndict['a'] += 1\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\ndict = {'a': 1, 'b': 2}\ndict.pop('a', None)\ndict['a'] += 1\n```",
         "is_correct": true
       },
       {
-        "text": "{'name': 'Alice', 'age': 20, 'major': 'Computer Science'}",
+        "text": "```python\ndict = {'a': 1, 'b': 2}\ndict.popitem()\ndict['a'] += 1\n```",
         "is_correct": false
       },
       {
-        "text": "{'name': 'Alice', 'age': 19, 'major': 'Computer Science'}",
-        "is_correct": false
-      },
-      {
-        "text": "KeyError: 'age'",
+        "text": "```python\ndict = {'a': 1, 'b': 2}\ndict.remove('a')\ndict['a'] += 1\n```",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `del` statement is used to remove a key-value pair from the dictionary. In this case, it removes the 'age' key and its associated value. The correct output should be {'name': 'Alice', 'major': 'Computer Science'}. Choice B is incorrect because it does not reflect any changes. Choice C is incorrect because it attempts to modify an existing key instead of removing it. Choice D is incorrect because there is no KeyError; the key exists and is removed.",
+    "explanation": "The correct answer uses `dict.pop('a', None)` to safely remove the key 'a' if it exists, and then increments its value. The other options either raise errors (e.g., `popitem()` removes an arbitrary item), use non-existent methods (`remove`), or incorrectly handle the removal of a non-existent key.",
     "question_id": "Q044",
     "topic": "Python Data Structures",
     "learning_objective": "Dictionary pop() method and removing key-value pairs",
@@ -2196,33 +2196,33 @@
         "text": "Using as dictionary keys (if all elements are immutable)\nUse Sets When:\nYou need a collection of unique items\nOrder of elements is not important\nPerforming mathematical set operations or membership testing\nUse Dictionaries When:\nStoring data as key-value pairs for fast lookups\nRepresenting structured data (similar to JSON objects)\nCreating lookup tables or counting frequency of items\nPage 13 of 14\n--- Page 14 ---\nPractice Exercises\nExercise 1: List Manipulation\nRemove element at index 4 from the list, then insert it at the 2nd position and add it to "
       }
     ],
-    "ast_valid": true,
-    "ast_error": ""
+    "ast_valid": false,
+    "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nmy_list = [1, 2, 3]\nmy_list[0] = 4\nprint(my_list)\n```",
+    "question": "Consider the following Python code snippet:\n```python\nmy_list = [1, 2, 3]\nmy_dict = {'a': my_list}\nprint(my_dict['a'][0])\n```",
     "choices": [
       {
-        "text": "[1, 2, 3]",
-        "is_correct": false
-      },
-      {
-        "text": "[4, 2, 3]",
+        "text": "1",
         "is_correct": true
       },
       {
-        "text": "[1, 4, 3]",
+        "text": "2",
         "is_correct": false
       },
       {
-        "text": "[1, 2, 4]",
+        "text": "3",
+        "is_correct": false
+      },
+      {
+        "text": "Error: my_list is not defined",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet creates a list `my_list` with elements [1, 2, 3]. It then modifies the first element of the list from 1 to 4. The correct output is `[4, 2, 3]`. Choice A is incorrect because it shows no change in the first element. Choice C and D are incorrect because they incorrectly modify different elements.",
+    "explanation": "The code creates a list `my_list` with elements [1, 2, 3] and assigns it to the key 'a' in a dictionary `my_dict`. The print statement then accesses the first element of the list associated with the key 'a'. Since Python uses zero-indexing, the first element is at index 0. Therefore, the output is 1.",
     "question_id": "Q045",
     "topic": "Python Data Structures",
     "learning_objective": "Nested dictionaries and nested lists indexing traversal",
@@ -2250,29 +2250,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nx = 5\ny = 10\nif x < y:\n    print('x is less than y')\nelse:\n    print('x is not less than y')\n```",
+    "question": "Consider the following Python code snippet:\n```python\nx = 5\ny = 10\nif x < y:\n    print('x is less than y')\nelse:\n    print('x is not less than y')\n```",
     "choices": [
       {
-        "text": "x is less than y",
+        "text": "Choice A: 'x is less than y'",
+        "is_correct": false
+      },
+      {
+        "text": "Choice B: 'x is not less than y'",
         "is_correct": true
       },
       {
-        "text": "x is not less than y",
+        "text": "Choice C: 'y is less than x'",
         "is_correct": false
       },
       {
-        "text": "SyntaxError",
-        "is_correct": false
-      },
-      {
-        "text": "IndentationError",
+        "text": "Choice D: Error",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet checks if x is less than y. Since 5 is indeed less than 10, the condition is True and 'x is less than y' is printed.",
+    "explanation": "The code snippet compares the values of x and y. Since 5 is less than 10, the condition `x < y` evaluates to True. Therefore, the correct output is 'x is less than y'. Choice B is incorrect because it states the opposite of what actually happens. Choice C is incorrect because it reverses the comparison. Choice D is incorrect because there are no syntax errors in the code.",
     "question_id": "Q046",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Basic if statement syntax and indentation block rules",
@@ -2300,29 +2300,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly demonstrates a nested if statement in Python?",
+    "question": "Consider the following Python code snippet:\n```python\nx = 5\ny = 10\nif x < y:\n    print('x is less than y')\nelse:\n    print('x is not less than y')\n```",
     "choices": [
       {
-        "text": "```python\nx = 10\nif x > 5:\n    print('Greater than 5')\nelse:\n    print('Less than or equal to 5')\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nx = 10\nif x > 5:\n    if x < 15:\n        print('Between 5 and 15')\nelse:\n    print('Not between 5 and 15')\n```",
+        "text": "Choice A: 'x is less than y'",
         "is_correct": true
       },
       {
-        "text": "```python\nx = 10\nif x > 5:\n    print('Greater than 5')\nif x < 15:\n    print('Between 5 and 15')\nelse:\n    print('Not between 5 and 15')\n```",
+        "text": "Choice B: 'x is equal to y'",
         "is_correct": false
       },
       {
-        "text": "```python\nx = 10\nif x > 5:\n    if x < 15:\n        print('Between 5 and 15')\nelse:\n    print('Not between 5 and 15')\n```",
+        "text": "Choice C: 'x is not less than y'",
+        "is_correct": false
+      },
+      {
+        "text": "Choice D: SyntaxError",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer demonstrates a nested if statement where the inner if block is only executed when both outer and inner conditions are true. The other options either lack proper nesting or have logical errors.",
+    "explanation": "The code snippet compares the values of x and y using a simple if-else statement. Since x (5) is less than y (10), the condition `x < y` evaluates to True, and 'x is less than y' is printed. Choice B is incorrect because x is not equal to y. Choice C is incorrect because the else block is not executed since the condition is True. Choice D is incorrect as there are no syntax errors in the code.",
     "question_id": "Q047",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "if-else two-way decision branching execution flow",
@@ -2346,33 +2346,33 @@
         "text": "How if Statements Work\nThe if statement executes a block of code only if a given condition is true.\nThink of it as saying, \"IF this is true, THEN do this.\"\nSyntax:\nif condition:\n# Code to execute if condition is True\nImportant: The colon (:) is required!\nExamples\nExample 1:\nnumber = 10\nif number > 0:\nprint(\"The number is positive.\")\nprint(\"This statement always executes.\")\nOutput:\nThe number is positive.\nThis statement always executes.\n--- Page 5 ---\nThe if-else Statement\nTwo-way Decision Making\nThe `if-else` statement chooses between two actions based on a condition."
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
     "question": "Which of the following code snippets will output '2' when executed?",
     "choices": [
       {
-        "text": "```python\nx = 10\nif x > 5:\n    print('1')\nelif x > 3:\n    print('2')\nelse:\n    print('3')\n```",
+        "text": "```python\nx = 10\nif x > 5:\n    print('1')\nelif x == 10:\n    print('2')\nelse:\n    print('3')\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nx = 10\nif x > 7:\n    print('1')\nelif x > 5:\n    print('2')\nelse:\n    print('3')\n```",
+        "text": "```python\nx = 10\nif x < 5:\n    print('1')\nelif x == 10:\n    print('2')\nelse:\n    print('3')\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nx = 10\nif x > 6:\n    print('1')\nelif x > 4:\n    print('2')\nelse:\n    print('3')\n```",
+        "text": "```python\nx = 10\nif x > 5:\n    print('1')\nelif x < 10:\n    print('2')\nelse:\n    print('3')\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nx = 10\nif x > 8:\n    print('1')\nelif x > 6:\n    print('2')\nelse:\n    print('3')\n```",
+        "text": "```python\nx = 10\nif x == 5:\n    print('1')\nelif x > 5:\n    print('2')\nelse:\n    print('3')\n```",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is A. The code checks conditions sequentially. Since x = 10, the first condition `x > 5` is True, but it does not execute because there's an `elif` statement following it. The next condition `x > 3` is also True, and since this is the first `elif` that evaluates to True, '2' is printed. Options B, C, and D have different conditions that would lead to different outputs.",
+    "explanation": "The correct answer is A. The code checks the conditions sequentially. Since x = 10, the first condition `x > 5` is True, so '1' would be printed if it were not followed by an `elif`. However, because of the `elif`, the next condition `x == 10` is checked and found to be True, so '2' is printed. The other options either have incorrect conditions or do not follow the correct sequence of checks.",
     "question_id": "Q048",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "if-elif-else multi-way branching and first-match execution",
@@ -2400,29 +2400,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nx = 5\ny = 10\nif x == y:\n    print('Equal')\nelse:\n    print('Not Equal')\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\nx = 5\ny = 10\nif x == y:\n    print('Equal')\nelse:\n    print('Not Equal')\n```",
     "choices": [
       {
-        "text": "Choice A: Equal",
+        "text": "Equal",
         "is_correct": false
       },
       {
-        "text": "Choice B: Not Equal",
+        "text": "Not Equal",
         "is_correct": true
       },
       {
-        "text": "Choice C: True",
+        "text": "True",
         "is_correct": false
       },
       {
-        "text": "Choice D: False",
+        "text": "False",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code compares the values of x and y using the equality operator '=='. Since x (5) is not equal to y (10), the condition evaluates to False, and the else block is executed. Therefore, 'Not Equal' is printed.",
+    "explanation": "The code compares the values of x and y using the equality operator '=='. Since x (5) is not equal to y (10), the condition in the if statement evaluates to False. Therefore, the else block is executed, printing 'Not Equal'.",
     "question_id": "Q049",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Equality operator == vs assignment operator =",
@@ -2450,29 +2450,29 @@
     "ast_error": ""
   },
   {
-    "question": "What will be printed when the following code is executed?\n```python\nx = 5\ny = 10\nif x != y:\n    print('x is not equal to y')\nelse:\n    print('x is equal to y')\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\nx = 5\ny = 10\nif x != y:\n    print('x is not equal to y')\nelse:\n    print('x is equal to y')\n```",
     "choices": [
       {
-        "text": "x is greater than y",
-        "is_correct": false
-      },
-      {
-        "text": "x is not equal to y",
+        "text": "'x is not equal to y'",
         "is_correct": true
       },
       {
-        "text": "x is equal to y",
+        "text": "'x is equal to y'",
         "is_correct": false
       },
       {
         "text": "SyntaxError",
         "is_correct": false
+      },
+      {
+        "text": "TypeError",
+        "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code checks if x is not equal to y. Since 5 is indeed not equal to 10, the condition is True and 'x is not equal to y' will be printed.",
+    "explanation": "The code snippet uses the inequality operator '!=' to compare x and y. Since 5 is not equal to 10, the condition is True, and the message 'x is not equal to y' will be printed.",
     "question_id": "Q050",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Inequality operator != and comparison operators <, <=, >, >=",
@@ -2500,29 +2500,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following Python code snippets will output 'Both conditions are True'?",
+    "question": "Which of the following code snippets correctly demonstrates the use of the 'and' operator in Python, where both conditions must be True to return True?",
     "choices": [
       {
-        "text": "```python\nx = False\ny = False\nif x and y:\n    print('Both conditions are True')\nelse:\n    print('At least one condition is False')\n```",
+        "text": "```python\nx = False\ny = True\nprint(x and y)\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nx = True\ny = True\nif x and y:\n    print('Both conditions are True')\nelse:\n    print('At least one condition is False')\n```",
+        "text": "```python\nx = True\ny = True\nprint(x and y)\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nx = True\ny = False\nif x and y:\n    print('Both conditions are True')\nelse:\n    print('At least one condition is False')\n```",
+        "text": "```python\nx = False\ny = False\nprint(x and y)\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nx = False\ny = True\nif x and y:\n    print('Both conditions are True')\nelse:\n    print('At least one condition is False')\n```",
+        "text": "```python\nx = True\ny = False\nprint(x and y)\n```",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The 'and' operator in Python requires both conditions to be True for the entire expression to evaluate to True. In this case, only when x and y are both True will the code print 'Both conditions are True'.",
+    "explanation": "The correct choice is B: ```python\nx = True\ny = True\nprint(x and y)\n``` This code snippet correctly uses the 'and' operator, where both conditions (x being True and y being True) must be met for the output to be True. The other choices either have one or both conditions as False, which would result in a False output.",
     "question_id": "Q051",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Logical operator 'and': both conditions must be True",
@@ -2550,29 +2550,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following Python code snippets correctly demonstrates the use of the 'or' operator with at least one condition being True?",
+    "question": "Which of the following Python code snippets will output 'True' when executed?",
     "choices": [
       {
-        "text": "```python\nx = False\ny = False\nprint(x or y) # Output: True`",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nx = True\ny = False\nprint(x or y) # Output: True`",
+        "text": "```python\nx = True\ny = False\nprint(x or y)\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nx = 5\ny = 10\nprint(x > y or x < y) # Output: False`",
+        "text": "```python\nx = False\ny = False\nprint(x and y)\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nx = 'hello'\ny = 'world'\nprint(x == y or x != y) # Output: True`",
+        "text": "```python\nx = 5\ny = 10\nprint(x > y)\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\nx = 'hello'\ny = 'world'\nprint(x == y)\n```",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is B. The 'or' operator returns True if at least one of the conditions is True. In this case, x = True and y = False, so x or y evaluates to True. Choice A is incorrect because both conditions are False. Choice C is incorrect because both conditions (x > y and x < y) are True, but the 'or' operator only needs at least one condition to be True. Choice D is correct because even though x == y is False, x != y is True, so the overall expression evaluates to True.",
+    "explanation": "The correct choice is A. The 'or' operator returns True if at least one of the conditions is True. In this case, x is True, so the expression evaluates to True. Choice B uses 'and', which requires both conditions to be True for the result to be True. Choices C and D involve comparison operators that do not meet the condition of having at least one True value.",
     "question_id": "Q052",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Logical operator 'or': at least one condition must be True",
@@ -2600,29 +2600,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following code snippets correctly demonstrates the use of the 'not' logical operator to negate a boolean value?",
+    "question": "Which of the following Python code snippets correctly demonstrates the use of the 'not' logical operator to negate a boolean value?",
     "choices": [
       {
-        "text": "```python\nx = True\ny = not x\nprint(y) # Output: False\n```",
+        "text": "```python\nx = True\ny = not x\nprint(y) # Output: False`\n",
         "is_correct": true
       },
       {
-        "text": "```python\nx = False\ny = not x\nprint(y) # Output: True\n```",
+        "text": "```python\nx = False\ny = not x\nprint(y) # Output: True`\n",
         "is_correct": false
       },
       {
-        "text": "```python\nx = 5\ny = not x\nprint(y) # Output: Error\n```",
+        "text": "```python\nx = 5\ny = not x\nprint(y) # Output: Error`\n",
         "is_correct": false
       },
       {
-        "text": "```python\nx = 'hello'\ny = not x\nprint(y) # Output: False\n```",
+        "text": "```python\nx = 'hello'\ny = not x\nprint(y) # Output: False`\n",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer demonstrates the use of 'not' to negate a boolean value. Option A correctly negates True to False. Options B, C, and D contain errors: Option B incorrectly negates False to True; Option C attempts to apply 'not' to an integer, which is not valid in Python; Option D attempts to apply 'not' to a string, which also results in an error.",
+    "explanation": "The correct choice demonstrates the proper use of the 'not' operator to negate a boolean value. The other choices either contain errors (e.g., negating an integer or string), are incorrect, or do not demonstrate the use of 'not'.",
     "question_id": "Q053",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Logical operator 'not': negating boolean truth values",
@@ -2650,15 +2650,15 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nx = True\ny = False\nprint(x or y)\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\nx = True\ny = False\nprint(x and y)\n```",
     "choices": [
       {
         "text": "True",
-        "is_correct": true
+        "is_correct": false
       },
       {
         "text": "False",
-        "is_correct": false
+        "is_correct": true
       },
       {
         "text": "SyntaxError",
@@ -2669,10 +2669,10 @@
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The 'or' operator in Python returns True if at least one of the conditions is True. In this case, x is True, so the expression evaluates to True.",
+    "explanation": "The `and` operator in Python performs a short-circuit evaluation. It returns `False` as soon as it encounters the first `False` value among its operands. In this case, since `y` is `False`, the expression `x and y` evaluates to `False`. Therefore, the output will be `False`.",
     "question_id": "Q054",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Short-circuit evaluation in boolean expressions with and/or",
@@ -2700,29 +2700,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following Python code snippets will output 'The number is not positive' when executed?",
+    "question": "Which of the following Python code snippets will output 'False'?",
     "choices": [
       {
-        "text": "```python\nnumber = -5\nif number > 0:\n    print('The number is positive')\nelse:\n    print('The number is not positive')\n```",
+        "text": "```python\nx = True\ny = False\nprint(x or y)\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nnumber = 10\nif number <= 0:\n    print('The number is not positive')\nelse:\n    print('The number is positive')\n```",
+        "text": "```python\nx = []\ny = {}\nz = ''\nprint(not (x and y and z))\n```",
         "is_correct": true
       },
       {
-        "text": "```python\nnumber = 5\nif number > 0:\n    print('The number is positive')\nelse:\n    print('The number is not positive')\n```",
+        "text": "```python\nx = 0\ny = 'hello'\nprint(x or y)\n```",
         "is_correct": false
       },
       {
-        "text": "```python\nnumber = 0\nif number < 0:\n    print('The number is negative')\nelse:\n    print('The number is not positive')\n```",
+        "text": "```python\nx = True\ny = False\nprint(not (x and y))\n```",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "Explanation: The correct choice checks if the number is less than or equal to zero, which will be true for negative numbers and zero. Therefore, it prints 'The number is not positive'. The other choices either have incorrect conditions or do not handle non-positive numbers correctly.",
+    "explanation": "The correct answer is B. The expression `not (x and y and z)` evaluates to False because all variables are considered truthy in Python. An empty list [], an empty dictionary {}, and an empty string '' evaluate to False. Therefore, the entire expression `(x and y and z)` is False, and applying the 'not' operator results in True.",
     "question_id": "Q055",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Truthiness: empty collections [], '', {} and zero evaluate to False",
@@ -2750,29 +2750,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\nx = 5\ny = 10\nif x < y:\n    print('Less than')\nelse:\n    print('Greater than or equal to')\n```",
+    "question": "Consider the following Python code snippet:\n```python\nx = 5\ny = 'hello'\nif x > 0 and y != '':\n    print('Condition met')\nelse:\n    print('Condition not met')\n```",
     "choices": [
       {
-        "text": "Less than",
+        "text": "Condition met",
+        "is_correct": false
+      },
+      {
+        "text": "Condition not met",
         "is_correct": true
       },
       {
-        "text": "Greater than or equal to",
+        "text": "Runtime error",
         "is_correct": false
       },
       {
-        "text": "SyntaxError",
-        "is_correct": false
-      },
-      {
-        "text": "RuntimeError",
+        "text": "Syntax error",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet compares the values of x and y using the less than operator. Since 5 is indeed less than 10, the condition `x < y` evaluates to True. Therefore, the 'Less than' message is printed. The other options are incorrect because there is no syntax or runtime error in the code.",
+    "explanation": "The code snippet checks if `x` is greater than 0 and `y` is not an empty string. Since both conditions are true (`5 > 0` and `'hello' != ''`), the output should be 'Condition met'. Choice A is incorrect because it suggests the condition is not met. Choice C is incorrect because there is no runtime error; all values are valid. Choice D is incorrect because there is no syntax error in the code.",
     "question_id": "Q056",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Truthiness: non-empty strings and non-zero numbers evaluate to True",
@@ -2800,29 +2800,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nx = 5\ny = 10\nif x > 3:\n    if y < 12:\n        print('Condition met')\nelse:\n    print('Outer else')\n```",
+    "question": "Consider the following Python code snippet:\n```python\nx = 5\ny = 10\nif x < y:\n    if y > 7:\n        print('Both conditions are true')\nelse:\n    print('Outer else block')\n```",
     "choices": [
       {
-        "text": "Condition met",
+        "text": "Both conditions are true",
+        "is_correct": false
+      },
+      {
+        "text": "Outer else block",
         "is_correct": true
       },
       {
-        "text": "Outer else",
+        "text": "Inner else block",
         "is_correct": false
       },
       {
-        "text": "SyntaxError",
-        "is_correct": false
-      },
-      {
-        "text": "IndentationError",
+        "text": "Syntax error",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet checks if `x > 3` and `y < 12`. Since both conditions are true, the inner block is executed, printing 'Condition met'. The outer else block is not reached because the inner condition is satisfied.",
+    "explanation": "The code first checks if x < y, which is true (5 < 10). Then it checks the inner condition if y > 7, which is also true (10 > 7). Since both conditions are true, the message 'Both conditions are true' should be printed. The outer else block is not executed because all conditions in the nested if statement were met.",
     "question_id": "Q057",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Nested if conditional statements within code blocks",
@@ -2850,14 +2850,14 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the output of the following Python code snippet?\n```python\nx = 15\nif 10 < x < 20:\n    print('x is between 10 and 20')\nelse:\n    print('x is not between 10 and 20')\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nx = 15\nif 10 < x < 20:\n    print('In range')\nelse:\n    print('Out of range')\n```",
     "choices": [
       {
-        "text": "'x is between 10 and 20'",
+        "text": "In range",
         "is_correct": true
       },
       {
-        "text": "'x is not between 10 and 20'",
+        "text": "Out of range",
         "is_correct": false
       },
       {
@@ -2872,7 +2872,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet uses chained comparison operators to check if x is between 10 and 20. Since x = 15, the condition 10 < x < 20 evaluates to True, so 'x is between 10 and 20' will be printed. The other options are incorrect because there is no syntax or type error in the code.",
+    "explanation": "The code snippet uses chained comparison operators to check if `x` is between 10 and 20. Since `x = 15`, the condition `10 < x < 20` evaluates to True, so 'In range' is printed.",
     "question_id": "Q058",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Chained comparison operators like 10 < x < 20 in Python",
@@ -2900,7 +2900,7 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nage = 20\nstatus = 'Adult' if age >= 18 else 'Minor'\nprint(status)\n```\nWhat will be printed to the console?",
+    "question": "What is the output of the following Python code?\n```python\nage = 20\nstatus = 'Adult' if age >= 18 else 'Minor'\nprint(status)\n```",
     "choices": [
       {
         "text": "Adult",
@@ -2922,7 +2922,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The ternary operator checks if the condition `age >= 18` is True. Since age is 20, which is greater than or equal to 18, the expression evaluates to 'Adult'. Therefore, 'Adult' will be printed.",
+    "explanation": "The ternary operator checks if `age >= 18`. Since `age` is 20, which is greater than or equal to 18, the condition is True. Therefore, 'Adult' is assigned to the variable `status`, and it is printed.",
     "question_id": "Q059",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Ternary conditional expressions: value_if_true if condition else value_if_false",
@@ -2953,26 +2953,26 @@
     "question": "What will be the output of the following Python code snippet?\n```python\nx = 5\ny = 10\nif x < y:\n    print('x is less than y')\nelse:\n    print('x is not less than y')\n```",
     "choices": [
       {
-        "text": "x is less than y",
+        "text": "'x is less than y'",
         "is_correct": true
       },
       {
-        "text": "x is not less than y",
+        "text": "'x is not less than y'",
         "is_correct": false
       },
       {
-        "text": "SyntaxError: invalid syntax",
+        "text": "SyntaxError",
         "is_correct": false
       },
       {
-        "text": "5 < 10",
+        "text": "RuntimeError",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code snippet uses a comparison operator (<) to check if x is less than y. Since 5 is indeed less than 10, the condition evaluates to True, and 'x is less than y' is printed.",
+    "explanation": "The code snippet checks if x is less than y. Since 5 is indeed less than 10, the condition evaluates to True and 'x is less than y' is printed.",
     "question_id": "Q060",
     "topic": "Conditionals & Boolean Control Flow",
     "learning_objective": "Combining logical and comparison operators in complex conditions",
@@ -3000,29 +3000,29 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the output of the following Python code snippet?\n```python\nnumbers = [1, 2, 3, 4]\ntotal = 0\nfor number in numbers:\ntotal += number\nprint(total)\n```",
+    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3, 4, 5]\ntotal = 0\nfor num in numbers:\ntotal += num\nprint(total)\n```",
     "choices": [
       {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "10",
+        "text": "The output will be 15",
         "is_correct": true
       },
       {
-        "text": "8",
+        "text": "The output will be 25",
         "is_correct": false
       },
       {
-        "text": "7",
+        "text": "The output will be 0",
+        "is_correct": false
+      },
+      {
+        "text": "The code will raise an error",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code initializes a list of numbers and iterates over each number, adding it to the total. The final value of total is 10.",
+    "explanation": "Explanation:\nThe for loop iterates over each number in the list 'numbers'. For each iteration, it adds the current number to the variable 'total'. After all numbers have been processed, the final value of 'total' is printed. The sum of the numbers 1 through 5 is 15, so the correct output is 15.\n\nDistractors:\nA) 25: This would be the result if we were adding each number twice (e.g., 1+1 + 2+2 + ...).\nB) 0: This would happen if 'total' was not initialized to 0 before the loop starts.\nC) Error: The code is syntactically correct and will run without issues.",
     "question_id": "Q061",
     "topic": "Loops & Iteration",
     "learning_objective": "Basic for loop syntax iterating over elements of a list",
@@ -3050,7 +3050,7 @@
     "ast_error": "expected an indented block after 'for' statement on line 3 (<unknown>, line 4)"
   },
   {
-    "question": "Which of the following code snippets correctly iterates over each character in the string 'Python' and prints it? ```python\nword = 'Python'\nfor char in word:\nprint(char)\n```",
+    "question": "Which of the following Python code snippets correctly iterates over each character in the string 'Python' and prints it? ```python\nword = 'Python'\nfor char in word:\nprint(char)\n```",
     "choices": [
       {
         "text": "Choice A text",
@@ -3072,7 +3072,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is B. The code snippet correctly uses a for loop to iterate over each character in the string 'Python' and prints it. Choice A is incorrect because it does not use a for loop. Choice C is incorrect because it attempts to access an index that is out of range. Choice D is incorrect because it tries to print the entire string instead of each individual character.",
+    "explanation": "The correct code snippet iterates over each character in the string 'Python' using a for loop and prints it. The syntax is correct, and it will output: P y t h o n. Choice A might have an off-by-one error or incorrect variable name. Choice C could be missing the colon at the end of the for loop statement. Choice D might use a while loop instead of a for loop.",
     "question_id": "Q062",
     "topic": "Loops & Iteration",
     "learning_objective": "for loop iterating over characters of a string",
@@ -3100,7 +3100,7 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nfor i in range(5):\n    print(i)\n```",
+    "question": "What will be printed when the following code is executed?\n```python\nfor i in range(5):\n    print(i)\n```",
     "choices": [
       {
         "text": "0 1 2 3 4",
@@ -3122,7 +3122,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The range(5) function generates numbers starting from 0 up to (but not including) 5. Therefore, it prints 0, 1, 2, 3, and 4.",
+    "explanation": "The range(5) function generates numbers starting from 0 up to, but not including, 5. Therefore, it will print 0 1 2 3 4.",
     "question_id": "Q063",
     "topic": "Loops & Iteration",
     "learning_objective": "range() function with single argument range(stop) generating 0 to stop-1",
@@ -3150,10 +3150,10 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nfor i in range(3, 8):\n    print(i)\n```",
+    "question": "Consider the following Python code snippet:\n```python\nfor i in range(3, 8):\n    print(i)\n```\nWhat will be the output of this code?",
     "choices": [
       {
-        "text": "2 3 4 5 6 7",
+        "text": "1 2 3 4 5 6",
         "is_correct": false
       },
       {
@@ -3161,18 +3161,18 @@
         "is_correct": true
       },
       {
-        "text": "1 2 3 4 5 6 7",
+        "text": "0 1 2 3 4 5 6 7",
         "is_correct": false
       },
       {
-        "text": "0 1 2 3 4 5 6 7",
+        "text": "2 3 4 5 6 7 8",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The range function starts from the start value (inclusive) and goes up to but does not include the stop value. Therefore, for i in range(3, 8), it will print numbers starting from 3 up to but not including 8, which are 3, 4, 5, 6, and 7.",
+    "explanation": "The range function starts from the start value (inclusive) and goes up to but does not include the stop value. Therefore, for i in range(3, 8), it will print numbers starting from 3 up to but not including 8.",
     "question_id": "Q064",
     "topic": "Loops & Iteration",
     "learning_objective": "range() function with two arguments range(start, stop)",
@@ -3200,29 +3200,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following code snippet:\n```python\nfor i in range(0, 10, 3):\n    print(i)\n``` What will be the output of this code?\n",
+    "question": "Consider the following Python code snippet:\n```python\nfor i in range(0, 10, 2):\n    print(i)\n```\nWhat will be the output of this code?",
     "choices": [
       {
-        "text": "0 3 6 9",
+        "text": "0 2 4 6 8",
         "is_correct": true
       },
       {
-        "text": "0 2 4 6 8",
+        "text": "0 1 2 3 4",
         "is_correct": false
       },
       {
-        "text": "1 4 7",
+        "text": "1 2 3 4 5",
         "is_correct": false
       },
       {
-        "text": "0 1 2 3 4 5 6 7 8 9",
+        "text": "2 4 6 8 10",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The range function generates numbers starting from the start value (inclusive) up to but not including the stop value, incrementing by the step. Here, it starts at 0 and increments by 3 each time until it reaches or exceeds 10. Therefore, the output will be 0, 3, 6, and 9.",
+    "explanation": "The range function generates numbers starting from the start value (inclusive) up to but not including the stop value (exclusive), incrementing by the step. In this case, it starts at 0 and increments by 2 until it reaches 10. Therefore, the output will be '0 2 4 6 8'.",
     "question_id": "Q065",
     "topic": "Loops & Iteration",
     "learning_objective": "range() function with three arguments range(start, stop, step)",
@@ -3250,29 +3250,29 @@
     "ast_error": ""
   },
   {
-    "question": "What will be the output of the following Python code snippet?\n```python\nfor i in range(10, -1, -2):\n    print(i)\n```",
+    "question": "Which of the following code snippets will correctly print numbers from 5 down to 1 using a for loop with a negative step in range()?",
     "choices": [
       {
-        "text": "8 6 4 2 0",
+        "text": "```python\nfor i in range(5, -1, -1):\n    print(i)\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\nfor i in range(6, 0, -1):\n    print(i)\n```",
         "is_correct": true
       },
       {
-        "text": "10 8 6 4 2 0",
+        "text": "```python\nfor i in range(5, 0, -1):\n    print(i)\n```",
         "is_correct": false
       },
       {
-        "text": "9 7 5 3 1",
-        "is_correct": false
-      },
-      {
-        "text": "10 8 6 4",
+        "text": "```python\nfor i in range(6, -1, -1):\n    print(i)\n```",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The range function starts at 10 and decrements by 2 until it reaches -1 (exclusive). The correct output is 8 6 4 2 0.",
+    "explanation": "The correct answer is B. The range function starts at 6 and decrements by 1 until it reaches 0 (exclusive). This will print numbers from 5 down to 1. Option A has an incorrect stop value of -1, which would not include 0 in the sequence. Option C does not include 0 in the sequence because the range function is exclusive of the stop value. Option D starts at 6 and decrements by 1 until it reaches -1 (inclusive), which will print numbers from 5 down to -1.",
     "question_id": "Q066",
     "topic": "Loops & Iteration",
     "learning_objective": "Counting backwards using negative step in range()",
@@ -3296,8 +3296,8 @@
         "text": "The continue Statement\nSkips the rest of the current iteration\nContinues to the next iteration\nDoes not exit the loop entirely\n# Example with for loop\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\nif num % 2 == 0: # If even\n# Skip printing for even numbers\ncontinue\nprint(num)\n1 2 3 Skips even numbers\nBoth statements control loop execution based on conditionsUse break to exit early, continue to skip items\n--- Page 8 ---\nChoosing the Right Loop Type\nFor Loops\nUse when you know the number of iterations in advance"
       }
     ],
-    "ast_valid": true,
-    "ast_error": ""
+    "ast_valid": false,
+    "ast_error": "No code snippet found in question"
   },
   {
     "question": "What is the output of the following Python code snippet?\n```python\ni = 0\nwhile i < 5:\n    print(i)\n    i += 1\n```",
@@ -3307,22 +3307,22 @@
         "is_correct": true
       },
       {
-        "text": "0 1 2 3",
+        "text": "0 1 2 3 4 5",
         "is_correct": false
       },
       {
-        "text": "1 2 3 4 5",
+        "text": "-1 0 1 2 3",
         "is_correct": false
       },
       {
-        "text": "Syntax Error",
+        "text": "SyntaxError: invalid syntax",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code initializes a variable `i` to 0 and enters a while loop that continues as long as `i` is less than 5. Inside the loop, it prints the value of `i` and then increments `i` by 1. The loop will run 5 times, printing 0 through 4.",
+    "explanation": "The code initializes `i` to 0 and enters a while loop that continues as long as `i` is less than 5. Inside the loop, it prints the current value of `i` and then increments `i` by 1. The loop runs exactly 5 times, printing 0 through 4.",
     "question_id": "Q067",
     "topic": "Loops & Iteration",
     "learning_objective": "Basic while loop syntax and condition-controlled iteration",
@@ -3350,29 +3350,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly updates the loop counter variable to prevent an infinite loop?\n```python\n# Code snippet\ni = 0\nwhile i < 5:\n    print(i)\n    # Missing line to update i\n```",
+    "question": "Consider the following code snippet. What will be the output of this program?\n```python\ni = 0\nwhile i < 5:\n    print(i)\n    # Missing line to update i\n```",
     "choices": [
       {
-        "text": "i += 1",
+        "text": "Output: 0 1 2 3 4",
         "is_correct": true
       },
       {
-        "text": "i -= 1",
+        "text": "Output: 0 1 2 3",
         "is_correct": false
       },
       {
-        "text": "i = 0",
+        "text": "Output: 0 1 2 3 4 5",
         "is_correct": false
       },
       {
-        "text": "i *= 2",
+        "text": "Infinite loop starting from 0",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is `i += 1`. This line increments the value of `i` by 1 in each iteration, ensuring that the condition `i < 5` will eventually become false and the loop will terminate. The other choices either decrement `i`, reset it to 0, or double its value, all of which could potentially lead to an infinite loop if not handled correctly.",
+    "explanation": "The correct answer is A. The loop will run as long as i is less than 5, printing the value of i each time. Since the line to update i (i += 1) is missing, the condition i < 5 will always be true, leading to an infinite loop starting from 0. Choice B is incorrect because it stops before reaching 4. Choice C is incorrect because it includes an extra iteration that would make i equal to 5, which violates the condition in the while loop. Choice D is incorrect because the code does not have a syntax error that would cause an infinite loop.",
     "question_id": "Q068",
     "topic": "Loops & Iteration",
     "learning_objective": "Updating loop counter variable in while loop to prevent infinite loops",
@@ -3415,14 +3415,14 @@
         "is_correct": false
       },
       {
-        "text": "```python\nwhile True:\n    user_input = input('Enter command: ')\n    if user_input != 'quit':\n        continue\n```",
+        "text": "```python\ncount = 0\nwhile count < 10:\n    count += 1\n    if count == 5:\n        continue\n```",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer uses the `break` statement to exit the loop immediately when the condition is met. The other options either use `continue`, which skips the current iteration, or do not have a condition that terminates the loop.",
+    "explanation": "The correct choice uses the `break` statement to terminate the loop immediately when the condition is met. The other choices either use `continue` (which skips the current iteration) or do not include a `break` statement.",
     "question_id": "Q069",
     "topic": "Loops & Iteration",
     "learning_objective": "break statement terminating loop execution immediately",
@@ -3450,29 +3450,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following code snippets will correctly print all odd numbers from 1 to 6 using a for loop and continue statement?",
+    "question": "Which of the following code snippets will correctly print all odd numbers from 1 to 6 using a for loop, skipping even numbers?",
     "choices": [
       {
-        "text": "```python\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\n    if num % 2 == 0:\n        print(num)\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\n    if num % 2 != 0:\n        continue\n    print(num)\n```",
-        "is_correct": true
-      },
-      {
         "text": "```python\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\n    if num % 2 == 0:\n        continue\n    print(num)\n```",
-        "is_correct": false
+        "is_correct": true
       },
       {
         "text": "```python\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\n    if num % 2 == 0:\n        break\n    print(num)\n```",
         "is_correct": false
+      },
+      {
+        "text": "```python\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\n    if num % 2 != 0:\n        continue\n    print(num)\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\n    if num % 2 == 0:\n        pass\n    print(num)\n```",
+        "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice uses the continue statement to skip even numbers and print only odd numbers. Choice A incorrectly prints even numbers because it does not use a condition to skip them. Choice C is incorrect because it continues printing all numbers, including even ones. Choice D is incorrect because it breaks out of the loop when an even number is encountered.",
+    "explanation": "The correct choice uses the `continue` statement to skip even numbers and print only odd numbers. The distractors either use `break`, which exits the loop entirely, or `pass`, which does nothing and prints all numbers.",
     "question_id": "Q070",
     "topic": "Loops & Iteration",
     "learning_objective": "continue statement skipping current iteration to next cycle",
@@ -3500,29 +3500,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python code snippet that aims to sum all numbers from 1 to 5 using a for loop. ```python\nsum = 0\nfor i in range(1, 6):\n    sum += i\nprint(sum)\n``` What will be the output of this code?",
+    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3, 4, 5]\ntotal = 0\nfor num in numbers:\n    total += num\nprint(total)\n```",
     "choices": [
       {
-        "text": "A) 15",
+        "text": "The output will be 15",
         "is_correct": true
       },
       {
-        "text": "B) 14",
+        "text": "The output will be 12",
         "is_correct": false
       },
       {
-        "text": "C) 16",
+        "text": "The output will be 10",
         "is_correct": false
       },
       {
-        "text": "D) 0",
+        "text": "The output will be 8",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The for loop iterates from 1 to 5 (inclusive), and the sum variable accumulates each value. The correct output is 15.",
+    "explanation": "Explanation of the correct choice and distractors:\n- The code is a simple for loop that iterates over a list of numbers and accumulates their sum in the variable `total`.\n- The correct answer is 15 because 1 + 2 + 3 + 4 + 5 = 15.\n- Choice B (12) is incorrect because it suggests an off-by-one error, where one number might be missed or counted twice.\n- Choice C (10) and D (8) are incorrect as they represent plausible mistakes in summing the numbers correctly.",
     "question_id": "Q071",
     "topic": "Loops & Iteration",
     "learning_objective": "Accumulator variable pattern summing numbers inside a for loop",
@@ -3546,33 +3546,33 @@
         "text": "The continue Statement\nSkips the rest of the current iteration\nContinues to the next iteration\nDoes not exit the loop entirely\n# Example with for loop\nnumbers = [1, 2, 3, 4, 5, 6]\nfor num in numbers:\nif num % 2 == 0: # If even\n# Skip printing for even numbers\ncontinue\nprint(num)\n1 2 3 Skips even numbers\nBoth statements control loop execution based on conditionsUse break to exit early, continue to skip items\n--- Page 8 ---\nChoosing the Right Loop Type\nFor Loops\nUse when you know the number of iterations in advance"
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3]\nfor i in range(len(numbers)):\n    print(numbers[i])\n```",
+    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3]\nsquares = []\nfor num in numbers:\n    squares.append(num * num)\nprint(squares)\n```\nWhat will be the output of this code?",
     "choices": [
       {
-        "text": "Prints: 0 1 2",
-        "is_correct": false
-      },
-      {
-        "text": "Prints: 1 2 3",
+        "text": "[1, 4, 9]",
         "is_correct": true
       },
       {
-        "text": "Prints: 2 3 4",
+        "text": "[2, 4, 6]",
         "is_correct": false
       },
       {
-        "text": "Raises an IndexError",
+        "text": "[1, 3, 5]",
+        "is_correct": false
+      },
+      {
+        "text": "[0, 0, 0]",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The for loop iterates over the range of indices of the list 'numbers'. Since Python uses zero-indexing, it starts from 0 and goes up to len(numbers) - 1. Therefore, it prints the elements at indices 0, 1, and 2, which are 1, 2, and 3 respectively.",
+    "explanation": "The code iterates over the list `numbers` and appends the square of each number to the list `squares`. The correct output is `[1, 4, 9]`. Choice B is incorrect because it squares the numbers but adds them incorrectly. Choice C is incorrect because it increments the numbers instead of squaring them. Choice D is incorrect because it initializes an empty list and then appends zeros.",
     "question_id": "Q072",
     "topic": "Loops & Iteration",
     "learning_objective": "Nested for loops and two-dimensional iteration flow",
@@ -3600,29 +3600,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nmy_dict = {'a': 1, 'b': 2, 'c': 3}\nfor key in my_dict.keys():\n    print(key)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nmy_dict = {'a': 1, 'b': 2, 'c': 3}\nfor key in my_dict:\n    print(key)\n```",
     "choices": [
       {
-        "text": "It will print: a b c",
+        "text": "a b c",
         "is_correct": true
       },
       {
-        "text": "It will raise an error because dictionaries are not iterable.",
+        "text": "1 2 3",
         "is_correct": false
       },
       {
-        "text": "It will print: {'a': 1, 'b': 2, 'c': 3}",
+        "text": "{'a': 1, 'b': 2, 'c': 3}",
         "is_correct": false
       },
       {
-        "text": "It will print: a\nb\nc\nd",
+        "text": "TypeError: 'dict' object is not iterable",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is A. The for loop iterates over the keys of the dictionary `my_dict` and prints each key. Dictionaries in Python are iterable, so this code will execute without errors and print 'a', 'b', and 'c'. Choice B is incorrect because dictionaries are indeed iterable. Choice C is wrong because it attempts to print the entire dictionary instead of its keys. Choice D is incorrect because there is no 'd' key in the dictionary.",
+    "explanation": "The code iterates over the keys of the dictionary `my_dict` and prints each key. The correct output is 'a b c'. Choice B is incorrect because it attempts to print the values instead of the keys. Choice C is incorrect because it tries to print the entire dictionary, not its keys. Choice D is incorrect because there are no issues with iterating over a dictionary.",
     "question_id": "Q073",
     "topic": "Loops & Iteration",
     "learning_objective": "Iterating over dictionary keys and values using a for loop",
@@ -3661,18 +3661,18 @@
         "is_correct": false
       },
       {
-        "text": "1 apple\n2 banana\n3 cherry",
+        "text": "apple banana cherry",
         "is_correct": false
       },
       {
-        "text": "apple 1\nbanana 2\nc cherry 3",
+        "text": "SyntaxError: invalid syntax",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The enumerate() function adds a counter to an iterable and returns it in a form of enumerate object. The syntax is enumerate(iterable, start=0). In this case, the loop starts at index 0 by default. Therefore, the output will be '0 apple', '1 banana', and '2 cherry'.",
+    "explanation": "The `enumerate()` function adds a counter to an iterable and returns it in a form of enumerate object. The output will be the index followed by the fruit name for each item in the list.",
     "question_id": "Q074",
     "topic": "Loops & Iteration",
     "learning_objective": "Looping with enumerate() to track both index and item",
@@ -3700,29 +3700,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly finds the maximum value in a list using a for loop? ```python\nnumbers = [3, 5, 1, 8, 2]\nmax_value = None\nfor num in numbers:\n    if max_value is None or num > max_value:\n        max_value = num\nprint(max_value)\n```",
+    "question": "What is the output of the following Python code snippet?\n```python\nnumbers = [3, 5, 1, 8, 2]\nmax_value = None\nfor num in numbers:\n    if max_value is None or num > max_value:\n        max_value = num\nprint(max_value)\n```",
     "choices": [
       {
-        "text": "Choice A: ```python\nnumbers = [3, 5, 1, 8, 2]\nmax_value = numbers[0]\nfor num in numbers:\n    if num > max_value:\n        max_value = num\nprint(max_value)\n```",
+        "text": "None",
         "is_correct": false
       },
       {
-        "text": "Choice B: ```python\nnumbers = [3, 5, 1, 8, 2]\nmax_value = None\nfor num in numbers:\n    if max_value is None or num > max_value:\n        max_value = num\nprint(max_value)\n```",
+        "text": "8",
         "is_correct": true
       },
       {
-        "text": "Choice C: ```python\nnumbers = [3, 5, 1, 8, 2]\nmax_value = numbers[0]\nfor num in numbers:\n    if num < max_value:\n        max_value = num\nprint(max_value)\n```",
+        "text": "1",
         "is_correct": false
       },
       {
-        "text": "Choice D: ```python\nnumbers = [3, 5, 1, 8, 2]\nmax_value = None\nfor num in numbers:\n    if max_value is not None and num > max_value:\n        max_value = num\nprint(max_value)\n```",
+        "text": "2",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice initializes `max_value` to `None` and updates it only if the current number is greater than the current maximum. This ensures that the loop correctly identifies the maximum value in the list. Choice A incorrectly initializes `max_value` to the first element of the list, which may not be the maximum. Choice C attempts to find the minimum value instead of the maximum. Choice D has a logical error where it updates `max_value` only if it is not `None`, which would cause an error on the first iteration.",
+    "explanation": "The code initializes `max_value` to `None`. It then iterates through the list `numbers`. For each number, it checks if `max_value` is `None` or if the current number is greater than `max_value`. If either condition is true, it updates `max_value`. After iterating through all numbers, `max_value` will hold the maximum value in the list. Therefore, the output is 8.",
     "question_id": "Q075",
     "topic": "Loops & Iteration",
     "learning_objective": "Finding maximum or minimum value in a list using a loop",
@@ -3746,33 +3746,33 @@
         "text": "Avoiding Infinite Loops\nWhat is an Infinite Loop?\nA loop that runs continuously without stopping \nbecause its condition never becomes False.\nCommon Causes\nCondition variable not updated within loop\nLogic error in condition expression\nUnintended side effects modifying loop condition\nPrevention Strategies\nAlways update loop control variables\nEnsure loop condition will become false\nTest with simple cases first\nProblematic Example\n# This creates an infinite loop!\nage = 32\nwhile age > 18:\nprint('You can vote')\n# age never updated"
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet that counts how many times the number 3 appears in a list of integers. ```python\nnumbers = [1, 2, 3, 4, 5, 3, 6]\ncount = 0\nfor num in numbers:\n    if num == 3:\n        count += 1\nprint(count)\n``` What will be the output of this code?",
+    "question": "Which of the following code snippets correctly counts how many times the letter 'a' appears in a given string using a for loop? ```python\n# code here\n```",
     "choices": [
       {
-        "text": "2",
+        "text": "for char in 'banana':\n    if char == 'A':\n        count += 1",
         "is_correct": false
       },
       {
-        "text": "3",
+        "text": "count = 0\nfor char in 'banana':\n    if char == 'a':\n        count += 1",
         "is_correct": true
       },
       {
-        "text": "4",
+        "text": "count = 0\nwhile char in 'banana':\n    if char == 'a':\n        count += 1",
         "is_correct": false
       },
       {
-        "text": "5",
+        "text": "for char in 'banana':\n    if char == 'a':\n        count++",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code initializes a counter `count` to 0. It then iterates over each element in the list `numbers`. For each element, it checks if the element is equal to 3. If it is, it increments the counter by 1. After iterating through all elements, it prints the final value of `count`, which is 2 because there are two occurrences of 3 in the list.",
+    "explanation": "The correct answer is B. The code initializes a counter to zero and iterates over each character in the string 'banana'. If the character is 'a', it increments the counter. This correctly counts how many times 'a' appears in the string. Choice A is incorrect because it checks for 'A' instead of 'a'. Choice C uses a while loop, which is not appropriate for this task since we know the length of the string. Choice D has a syntax error with 'count++', which should be 'count += 1' in Python.",
     "question_id": "Q076",
     "topic": "Loops & Iteration",
     "learning_objective": "Counting occurrences of a specific element inside a loop",
@@ -3800,29 +3800,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python code snippet that is intended to create a new list containing only even numbers from an existing list. ```python\nnumbers = [1, 2, 3, 4, 5, 6]\neven_numbers = []\nfor number in numbers:\n    if number % 2 == 0:\n        even_numbers.append(number)\n``` What will be the output of this code?\n",
+    "question": "Which of the following code snippets correctly filters out even numbers from a list using a for loop and appends them to a new list?",
     "choices": [
       {
-        "text": "even_numbers = [1, 3, 5]",
-        "is_correct": false
-      },
-      {
-        "text": "even_numbers = [2, 4, 6]",
+        "text": "```python\nnew_list = []\nfor num in [1, 2, 3, 4]:\n    if num % 2 == 0:\n        new_list.append(num)\nprint(new_list)  # Output: [2, 4]\n```",
         "is_correct": true
       },
       {
-        "text": "even_numbers = [0, 2, 4, 6]",
+        "text": "```python\nnew_list = []\nfor num in range(1, 5):\n    if num % 2 == 0:\n        new_list.append(num)\nprint(new_list)  # Output: [2, 4]\n```",
         "is_correct": false
       },
       {
-        "text": "even_numbers = [1, 2, 3, 4, 5, 6]",
+        "text": "```python\nnew_list = []\nfor num in [1, 2, 3, 4]:\n    if num % 2 != 0:\n        new_list.append(num)\nprint(new_list)  # Output: [1, 3]\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\nnew_list = []\nfor num in range(5):\n    if num % 2 == 0:\n        new_list.append(num)\nprint(new_list)  # Output: [0, 2, 4]\n```",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code iterates over the list 'numbers' and checks if each number is even using the modulus operator. If a number is even, it is appended to the 'even_numbers' list. The correct output should be [2, 4, 6].",
+    "explanation": "The correct answer filters out even numbers from the list [1, 2, 3, 4] and appends them to a new list. The first choice correctly implements this logic. The second choice uses range(5) instead of a specific list, which is not asked for in the question. The third choice filters out odd numbers instead of even ones. The fourth choice includes zero, which was not part of the original list.",
     "question_id": "Q077",
     "topic": "Loops & Iteration",
     "learning_objective": "Building a new filtered list inside a for loop with append()",
@@ -3850,29 +3850,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nuser_input = \"\"\nwhile user_input != \"quit\":\n    user_input = input(\"Enter command: \")\nprint(\"Exiting loop\")\n```\nWhat will be the output if a user enters 'help' and then 'quit'?\n",
+    "question": "What will be the output of the following Python code snippet?\n```python\nuser_input = \"\"\nwhile user_input != \"quit\":\n    user_input = input(\"Enter command: \")\n    if user_input == \"stop\":\n        break\nprint(\"Loop ended\")\n```",
     "choices": [
       {
-        "text": "Enter command: help\nEnter command: quit\nExiting loop",
+        "text": "The program will print 'Loop ended' and then wait for the next command.",
         "is_correct": false
       },
       {
-        "text": "Enter command: help\nExiting loop",
+        "text": "The program will keep asking for commands until 'quit' is entered.",
         "is_correct": true
       },
       {
-        "text": "Enter command: quit\nExiting loop",
+        "text": "The program will enter an infinite loop because of the missing condition update.",
         "is_correct": false
       },
       {
-        "text": "Error: Invalid input",
+        "text": "The program will print 'Loop ended' and then continue to ask for commands indefinitely.",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer is B. When the user enters 'help', the loop continues and asks for another command. However, when the user enters 'quit', the condition `user_input != \"quit\"` becomes false, causing the loop to exit and print 'Exiting loop'. Choice A is incorrect because it shows an extra iteration that does not occur. Choice C is incorrect because it assumes the loop exits immediately upon entering 'quit', which is not the case. Choice D is incorrect because there are no invalid inputs in this scenario.",
+    "explanation": "Explanation: The code uses a while loop that continues until the user enters 'quit'. Inside the loop, there is an if statement that checks if the input is 'stop'. If it is, the break statement is executed, which exits the loop immediately. Therefore, the correct output will be 'Loop ended' followed by the prompt for the next command.",
     "question_id": "Q078",
     "topic": "Loops & Iteration",
     "learning_objective": "while loop with break condition and user input simulation",
@@ -3900,29 +3900,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nnumbers = [1, 2, 3, 4, 5]\ncount = 0\nfor num in numbers:\n    if num % 2 == 0:\n        count += 1\nprint(count)\n```",
+    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3, 4, 5]\ncount = 0\nfor num in numbers:\n    if num % 2 == 0:\n        continue\ncount += 1\nprint(count)\n```",
     "choices": [
       {
-        "text": "0",
+        "text": "The output will be 5",
         "is_correct": false
       },
       {
-        "text": "2",
+        "text": "The output will be 3",
         "is_correct": true
       },
       {
-        "text": "3",
+        "text": "The output will be 2",
         "is_correct": false
       },
       {
-        "text": "5",
+        "text": "The code will enter an infinite loop",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code counts the number of even numbers in the list 'numbers'. It iterates through each number, checks if it is even using the modulus operator, and increments the count if true. The final output is the count of even numbers.",
+    "explanation": "Explanation: The for loop iterates over the list `numbers`. When it encounters an even number (2 and 4), the continue statement is executed, skipping the increment of `count` for those numbers. Therefore, only the odd numbers (1, 3, 5) contribute to the final value of `count`, which is incremented three times. The correct output is 3.",
     "question_id": "Q079",
     "topic": "Loops & Iteration",
     "learning_objective": "Execution tracing: predicting final variable state after nested loops",
@@ -3950,7 +3950,7 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\nfound = False\nnumbers = [3, 5, 7, 9]\nfor num in numbers:\n    if num == 6:\n        found = True\n        break\nprint(found)\n```",
+    "question": "Consider the following Python code snippet:\n```python\nfound = False\nnumbers = [1, 2, 3, 4, 5]\nfor num in numbers:\n    if num == 3:\n        found = True\n        break\nprint(found)\n```",
     "choices": [
       {
         "text": "True",
@@ -3972,7 +3972,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code initializes a boolean flag `found` to False. It then iterates over the list `numbers`. If it finds the number 6, it sets `found` to True and breaks out of the loop. Since 6 is not in the list, the loop completes without finding 6, and `found` remains False. Therefore, the output is False.",
+    "explanation": "The code initializes a boolean flag `found` to False. It then iterates over the list `numbers`. When it encounters the number 3, it sets `found` to True and breaks out of the loop. The final print statement outputs the value of `found`, which is False.",
     "question_id": "Q080",
     "topic": "Loops & Iteration",
     "learning_objective": "Combining while loops with boolean flag variables",
@@ -4000,7 +4000,7 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\ndef main():\n    print(greet('Alice'))\n\nif __name__ == '__main__':\n    main()\n```",
+    "question": "What will be the output of the following Python code snippet?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\ndef main():\n    print(greet('Alice'))\n\nif __name__ == '__main__':\n    main()\n```",
     "choices": [
       {
         "text": "Hello, Alice!",
@@ -4011,18 +4011,18 @@
         "is_correct": false
       },
       {
-        "text": "NameError: name 'name' is not defined",
+        "text": "NameError: name 'Alice' is not defined",
         "is_correct": false
       },
       {
-        "text": "TypeError: greet() takes no arguments (1 given)",
+        "text": "TypeError: greet() missing 1 required positional argument: 'name'",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `greet` is defined to take one parameter, `name`. In the `main` function, we call `greet('Alice')`, which correctly passes 'Alice' as an argument. The function returns the string 'Hello, Alice!', which is then printed by the `print` statement in `main()`. Therefore, the correct output is 'Hello, Alice!'.",
+    "explanation": "The code defines a function `greet` that takes a name as an argument and returns a greeting string. The `main` function calls `greet('Alice')`, which correctly substitutes 'Alice' into the greeting template, resulting in 'Hello, Alice!'. Choice B is incorrect because it passes 'Bob' instead of 'Alice'. Choice C is incorrect because there are no undefined names in the code. Choice D is incorrect because all arguments required by the function are provided.",
     "question_id": "Q081",
     "topic": "Functions & Scope",
     "learning_objective": "Defining functions using def keyword and calling functions",
@@ -4050,29 +4050,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python function definition:\n```python\ndef calculate_area(length, width):\n    return length * width\n```\nWhat will be the output of calling `calculate_area(5, 3)`?\n",
+    "question": "What is the output of the following code snippet?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\nresult = greet('Alice')\nprint(result)\n```",
     "choices": [
       {
-        "text": "15",
+        "text": "Hello, Alice!",
         "is_correct": true
       },
       {
-        "text": "8",
+        "text": "Hello, Bob!",
         "is_correct": false
       },
       {
-        "text": "10",
+        "text": "Hello, !",
         "is_correct": false
       },
       {
-        "text": "20",
+        "text": "NameError: name 'name' is not defined",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `calculate_area` takes two parameters, `length` and `width`. When called with the arguments `5` and `3`, it calculates the area as `5 * 3 = 15`. Therefore, the correct output is `15`.",
+    "explanation": "The function `greet` takes a parameter `name` and returns a greeting string. When calling `greet('Alice')`, the argument 'Alice' is passed to the parameter `name`. The function correctly substitutes 'Alice' into the greeting template, resulting in 'Hello, Alice!'. Choice B has an incorrect name, Choice C is missing the name entirely, and Choice D indicates a NameError which does not occur.",
     "question_id": "Q082",
     "topic": "Functions & Scope",
     "learning_objective": "Function parameters and passing positional arguments",
@@ -4100,29 +4100,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\ndef multiply(a, b):\n    return a * b\nresult = multiply(4, 3)\nprint(result)\n```",
+    "question": "Consider the following Python function:\n```python\ndef calculate_average(numbers):\n    return sum(numbers) / len(numbers)\n\naverage = calculate_average([1, 2, 3, 4, 5])\nprint(average)\n```\nWhat will be the output of this code?",
     "choices": [
       {
-        "text": "12",
+        "text": "10.0",
+        "is_correct": false
+      },
+      {
+        "text": "3.0",
         "is_correct": true
       },
       {
-        "text": "10",
+        "text": "2.5",
         "is_correct": false
       },
       {
-        "text": "8",
-        "is_correct": false
-      },
-      {
-        "text": "7",
+        "text": "5.0",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `multiply` takes two arguments, `a` and `b`, and returns their product. When called with `multiply(4, 3)`, the result is `12`. The print statement then outputs this value.",
+    "explanation": "The function `calculate_average` computes the average of a list of numbers by summing them up and dividing by the count. The input list `[1, 2, 3, 4, 5]` has a sum of 15 and a length of 5, so the average is 15 / 5 = 3.0.",
     "question_id": "Q083",
     "topic": "Functions & Scope",
     "learning_objective": "return statement returning a computed value to caller",
@@ -4150,18 +4150,18 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('Alice'))\n```",
+    "question": "What is the output of the following Python code?\n```python\ndef greet(name):\n    return f\"Hello, {name}!\"\n\nprint(greet(\"Alice\"))\n```",
     "choices": [
       {
         "text": "Hello, Alice!",
         "is_correct": true
       },
       {
-        "text": "None",
+        "text": "Hello, !",
         "is_correct": false
       },
       {
-        "text": "Hello, !",
+        "text": "None",
         "is_correct": false
       },
       {
@@ -4172,7 +4172,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `greet` is defined to return a greeting string. When called with the argument `'Alice'`, it correctly returns 'Hello, Alice!'. The print statement then outputs this returned value.",
+    "explanation": "The function `greet` is defined to return a string that includes the name passed as an argument. When calling `print(greet(\"Alice\"))`, it correctly substitutes \"Alice\" into the string and returns 'Hello, Alice!'. Choice A is correct. Choice B is incorrect because the function does not return just 'Hello, !' but the full greeting. Choice C is incorrect because the function does not return None; it returns a string. Choice D is incorrect because there are no missing arguments when calling the function.",
     "question_id": "Q084",
     "topic": "Functions & Scope",
     "learning_objective": "Difference between print() displaying output and return producing a value",
@@ -4207,22 +4207,22 @@
         "is_correct": true
       },
       {
-        "text": "Hello, Alice!",
-        "is_correct": false
-      },
-      {
         "text": "'Hello, Alice!'",
         "is_correct": false
       },
       {
-        "text": "Error: function has no return statement",
+        "text": "TypeError: greet() missing 1 required positional argument: 'name'",
+        "is_correct": false
+      },
+      {
+        "text": "SyntaxError: invalid syntax",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `greet` function is defined to print a greeting message but does not have an explicit return statement. In Python, if a function does not have a return statement, it implicitly returns `None`. Therefore, the output of the code will be `None`, and nothing else will be printed.",
+    "explanation": "The function `greet` is defined to print a greeting message but does not return anything. When called with an argument, it prints the message and then implicitly returns None.",
     "question_id": "Q085",
     "topic": "Functions & Scope",
     "learning_objective": "Functions without explicit return returning None by default",
@@ -4250,29 +4250,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following functions correctly returns a tuple containing the sum and product of two numbers?",
+    "question": "Which of the following functions correctly returns a tuple containing two values?",
     "choices": [
       {
-        "text": "```python\ndef calculate(a, b):\n    return a + b\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\ndef calculate(a, b):\n    sum = a + b\n    product = a * b\n    return (sum, product)\n```",
+        "text": "```python\ndef get_values():\n    x = 10\n    y = 20\n    return x, y\n```",
         "is_correct": true
       },
       {
-        "text": "```python\ndef calculate(a, b):\n    result = a + b * a\n    return result\n```",
+        "text": "```python\ndef get_values():\n    x = 10\n    y = 20\n    return (x)\n```",
         "is_correct": false
       },
       {
-        "text": "```python\ndef calculate(a, b):\n    sum = a + b\n    product = a * b\n    return sum, product\n```",
+        "text": "```python\ndef get_values():\n    x = 10\n    y = 20\n    return [x, y]\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\ndef get_values():\n    x = 10\n    y = 20\n    return x + y\n```",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct function returns a tuple containing both the sum and product of two numbers. Choice A only returns the sum, Choice C calculates an incorrect value, and Choice D has the same issue as Choice A.",
+    "explanation": "The correct function returns a tuple containing two values, `x` and `y`. The second option incorrectly wraps the return value in parentheses, making it a single-element tuple. The third option returns a list instead of a tuple. The fourth option attempts to add the values together rather than returning them as a tuple.",
     "question_id": "Q086",
     "topic": "Functions & Scope",
     "learning_objective": "Returning multiple values as a tuple from a function",
@@ -4300,29 +4300,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following is the correct way to define a function with default parameters in Python, avoiding potential bugs related to mutable default arguments?",
+    "question": "Consider the following Python function:\n\n```python\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\n```\nWhat is the output of `add_item('apple')` followed by `add_item('banana')`?\n",
     "choices": [
       {
-        "text": "```python\ndef add_item(item, items=[]): items.append(item); return items\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\ndef add_item(item, items=None): if items is None: items = []; items.append(item); return items\n```",
+        "text": "[apple, banana]",
         "is_correct": true
       },
       {
-        "text": "```python\ndef add_item(item, items=()): items += (item,); return items\n```",
+        "text": "[banana, apple]",
         "is_correct": false
       },
       {
-        "text": "```python\ndef add_item(item, items={}): items[item] = 1; return items\n```",
+        "text": "[apple]",
+        "is_correct": false
+      },
+      {
+        "text": "[banana]",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer initializes the default mutable argument `items` to `None` and then checks if it is `None` inside the function. If it is, it reassigns it to an empty list. This avoids the common pitfall of using a mutable object as a default argument in Python, which can lead to unexpected behavior when the function is called multiple times. The other options either use incorrect syntax or do not properly handle the initialization of the default argument.",
+    "explanation": "The function `add_item` uses a mutable default argument `items=[]`. When the function is called for the first time with 'apple', it appends 'apple' to the list. The same list is then used when calling the function again with 'banana', appending 'banana' to the existing list. Thus, the final output is [apple, banana].",
     "question_id": "Q087",
     "topic": "Functions & Scope",
     "learning_objective": "Default parameter values and optional arguments in function definition",
@@ -4346,22 +4346,22 @@
         "text": "Avoid using mutable objects (lists, dictionaries) as default values:\n# DON'T DO THIS\ndef add_item(item, items=[]): # Risky!\nitems.append(item)\nreturn items\nRecommended Approach\nUse N o neas default and initialize inside function:\n# DO THIS INSTEAD\ndef add_item(item, items=None):\nif items is None :\nitems = []\nitems.append(item)\nreturn items\n7/13\n--- Page 8 ---\nArbitrary Arguments\n*args\nAllows a function to accept an arbitrary number of positional \narguments\nArguments are collected into a tuple\nThe * operator is the unpacking operator"
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "Which of the following function calls will correctly pass keyword arguments to a function named `greet` that expects two parameters: `name` and `age`?\n```python\ndef greet(name, age):\n    print(f'Hello, {name}. You are {age} years old.')\n\n# Which of these calls is correct?\ngreet(?, ?)\n```\n",
+    "question": "Which of the following is the correct way to call a function with keyword arguments in Python? ```python\ndef greet(name, age):\n    print(f'Hello, {name}. You are {age} years old.')\n```",
     "choices": [
       {
         "text": "greet('Alice', 30)",
         "is_correct": false
       },
       {
-        "text": "greet(name='Alice', age=30)",
+        "text": "greet(age=30, name='Alice')",
         "is_correct": true
       },
       {
-        "text": "greet(age=30, 'Alice')",
+        "text": "greet(name='Alice', 30)",
         "is_correct": false
       },
       {
@@ -4372,7 +4372,7 @@
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is `greet(name='Alice', age=30)`. This correctly passes keyword arguments to the function, specifying both `name` and `age`. The other choices either use positional arguments incorrectly or mix up the order of parameters.",
+    "explanation": "In Python, keyword arguments allow you to specify the parameter names during function calls. This makes the code more readable and less prone to errors. The correct call is `greet(age=30, name='Alice')`, which correctly assigns the values to their respective parameters.",
     "question_id": "Q088",
     "topic": "Functions & Scope",
     "learning_objective": "Keyword arguments specifying parameter names during function call",
@@ -4397,32 +4397,32 @@
       }
     ],
     "ast_valid": false,
-    "ast_error": "invalid syntax (<unknown>, line 5)"
+    "ast_error": "No code snippet found in question"
   },
   {
     "question": "Consider the following Python code snippet:\n```python\nx = 5\n\ndef my_function():\n    x = 10\n    print(x)\n\nmy_function()\nprint(x)\n```",
     "choices": [
       {
-        "text": "Output: 10 10",
+        "text": "5\n10",
         "is_correct": false
       },
       {
-        "text": "Output: 10 5",
+        "text": "10\n5",
         "is_correct": true
       },
       {
-        "text": "Output: 5 10",
+        "text": "5\n5",
         "is_correct": false
       },
       {
-        "text": "Error: UnboundLocalError",
+        "text": "10\n10",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `my_function` has a local variable `x` that shadows the global variable `x`. When `print(x)` is called inside the function, it prints the value of the local `x`, which is 10. Outside the function, the global `x` remains unchanged and is printed as 5.",
+    "explanation": "The function `my_function` has a local variable `x` which shadows the global variable `x`. When `my_function` is called, it prints the local value of `x`, which is 10. After the function call, the global variable `x` remains unchanged and still holds its original value of 5.",
     "question_id": "Q089",
     "topic": "Functions & Scope",
     "learning_objective": "Local variable scope inside function vs global variable scope outside",
@@ -4450,29 +4450,29 @@
     "ast_error": ""
   },
   {
-    "question": "Consider the following Python code snippet:\n```python\ndef calculate_average(numbers):\n    return sum(numbers) / len(numbers)\n\naverage = calculate_average([1, 2, 3])\nprint(average)\n```\nWhat will be the output of this code?",
+    "question": "What will be the output of the following Python code snippet?\n```python\ndef calculate_average(numbers):\n    return sum(numbers) / len(numbers)\n\nresult = calculate_average([1, 2, 3, 4])\nprint(result)\n```",
     "choices": [
       {
-        "text": "6.0",
+        "text": "8.0",
         "is_correct": false
       },
       {
-        "text": "2.0",
+        "text": "2.5",
         "is_correct": true
       },
       {
-        "text": "1.5",
+        "text": "SyntaxError",
         "is_correct": false
       },
       {
-        "text": "3.0",
+        "text": "NameError",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `calculate_average` correctly calculates the average of the numbers in the list `[1, 2, 3]`, which is `(1 + 2 + 3) / 3 = 6.0 / 3 = 2.0`. The variable `average` holds this value and is printed.",
+    "explanation": "The function `calculate_average` correctly calculates the average of the numbers in the list `[1, 2, 3, 4]`, which is `(1+2+3+4) / 4 = 10 / 4 = 2.5`. The code executes without errors and prints `2.5`.",
     "question_id": "Q090",
     "topic": "Functions & Scope",
     "learning_objective": "Attempting to access local variable outside function raises NameError",
@@ -4503,26 +4503,26 @@
     "question": "Consider the following Python code snippet:\n```python\nx = 5\n\ndef my_function():\n    x = 10\n    print(x)\n\nmy_function()\nprint(x)\n```\nWhat will be the output of this code?",
     "choices": [
       {
-        "text": "10 10",
-        "is_correct": false
-      },
-      {
-        "text": "5 10",
-        "is_correct": true
-      },
-      {
         "text": "10 5",
         "is_correct": false
       },
       {
+        "text": "10 10",
+        "is_correct": true
+      },
+      {
         "text": "5 5",
+        "is_correct": false
+      },
+      {
+        "text": "5 10",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `my_function` defines a local variable `x` with the value 10. When `print(x)` is called inside the function, it prints the local `x`, which is 10. Outside the function, the global `x` remains unchanged at its initial value of 5.",
+    "explanation": "The function `my_function` has a local variable `x` that shadows the global variable `x`. When `my_function` is called, it prints the value of its local `x`, which is 10. After the function call, the global `x` remains unchanged at 5.",
     "question_id": "Q091",
     "topic": "Functions & Scope",
     "learning_objective": "Shadowing global variables with local variables of the same name",
@@ -4550,29 +4550,29 @@
     "ast_error": ""
   },
   {
-    "question": "Which of the following code snippets correctly demonstrates how to pass a mutable object like a list to a function without causing in-place side effects?",
+    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3]\ndef add_to_list(num, lst=[]):\n    lst.append(num)\n    return lst\nresult = add_to_list(4)\nprint(result)\n```",
     "choices": [
       {
-        "text": "```python\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\nmy_list = [1, 2, 3]\nnew_list = add_item(4, my_list)\nprint(new_list) # Output: [1, 2, 3, 4]",
+        "text": "[1, 2, 3]",
         "is_correct": false
       },
       {
-        "text": "```python\ndef add_item(item, items=None):\n    if items is None:\n        items = []\n    items.append(item)\n    return items\nmy_list = [1, 2, 3]\nnew_list = add_item(4, my_list)\nprint(new_list) # Output: [1, 2, 3, 4]",
+        "text": "[1, 2, 3, 4]",
         "is_correct": true
       },
       {
-        "text": "```python\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\nmy_list = [1, 2, 3]\nnew_list = add_item(4)\nprint(new_list) # Output: [1, 2, 3, 4]",
+        "text": "[4]",
         "is_correct": false
       },
       {
-        "text": "```python\ndef add_item(item, items=[]):\n    return items + [item]\nmy_list = [1, 2, 3]\nnew_list = add_item(4, my_list)\nprint(new_list) # Output: [1, 2, 3, 4]",
+        "text": "[1, 2, 3, 4, 4]",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct answer uses `items=None` and initializes the list inside the function if it is not provided. This prevents in-place side effects on the original list, ensuring that the function does not modify the input list directly.",
+    "explanation": "The function `add_to_list` uses a mutable list as a default argument. When the function is called for the first time, it appends the number 4 to the default list and returns it. Since the same list is used across multiple calls (due to the default argument behavior), calling `add_to_list(4)` again will append another 4 to the same list.",
     "question_id": "Q092",
     "topic": "Functions & Scope",
     "learning_objective": "Passing mutable objects like lists to functions and in-place side effects",
@@ -4596,33 +4596,33 @@
         "text": "mutable\nTuples\nImmutable sequences of elements\nSets\nCollections of unique elements\nDictionaries\nKey-value pairs for fast lookups\nPage 2 of 14\n[ ] ( )\n{ } {:}\n--- Page 3 ---\nLists: The Dynamic Array\nDefinition\nA versatile, built-in data structure that functions as an \nordered, mutable collection of items.\nExample\nmy_list = [10, \"hello\", 3.14, True, 10]\nprint(my_list)\nOutput: [10, 'hello', 3.14, True, 10]\nKey Characteristics\nOrdered\nElements maintain their insertion order, \nwith fixed index starting from 0.\nMutable\nElements can be added, removed, or "
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "Consider the following Python function that calculates the sum of a list of numbers and returns the average. ```python\ndef calculate_average(numbers):\n    return sum(numbers) / len(numbers)\n``` What will be the output when calling `calculate_average([1, 2, 3])`?",
+    "question": "What is the output of the following Python code snippet?\n```python\ndef modify_string(s):\n    s += ' World'\n\noriginal = 'Hello'\nmodify_string(original)\nprint(original)\n```",
     "choices": [
       {
-        "text": "6",
-        "is_correct": false
-      },
-      {
-        "text": "2.0",
+        "text": "Hello",
         "is_correct": true
       },
       {
-        "text": "5",
+        "text": "Hello World",
         "is_correct": false
       },
       {
-        "text": "4",
+        "text": "World Hello",
+        "is_correct": false
+      },
+      {
+        "text": "Error: cannot modify immutable object",
         "is_correct": false
       }
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `calculate_average` takes a list of numbers as input. It calculates the sum of the numbers using `sum(numbers)` and then divides by the length of the list using `len(numbers)`. For the input `[1, 2, 3]`, the sum is 6 and the length is 3, so the average is 6 / 3 = 2.0.",
+    "explanation": "The function `modify_string` takes a string `s` as an argument and attempts to modify it by appending ' World'. However, strings in Python are immutable, so the modification does not affect the original string. The original string remains unchanged after calling the function.",
     "question_id": "Q093",
     "topic": "Functions & Scope",
     "learning_objective": "Passing immutable objects like integers and strings to functions",
@@ -4646,11 +4646,11 @@
         "text": "Report Date: 2025-12-23\n--- Page 2 ---\nWhat is a Function?\nDefinition\nA named, self-contained block of code designed to perform a \nspecific task\nOnly runs when it is called\nCan optionally return data as a result\n# A simple function definition\ndef greet():\nprint(\"Hello from a function!\")\n# Calling the function\ngreet() # Output: \"Hello from a function!\"\nTypes of Functions\nBuilt-in Functions\nprint() len()\ntype() int()\nUser-defined Functions\nCreated by developers to address specific needs\ndef calculate_area(length, width):"
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('Alice'))\n```",
+    "question": "What will be the output of the following Python code?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\ndef main():\n    print(greet('Alice'))\n\nmain()\n```",
     "choices": [
       {
         "text": "Hello, Alice!",
@@ -4665,14 +4665,14 @@
         "is_correct": false
       },
       {
-        "text": "TypeError: greet() takes 0 positional arguments but 1 was given",
+        "text": "TypeError: greet() missing 1 required positional argument: 'name'",
         "is_correct": false
       }
     ],
     "correct_index": 0,
-    "difficulty": "medium",
-    "bloom_level": "Apply",
-    "explanation": "The function `greet` is defined to take one parameter, `name`. When calling `greet('Alice')`, the argument 'Alice' is correctly passed to the function. The function returns a string with the greeting message, which is then printed as 'Hello, Alice!'.",
+    "difficulty": "easy",
+    "bloom_level": "Remember",
+    "explanation": "The function `greet` is called with the argument 'Alice'. It returns the string 'Hello, Alice!'. The `main` function then prints this returned value. Therefore, the output is 'Hello, Alice!'.",
     "question_id": "Q094",
     "topic": "Functions & Scope",
     "learning_objective": "Functions calling other functions and functional decomposition",
@@ -4711,18 +4711,18 @@
         "is_correct": true
       },
       {
-        "text": "8.0",
+        "text": "10.0",
         "is_correct": false
       },
       {
-        "text": "1.0",
+        "text": "8.0",
         "is_correct": false
       }
     ],
     "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `calculate_average` takes a list of numbers as input and returns their average. The sum of [1, 2, 3, 4] is 10, and the length of the list is 4. Therefore, the average is 10 / 4 = 2.5.",
+    "explanation": "The function `calculate_average` correctly calculates the average of a list by summing all elements and dividing by the count of elements. For the input [1, 2, 3, 4], the sum is 10 and there are 4 elements, so the correct output is 10 / 4 = 2.5.",
     "question_id": "Q095",
     "topic": "Functions & Scope",
     "learning_objective": "Docstrings and documenting function behavior with triple quotes",
@@ -4750,29 +4750,29 @@
     "ast_error": "No code snippet found in question"
   },
   {
-    "question": "What is the output of the following Python code snippet?\n```python\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\nprint(factorial(3))\n```",
+    "question": "Which of the following functions correctly calculates the factorial of a number using recursion? ```python\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n```",
     "choices": [
       {
-        "text": "6",
+        "text": "The function is correct and will calculate the factorial correctly.",
         "is_correct": true
       },
       {
-        "text": "5",
+        "text": "The function has a base case error and will not terminate properly.",
         "is_correct": false
       },
       {
-        "text": "4",
+        "text": "The function uses zero-indexing, which will cause an infinite recursion.",
         "is_correct": false
       },
       {
-        "text": "7",
+        "text": "The function does not handle negative numbers correctly, leading to incorrect results.",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The `factorial` function is a recursive function that calculates the factorial of a number. The base case is when `n == 0`, in which case it returns 1. For any other value of `n`, it returns `n * factorial(n - 1)`. When called with `factorial(3)`, it computes 3 * 2 * 1, which equals 6.",
+    "explanation": "The correct answer is [A]. The function uses the correct base case (n == 0) and recursive call (factorial(n - 1)) to calculate the factorial of a number. Choice [B] is incorrect because the base case is properly defined, so the function will terminate correctly. Choice [C] is wrong because Python uses one-based indexing, not zero-indexing. Choice [D] is incorrect because the function does not handle negative numbers specifically; it simply returns 1 when n == 0, which is mathematically correct for factorial(0).",
     "question_id": "Q096",
     "topic": "Functions & Scope",
     "learning_objective": "Simple recursive function definition with base case termination",
@@ -4796,11 +4796,11 @@
         "text": "print(f\"Hello, {name}!\")\ngreet(\"Alice\") # Output: Hello, \nAlice!\n4/13\n--- Page 5 ---\nThe Return Statement\nPurpose\nThe return statement serves two \nprimary purposes:\nSends a value back to the caller\nImmediately terminates \nfunction execution\ndef add(a, b):\nresult = a + b\nreturn result\nsum_result = add(3, 5)\nSingle Value\nFunctions can return any data \ntype:\nNumbers\nStrings\nLists, dictionaries, etc.\ndef square(number):\nreturn number * number\nresult = square(5)\n# Returns 25\nMultiple Values\nFunctions can return multiple \nvalues:"
       }
     ],
-    "ast_valid": true,
-    "ast_error": ""
+    "ast_valid": false,
+    "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Consider the following Python function that calculates the factorial of a number using recursion:\n```python\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n```\nWhat will be the output when calling `factorial(3)`?",
+    "question": "What is the output of the following Python code snippet?\n```python\n# Define a function to calculate factorial using recursion\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\n# Call the function with an input of 3\nresult = factorial(3)\nprint(result)\n```",
     "choices": [
       {
         "text": "6",
@@ -4822,7 +4822,7 @@
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The function `factorial(3)` will call itself with the arguments `factorial(2)`, `factorial(1)`, and finally `factorial(0)`. Each recursive call multiplies the current value of `n` by the result of the next recursive call until it reaches `factorial(0)`, which returns 1. The final result is 3 * 2 * 1 = 6.",
+    "explanation": "The function `factorial` is defined to calculate the factorial of a number using recursion. When called with an input of 3, it calculates 3 * 2 * 1 = 6. The correct output is therefore 6.",
     "question_id": "Q097",
     "topic": "Functions & Scope",
     "learning_objective": "Recursive factorial or countdown execution tracing",
@@ -4850,29 +4850,29 @@
     "ast_error": ""
   },
   {
-    "question": "What is the output of the following code snippet?\n```python\nx = lambda a, b: a + b\nprint(x(3, 4))\n```",
+    "question": "Which of the following lambda functions correctly calculates the square of a number?",
     "choices": [
       {
-        "text": "7",
+        "text": "```python\nsquare = lambda x: x * x + 1\n```",
+        "is_correct": false
+      },
+      {
+        "text": "```python\nsquare = lambda x: x ** 2\n```",
         "is_correct": true
       },
       {
-        "text": "8",
+        "text": "```python\nsquare = lambda x: x * x - 1\n```",
         "is_correct": false
       },
       {
-        "text": "9",
-        "is_correct": false
-      },
-      {
-        "text": "10",
+        "text": "```python\nsquare = lambda x: x / 2\n```",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The lambda function `x` takes two arguments, `a` and `b`, and returns their sum. When called with `x(3, 4)`, it adds 3 and 4 to get 7.",
+    "explanation": "The correct answer is B. The lambda function `lambda x: x ** 2` correctly calculates the square of a number by using the exponentiation operator `**`. Choice A adds 1 to the square, making it incorrect. Choice C subtracts 1 from the square, also making it incorrect. Choice D divides the number by 2, which is not related to squaring.",
     "question_id": "Q098",
     "topic": "Functions & Scope",
     "learning_objective": "Anonymous lambda functions for short one-line expressions",
@@ -4896,33 +4896,33 @@
         "text": "def log_function_call (func):\ndef wrapper(*args, **kwargs):\n# Before function call\nprint(f\"Calling function: {func.__name__}\")\nresult = func(*args, **kwargs)\n# After function call\nprint(f\"Function {func.__name__} finished. Result: \n{result}\")\nreturn result\nreturn wrapper\n# Function with decorator\n@log_function_call\ndef add(a, b):\nreturn a + b\n@log_function_call is syntactic sugar for add = log_function_call(add)\n10/13\n--- Page 11 ---\nGenerators\nWhat are Generators?\nSpecial type of iterable that produces values one at a time"
       }
     ],
-    "ast_valid": true,
-    "ast_error": ""
+    "ast_valid": false,
+    "ast_error": "No code snippet found in question"
   },
   {
-    "question": "Which of the following code snippets correctly uses a lambda function with `map()` to square each number in a list?",
+    "question": "Consider the following Python code snippet:\n```python\nnumbers = [1, 2, 3, 4, 5]\nsquared_numbers = list(map(lambda x: x**2, numbers))\nprint(squared_numbers)\n```",
     "choices": [
       {
-        "text": "```python\nnumbers = [1, 2, 3]\nsquared_numbers = map(lambda x: x * x, numbers)\nprint(list(squared_numbers))\n```",
+        "text": "[1, 2, 3, 4, 5]",
+        "is_correct": false
+      },
+      {
+        "text": "[1, 4, 9, 16, 25]",
         "is_correct": true
       },
       {
-        "text": "```python\nnumbers = [1, 2, 3]\nsquared_numbers = map(lambda x: x + x, numbers)\nprint(list(squared_numbers))\n```",
+        "text": "[0, 1, 2, 3, 4]",
         "is_correct": false
       },
       {
-        "text": "```python\nnumbers = [1, 2, 3]\nsquared_numbers = map(x * x, numbers)\nprint(list(squared_numbers))\n```",
-        "is_correct": false
-      },
-      {
-        "text": "```python\nnumbers = [1, 2, 3]\nsquared_numbers = map(lambda x: x ** 2, numbers)\nprint(list(squared_numbers))\n```",
+        "text": "[2, 4, 6, 8, 10]",
         "is_correct": false
       }
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The correct choice is A. The lambda function `lambda x: x * x` correctly squares each number in the list. Choice B uses addition instead of multiplication, which would not square the numbers. Choice C lacks the necessary lambda keyword and uses an invalid syntax for squaring. Choice D uses the exponentiation operator `**`, but it is not necessary as `x * x` achieves the same result.",
+    "explanation": "The lambda function `lambda x: x**2` squares each element in the list. The map() function applies this lambda to each element of `numbers`, resulting in `[1, 4, 9, 16, 25]`. Choice A is incorrect because it does not square the numbers. Choice C is incorrect because it contains zeros instead of the squared values. Choice D is incorrect because it increments each number by one instead of squaring them.",
     "question_id": "Q099",
     "topic": "Functions & Scope",
     "learning_objective": "Using lambda functions with map() or filter() or sorted() key",
@@ -4946,33 +4946,33 @@
         "text": "function name and expected inputs.\nMaintainability\nCode structured with functions is easier to \nunderstand, correct, enhance, and adapt over \ntime. Changes can be isolated to specific \nfunctions.\nTestability\nFunctions with clear arguments and explicit \nreturn values are easier to test, ensuring they \nbehave as expected.\nFunctions are the building blocks of well-\nstructured programs\n3/13\n--- Page 4 ---\nBasic Function Syntax\nFunction Definition\nUse the def keyword to define a function:\ndef function_name(parameter1, "
       }
     ],
-    "ast_valid": false,
-    "ast_error": "No code snippet found in question"
+    "ast_valid": true,
+    "ast_error": ""
   },
   {
-    "question": "What is the output of the following Python code?\n```python\ndef greet(name):\n    return f'Hello, {name}!'\ndef introduce(greet_func, person):\n    return greet_func(person)\nprint(introduce(greet, 'Alice'))\n```",
+    "question": "Consider the following Python function definition:\n```python\ndef greet(name):\n    print(f'Hello, {name}!')\n\n# Calling the function with an argument\nresult = greet('Alice')\n``` What will be the output of this code?\n",
     "choices": [
       {
         "text": "Hello, Alice!",
         "is_correct": true
       },
       {
-        "text": "Hello, Bob!",
+        "text": "NameError: name 'name' is not defined",
         "is_correct": false
       },
       {
-        "text": "NameError: name 'person' is not defined",
+        "text": "TypeError: greet() takes no arguments (1 given)",
         "is_correct": false
       },
       {
-        "text": "TypeError: greet() takes 0 positional arguments but 1 was given",
+        "text": "SyntaxError: invalid syntax",
         "is_correct": false
       }
     ],
     "correct_index": 0,
     "difficulty": "medium",
     "bloom_level": "Apply",
-    "explanation": "The code defines two functions, `greet` and `introduce`. The `greet` function takes a name as an argument and returns a greeting string. The `introduce` function takes another function (`greet_func`) and a person's name as arguments, then calls the passed function with the person's name. When calling `introduce(greet, 'Alice')`, it correctly passes the `greet` function and the string `'Alice'` to `introduce`. The `introduce` function then calls `greet('Alice')`, which returns the string 'Hello, Alice!', which is printed.",
+    "explanation": "The function `greet` is defined to take one parameter, `name`. When calling the function with the argument `'Alice'`, it correctly prints 'Hello, Alice!'. Choice B is incorrect because there are no issues with variable names. Choice C is wrong because the function does accept an argument. Choice D is incorrect as there is no syntax error.",
     "question_id": "Q100",
     "topic": "Functions & Scope",
     "learning_objective": "Function composition and passing functions as arguments",
