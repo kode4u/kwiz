@@ -518,12 +518,39 @@ if ($is_teacher) {
     echo '        <div id="studio-topic-match-feedback" style="display: none; font-size: 0.8rem; margin-top: 4px; color: #0284c7; font-weight: 500;"></div>';
     echo '      </div>';
 
-    // Row: Count, Difficulty, Language with Pill Select Design
-    echo '      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 14px;">';
-    echo '        <div>';
+    // Row: Pedagogical and Generation Parameters with Responsive Pill Select Design
+    echo '      <div style="display: flex; flex-wrap: wrap; gap: 16px 20px; margin-bottom: 14px; align-items: flex-start;">';
+    echo '        <div style="flex: 1 1 250px; min-width: 240px;">';
+    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Question Modality:</label>';
+    echo '          <div class="gq-pill-select" data-target="studio-question-type-select">';
+    echo '            <button type="button" class="gq-pill-btn active" data-value="code" title="Code-Centric Tracing &amp; Output Prediction">Code-Centric</button>';
+    echo '            <button type="button" class="gq-pill-btn" data-value="mixed" title="Balanced Mix of Code &amp; Conceptual Theory">Balanced</button>';
+    echo '            <button type="button" class="gq-pill-btn" data-value="conceptual" title="Conceptual Definitions &amp; Theory">Conceptual</button>';
+    echo '          </div>';
+    echo '          <select id="studio-question-type-select" class="form-select form-control" style="display: none;">';
+    echo '            <option value="code" selected>Code-Centric (Tracing &amp; Output)</option>';
+    echo '            <option value="mixed">Balanced Mix (Code &amp; Concepts)</option>';
+    echo '            <option value="conceptual">Conceptual (Definitions &amp; Theory)</option>';
+    echo '          </select>';
+    echo '        </div>';
+    echo '        <div style="flex: 1 1 210px; min-width: 190px;">';
+    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Difficulty Level:</label>';
+    $curr_diff = !empty($kwiz->difficulty) ? $kwiz->difficulty : 'medium';
+    echo '          <div class="gq-pill-select" data-target="studio-difficulty-select">';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'easy' ? ' active' : '') . '" data-value="easy" title="Knowledge &amp; Syntax">Easy</button>';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'medium' ? ' active' : '') . '" data-value="medium" title="Tracing &amp; Output">Medium</button>';
+    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'hard' ? ' active' : '') . '" data-value="hard" title="Edge Cases &amp; Reasoning">Hard</button>';
+    echo '          </div>';
+    echo '          <select id="studio-difficulty-select" class="form-select form-control" style="display: none;">';
+    echo '            <option value="easy"' . ($curr_diff === 'easy' ? ' selected' : '') . '>Easy (Knowledge &amp; Syntax)</option>';
+    echo '            <option value="medium"' . ($curr_diff === 'medium' ? ' selected' : '') . '>Medium (Tracing &amp; Output)</option>';
+    echo '            <option value="hard"' . ($curr_diff === 'hard' ? ' selected' : '') . '>Hard (Edge Cases &amp; Reasoning)</option>';
+    echo '          </select>';
+    echo '        </div>';
+    echo '        <div style="flex: 1 1 260px; min-width: 250px;">';
     echo '          <label for="studio-count-input" style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Number of Questions:</label>';
     echo '          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
-    echo '            <input type="number" id="studio-count-input" class="form-control gq-count-input" min="1" max="50" value="10" style="width: 76px; height: 32px; text-align: center; font-weight: 600; font-size: 0.9rem; border-radius: 9999px; border: 1px solid #cbd5e1; background: #ffffff; padding: 2px 8px;" title="Enter question count (1-50)">';
+    echo '            <input type="number" id="studio-count-input" class="form-control gq-count-input" min="1" max="50" value="10" style="width: 68px; height: 32px; text-align: center; font-weight: 600; font-size: 0.9rem; border-radius: 9999px; border: 1px solid #cbd5e1; background: #ffffff; padding: 2px 6px;" title="Enter question count (1-50)">';
     echo '            <div class="gq-pill-select" data-target="studio-count-input">';
     echo '              <button type="button" class="gq-pill-btn" data-value="1">1</button>';
     echo '              <button type="button" class="gq-pill-btn" data-value="3">3</button>';
@@ -542,34 +569,7 @@ if ($is_teacher) {
     echo '            <option value="20">20 Questions</option>';
     echo '          </select>';
     echo '        </div>';
-    echo '        <div>';
-    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Difficulty Level:</label>';
-    $curr_diff = !empty($kwiz->difficulty) ? $kwiz->difficulty : 'medium';
-    echo '          <div class="gq-pill-select" data-target="studio-difficulty-select">';
-    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'easy' ? ' active' : '') . '" data-value="easy">Easy (Syntax)</button>';
-    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'medium' ? ' active' : '') . '" data-value="medium">Medium (Tracing)</button>';
-    echo '            <button type="button" class="gq-pill-btn' . ($curr_diff === 'hard' ? ' active' : '') . '" data-value="hard">Hard (Edge Cases)</button>';
-    echo '          </div>';
-    echo '          <select id="studio-difficulty-select" class="form-select form-control" style="display: none;">';
-    echo '            <option value="easy"' . ($curr_diff === 'easy' ? ' selected' : '') . '>Easy (Knowledge &amp; Syntax)</option>';
-    echo '            <option value="medium"' . ($curr_diff === 'medium' ? ' selected' : '') . '>Medium (Tracing &amp; Output)</option>';
-    echo '            <option value="hard"' . ($curr_diff === 'hard' ? ' selected' : '') . '>Hard (Edge Cases &amp; Reasoning)</option>';
-    echo '          </select>';
-    echo '        </div>';
-    echo '        <div>';
-    echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Question Modality:</label>';
-    echo '          <div class="gq-pill-select" data-target="studio-question-type-select">';
-    echo '            <button type="button" class="gq-pill-btn active" data-value="code">Code-Centric (Tracing)</button>';
-    echo '            <button type="button" class="gq-pill-btn" data-value="mixed">Balanced Mix</button>';
-    echo '            <button type="button" class="gq-pill-btn" data-value="conceptual">Conceptual</button>';
-    echo '          </div>';
-    echo '          <select id="studio-question-type-select" class="form-select form-control" style="display: none;">';
-    echo '            <option value="code" selected>Code-Centric (Tracing &amp; Output)</option>';
-    echo '            <option value="mixed">Balanced Mix (Code &amp; Concepts)</option>';
-    echo '            <option value="conceptual">Conceptual (Definitions &amp; Theory)</option>';
-    echo '          </select>';
-    echo '        </div>';
-    echo '        <div>';
+    echo '        <div style="flex: 0 1 auto; min-width: 100px;">';
     echo '          <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 6px;">Language:</label>';
     $curr_lang = !empty($kwiz->language) ? $kwiz->language : 'en';
     echo '          <div class="gq-pill-select" data-target="studio-language-select">';
@@ -954,6 +954,14 @@ if ($is_teacher) {
         gap: 2px !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+    .gq-pill-select::-webkit-scrollbar,
+    .gq-pill-filter-group::-webkit-scrollbar,
+    .gq-pill-actions-group::-webkit-scrollbar {
+        display: none !important;
     }
     .gq-pill-actions-group {
         background: #f8fafc !important;
@@ -968,7 +976,7 @@ if ($is_teacher) {
         outline: none !important;
         background: transparent !important;
         color: #475569 !important;
-        padding: 5px 13px !important;
+        padding: 5px 11px !important;
         border-radius: 9999px !important;
         font-size: 0.8rem !important;
         font-weight: 500 !important;

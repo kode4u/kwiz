@@ -1136,6 +1136,15 @@
     gap: 2px !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.gq-pill-select::-webkit-scrollbar,
+.gq-pill-filter-group::-webkit-scrollbar,
+.gq-pill-actions-group::-webkit-scrollbar {
+    display: none !important;
 }
 
 .gq-pill-actions-group {
@@ -1152,7 +1161,7 @@ button.gq-pill {
     outline: none !important;
     background: transparent !important;
     color: #475569 !important;
-    padding: 5px 13px !important;
+    padding: 5px 11px !important;
     border-radius: 9999px !important;
     font-size: 0.8rem !important;
     font-weight: 500 !important;
