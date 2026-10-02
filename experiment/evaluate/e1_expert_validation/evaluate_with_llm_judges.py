@@ -157,9 +157,9 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> 
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-3.8-flash"
+    model: str = "gemini-2.5-flash"
 ) -> Optional[Dict[str, Any]]:
-    raw_models = [model, "gemini-3.8-flash", "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"]
+    raw_models = [model, "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.8-flash"]
     gemini_models = []
     for m in raw_models:
         if m and m not in gemini_models:
@@ -188,10 +188,13 @@ def judge_with_gemini(
                 elif resp.status_code in (404, 400) and ("not found" in resp.text.lower() or "not supported" in resp.text.lower()):
                     print(f" [Gemini model '{g_model}' not found ({resp.status_code}). Trying next fallback model...]", end="", flush=True)
                     break
-                elif resp.status_code == 429:
-                    wait_time = 10 * (attempt + 1)
-                    print(f" [Gemini Rate Limit 429 on {g_model}: waiting {wait_time}s]...", end="", flush=True)
-                    time.sleep(wait_time)
+                elif resp.status_code in (429, 503, 500) or "high demand" in resp.text.lower() or "resource_exhausted" in resp.text.lower():
+                    if attempt == 0:
+                        print(f" [Gemini {g_model} high demand (429/503): retrying in 5s...]...", end="", flush=True)
+                        time.sleep(5)
+                    else:
+                        print(f" [Gemini {g_model} high demand (429/503): switching to fallback model...]", end="", flush=True)
+                        break
                 else:
                     print(f" [Gemini Error {resp.status_code} on {g_model}]: {resp.text[:120]}")
                     time.sleep(3)
