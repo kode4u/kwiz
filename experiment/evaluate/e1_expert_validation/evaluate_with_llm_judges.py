@@ -181,11 +181,16 @@ def judge_with_gemini(
                 if candidates:
                     text = candidates[0]["content"]["parts"][0]["text"]
                     return json.loads(text)
-            wait_time = min(5 * ((attempt - 1) % 6 + 1), 30)
-            print(f" [Gemini {model} Error {resp.status_code}: retrying in {wait_time}s (attempt {attempt})]...", end="", flush=True)
-            time.sleep(wait_time)
+            elif resp.status_code == 429 or "resource_exhausted" in resp.text.lower() or "quota" in resp.text.lower():
+                wait_time = min(20 * attempt, 60)
+                print(f" [Gemini {model} Rate Limit 429 (quota window active): waiting {wait_time}s for reset (attempt {attempt})]...", end="", flush=True)
+                time.sleep(wait_time)
+            else:
+                wait_time = min(5 * attempt, 30)
+                print(f" [Gemini {model} Error {resp.status_code}: retrying in {wait_time}s (attempt {attempt})]...", end="", flush=True)
+                time.sleep(wait_time)
         except Exception as e:
-            wait_time = min(5 * ((attempt - 1) % 6 + 1), 30)
+            wait_time = min(5 * attempt, 30)
             print(f" [Gemini Exception on {model}: {e}. Retrying in {wait_time}s (attempt {attempt})]...", end="", flush=True)
             time.sleep(wait_time)
 
@@ -556,7 +561,7 @@ def main():
             lambda p: judge_with_gemini(p, args.gemini_key),
             questions,
             r2_csv,
-            inter_delay=2.0
+            inter_delay=5.0
         )
 
     # 3. Setup R3 (Calibrated Independent Reviewer or Local LLM)
