@@ -157,9 +157,13 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> 
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-3.8-pro"
+    model: str = "gemini-2.5-pro"
 ) -> Optional[Dict[str, Any]]:
-    gemini_models = [model, "gemini-3.8-pro", "gemini-3.8"]
+    raw_models = [model, "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"]
+    gemini_models = []
+    for m in raw_models:
+        if m and m not in gemini_models:
+            gemini_models.append(m)
     
     for g_model in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={api_key}"
@@ -181,6 +185,9 @@ def judge_with_gemini(
                     if candidates:
                         text = candidates[0]["content"]["parts"][0]["text"]
                         return json.loads(text)
+                elif resp.status_code in (404, 400) and ("not found" in resp.text.lower() or "not supported" in resp.text.lower()):
+                    print(f" [Gemini model '{g_model}' not found ({resp.status_code}). Trying next fallback model...]", end="", flush=True)
+                    break
                 elif resp.status_code == 429:
                     wait_time = 10 * (attempt + 1)
                     print(f" [Gemini Rate Limit 429 on {g_model}: waiting {wait_time}s]...", end="", flush=True)
@@ -491,7 +498,7 @@ def generate_calibrated_sheet(judge_id: str, judge_name: str, questions: list, o
 
 def main():
     parser = argparse.ArgumentParser(description="Multi-Judge E1 Evaluation Runner across 5 Dimensions")
-    parser.add_argument("--questions", default="evaluate/e1_expert_validation/e1_questions.json", help="Questions JSON path")
+    parser.add_argument("--questions", default=DEFAULT_QUESTIONS_PATH, help="Questions JSON path")
     parser.add_argument("--ollama-url", default="http://localhost:11434", help="Ollama API base URL")
     parser.add_argument("--openai-key", default=os.getenv("OPENAI_API_KEY"), help="OpenAI API key")
     parser.add_argument("--gemini-key", default=os.getenv("GEMINI_API_KEY"), help="Google Gemini API key")
@@ -501,11 +508,15 @@ def main():
     parser.add_argument("--limit", type=int, default=0, help="Evaluate first N questions only (0=all)")
     args = parser.parse_args()
 
-    if not os.path.exists(args.questions):
-        print(f"[ERROR] Questions file not found at: {args.questions}")
+    questions_path = args.questions
+    if not os.path.exists(questions_path) and os.path.exists(DEFAULT_QUESTIONS_PATH):
+        questions_path = DEFAULT_QUESTIONS_PATH
+
+    if not os.path.exists(questions_path):
+        print(f"[ERROR] Questions file not found at: {questions_path}")
         sys.exit(1)
 
-    with open(args.questions, "r", encoding="utf-8") as f:
+    with open(questions_path, "r", encoding="utf-8") as f:
         questions = json.load(f)
 
     if args.limit > 0:

@@ -9,18 +9,18 @@
 
 | Evaluation Dimension | Mean ± SD | Fleiss' Kappa (κ) | Agreement Level | ICC(2,k) | Reliability |
 |:---------------------|:---------:|:------------------:|:---------------:|:--------:|:-----------:|
-| Technical Correctness (TC) | 4.40 ± 1.30 | 0.127 | Fair | 0.536 | Moderate |
-| Distractor Plausibility (DP) | 4.73 ± 0.59 | 0.039 | Fair | 0.085 | Moderate |
-| Pedagogical Relevance (PR) | 4.94 ± 0.25 | 0.130 | Fair | 0.292 | Moderate |
-| Code Executability (CE) | 4.89 ± 0.54 | 0.031 | Fair | 0.206 | Moderate |
-| Context Groundedness (CG) | 4.44 ± 0.90 | 0.158 | Fair | 0.588 | Moderate |
+| Technical Correctness (TC) | 4.09 ± 1.51 | 0.024 | Fair | 0.272 | Moderate |
+| Distractor Plausibility (DP) | 4.25 ± 1.05 | -0.101 | Fair | 0.030 | Moderate |
+| Pedagogical Relevance (PR) | 4.91 ± 0.29 | 0.130 | Fair | 0.296 | Moderate |
+| Code Executability (CE) | 4.87 ± 0.58 | 0.022 | Fair | 0.174 | Moderate |
+| Context Groundedness (CG) | 4.28 ± 0.99 | 0.080 | Fair | 0.558 | Moderate |
 
 ### Topic-by-Topic Quality Breakdown
 
 | Topic | Technical Correctness | Distractor Plausibility | Pedagogical Relevance | Code Executability | Context Groundedness |
 |:------|:---------------------:|:-----------------------:|:---------------------:|:------------------:|:--------------------:|
-| Conditionals & Boolean Control Flow | 4.09 ± 1.55 | 4.64 ± 0.57 | 4.98 ± 0.15 | 4.96 ± 0.21 | 4.69 ± 0.76 |
-| Functions & Scope | 4.90 ± 0.44 | 4.92 ± 0.28 | 4.97 ± 0.18 | 5.00 ± 0.00 | 4.62 ± 0.83 |
-| Loops & Iteration | 4.67 ± 0.91 | 4.80 ± 0.61 | 4.92 ± 0.28 | 4.80 ± 0.71 | 4.60 ± 0.69 |
-| Python Data Structures | 4.63 ± 0.97 | 4.71 ± 0.69 | 4.89 ± 0.35 | 4.87 ± 0.60 | 4.24 ± 1.01 |
-| Variables, Data Types & Type Casting | 3.57 ± 1.85 | 4.57 ± 0.65 | 4.97 ± 0.18 | 4.83 ± 0.67 | 4.17 ± 1.01 |
+| Conditionals & Boolean Control Flow | 3.96 ± 1.64 | 4.27 ± 1.01 | 4.96 ± 0.21 | 4.96 ± 0.21 | 4.53 ± 0.89 |
+| Functions & Scope | 4.35 ± 1.33 | 4.25 ± 1.10 | 4.90 ± 0.30 | 5.00 ± 0.00 | 4.20 ± 1.04 |
+| Loops & Iteration | 4.13 ± 1.43 | 4.32 ± 1.07 | 4.87 ± 0.34 | 4.83 ± 0.67 | 4.50 ± 0.75 |
+| Python Data Structures | 4.32 ± 1.26 | 4.32 ± 1.08 | 4.89 ± 0.35 | 4.87 ± 0.60 | 4.20 ± 1.04 |
+| Variables, Data Types & Type Casting | 3.62 ± 1.82 | 4.07 ± 0.99 | 4.97 ± 0.18 | 4.73 ± 0.84 | 4.03 ± 1.09 |
