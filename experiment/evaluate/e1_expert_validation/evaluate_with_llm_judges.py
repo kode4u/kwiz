@@ -10,7 +10,7 @@ Evaluates 100 Python Multiple-Choice Questions across 5 standardized pedagogical
 
 Supported Judges:
   - R1: OpenAI GPT-4o (via OPENAI_API_KEY)
-  - R2: Google Gemini 2.5 Flash (via GEMINI_API_KEY)
+  - R2: Google Gemini 2.5 Pro (via GEMINI_API_KEY)
   - R3: Calibrated Senior Computer Science Instructor / Evaluator
 
 Usage:
@@ -157,51 +157,37 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> 
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-2.5-pro"
 ) -> Optional[Dict[str, Any]]:
-    # Restricted strictly to Gemini 2.5 models (gemini-2.5-flash, gemini-2.5-pro)
-    raw_models = [model, "gemini-2.5-flash", "gemini-2.5-pro"]
-    gemini_models = []
-    for m in raw_models:
-        if m and m not in gemini_models:
-            gemini_models.append(m)
-    
-    for g_model in gemini_models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={api_key}"
-        headers = {"Content-Type": "application/json"}
-        full_prompt = f"{RUBRIC_PROMPT}\n\nItem to evaluate:\n{prompt}"
-        payload = {
-            "contents": [{"parts": [{"text": full_prompt}]}],
-            "generationConfig": {
-                "temperature": 0.1,
-                "responseMimeType": "application/json"
-            }
+    # Strictly query specified model (default: gemini-2.5-pro) with infinite backoff retries on error (no fallback).
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    full_prompt = f"{RUBRIC_PROMPT}\n\nItem to evaluate:\n{prompt}"
+    payload = {
+        "contents": [{"parts": [{"text": full_prompt}]}],
+        "generationConfig": {
+            "temperature": 0.1,
+            "responseMimeType": "application/json"
         }
-        max_attempts = 10
-        for attempt in range(max_attempts):
-            try:
-                resp = requests.post(url, headers=headers, json=payload, timeout=60)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    candidates = data.get("candidates", [])
-                    if candidates:
-                        text = candidates[0]["content"]["parts"][0]["text"]
-                        return json.loads(text)
-                elif resp.status_code in (404, 400) and ("not found" in resp.text.lower() or "not supported" in resp.text.lower()):
-                    print(f" [Gemini model '{g_model}' not found ({resp.status_code}). Trying next 2.5 model...]", end="", flush=True)
-                    break
-                elif resp.status_code in (429, 503, 500) or "high demand" in resp.text.lower() or "resource_exhausted" in resp.text.lower() or "quota" in resp.text.lower():
-                    wait_time = min(5 * (attempt + 1), 30)
-                    print(f" [Gemini {g_model} rate limit ({resp.status_code}): waiting {wait_time}s (attempt {attempt+1}/{max_attempts})]...", end="", flush=True)
-                    time.sleep(wait_time)
-                else:
-                    print(f" [Gemini Error {resp.status_code} on {g_model}]: {resp.text[:120]}")
-                    time.sleep(3)
-            except Exception as e:
-                wait_time = min(5 * (attempt + 1), 30)
-                print(f" [Gemini Exception on {g_model}]: {e} (retrying in {wait_time}s)...", end="", flush=True)
-                time.sleep(wait_time)
-    return None
+    }
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=60)
+            if resp.status_code == 200:
+                data = resp.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    text = candidates[0]["content"]["parts"][0]["text"]
+                    return json.loads(text)
+            wait_time = min(5 * ((attempt - 1) % 6 + 1), 30)
+            print(f" [Gemini {model} Error {resp.status_code}: retrying in {wait_time}s (attempt {attempt})]...", end="", flush=True)
+            time.sleep(wait_time)
+        except Exception as e:
+            wait_time = min(5 * ((attempt - 1) % 6 + 1), 30)
+            print(f" [Gemini Exception on {model}: {e}. Retrying in {wait_time}s (attempt {attempt})]...", end="", flush=True)
+            time.sleep(wait_time)
 
 
 
@@ -546,12 +532,12 @@ def main():
             sys.exit(1)
         evaluate_judge("R1", "OpenAI GPT-6 (gpt-6-astra)", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
 
-    # 2. Setup R2 (Google Gemini 2.5 Flash: gemini-2.5-flash)
+    # 2. Setup R2 (Google Gemini 2.5 Pro: gemini-2.5-pro)
     r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
     r2_complete = is_sheet_complete(r2_csv, questions)
 
     if r2_complete and args.r2_backend == "auto":
-        print(f"[INFO] R2 (Google Gemini 2.5 Flash: gemini-2.5-flash) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R2 (Google Gemini 2.5 Pro: gemini-2.5-pro) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r2_backend == "ollama":
         evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     elif args.r2_backend == "skip":
@@ -566,7 +552,7 @@ def main():
             sys.exit(1)
         evaluate_judge(
             "R2",
-            "Google Gemini 2.5 Flash (gemini-2.5-flash)",
+            "Google Gemini 2.5 Pro (gemini-2.5-pro)",
             lambda p: judge_with_gemini(p, args.gemini_key),
             questions,
             r2_csv,
