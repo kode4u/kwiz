@@ -27,6 +27,10 @@ fi
 PYTHON_BIN="python3"
 if [ -f "venv/bin/python3" ]; then
     PYTHON_BIN="venv/bin/python3"
+elif [ -f "../venv/bin/python3" ]; then
+    PYTHON_BIN="../venv/bin/python3"
+elif [ -f "$SCRIPT_DIR/../venv/bin/python3" ]; then
+    PYTHON_BIN="$SCRIPT_DIR/../venv/bin/python3"
 elif [ -n "$LLMAPI_DIR" ] && [ -f "$LLMAPI_DIR/venv/bin/python3" ]; then
     PYTHON_BIN="$LLMAPI_DIR/venv/bin/python3"
 fi
