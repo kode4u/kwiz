@@ -15,3 +15,229 @@ Q013,"Variables, Data Types & Type Casting",medium,"What will be the output of t
 Q014,"Variables, Data Types & Type Casting",medium,What is the output of the following Python code? \n ```python \n x = 2 \n y = 3 \n result = x ** y \n print(result) \n ```,[A] 6 | [B] 8 | [C] 9 | [D] 12,[B] 8,"The code snippet calculates the exponentiation of x to the power of y. In Python, the ** operator is used for exponentiation. Here, x = 2 and y = 3, so result = 2 ** 3 = 8.",5,5,5,5,5,"The question is technically sound, highly relevant, and well-grounded in the slide concepts on arithmetic operations. The distractors effectively target common misconceptions such as mistaking exponentiation for multiplication (2*3=6) or reversing the operands (3^2=9)."
 Q015,"Variables, Data Types & Type Casting",medium,What will be the value of `x` after executing the following code snippet? \n ```python \n x = 5 \n x += 3 \n print(x) \n ```,[A] 8 | [B] 7 | [C] 6 | [D] 9,[A] 8,"The code snippet initializes `x` to 5 and then uses the compound assignment operator `+=` to add 3 to `x`. This is equivalent to `x = x + 3`, resulting in `x` being 8. Option A (8) is correct, while options B (7), C (6), and D (9) are incorrect off-by-one errors.",5,4,5,5,5,"This MCQ is technically flawless, directly testing the understanding of the `+=` compound assignment operator, which is explicitly defined and exemplified in the provided course slides. The distractors are plausible off-by-one errors, making it a good assessment of a fundamental concept."
 Q016,"Variables, Data Types & Type Casting",medium,What is the output of the following code snippet? \n ```python \n name = 'Alice' \n print(name * 3) \n ```,"[A] 'AliceAlice' | [B] 'AliceAliceAlice' | [C] TypeError: can only concatenate str (not ""int"") to str | [D] 'Alic'Alic'Alic'",[B] 'AliceAliceAlice',"The code multiplies the string 'Alice' by 3, resulting in 'AliceAliceAlice'. The multiplication operator (*) is used to repeat a string in Python.",4,4,5,5,3,"The code and concept of string repetition are standard and technically sound (though standard print() outputs without surrounding quotes). However, string arithmetic/repetition operations are not explicitly covered in the retrieved slide chunks."
+Q017,"Variables, Data Types & Type Casting",medium,Which of the following code snippets correctly converts a boolean value to an integer in Python?,"[A] ```python
+result = int(True)
+``` | [B] ```python
+result = int(False)
+``` | [C] ```python
+result = bool(1)
+``` | [D] ```python
+result = str(True)
+```","[A] ```python
+result = int(True)
+```","The correct answer is `int(True)`, which converts the boolean value True to the integer 1. The other options either do not perform a type conversion (choice C), convert to a different data type (choice D), or are incorrect syntax (choice B).",2,2,5,5,4,"The question is flawed as both options (A) and (B) correctly convert a boolean to an integer, making it ambiguous for a single-choice format. The provided explanation incorrectly states that option (B) has 'incorrect syntax'."
+Q018,"Variables, Data Types & Type Casting",medium,"What is the output of the following code snippet? \n ```python \n str_num = ""123"" \n int_num = int(str_num) \n print(int_num + 5) \n ```","[A] 128 | [B] Error: invalid literal for int() with base 10: '123' | [C] 1235 | [D] TypeError: can only concatenate str (not ""int"") to str",[A] 128,"The code snippet converts the string '123' to an integer using int(str_num), resulting in 123. Then, it adds 5 to this integer, yielding 128. Choice B is incorrect because there are no issues with the conversion or arithmetic operation. Choice C is wrong as it incorrectly adds a string and an integer without proper type casting. Choice D is incorrect because it attempts to concatenate a string and an integer, which raises a TypeError.",5,5,5,5,5,"The question is technically flawless, directly tests core type casting and arithmetic concepts, and is explicitly supported by the provided course slides. Distractors are well-designed, reflecting common student misconceptions regarding type conversion and concatenation."
+Q019,"Variables, Data Types & Type Casting",medium,What is the output of the following Python code? \n ```python \n a = 5 \n b = 2 \n c = a * b + 3 \n print(c) \n ```,[A] 10 | [B] 13 | [C] 14 | [D] 15,[B] 13,"The code performs multiplication first (a * b = 10) and then addition (10 + 3 = 13). The result is printed, which is 13.",5,3,5,5,3,"The question is technically correct, uses flawless code, and tests a highly relevant core concept (operator precedence). However, the provided course slides do not explicitly state the rule of arithmetic operator precedence (multiplication before addition), making it partially grounded. Distractors (C) and (D) are not clearly derived from common student misconceptions related to precedence."
+Q020,"Variables, Data Types & Type Casting",medium,What is the output of the following Python code snippet? \n ```python \n x = 5 \n y = '10' \n z = x + y \n print(z) \n ```,[A] 15 | [B] 510 | [C] TypeError: unsupported operand type(s) for +: 'int' and 'str' | [D] 'x' is not defined,[B] 510,"The code attempts to add an integer (5) and a string ('10'). In Python, attempting to perform arithmetic operations between different types results in a TypeError. The correct output is '510' because the '+' operator concatenates strings instead of performing addition when one or both operands are strings.",1,2,5,5,4,The designated correct answer (B) and its explanation are fundamentally incorrect. Python raises a TypeError when attempting to add an integer and a string directly; it does not implicitly concatenate them. The explanation correctly states a TypeError occurs but then contradicts itself by claiming '510' is the correct output due to concatenation.
+Q021,Python Data Structures,medium,"Consider the following Python code snippet: \n ```python \n my_list = [10, 'hello', 3.14, True] \n print(my_list[2]) \n ```",[A] 3.14 | [B] 'hello' | [C] True | [D] 10,[B] 'hello',"The code snippet prints the element at index 2 of the list my_list. In Python, indexing starts at 0, so my_list[2] refers to the third element in the list. The third element is 'hello', which is a string.",1,4,5,5,5,"The designated correct answer and its explanation are fundamentally incorrect; `my_list[2]` evaluates to `3.14`, not `'hello'`. However, the question effectively targets a core concept, and the code is syntactically flawless and well-grounded in the provided slides."
+Q022,Python Data Structures,medium,"Which of the following Python code snippets correctly prints the second last element of a list using negative indexing? \n ```python \n my_list = [10, 'hello', 3.14, True] \n print(my_list[-2]) \n ```",[A] Choice A: my_list[1] | [B] Choice B: my_list[-2] | [C] Choice C: my_list[3] | [D] Choice D: my_list[-1],[B] Choice B: my_list[-2],"The correct answer is Choice B: my_list[-2]. Negative indexing in Python starts from -1 for the last element. Therefore, my_list[-2] accesses the second last element of the list. Choices A (my_list[1]) and D (my_list[-1]) are incorrect because they access different elements. Choice C (my_list[3]) is out of range since the list only has 4 elements.",2,5,5,5,5,"The question prompt is fundamentally flawed as it includes the correct answer (`print(my_list[-2])`) within the question itself, making it trivial. Additionally, the provided explanation contains a factual error, stating that `my_list[3]` is out of range for a list of four elements, which is incorrect."
+Q023,Python Data Structures,medium,Which of the following code snippets correctly demonstrates how to modify an element in a list in Python?,"[A] ```python
+my_list = [1, 2, 3]
+my_list[0] = 'a'
+``` | [B] ```python
+my_list = [1, 2, 3]
+my_list.append(4)
+``` | [C] ```python
+my_list = [1, 2, 3]
+my_list[1] = 5
+``` | [D] ```python
+my_list = (1, 2, 3)
+my_list[1] = 5
+```","[C] ```python
+my_list = [1, 2, 3]
+my_list[1] = 5
+```","The correct choice modifies an element in a list using the index. Lists are mutable, so elements can be changed after creation. Choice A attempts to change an integer to a string, which is not allowed. Choice B adds an element to the end of the list, but it does not modify an existing element. Choice D tries to modify an element in a tuple, which is immutable.",2,2,5,5,4,"The question effectively targets list mutability, but option (A) is also a correct way to modify a list element, making the question have multiple correct answers. Furthermore, the provided explanation for option (A) is factually incorrect in Python, stating that changing an integer to a string in a list is not allowed."
+Q024,Python Data Structures,medium,"Which of the following Python code snippets correctly slices a list to get elements from index 2 to 4 (inclusive)? ```python \n my_list = [10, 20, 30, 40, 50] \n sliced_list = my_list[2:5] \n ```","[A] sliced_list will be [30, 40, 50] | [B] sliced_list will be [20, 30, 40] | [C] sliced_list will be [10, 20, 30] | [D] sliced_list will be [30, 40]","[B] sliced_list will be [20, 30, 40]","The correct slice is my_list[2:5], which includes elements at indices 2, 3, and 4. Python list slicing is inclusive of the start index but exclusive of the stop index.",1,5,5,5,2,"The designated correct answer (B) is fundamentally incorrect for the provided code snippet `my_list[2:5]`, which actually yields `[30, 40, 50]` (Choice A). The provided explanation correctly describes the behavior of `my_list[2:5]` but contradicts the designated answer. The question tests a core concept (list slicing) but the specific syntax and rules are not explicitly covered in the retrieved slides."
+Q025,Python Data Structures,medium,Which of the following Python code snippets correctly slices a list to get elements from index 2 to 5 with a step of 2?,"[A] ```python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:5:2]
+print(sliced_list)
+``` | [B] ```python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:6:2]
+print(sliced_list)
+``` | [C] ```python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[1:5:2]
+print(sliced_list)
+``` | [D] ```python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:5:3]
+print(sliced_list)
+```","[B] ```python
+my_list = [1, 2, 3, 4, 5, 6]
+sliced_list = my_list[2:6:2]
+print(sliced_list)
+```","The correct answer is B. The slice `my_list[2:6:2]` correctly starts at index 2, ends before index 6 (exclusive), and steps by 2, resulting in `[3, 5]`. Choice A has an incorrect end index, choice C has an incorrect start index, and choice D has an incorrect step value.",5,5,5,5,3,"The question is technically correct, with the designated answer accurately reflecting the prompt's intent for list slicing, including the exclusive nature of the stop index. Distractors are highly plausible, targeting common misconceptions regarding start, stop, and step parameters. However, the retrieved course slides only cover basic slicing `[start:end]` and do not explicitly introduce the `step` parameter, which is central to this question."
+Q026,Python Data Structures,medium,Which of the following Python code snippets correctly slices a list to get elements from index 2 to the end?,"[A] my_list[2:] # Correct | [B] my_list[:2] # Incorrect, gets first two elements | [C] my_list[2:3] # Incorrect, gets only the third element | [D] my_list[-1:] # Incorrect, gets last element",[A] my_list[2:] # Correct,The correct answer is my_list[2:]. This slice starts at index 2 and goes to the end of the list. The other options are incorrect because they either start at the wrong index or do not include all elements from index 2 onwards.,5,5,5,5,4,"The question is technically correct, directly tests a core concept of list slicing, and features highly plausible distractors. While the slides explicitly show `[:end]`, the concept of `[start:]` is a direct and logical extension, making it largely supported by the provided context."
+Q027,Python Data Structures,medium,Which of the following code snippets correctly reverses a list using slicing in Python?,"[A] ```python
+my_list = [1, 2, 3]
+reversed_list = my_list[::-1]
+print(reversed_list)
+``` | [B] ```python
+my_list = [1, 2, 3]
+reversed_list = my_list[::1]
+print(reversed_list)
+``` | [C] ```python
+my_list = [1, 2, 3]
+reversed_list = my_list[::-2]
+print(reversed_list)
+``` | [D] ```python
+my_list = [1, 2, 3]
+reversed_list = my_list[1::-1]
+print(reversed_list)
+```","[A] ```python
+my_list = [1, 2, 3]
+reversed_list = my_list[::-1]
+print(reversed_list)
+```","The correct answer uses slicing with a step of -1 to reverse the list. The other options either do not reverse the list (choice B), reverse every second element (choice C), or start reversing from the wrong index (choice D).",5,5,5,5,4,"The question is technically flawless, testing a core Python list manipulation technique with highly plausible distractors. All code is executable. While the exact `[::-1]` syntax isn't explicitly shown in the slides, the foundational concepts of slicing and negative indexing are well-covered, making it a logical extension."
+Q028,Python Data Structures,medium,Which of the following code snippets correctly appends an element to a list named `my_list`?,"[A] ```python
+my_list = [1, 2, 3]
+my_list.append(4)
+print(my_list)  # Output: [1, 2, 3, 4]
+``` | [B] ```python
+my_list = [1, 2, 3]
+my_list.insert(3, 4)
+print(my_list)  # Output: [1, 2, 3, 4]
+``` | [C] ```python
+my_list = [1, 2, 3]
+my_list.remove(3)
+print(my_list)  # Output: [1, 2]
+``` | [D] ```python
+my_list = [1, 2, 3]
+my_list.extend([4])
+print(my_list)  # Output: [1, 2, 3, 4]
+```","[A] ```python
+my_list = [1, 2, 3]
+my_list.append(4)
+print(my_list)  # Output: [1, 2, 3, 4]
+```","The correct answer uses the `append()` method to add an element to the end of the list. The other options either insert at a specific index, remove an element, or extend the list with another list, which are not the intended operations for appending.",2,5,5,5,3,"The question's phrasing 'correctly appends an element' is ambiguous, as options (B) and (D) also achieve the outcome of adding an element to the end of the list, making (A) not unequivocally the sole correct answer. Furthermore, the `extend()` method used in distractor (D) is not explicitly covered in the provided course slides."
+Q029,Python Data Structures,medium,"Which of the following code snippets correctly inserts the element 'world' at index 2 in the list `my_list`? ```python \n my_list = [10, 'hello'] \n # code here \n ```","[A] my_list.insert(2, 'world') | [B] my_list.append('world', 2) | [C] my_list[2] = 'world' | [D] my_list.extend([2, 'world'])","[A] my_list.insert(2, 'world')","The correct choice is `my_list.insert(2, 'world')`. This correctly inserts the string 'world' at index 2 in the list. The distractors are incorrect because: (B) uses a non-existent method `append` with two arguments; (C) attempts to assign directly to an index which does not exist yet and will raise an error; (D) extends the list with another list, which is not what was asked for.",5,5,5,5,5,"This MCQ is exceptionally well-designed. It directly tests a core list method explicitly covered in the slides, and all distractors are highly plausible, targeting common student misconceptions regarding list manipulation. The question is technically flawless and pedagogically relevant."
+Q030,Python Data Structures,medium,Which of the following code snippets correctly removes an element by value from a list in Python?,"[A] ```python
+my_list = [1, 2, 3]
+popped = my_list.pop(2)
+print(popped)  # Output: 3
+``` | [B] ```python
+my_list = [1, 2, 3]
+removed = my_list.remove(2)
+print(removed)  # Output: None
+``` | [C] ```python
+my_list = [1, 2, 3]
+popped = my_list.pop()
+print(popped)  # Output: 1
+``` | [D] ```python
+my_list = [1, 2, 3]
+del my_list[1]
+print(my_list)  # Output: [1, 3]
+```","[B] ```python
+my_list = [1, 2, 3]
+removed = my_list.remove(2)
+print(removed)  # Output: None
+```","The correct choice uses the `remove()` method to remove an element by value. The `pop()` method removes and returns an element at a specific index, not by value. The `del` statement removes an item at a specific index.",5,4,5,4,4,"The question correctly identifies `remove()` as the method for removing by value, and the designated answer is technically sound. Distractors effectively test common misconceptions regarding `pop()` and `del`, though one distractor has an incorrect output comment. The topic is highly relevant to Python list manipulation, and `pop()` is explicitly covered in the slides, supporting the core distinction."
+Q031,Python Data Structures,medium,"Consider the following Python code snippet: \n ```python \n my_list = [[1, 2], [3, 4, 5], [6]] \n print(len(my_list)) \n ``` \n What will be the output of this code?",[A] 3 | [B] 6 | [C] 2 | [D] 1,[A] 3,"The `len()` function returns the number of elements in a list. In this case, `my_list` contains three sublists: `[1, 2]`, `[3, 4, 5]`, and `[6]`. Therefore, the length of `my_list` is 3.",5,4,5,5,4,"The question accurately assesses understanding of the `len()` function on nested lists, a common area of student misconception. Distractor (B) is particularly effective. While `len()` isn't explicitly named, its function is directly implied by the slides' discussion of list creation and dynamic sizing."
+Q032,Python Data Structures,medium,Which of the following code snippets correctly concatenates two lists in Python?,"[A] ```python
+list1 = [1, 2]
+list2 = [3, 4]
+result = list1 + list2
+print(result)
+``` | [B] ```python
+list1 = [1, 2]
+list2 = [3, 4]
+result = list1 * list2
+print(result)
+``` | [C] ```python
+list1 = [1, 2]
+list2 = [3, 4]
+result = list1 - list2
+print(result)
+``` | [D] ```python
+list1 = [1, 2]
+list2 = [3, 4]
+result = list1 / list2
+print(result)
+```","[A] ```python
+list1 = [1, 2]
+list2 = [3, 4]
+result = list1 + list2
+print(result)
+```","The correct choice uses the plus operator (`+`) to concatenate two lists, which is the appropriate method for combining lists in Python. The other choices use operators that are not valid for list concatenation: `*` performs repetition, `-` and `/` perform arithmetic operations on lists, which are not defined.",5,4,5,5,2,"The question is technically correct, highly relevant, and uses valid code. However, the provided course slides introduce lists and basic arithmetic operators for numbers, but do not explicitly cover list concatenation using the `+` operator, making its grounding weak."
+Q033,Python Data Structures,medium,Which of the following code snippets correctly checks if the element '3' is in the list `my_list` using the 'in' operator?,"[A] ```python
+my_list = [1, 2, 3]
+if my_list[0] == 3:
+    print('3 is in the list')
+else:
+    print('3 is not in the list')
+``` | [B] ```python
+my_list = [1, 2, 3]
+if 3 in my_list:
+    print('3 is in the list')
+else:
+    print('3 is not in the list')
+``` | [C] ```python
+my_list = [1, 2, 3]
+if my_list[2] == 3:
+    print('3 is in the list')
+else:
+    print('3 is not in the list')
+``` | [D] ```python
+my_list = [1, 2, 3]
+if my_list[3] == 3:
+    print('3 is in the list')
+else:
+    print('3 is not in the list')
+```","[B] ```python
+my_list = [1, 2, 3]
+if 3 in my_list:
+    print('3 is in the list')
+else:
+    print('3 is not in the list')
+```","The correct choice uses the 'in' operator to check for membership, which is the proper way to determine if an element exists in a list. The other choices either use incorrect indexing or try to access an index that does not exist.",5,5,5,5,3,"The question is technically sound, highly relevant, and features excellent distractors that target common student misconceptions regarding list indexing versus membership. However, the specific 'in' operator for membership testing is not explicitly mentioned or demonstrated in the provided slide chunks, though lists themselves are well-covered."
+Q034,Python Data Structures,medium,Which of the following code snippets correctly creates a tuple with three elements?,"[A] ```python
+my_tuple = (1, 2, 3)
+``` | [B] ```python
+my_tuple = [1, 2, 3]
+``` | [C] ```python
+my_tuple = (1, 2)
+``` | [D] ```python
+my_tuple = 1, 2, 3
+```","[A] ```python
+my_tuple = (1, 2, 3)
+```","The correct answer is A. Tuples are created using parentheses and must include a trailing comma for single-element tuples. Option B uses square brackets, which creates a list instead of a tuple. Option C is missing the trailing comma, making it an invalid tuple syntax. Option D correctly creates a tuple without parentheses but with a trailing comma.",1,1,5,5,2,"The question has multiple correct answers (A and D are both valid ways to create a three-element tuple, and both are explicitly shown in the slides). The provided explanation contains factual errors regarding options C and D, misrepresenting Python's tuple syntax rules."
+Q035,Python Data Structures,medium,Which of the following code snippets will raise a TypeError when executed?,"[A] ```python
+my_tuple = (1, 'hello', 3.14)
+my_tuple[0] = 2
+``` | [B] ```python
+my_list = [1, 'hello', 3.14]
+my_list[0] = 2
+``` | [C] ```python
+my_dict = {'a': 1, 'b': 'hello'}
+my_dict['c'] = 3.14
+``` | [D] ```python
+my_set = {1, 'hello', 3.14}
+my_set.add(2)
+```","[A] ```python
+my_tuple = (1, 'hello', 3.14)
+my_tuple[0] = 2
+```","The correct choice is A because tuples are immutable in Python. Attempting to assign a new value to an element of a tuple will raise a TypeError. The other choices involve mutable data structures (list, dictionary, set) where such assignments are allowed.",5,5,5,5,5,"This MCQ flawlessly assesses the core concept of tuple immutability, a fundamental aspect of Python data structures explicitly covered in the course slides. The distractors are highly plausible, representing mutable data structures, which effectively tests student understanding of mutability differences."
+Q036,Python Data Structures,medium,"What is the output of the following Python code snippet? \n ```python \n my_tuple = (10, 20, 30, 40, 50) \n print(my_tuple[2]) \n ```",[A] 30 | [B] 20 | [C] 10 | [D] 40,[A] 30,"The code snippet prints the third element of the tuple `my_tuple`. In Python, indexing starts at 0, so the third element is at index 2. Therefore, the output is 30.",5,5,5,5,5,"The question is technically flawless, testing a core concept of tuple indexing directly supported by the provided slides. Distractors are plausible, reflecting common indexing misconceptions."
+Q037,Python Data Structures,medium,"Which of the following code snippets correctly creates a set from a list, ensuring that all duplicate elements are removed?","[A] ```python
+my_list = [1, 2, 3, 2, 4]
+my_set = set(my_list)
+print(my_set)  # Output: {1, 2, 3, 4}
+``` | [B] ```python
+my_list = [1, 2, 3, 2, 4]
+my_set = list(set(my_list))
+print(my_set)  # Output: {1, 2, 3, 4}
+``` | [C] ```python
+my_list = [1, 2, 3, 2, 4]
+my_set = set(my_list)
+print(my_list)  # Output: [1, 2, 3, 2, 4]
+``` | [D] ```python
+my_list = [1, 2, 3, 2, 4]
+my_set = list(my_list)
+print(my_set)  # Output: [1, 2, 3, 2, 4]
+```","[A] ```python
+my_list = [1, 2, 3, 2, 4]
+my_set = set(my_list)
+print(my_set)  # Output: {1, 2, 3, 4}
+```","The correct answer is A. The code snippet correctly creates a set from the list `my_list`, which automatically removes any duplicate elements, resulting in `{1, 2, 3, 4}`. Choice B attempts to convert the set back to a list, which is unnecessary and does not change the output. Choice C tries to print the original list instead of the set, which would result in `[1, 2, 3, 2, 4]`. Choice D also tries to print the original list, leading to the same incorrect output.",5,5,5,5,5,"This MCQ is excellent, directly testing the core concept of Python set creation and duplicate elimination as explicitly covered in the course slides. The distractors are highly plausible, targeting common student misconceptions about data structure conversion and variable modification."

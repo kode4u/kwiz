@@ -159,7 +159,8 @@ def judge_with_gemini(
     api_key: str,
     model: str = "gemini-2.5-flash"
 ) -> Optional[Dict[str, Any]]:
-    raw_models = [model, "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash"]
+    # Restricted strictly to Gemini 2.5 models (gemini-2.5-flash, gemini-2.5-pro)
+    raw_models = [model, "gemini-2.5-flash", "gemini-2.5-pro"]
     gemini_models = []
     for m in raw_models:
         if m and m not in gemini_models:
@@ -176,7 +177,8 @@ def judge_with_gemini(
                 "responseMimeType": "application/json"
             }
         }
-        for attempt in range(3):
+        max_attempts = 10
+        for attempt in range(max_attempts):
             try:
                 resp = requests.post(url, headers=headers, json=payload, timeout=60)
                 if resp.status_code == 200:
@@ -186,21 +188,19 @@ def judge_with_gemini(
                         text = candidates[0]["content"]["parts"][0]["text"]
                         return json.loads(text)
                 elif resp.status_code in (404, 400) and ("not found" in resp.text.lower() or "not supported" in resp.text.lower()):
-                    print(f" [Gemini model '{g_model}' not found ({resp.status_code}). Trying next fallback model...]", end="", flush=True)
+                    print(f" [Gemini model '{g_model}' not found ({resp.status_code}). Trying next 2.5 model...]", end="", flush=True)
                     break
-                elif resp.status_code in (429, 503, 500) or "high demand" in resp.text.lower() or "resource_exhausted" in resp.text.lower():
-                    if attempt == 0:
-                        print(f" [Gemini {g_model} rate limit (429/503): retrying in 5s...]...", end="", flush=True)
-                        time.sleep(5)
-                    else:
-                        print(f" [Gemini {g_model} rate limit (429/503): switching to fallback model...]", end="", flush=True)
-                        break
+                elif resp.status_code in (429, 503, 500) or "high demand" in resp.text.lower() or "resource_exhausted" in resp.text.lower() or "quota" in resp.text.lower():
+                    wait_time = min(5 * (attempt + 1), 30)
+                    print(f" [Gemini {g_model} rate limit ({resp.status_code}): waiting {wait_time}s (attempt {attempt+1}/{max_attempts})]...", end="", flush=True)
+                    time.sleep(wait_time)
                 else:
                     print(f" [Gemini Error {resp.status_code} on {g_model}]: {resp.text[:120]}")
                     time.sleep(3)
             except Exception as e:
-                print(f" [Gemini Exception on {g_model}]: {e}")
-                time.sleep(3)
+                wait_time = min(5 * (attempt + 1), 30)
+                print(f" [Gemini Exception on {g_model}]: {e} (retrying in {wait_time}s)...", end="", flush=True)
+                time.sleep(wait_time)
     return None
 
 
