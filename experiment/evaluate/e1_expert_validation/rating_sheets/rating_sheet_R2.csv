@@ -241,3 +241,484 @@ my_list = [1, 2, 3, 2, 4]
 my_set = set(my_list)
 print(my_set)  # Output: {1, 2, 3, 4}
 ```","The correct answer is A. The code snippet correctly creates a set from the list `my_list`, which automatically removes any duplicate elements, resulting in `{1, 2, 3, 4}`. Choice B attempts to convert the set back to a list, which is unnecessary and does not change the output. Choice C tries to print the original list instead of the set, which would result in `[1, 2, 3, 2, 4]`. Choice D also tries to print the original list, leading to the same incorrect output.",5,5,5,5,5,"This MCQ is excellent, directly testing the core concept of Python set creation and duplicate elimination as explicitly covered in the course slides. The distractors are highly plausible, targeting common student misconceptions about data structure conversion and variable modification."
+Q038,Python Data Structures,medium,"Which of the following Python code snippets correctly demonstrates the use of a set to find the intersection of two sets, `set1` and `set2`, and prints the result?","[A] ```python
+set1 = {1, 2, 3}
+set2 = {3, 4, 5}
+intersection = set1.intersection(set2)
+print(intersection)
+``` | [B] ```python
+set1 = [1, 2, 3]
+set2 = [3, 4, 5]
+intersection = set1 & set2
+print(intersection)
+``` | [C] ```python
+set1 = {1, 2, 3}
+set2 = {4, 5, 6}
+difference = set1 - set2
+print(difference)
+``` | [D] ```python
+set1 = {1, 2, 3}
+set2 = {3, 4, 5}
+difference = set2 - set1
+print(difference)
+```","[A] ```python
+set1 = {1, 2, 3}
+set2 = {3, 4, 5}
+intersection = set1.intersection(set2)
+print(intersection)
+```",The correct answer demonstrates the proper use of the `.intersection()` method to find common elements between two sets. The other options either use incorrect data types or operators for set intersection.,5,5,5,4,2,"The question is technically correct, highly relevant, and features excellent distractors. However, the provided course slides introduce sets but do not cover set operations like intersection, union, or difference, making it weakly supported by the evidence."
+Q039,Python Data Structures,medium,"What is the output of the following Python code snippet? \n ```python \n student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} \n print(student['major']) \n ```","[A] Alice | [B] Computer Science | [C] 20 | [D] {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}",[B] Computer Science,"The code snippet creates a dictionary named `student` with three key-value pairs. The keys are 'name', 'age', and 'major'. The value associated with the key 'major' is 'Computer Science'. When `print(student['major'])` is executed, it retrieves and prints the value of the 'major' key, which is 'Computer Science'.",5,5,5,5,5,"This MCQ is technically flawless, directly testing core dictionary access from the slides with highly plausible distractors. The code is perfectly executable and the question is well-grounded in the provided course material."
+Q040,Python Data Structures,medium,"Given the following Python code snippet, what will be the output of `print(student['major'])`? \n ```python \n student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} \n print(student['major']) \n ```",[A] Alice | [B] Computer Science | [C] 20 | [D] NameError: name 'student' is not defined,[B] Computer Science,"The correct answer is 'Computer Science'. The code accesses the value associated with the key 'major' in the dictionary `student`. Distractors include incorrect keys ('name', 'age'), and a NameError which would occur if the variable `student` was not defined.",5,5,5,5,5,"The question is technically sound, directly tests a core concept of dictionary access, and features highly plausible distractors. Its content and structure are strongly supported by the provided course slides, including an almost identical example."
+Q041,Python Data Structures,medium,"Consider the following Python code snippet: \n ```python \n student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} \n student['age'] = 21 \n student['gender'] = 'Female' \n print(student) \n ``` \n What will be the output of this code?","[A] {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} | [B] {'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Female'} | [C] {'name': 'Alice', 'age': 20, 'major': 'Computer Science', 'gender': 'Male'} | [D] KeyError: 'gender'","[B] {'name': 'Alice', 'age': 21, 'major': 'Computer Science', 'gender': 'Female'}","The code first updates the value of the key 'age' to 21. Then, it adds a new key-value pair ('gender': 'Female') to the dictionary. The final output is the updated dictionary with both changes applied.",5,5,5,5,5,"This MCQ flawlessly tests core dictionary manipulation (updating and adding key-value pairs), directly aligning with the learning objective and supported by the slides' emphasis on dictionary mutability. Distractors are highly plausible, targeting common misconceptions."
+Q042,Python Data Structures,medium,"What is the output of the following Python code snippet? \n ```python \n student = {'name': 'Alice', 'age': 20} \n print(student.get('email')) \n print(student.get('phone', 'N/A')) \n ```",[A] None N/A | [B] None N/A | [C] Alice None | [D] 20 N/A,[B] None N/A,"The `get()` method is used to retrieve the value associated with a key in a dictionary. If the key does not exist, it returns `None` by default or the specified default value if provided. In this case, 'email' and 'phone' keys do not exist in the `student` dictionary, so the first print statement outputs `None`. The second print statement provides a default value of 'N/A', so it also outputs 'N/A'.",3,1,5,5,5,"The question tests a core concept directly from the slides, and the code is perfectly executable. However, the designated correct answer's format 'None N/A' is technically incorrect for two separate print statements (which would produce 'None\nN/A'). More critically, choices (A) and (B) are identical, which is a fundamental flaw in MCQ design."
+Q043,Python Data Structures,medium,"Consider the following Python code snippet: \n ```python \n student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} \n print(student.keys()) \n ``` What will be the output of this code? \n ","[A] ['name', 'age', 'major'] | [B] ('name', 'age', 'major') | [C] [('name', 'Alice'), ('age', 20), ('major', 'Computer Science')] | [D] {'name': 'Alice', 'age': 20, 'major': 'Computer Science'}","[A] ['name', 'age', 'major']","The `keys()` method returns a view object that displays a list of all the keys in the dictionary. Therefore, the output will be a list containing the keys 'name', 'age', and 'major'. The other options are incorrect because they either return the values or the entire dictionary instead of just the keys.",2,4,5,5,2,"The designated answer (A) is technically incorrect as the direct output of `print(student.keys())` is a `dict_keys` view object, not a list. The question tests the `.keys()` method, which is not explicitly introduced or explained in the provided course slides, impacting its context groundedness."
+Q044,Python Data Structures,medium,"What is the output of the following code snippet? \n ```python \n student = {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} \n del student['age'] \n print(student) \n ```","[A] {'name': 'Alice', 'major': 'Computer Science'} | [B] {'name': 'Alice', 'age': 20} | [C] {'name': 'Alice', 'age': 20, 'major': 'Computer Science'} | [D] KeyError: 'age'","[A] {'name': 'Alice', 'major': 'Computer Science'}","The `del` statement is used to remove a key-value pair from the dictionary. In this case, 'age' and its value are removed, leaving only {'name': 'Alice', 'major': 'Computer Science'}.",5,5,5,5,4,"The question accurately tests the `del` statement for dictionary key-value pair removal, a fundamental concept of mutable data structures. Distractors are highly plausible, reflecting common student misunderstandings. While `del` isn't explicitly in the retrieved slides, dictionary mutability and manipulation are clearly emphasized, making the concept well-grounded."
+Q045,Python Data Structures,medium,Which of the following code snippets correctly accesses the value 'world' from a nested dictionary in Python? ```python \n nested_dict = {'hello': {'world': 42}} \n ```,[A] print(nested_dict['hello']['world']) | [B] print(nested_dict[0]['world']) | [C] print(nested_dict['hello'][1]) | [D] print(nested_dict[0][1]),[A] print(nested_dict['hello']['world']),"The correct answer accesses the nested dictionary using the appropriate keys. The first choice correctly uses 'hello' and 'world' as keys to retrieve the value 42. The other choices either use incorrect indices or keys, leading to errors.",4,5,5,5,4,"The question effectively tests nested dictionary access, a core concept, with highly plausible distractors targeting common indexing misconceptions. The prompt's wording 'value 'world'' is slightly imprecise, as 'world' is a key, but the intent to retrieve the associated value (42) is clear from the correct answer and explanation."
+Q046,Conditionals & Boolean Control Flow,medium,Consider the following Python code snippet: \n ```python \n x = 5 \n y = 10 \n if x < y: \n     print('x is less than y') \n else: \n     print('x is not less than y') \n ```,[A] x is less than y | [B] x is not less than y | [C] SyntaxError: invalid syntax | [D] IndentationError: unexpected indent,[A] x is less than y,"The code snippet is a simple if-else statement. The condition `x < y` evaluates to True because 5 is less than 10. Therefore, the block under 'if' will execute and print 'x is less than y'. Choice B is incorrect because it contradicts the output of the code. Choices C and D are distractors as they represent common Python syntax errors that could occur if the code were incorrectly written.",5,5,5,5,5,"This MCQ is excellent, perfectly aligning with the learning objective and course materials. It accurately tests fundamental if-else logic, comparison operators, and Python syntax, with highly plausible distractors that target common student misconceptions."
+Q047,Conditionals & Boolean Control Flow,medium,Consider the following Python code snippet: \n ```python \n x = 5 \n y = 10 \n if x < y: \n     print('x is less than y') \n else: \n     print('x is not less than y') \n ```,[A] Choice A: x is less than y | [B] Choice B: x is not less than y | [C] Choice C: SyntaxError | [D] Choice D: NameError,[B] Choice B: x is not less than y,"The code snippet compares the values of x and y. Since 5 is less than 10, the condition `x < y` is True. Therefore, the correct output is 'x is less than y'. Choice B is incorrect because it states the opposite of what happens in this case. Choice C is incorrect because there are no syntax errors in the code. Choice D is incorrect because all variables used in the code are defined.",1,4,5,5,5,"The question effectively tests core concepts of `if-else` statements and comparison operators, and the code is syntactically correct and well-grounded in the course material. However, the designated correct answer is fundamentally incorrect and directly contradicts the provided explanation and the actual execution of the code, rendering the item invalid as an assessment."
+Q048,Conditionals & Boolean Control Flow,medium,Which of the following code snippets will output '2' when executed?,"[A] ```python
+if x > 1:
+    print('1')
+elif x == 1:
+    print('2')
+else:
+    print('3')
+x = 0
+``` | [B] ```python
+x = 1
+if x == 1:
+    print('2')
+elif x > 1:
+    print('1')
+else:
+    print('3')
+``` | [C] ```python
+x = 0
+if x < 1:
+    print('3')
+elif x == 1:
+    print('2')
+else:
+    print('1')
+``` | [D] ```python
+x = 2
+if x > 1:
+    print('1')
+elif x == 1:
+    print('2')
+else:
+    print('3')
+```","[B] ```python
+x = 1
+if x == 1:
+    print('2')
+elif x > 1:
+    print('1')
+else:
+    print('3')
+```","The correct answer is B. The code snippet sets x to 1 and checks the conditions sequentially. Since x == 1, it prints '2'. Choice A is incorrect because it checks if x > 1 first, which is False, so it moves to the elif block where x == 1 is also False, printing '3'. Choice C is incorrect because it sets x to 0 and checks if x < 1, which is True, but then moves to the elif block where x == 1 is False, printing '3'. Choice D is incorrect because it sets x to 2 and checks if x > 1 first, which is True, so it prints '1' instead of '2'.",3,4,5,4,5,"The question effectively tests core `if-elif-else` concepts and sequential execution, which is well-grounded in the slides. However, the provided explanation for distractor (A) is factually incorrect regarding its execution (it would raise a NameError), and the explanation for (C) misrepresents the control flow, impacting overall technical correctness."
+Q049,Conditionals & Boolean Control Flow,medium,Consider the following Python code snippet: \n ```python \n x = 5 \n y = 10 \n if x == y: \n     print('Equal') \n else: \n     print('Not Equal') \n ```,[A] Choice A: 'Equal' | [B] Choice B: 'Not Equal' | [C] Choice C: 'True' | [D] Choice D: 'False',[B] Choice B: 'Not Equal',"The code compares the values of x and y using the equality operator ==. Since x (5) is not equal to y (10), the condition in the if statement evaluates to False, and the else block is executed, printing 'Not Equal'.",5,5,5,5,5,"The question is technically flawless, directly tests core conditional logic and comparison operators, and features highly plausible distractors. All concepts are explicitly covered and well-supported by the provided course slides."
+Q050,Conditionals & Boolean Control Flow,medium,What will be the output of the following Python code snippet? \n ```python \n x = 5 \n y = 10 \n if x != y: \n     print('x is not equal to y') \n else: \n     print('x is equal to y') \n ```,[A] x is not equal to y | [B] x is equal to y | [C] SyntaxError: invalid syntax | [D] RuntimeError: division by zero,[A] x is not equal to y,"The code snippet uses the inequality operator != to compare x and y. Since 5 is not equal to 10, the condition x != y evaluates to True. Therefore, the first print statement 'x is not equal to y' will be executed.",5,3,5,5,5,"The question is technically correct, uses flawless syntax, and directly tests core concepts of comparison operators and if-else statements as covered in the slides. However, two of the distractors (C and D) are weak and easily identifiable as incorrect."
+Q051,Conditionals & Boolean Control Flow,medium,Which of the following code snippets will output 'True' when executed?,"[A] ```python
+x = True
+y = False
+print(x or y)
+``` | [B] ```python
+x = True
+y = True
+print(x and y)
+``` | [C] ```python
+x = False
+y = True
+print(x and y)
+``` | [D] ```python
+x = False
+y = False
+print(x or y)
+```","[B] ```python
+x = True
+y = True
+print(x and y)
+```","The 'and' operator requires both conditions to be True for the result to be True. In option B, both x and y are True, so the output is 'True'. The other options either have one or both conditions as False, resulting in 'False' outputs.",1,1,5,5,5,"The question is fundamentally flawed as a single-choice MCQ because both option (A) and option (B) correctly output 'True'. This makes the designated correct answer ambiguous and severely impacts the distractor plausibility. However, the question effectively tests core concepts of logical operators and is well-grounded in the provided course materials."
+Q052,Conditionals & Boolean Control Flow,medium,Which of the following code snippets will output 'True' when executed?,"[A] ```python
+x = True
+y = False
+print(x or y)
+``` | [B] ```python
+x = False
+y = False
+print(x and y)
+``` | [C] ```python
+x = 5
+y = 10
+print(x > y)
+``` | [D] ```python
+x = 'hello'
+y = 'world'
+print(x == y)
+```","[A] ```python
+x = True
+y = False
+print(x or y)
+```","The correct choice is A. The `or` operator returns True if at least one of the conditions is True. In this case, x or y will be True because x is True. Choice B uses `and`, which requires both conditions to be True for the result to be True. Choice C compares integers and will output False since 5 is not greater than 10. Choice D checks if two strings are equal, which will also output False.",5,5,5,5,5,"This MCQ is exceptionally well-designed, directly testing the core concept of the 'or' operator as defined and exemplified in the course slides. All code snippets are technically correct and executable, and the distractors are highly plausible, reflecting common student misconceptions or related concepts covered in the material."
+Q053,Conditionals & Boolean Control Flow,medium,What is the output of the following Python code snippet? \n ```python \n x = True \n y = False \n print(not x or y) \n ```,[A] True | [B] False | [C] SyntaxError | [D] TypeError,[B] False,"The expression `not x or y` is evaluated as follows:
+- `not x` evaluates to `False`
+- `False or y` evaluates to `y`, which is `False`
+Thus, the output is `False`. The distractors are plausible bugs: a syntax error would occur if there were an unclosed parenthesis, and a type error would occur if `x` or `y` were not boolean values.",5,4,5,5,5,"The question accurately assesses understanding of Python's logical operators `not` and `or`, including their precedence. The code is syntactically correct, and the designated answer is accurate and well-explained, directly aligning with the provided course materials."
+Q054,Conditionals & Boolean Control Flow,medium,Which of the following code snippets correctly demonstrates short-circuit evaluation in Python using the `and` operator?,"[A] ```python
+x = True
+y = False
+print(x and y) # Output: False`
+ | [B] ```python
+x = False
+y = True
+print(x and y) # Output: True`
+ | [C] ```python
+x = True
+y = 0
+print(x and y) # Output: 0`
+ | [D] ```python
+x = False
+y = None
+print(x and y) # Output: None`
+","[A] ```python
+x = True
+y = False
+print(x and y) # Output: False`
+","The correct answer demonstrates short-circuit evaluation where the `and` operator stops evaluating further conditions as soon as it encounters a False value. In this case, since `x` is True and `y` is False, the expression evaluates to False without checking the value of `y`. The other options either do not demonstrate short-circuiting or contain errors.",1,3,5,5,2,"The designated correct answer (A) fundamentally misunderstands and incorrectly demonstrates short-circuit evaluation for the `and` operator, as `x` being True forces evaluation of `y`. The provided explanation is also factually incorrect. Options (B) and (D) are actual demonstrations of short-circuiting for `and`."
+Q055,Conditionals & Boolean Control Flow,medium,Consider the following Python code snippet: \n ```python \n x = [] \n y = 'hello' \n z = 0 \n if x or y or z: \n     print('At least one condition is True') \n else: \n     print('All conditions are False') \n ```,[A] Choice A: All conditions are False | [B] Choice B: At least one condition is True | [C] Choice C: The code will raise an error | [D] Choice D: The output will be empty,[B] Choice B: At least one condition is True,"The `or` operator in Python short-circuits, meaning it stops evaluating further conditions as soon as it finds a True value. In this case, `y` is a non-empty string, which evaluates to True. Therefore, the condition `x or y or z` is True, and 'At least one condition is True' will be printed.",5,4,5,5,3,"The question is technically correct, tests a core Python concept (truthiness and short-circuiting with 'or'), and the code is flawless. However, the specific truthiness rules for empty collections and zero, which are central to the question, are not explicitly detailed in the provided slide chunks."
+Q056,Conditionals & Boolean Control Flow,medium,Consider the following Python code snippet: \n ```python \n x = 5 \n y = 10 \n if x < y or x == y: \n     print('Condition met') \n else: \n     print('Condition not met') \n ```,[A] Condition met | [B] Condition not met | [C] Syntax error | [D] Runtime error,[A] Condition met,"The code snippet uses the 'or' operator, which means that if at least one of the conditions is True, the entire expression evaluates to True. In this case, both x < y (True) and x == y (False) are checked, but since 'or' short-circuits and stops at the first True condition, the overall expression evaluates to True. Therefore, 'Condition met' is printed.",5,4,4,5,5,"The question is technically correct, and the code executes flawlessly. It effectively tests understanding of conditional statements and logical operators, which are well-supported by the course slides. While the stated learning objective focuses on 'truthiness' of non-boolean types, the question itself tests a fundamental aspect of boolean evaluation, making it highly relevant."
+Q057,Conditionals & Boolean Control Flow,medium,Consider the following Python code snippet: \n ```python \n x = 5 \n y = 10 \n if x > 3: \n     if y < 12: \n         print('Condition met') \n else: \n     print('Outer else') \n ```,[A] Condition met | [B] Outer else | [C] SyntaxError | [D] IndentationError,[A] Condition met,"The code snippet has a nested if statement. The outer condition `x > 3` is True because 5 is greater than 3. The inner condition `y < 12` is also True because 10 is less than 12. Therefore, the code inside the innermost block executes and prints 'Condition met'. Choice B is incorrect because it refers to an outer else block that does not execute in this case. Choices C and D are distractors representing common Python errors, but they do not apply here.",5,5,5,5,5,"The question flawlessly tests the understanding of nested if-else statements, with highly plausible distractors that target common misconceptions. The code is syntactically perfect and the concepts are directly and explicitly covered in the provided course slides."
+Q058,Conditionals & Boolean Control Flow,medium,What will be the output of the following Python code snippet? \n ```python \n x = 15 \n if 10 < x < 20: \n     print('x is between 10 and 20') \n else: \n     print('x is not between 10 and 20') \n ```,[A] 'x is between 10 and 20' | [B] 'x is not between 10 and 20' | [C] SyntaxError | [D] TypeError,[A] 'x is between 10 and 20',"The code snippet uses chained comparison operators to check if x is between 10 and 20. Since x = 15, the condition 10 < x < 20 evaluates to True, leading to the output 'x is between 10 and 20'. The other options are incorrect because there is no syntax or type error in the code.",5,4,5,5,4,"The question accurately tests Python's chained comparison operators, a key language feature. Distractors are plausible, particularly for students unfamiliar with this Pythonic syntax. While the exact chained comparison syntax isn't explicitly in the slides, the foundational comparison and logical operators are thoroughly covered, making it a logical and relevant extension."
+Q059,Conditionals & Boolean Control Flow,medium,Which of the following code snippets correctly uses a ternary operator to determine if a number is even or odd?,"[A] ```python
+number = 7
+even_or_odd = 'Even' if number % 2 == 0 else 'Odd'
+print(even_or_odd)
+``` | [B] ```python
+number = 7
+even_or_odd = 'Odd' if number % 2 != 0 else 'Even'
+print(even_or_odd)
+``` | [C] ```python
+number = 7
+even_or_odd = 'Even' if number % 2 == 1 else 'Odd'
+print(even_or_odd)
+``` | [D] ```python
+number = 7
+even_or_odd = 'Odd' if number % 2 == 0 else 'Even'
+print(even_or_odd)
+```","[A] ```python
+number = 7
+even_or_odd = 'Even' if number % 2 == 0 else 'Odd'
+print(even_or_odd)
+```","The correct answer uses the ternary operator to check if `number % 2 == 0`. If true, it assigns 'Even' to `even_or_odd`; otherwise, it assigns 'Odd'. The distractors have errors in their conditions or logic.",2,2,5,5,5,"The question is highly relevant and well-grounded in the course material, and all code snippets are executable. However, a critical flaw exists as option (B) is also a technically correct solution to determine if a number is even or odd using a ternary operator, leading to multiple correct answers."
+Q060,Conditionals & Boolean Control Flow,medium,What will be the output of the following Python code snippet? \n ```python \n x = 5 \n y = 10 \n if x < y: \n     print('x is less than y') \n else: \n     print('x is not less than y') \n ```,[A] x is less than y | [B] x is not less than y | [C] SyntaxError: invalid syntax | [D] RuntimeError: division by zero,[A] x is less than y,"The code snippet compares the values of x and y using the less than operator (<). Since 5 is indeed less than 10, the condition `x < y` evaluates to True. Therefore, the program will print 'x is less than y'. The other options are incorrect because they either represent a logical error (choice C) or an unrelated runtime error (choice D), which would not occur in this specific code snippet.",5,3,4,5,5,"The question is technically correct and the code is perfectly executable, directly testing fundamental `if/else` control flow and comparison operators, which are explicitly covered in the slides. While distractor (B) is plausible, (C) and (D) are weaker, slightly impacting overall distractor quality. It addresses a foundational aspect of the stated learning objective."
+Q061,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n numbers = [1, 2, 3, 4] \n total = 0 \n for number in numbers: \n total += number \n print(total) \n ```",[A] The output will be 10 | [B] The output will be 9 | [C] The output will be 8 | [D] The output will be 7,[A] The output will be 10,"Explanation: The for loop iterates over each number in the list [1, 2, 3, 4] and adds it to the total. After the loop completes, the total is printed, which should be 10. Choice B (9) is incorrect because it misses one of the numbers. Choice C (8) is incorrect because it misses two of the numbers. Choice D (7) is incorrect because it misses three of the numbers.",5,4,5,2,5,"The question is technically correct, directly tests a fundamental concept of for loops iterating over lists as covered in the slides, and uses valid Python code. Distractors are plausible, representing common arithmetic errors."
+Q062,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n word = 'Python' \n for char in word: \n     print(char, end=' ') \n ``` What will be the output of this code? \n ",[A] P y t h o n | [B] P y t h o n  | [C] Python | [D] p y t h o n,[B] P y t h o n ,"The code iterates over each character in the string 'Python' and prints it with a space at the end. The `end=' '` argument in the print function ensures that each character is printed on the same line separated by spaces, resulting in 'P y t h o n '.",5,4,5,5,4,"This MCQ flawlessly assesses the understanding of `for` loop iteration over strings and the `print()` function's `end` argument, which are fundamental Python concepts. The distractors are well-crafted, particularly (A) and (C), targeting common student misconceptions about output formatting. The question is strongly supported by the provided course slides, which explicitly cover string iteration with `for` loops."
+Q063,Loops & Iteration,medium,What will be the output of the following Python code snippet? \n ```python \n for i in range(5): \n     print(i) \n ```,[A] 0 1 2 3 4 | [B] 1 2 3 4 5 | [C] 0 2 4 6 8 | [D] -1 0 1 2 3,[A] 0 1 2 3 4,"The range(5) function generates numbers starting from 0 up to (but not including) 5. Therefore, the output will be 0 1 2 3 4.",5,5,5,5,5,"The question is technically flawless, directly supported by the provided slides with an identical example, and uses highly plausible distractors reflecting common student misconceptions about the range() function's behavior."
+Q064,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n for i in range(3, 8): \n     print(i) \n ``` \n What will be the output of this code?",[A] 1 2 3 4 5 6 | [B] 3 4 5 6 7 | [C] 0 1 2 3 4 5 6 | [D] 2 3 4 5 6 7 8,[B] 3 4 5 6 7,"The range function starts from the 'start' value (inclusive) and goes up to but does not include the 'stop' value. In this case, it starts at 3 and stops just before 8, so the output will be 3 4 5 6 7.",5,5,5,5,5,"The question is technically flawless, directly tests a core concept of the range() function, and the code is perfectly executable. Distractors are highly plausible, reflecting common student misconceptions about inclusive/exclusive boundaries or default start values. The question is fully supported by explicit statements and examples in the provided course slides."
+Q065,Loops & Iteration,medium,"What will be printed when the following code is executed? \n ```python \n for i in range(0, 10, 3): \n     print(i) \n ```",[A] 0 3 6 9 | [B] 0 2 4 6 8 | [C] 1 4 7 | [D] 0 1 2 3 4 5 6 7 8 9,[A] 0 3 6 9,"The range function generates numbers starting from 0 up to (but not including) 10, incrementing by 3. Therefore, it will print 0, 3, 6, and 9.",5,5,5,5,5,"The question is technically flawless, directly testing a core concept of the range() function with three arguments as explicitly covered in the course slides. Distractors are highly plausible, reflecting common student misconceptions regarding the 'step' and 'stop' parameters."
+Q066,Loops & Iteration,medium,"What will be printed when the following code is executed? \n ```python \n for i in range(10, -1, -2): \n     print(i) \n ```",[A] 8 6 4 2 0 | [B] 9 7 5 3 1 | [C] 10 8 6 4 2 | [D] 10 8 6 4 2 0 -2,[A] 8 6 4 2 0,The range function starts at 10 and decrements by 2 until it reaches -1 (exclusive). The correct output is 8 6 4 2 0.,1,4,5,5,5,"The question is well-formed and tests a core concept directly supported by the slides. However, the designated correct answer (A) is technically incorrect, as the `start` value (10) should be included in the output, making the actual correct sequence `10 8 6 4 2 0`."
+Q067,Loops & Iteration,medium,What is the output of the following code snippet? \n ```python \n i = 0 \n while i < 5: \n     print(i) \n     i += 1 \n ```,[A] 0 1 2 3 4 | [B] 0 1 2 3 4 5 | [C] 1 2 3 4 5 | [D] -1 -2 -3 -4 -5,[A] 0 1 2 3 4,"The code initializes `i` to 0 and enters a while loop that continues as long as `i` is less than 5. Inside the loop, it prints the value of `i` and then increments `i` by 1. The loop runs for 5 iterations (i = 0, 1, 2, 3, 4), printing each value before incrementing. Therefore, the correct output is '0 1 2 3 4'.",5,4,5,5,5,"This MCQ is technically flawless, directly tests core `while` loop concepts from the slides, and features plausible distractors that target common off-by-one errors. The code is perfectly executable and the question is strongly supported by the provided course material."
+Q068,Loops & Iteration,medium,Which of the following code snippets correctly updates the loop counter variable to prevent an infinite loop in a while loop?,"[A] ```python
+i = 0
+while i < 5:
+    print(i)
+``` | [B] ```python
+i = 0
+while i < 5:
+    print(i)
+    i += 1
+``` | [C] ```python
+i = 0
+while i <= 5:
+    print(i)
+``` | [D] ```python
+i = 0
+while i < 5:
+    print(i)
+    i -= 1
+```","[B] ```python
+i = 0
+while i < 5:
+    print(i)
+    i += 1
+```","The correct choice updates the loop counter variable `i` by incrementing it (`i += 1`) within the loop. This ensures that the condition `i < 5` will eventually become false, thus preventing an infinite loop. The other choices either do not update the counter (A and D) or have a condition that never becomes false (C), leading to infinite loops.",5,5,5,5,5,"This MCQ is exceptionally well-designed, directly testing a core concept of while loop termination with flawless technical correctness and highly plausible distractors. The question and its solution are explicitly and thoroughly supported by the provided course slides, which emphasize the importance of updating loop control variables to prevent infinite loops."
+Q069,Loops & Iteration,medium,"Which of the following code snippets will correctly print all numbers from 1 to 5, excluding the number 3?","[A] ```python
+for i in range(1, 6):
+    if i == 3:
+        continue
+    print(i)
+``` | [B] ```python
+i = 1
+while i <= 5:
+    if i == 3:
+        break
+    print(i)
+    i += 1
+``` | [C] ```python
+for i in range(1, 6):
+    if i != 3:
+        print(i)
+``` | [D] ```python
+i = 1
+while i <= 5:
+    if i == 3:
+        continue
+    print(i)
+    i += 1
+```","[A] ```python
+for i in range(1, 6):
+    if i == 3:
+        continue
+    print(i)
+```","The correct answer uses a for loop with the `continue` statement to skip printing the number 3. The distractors either use `break` instead of `continue`, which would terminate the loop entirely, or they do not include any conditional logic to skip the number 3.",2,1,5,5,5,"The question is technically flawed as options (A), (C), and (D) all produce the correct output, making it a multiple-correct-answer question instead of a single-choice MCQ. This severely impacts distractor plausibility, as (C) and (D) are not distractors but alternative correct solutions."
+Q070,Loops & Iteration,medium,Which of the following code snippets will correctly print all odd numbers from 1 to 6 using a for loop and continue statement?,"[A] ```python
+numbers = [1, 2, 3, 4, 5, 6]
+for num in numbers:
+    if num % 2 == 0:
+        print(num)
+``` | [B] ```python
+numbers = [1, 2, 3, 4, 5, 6]
+for num in numbers:
+    if num % 2 != 0:
+        continue
+    print(num)
+``` | [C] ```python
+numbers = [1, 2, 3, 4, 5, 6]
+for num in numbers:
+    if num % 2 == 0:
+        continue
+    print(num)
+``` | [D] ```python
+numbers = [1, 2, 3, 4, 5, 6]
+for num in numbers:
+    if num % 2 == 0:
+        break
+    print(num)
+```","[B] ```python
+numbers = [1, 2, 3, 4, 5, 6]
+for num in numbers:
+    if num % 2 != 0:
+        continue
+    print(num)
+```","The correct answer uses the continue statement to skip even numbers and print only odd numbers. Choice A is incorrect because it prints all even numbers instead of skipping them. Choice C is also incorrect for the same reason as Choice A. Choice D is incorrect because it uses break instead of continue, which would exit the loop entirely when an even number is encountered.",1,4,5,5,5,"The designated correct answer (B) is fundamentally incorrect as it prints even numbers, contradicting the prompt's requirement to print odd numbers. The actual correct answer is (C), which aligns perfectly with the example provided in the retrieved course slides for the `continue` statement."
+Q071,Loops & Iteration,medium,"Which of the following code snippets correctly calculates the sum of numbers from 1 to 5 using a for loop? ```python \n sum = 0 \n for i in range(1, 6): \n     sum += i \n print(sum) \n ```",[A] Choice A: The code is correct and will output 15. | [B] Choice B: The code is incorrect because it uses a while loop instead of a for loop. | [C] Choice C: The code is incorrect because it starts the range from 0 instead of 1. | [D] Choice D: The code is incorrect because it does not initialize the sum variable before using it.,[B] Choice B: The code is incorrect because it uses a while loop instead of a for loop.,"The correct answer is B. The code uses a for loop to iterate over numbers from 1 to 5 and correctly calculates their sum, which is 15. Choice A is incorrect because it suggests the code is correct when in fact it is not using a for loop as specified in the question. Choice C is incorrect because it points out an off-by-one error in the range but does not address the use of a while loop instead of a for loop, which is the main issue with the code. Choice D is incorrect because the sum variable is initialized before being used.",1,2,5,5,5,"The designated correct answer (B) is factually incorrect, stating the provided code uses a `while` loop when it clearly uses a `for` loop. This fundamentally breaks the question's validity and makes the actual correct statement about the code (Choice A) a distractor. The explanation also contains contradictory statements."
+Q072,Loops & Iteration,medium,Which of the following code snippets correctly prints each element in a list of numbers from 1 to 5 using a for loop?,"[A] ```python
+for i in range(1, 6):
+    print(i)
+``` | [B] ```python
+i = 1
+while i <= 5:
+    print(i)
+    i += 1
+``` | [C] ```python
+numbers = [1, 2, 3, 4, 5]
+for number in numbers:
+    print(number + 1)
+``` | [D] ```python
+numbers = [1, 2, 3, 4, 5]
+for i in range(0, 6):
+    print(numbers[i])
+```","[A] ```python
+for i in range(1, 6):
+    print(i)
+```","The correct answer uses a for loop with the `range` function to iterate from 1 to 5. The other options either use a while loop, modify the printed numbers incorrectly, or have an off-by-one error in their range.",5,5,3,5,4,"The question is technically correct and features highly plausible distractors. However, it does not align with the specified target learning objective of 'Nested for loops and two-dimensional iteration flow', instead focusing on basic single for loop usage. The code is syntactically flawless, and most concepts are well-grounded in the slides, though explicit teaching of list indexing for iteration is not present."
+Q073,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n my_dict = {'a': 1, 'b': 2, 'c': 3} \n for key in my_dict.keys(): \n     print(key) \n ```","[A] It will print: a b c | [B] It will raise an error because dictionaries are unordered | [C] It will print: {'a': 1, 'b': 2, 'c': 3} | [D] It will print: a
+b
+c
+and then raise an error",[A] It will print: a b c,"The correct answer is A. The for loop iterates over the keys of the dictionary and prints each key on a new line. Dictionaries in Python are ordered as of version 3.7, so the order of printing will be 'a', 'b', and 'c'. Choice B is incorrect because dictionaries can be ordered from Python 3.7 onwards. Choice C is incorrect because it attempts to print the dictionary itself rather than its keys. Choice D is incorrect because there are no errors in the code.",2,5,5,5,3,"The designated correct answer (A) is technically incorrect regarding the output format, as `print(key)` will print each key on a new line, not a single line separated by spaces. The provided explanation even contradicts the chosen answer by stating 'prints each key on a new line.' While for loops and dictionaries are introduced, the specific method `my_dict.keys()` and the behavior of iterating over dictionary keys are not explicitly covered in the retrieved course slides."
+Q074,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n fruits = ['apple', 'banana', 'cherry'] \n for i, fruit in enumerate(fruits): \n     print(i, fruit) \n ``` \n What will be the output of this code?","[A] 0 apple
+1 banana
+2 cherry | [B] apple 0
+banana 1
+c cherry 2 | [C] apple banana cherry | [D] 1 apple
+2 banana
+3 cherry","[A] 0 apple
+1 banana
+2 cherry","The enumerate() function adds a counter to an iterable and returns it in a form of enumerate object. The syntax is enumerate(iterable, start=0). In this case, the loop starts with index 0 and prints both the index and the fruit name. Therefore, the correct output is '0 apple
+1 banana
+2 cherry'.",5,5,5,5,1,"The question is technically correct, highly relevant, and has excellent distractors reflecting common misconceptions. However, the `enumerate()` function, which is central to the question, is not mentioned or explained in the provided course slides, making it unsupported by the given context."
+Q075,Loops & Iteration,medium,"Which of the following Python code snippets correctly finds the maximum value in a list using a for loop? ```python \n numbers = [3, 5, 1, 8, 2] \n max_value = None \n for number in numbers: \n     if max_value is None or number > max_value: \n         max_value = number \n print(max_value) \n ```",[A] Choice A text | [B] Choice B text | [C] Choice C text | [D] Choice D text,[B] Choice B text,"The correct code snippet initializes `max_value` to `None` and iterates through the list, updating `max_value` whenever it finds a number greater than the current `max_value`. This ensures that by the end of the loop, `max_value` holds the maximum value in the list. The distractors represent common mistakes such as not initializing `max_value`, using an incorrect comparison operator, or modifying the list during iteration.",5,5,5,5,4,"The provided code snippet correctly implements a robust algorithm for finding the maximum value in a list using a for loop, aligning perfectly with the target learning objective. The described distractors are highly plausible, reflecting common student misconceptions. The question's core concepts of iterating over lists with for loops are well-supported by the retrieved course slides."
+Q076,Loops & Iteration,medium,Which of the following code snippets correctly counts how many times the letter 'a' appears in a given string using a for loop?,"[A] ```python
+string = ""banana""
+count = 0
+for char in string:
+    if char == 'b':
+        count += 1
+print(count)
+``` | [B] ```python
+string = ""banana""
+count = 0
+for char in string:
+    if char == 'a':
+        count += 1
+print(count)
+``` | [C] ```python
+string = ""banana""
+count = 0
+for char in string:
+    if char == 'A':
+        count += 1
+print(count)
+``` | [D] ```python
+string = ""banana""
+count = 0
+for char in string:
+    if char != 'a':
+        count += 1
+print(count)
+```","[B] ```python
+string = ""banana""
+count = 0
+for char in string:
+    if char == 'a':
+        count += 1
+print(count)
+```","The correct answer is B. The code iterates over each character in the string 'banana' and increments the count whenever it encounters the letter 'a'. Choice A has an off-by-one error by checking for 'b' instead of 'a'. Choice C confuses case sensitivity by checking for 'A' instead of 'a'. Choice D incorrectly counts non-'a' characters, which is the opposite of what we want.",5,5,5,5,4,"The question is technically flawless, with a correct answer and highly plausible distractors that target common student misconceptions like case sensitivity and logical errors. It directly assesses core concepts of for loops and conditional logic, which are fundamental to the provided course material. While `if` statements aren't explicitly detailed in the retrieved chunks, their use within loops is a standard and necessary extension of the 'for loop basics' covered."
+Q077,Loops & Iteration,medium,"Which of the following code snippets correctly filters out even numbers from a list using a for loop and appends them to a new list? ```python \n numbers = [1, 2, 3, 4, 5] \n filtered_numbers = [] \n for number in numbers: \n     if number % 2 == 0: \n         filtered_numbers.append(number) \n print(filtered_numbers) \n ```","[A] [1, 3, 5] | [B] [2, 4] | [C] [1, 2, 3, 4, 5] | [D] [0, 2, 4]","[B] [2, 4]","The correct answer is [2, 4]. The code iterates over the list 'numbers' and checks if each number is even using the modulus operator (%). If the number is even (i.e., number % 2 == 0), it appends the number to the 'filtered_numbers' list. After the loop completes, the 'filtered_numbers' list contains only the even numbers [2, 4]. The other options are incorrect because they either contain odd numbers or include zero.",5,4,5,5,4,"The question is technically correct, directly tests core concepts of for loops and list append operations, and the code is flawless. Distractors are mostly plausible, and the question is well-grounded in the provided slides, though the `if` condition and modulus operator are assumed knowledge beyond the specific chunks."
+Q078,Loops & Iteration,medium,"What will be the output of the following Python code snippet? \n ```python \n user_input = """" \n while user_input != ""quit"": \n     user_input = input(""Enter command: "") \n     if user_input == ""stop"": \n         break \n print(""Loop ended"") \n ```",[A] The program will print 'Loop ended' and then wait for the next user input. | [B] The program will continuously prompt the user to enter a command until they type 'quit'. | [C] The program will print 'Loop ended' immediately without waiting for any user input. | [D] The program will enter an infinite loop and never terminate.,[B] The program will continuously prompt the user to enter a command until they type 'quit'.,"Explanation: The code uses a while loop to continuously prompt the user for input until they type 'quit'. Inside the loop, there is an if statement that checks if the user input is 'stop'. If it is, the break statement is executed, which exits the loop immediately. Therefore, the correct output is that the program will continuously prompt the user to enter a command until they type 'quit', and then it will print 'Loop ended' and terminate.",1,3,5,5,5,"The designated correct answer (B) is factually incorrect. The loop terminates if the user types 'stop' (due to the break statement) or 'quit', not solely 'quit'. This makes the key fundamentally flawed."
+Q079,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n numbers = [1, 2, 3, 4, 5] \n count = 0 \n for num in numbers: \n     if num % 2 == 0: \n         count += 1 \n print(count) \n ```",[A] The code will print 3 | [B] The code will print 2 | [C] The code will print 5 | [D] The code will print 0,[B] The code will print 2,"Explanation: The loop iterates through the list [1, 2, 3, 4, 5]. For each number, it checks if the number is even (num % 2 == 0). If true, it increments the count. After the loop, it prints the value of count. There are two even numbers in the list: 2 and 4. Therefore, the code will print 2.",5,5,5,5,5,"The question is technically flawless, and the designated answer is unequivocally correct. Distractors are well-designed, reflecting common student misconceptions regarding loop execution and conditional logic. It directly tests core concepts of iteration, conditional statements, and variable tracing, which are fundamental to Python programming and explicitly covered in the course slides. The code is syntactically perfect and executes deterministically, and all concepts are directly supported by the provided slide chunks, especially the `for` loop examples and the use of the modulo operator for even/odd checks."
+Q080,Loops & Iteration,medium,"Consider the following Python code snippet: \n ```python \n found = False \n numbers = [1, 2, 3, 4, 5] \n for num in numbers: \n     if num == 3: \n         found = True \n         break \n print(found) \n ```",[A] True | [B] False | [C] SyntaxError | [D] Infinite Loop,[B] False,"The code initializes a boolean flag `found` to False. It then iterates over the list `numbers`. When it encounters the number 3, it sets `found` to True and breaks out of the loop. The final print statement outputs the value of `found`, which is False.",1,3,4,5,2,"The designated correct answer (B) is factually incorrect; the code snippet actually outputs 'True' due to the `break` statement. The question tests relevant concepts like `for` loops and boolean flags, but the `break` statement and boolean flags are not explicitly covered in the provided slides, and the stated learning objective mentions `while` loops, not `for` loops."
+Q081,Functions & Scope,medium,"What will be the output of the following code snippet? \n ```python \n def greet(name): \n     return f'Hello, {name}!' \n  \n def main(): \n     print(greet('Alice')) \n  \n if __name__ == '__main__': \n     main() \n ```","[A] Hello, Alice! | [B] Hello, Bob! | [C] NameError: name 'Alice' is not defined | [D] SyntaxError: unexpected indent","[A] Hello, Alice!","The code defines a function `greet` that takes a name as an argument and returns a greeting message. The `main` function calls `greet('Alice')`, which should output 'Hello, Alice!'. The correct answer is A. Choice B is incorrect because the name passed to `greet` is 'Alice', not 'Bob'. Choice C is incorrect because there are no errors in the code that would prevent it from running and producing the expected output. Choice D is incorrect because there are no syntax errors in the code.",5,3,5,5,5,"The question accurately tests fundamental Python function definition, parameter passing, and calling, directly aligning with the provided course slides. The code is flawless and the correct answer is unequivocally identified, though some distractors are easily eliminated."
+Q082,Functions & Scope,medium,"Which of the following is the correct way to call a function named `calculate_area` with two arguments, `length` and `width`, in Python? ```python \n # code here \n ```","[A] calculate_area(length=5, width=10) | [B] calculate_area(5, 10) | [C] length, width = calculate_area(5, 10) | [D] area = calculate_area(length=5, width=10)","[B] calculate_area(5, 10)",The correct way to call a function in Python is by using the function name followed by parentheses containing the arguments. Positional arguments must be provided in the order they are defined in the function definition.,2,2,5,5,4,"The question is flawed as both option (A) and option (B) are technically correct ways to call a function in Python, and the course slides explicitly present both positional and keyword arguments as valid. This undermines the single-choice MCQ format and makes option (A) a correct answer rather than a distractor."
+Q083,Functions & Scope,medium,Which of the following functions will correctly return the sum of a list of numbers?,"[A] ```python
+def sum_list(numbers):
+    return sum(numbers)
+``` | [B] ```python
+def sum_list(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    return total + 1
+``` | [C] ```python
+def sum_list(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    return total - 1
+``` | [D] ```python
+def sum_list(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    return str(total)
+```","[A] ```python
+def sum_list(numbers):
+    return sum(numbers)
+```","The correct function `sum_list(numbers)` returns the sum of a list of numbers without any modifications. The distractors introduce errors: adding 1 (Choice B), subtracting 1 (Choice C), and converting to string (Choice D).",5,5,5,5,5,"The question is technically flawless, directly testing the return statement and the `sum()` function, which is explicitly shown in the slides. Distractors are highly plausible, representing common student errors like off-by-one or incorrect data type return."
+Q084,Functions & Scope,medium,"What is the output of the following Python code snippet? \n ```python \n def greet(name): \n     return f""Hello, {name}!"" \n  \n greet(""Alice"") \n ```","[A] Hello, Alice! | [B] None | [C] Hello, | [D] Error: name is not defined","[A] Hello, Alice!","The function `greet` returns a string formatted with the input `name`. When calling `greet(""Alice"")`, it should return 'Hello, Alice!'. Choice A is correct. Choice B is incorrect because the function does not return None; it returns a string. Choice C is incorrect because the function includes the name in its output. Choice D is incorrect because there are no undefined variables.",1,5,5,5,5,"The designated correct answer (A) represents the *return value* of the function, not the *output* to the console. The code snippet `greet(""Alice"")` on its own produces no console output. This directly contradicts the stated learning objective regarding the difference between `print()` (displaying output) and `return` (producing a value)."
+Q085,Functions & Scope,medium,"What will be the output of the following Python code snippet? \n ```python \n def greet(name): \n     print(f'Hello, {name}!') \n result = greet('Alice') \n print(result) \n ```","[A] None | [B] 'Hello, Alice!' | [C] Error: function has no return statement | [D] TypeError: greet() takes 0 positional arguments but 1 was given",[A] None,"The function `greet` is defined to print a greeting message. Since it does not have an explicit return statement, it implicitly returns None by default. Therefore, when we call `result = greet('Alice')`, the value of `result` will be None. The subsequent `print(result)` will output 'None'.",5,4,5,5,5,"The question flawlessly assesses the core concept of implicit None return in Python functions, directly supported by the provided slide. Distractors are plausible, especially confusing print output with return value."
+Q086,Functions & Scope,medium,Which of the following functions correctly returns multiple values as a tuple?,"[A] ```python
+def get_values():
+    x = 10
+    y = 20
+    return x, y
+``` | [B] ```python
+def get_values():
+    x = 10
+    y = 20
+    return (x, y)
+``` | [C] ```python
+def get_values():
+    x = 10
+    y = 20
+    return [x, y]
+``` | [D] ```python
+def get_values():
+    x = 10
+    y = 20
+    return x + y
+```","[A] ```python
+def get_values():
+    x = 10
+    y = 20
+    return x, y
+```","The correct function returns multiple values as a tuple using the syntax `return x, y`. This is the standard way to return multiple values from a Python function. The other options either return a list or a single value, which do not meet the requirement of returning multiple values as a tuple.",3,2,5,5,5,"The question effectively targets a core concept from the slides. However, its design as an MCQ is flawed because option (B) is also a technically correct way to return a tuple, making the designated correct answer not unique. This significantly impacts technical correctness and distractor plausibility."
+Q087,Functions & Scope,medium,"Consider the following Python function: \n ```python \n  \n def add_item(item, items=[]): \n     items.append(item) \n     return items \n  \n result = add_item('apple') \n result2 = add_item('banana', result) \n print(result2) \n ``` \n What will be the output of this code?","[A] [apple, banana] | [B] [apple] | [C] [banana] | [D] [apple, banana, apple]","[A] [apple, banana]","The function `add_item` uses a mutable default argument `items=[]`. When called without an argument for `items`, it appends the new item to this shared list. In the given code, `result` is assigned the result of calling `add_item('apple')`, which modifies the shared list. Then, `result2` is assigned the result of calling `add_item('banana', result)`, appending 'banana' to the same list. The final print statement outputs `[apple, banana]`. Therefore, choice A is correct.",5,4,5,5,5,"The question accurately assesses the understanding of mutable default arguments, a critical Python concept explicitly highlighted as a pitfall in the course slides. The code is syntactically correct and the designated answer is technically sound, with plausible distractors."
+Q088,Functions & Scope,medium,"Which of the following function calls will correctly pass keyword arguments to a function named `calculate_area` that expects parameters `length` and `width`? \n ```python \n def calculate_area(length, width): \n     return length * width \n ```","[A] calculate_area(5, 3) | [B] calculate_area(length=5, width=3) | [C] calculate_area(3, length=5) | [D] calculate_area(width=3, 5)","[B] calculate_area(length=5, width=3)","The correct choice is `calculate_area(length=5, width=3)`. This correctly passes keyword arguments to the function. The other choices either use positional arguments incorrectly or mix up the order of keyword arguments.",5,5,5,5,5,"The question is technically flawless, with a clearly correct answer and highly plausible distractors that target common student misconceptions regarding argument passing. It directly assesses a core Python concept (keyword arguments) and is well-supported by the provided course slides, particularly the `**kwargs` example which demonstrates keyword argument syntax."
+Q089,Functions & Scope,medium,Consider the following Python code snippet: \n ```python \n x = 5 \n  \n def my_function(): \n     x = 10 \n     print(x) \n  \n my_function() \n print(x) \n ```,[A] 6 and 5 | [B] 10 and 5 | [C] 10 and 10 | [D] 5 and 10,[B] 10 and 5,"In the code, `x` is declared as a global variable outside the function with the value 5. Inside the function `my_function`, another `x` is declared and assigned the value 10. This creates a new local variable `x` that shadows the global one. When `print(x)` is called inside the function, it prints the local `x` which is 10. Outside the function, the global `x` remains unchanged at 5.",5,4,5,5,2,"The question is technically correct, highly relevant to core Python concepts, and uses executable code. However, the provided course slides introduce functions and variables but do not cover variable scope (local vs. global) or shadowing, which is central to this question."
+Q090,Functions & Scope,medium,"Consider the following Python code snippet: \n ```python \n def calculate_average(numbers): \n     return sum(numbers) / len(numbers) \n  \n average = calculate_average([1, 2, 3]) \n print(average) \n ```",[A] The output will be 2.0 | [B] The output will be 3.0 | [C] The code will raise a NameError | [D] The code will raise a TypeError,[B] The output will be 3.0,"Explanation: The function `calculate_average` is called with the list `[1, 2, 3]`. Inside the function, the sum of the numbers (1 + 2 + 3 = 6) is divided by the length of the list (3), resulting in an average of 2.0. Therefore, the correct output will be 3.0.",1,3,5,5,5,"The designated correct answer (B) is incorrect; the code actually outputs 2.0. The provided explanation correctly calculates 2.0 but then contradicts itself by stating the correct output is 3.0, indicating a fundamental error in the key."
+Q091,Functions & Scope,medium,What is the output of the following Python code? \n ```python \n x = 5 \n  \n def my_function(): \n     x = 10 \n     return x \n  \n print(my_function()) \n ```,[A] 5 | [B] 10 | [C] None | [D] Error,[B] 10,"The function `my_function` defines a local variable `x` with the value 10. When calling the function, it returns this local `x`, not the global `x`. Therefore, the output is 10.",5,5,5,5,1,"The question is technically correct, highly relevant to core Python concepts, and features strong distractors. However, the crucial concept of variable scope and shadowing, which is central to the question, is not explicitly covered in the provided course slide chunks."
+Q092,Functions & Scope,medium,Which of the following code snippets correctly demonstrates how to pass a mutable object like a list to a function without causing unintended side effects?,"[A] ```python
+def add_item(item, items=[]):
+    items.append(item)
+    return items
+
+my_list = [1, 2, 3]
+new_list = add_item(4, my_list)
+print(new_list) # Output: [1, 2, 3, 4]
+``` | [B] ```python
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+
+my_list = [1, 2, 3]
+new_list = add_item(4, my_list)
+print(new_list) # Output: [1, 2, 3, 4]
+``` | [C] ```python
+def add_item(item, items=[]):
+    items.append(item)
+    return items
+
+my_list = [1, 2, 3]
+new_list = add_item(4)
+print(new_list) # Output: [4]
+``` | [D] ```python
+def add_item(item):
+    my_list = [item]
+    return my_list
+
+my_list = [1, 2, 3]
+new_list = add_item(4)
+print(new_list) # Output: [4]
+```","[B] ```python
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+
+my_list = [1, 2, 3]
+new_list = add_item(4, my_list)
+print(new_list) # Output: [1, 2, 3, 4]
+```","The correct answer uses `items=None` as the default value for the function parameter and initializes `items = []` inside the function if it is `None`. This prevents the use of a mutable default argument, which can lead to unintended side effects. The other options either incorrectly modify the default list or do not handle the list correctly.",5,5,5,5,5,"The question flawlessly tests the critical concept of mutable default arguments in Python, directly aligning with the provided course slides. Distractors are highly plausible, reflecting common student misconceptions regarding function parameters and side effects."
+Q093,Functions & Scope,medium,"Consider the following Python function that calculates the sum of a list of numbers and then divides by the length of the list to find the average. ```python \n def calculate_average(numbers): \n     return sum(numbers) / len(numbers) \n ``` What will be the output if we call `calculate_average([1, 2, 3])`?",[A] 6 | [B] 2.0 | [C] 4 | [D] 3,[B] 2.0,"The function `calculate_average` takes a list of numbers as input. It calculates the sum of the numbers using `sum(numbers)`, which is 6. Then, it divides this sum by the length of the list using `len(numbers)`, which is 3. Therefore, the result is 6 / 3 = 2.0.",5,4,5,5,5,"The question is technically correct, and the code is flawless. It directly tests core concepts of function execution and built-in functions (`sum`, `len`) explicitly shown in the course slides. Distractors are plausible, reflecting common calculation errors."
+Q094,Functions & Scope,medium,"What is the output of the following Python code snippet? \n ```python \n def greet(name): \n     return f'Hello, {name}!' \n  \n def main(): \n     print(greet('Alice')) \n  \n main() \n ```","[A] Hello, Alice! | [B] Hello, Bob! | [C] Good morning, Alice! | [D] NameError: name 'name' is not defined","[A] Hello, Alice!","The `greet` function takes a parameter `name` and returns a greeting string. The `main` function calls `greet('Alice')`, which correctly substitutes 'Alice' into the greeting template, resulting in 'Hello, Alice!'.",5,5,5,5,5,"This MCQ flawlessly tests fundamental Python function definition, calling, and parameter passing. The code is correct, the designated answer is accurate, and distractors are highly plausible. The question is directly supported by the provided course slides on basic function concepts."
+Q095,Functions & Scope,medium,"Consider the following Python function that calculates the average of a list of numbers. ```python \n def calculate_average(numbers): \n     return sum(numbers) / len(numbers) \n ``` What is the output when calling `calculate_average([1, 2, 3])`? \n ",[A] 6 | [B] 2.0 | [C] 3 | [D] 4,[B] 2.0,"The function `calculate_average` takes a list of numbers as input. It calculates the sum of the numbers using `sum(numbers)` and then divides by the length of the list using `len(numbers)`. For the input `[1, 2, 3]`, the sum is 6 and the length is 3, so the average is 6 / 3 = 2.0.",5,4,4,5,4,"The question accurately tests basic function execution and Python's float division, directly using a function example from the course slides. While the question's content is well-grounded, it does not directly assess the stated learning objective regarding docstrings."
+Q096,Functions & Scope,medium,What is the output of the following Python code snippet? \n ```python \n def factorial(n): \n     if n == 0: \n         return 1 \n     else: \n         return n * factorial(n-1) \n  \n result = factorial(3) \n print(result) \n ```,[A] 6 | [B] 5 | [C] 4 | [D] 3,[A] 6,"The `factorial` function is a recursive function that calculates the factorial of a number. The base case is when `n == 0`, in which case it returns 1. For other values, it recursively calls itself with `n-1`. When `result = factorial(3)`, the function calls itself as follows: `factorial(3)` -> `3 * factorial(2)` -> `3 * (2 * factorial(1))` -> `3 * (2 * (1 * factorial(0)))` -> `3 * (2 * 1) = 6`. Therefore, the output is 6.",5,3,5,5,2,"The question is technically correct, uses flawless Python syntax, and tests a core CS concept (recursion). However, the provided course slides only cover basic function definition and return statements, not the concept of recursion itself, making it weakly supported by the given context. The distractors could also be improved to reflect more common student misconceptions related to recursion."
+Q097,Functions & Scope,medium,Consider the following Python function that calculates the factorial of a number using recursion: \n ```python \n def factorial(n): \n     if n == 0: \n         return 1 \n     else: \n         return n * factorial(n - 1) \n ``` \n What is the output when calling `factorial(3)`? \n ,[A] 6 | [B] 5 | [C] 4 | [D] 7,[A] 6,"The function `factorial(3)` calls itself with `n-1` until it reaches the base case where `n == 0`. The correct output is 6, as 3! = 3 * 2 * 1.",5,2,5,5,1,"The question's code and correct answer are technically flawless, and recursion is a highly relevant pedagogical concept for functions. However, the provided distractors are weak and do not reflect common misconceptions in tracing recursive calls. Crucially, the concept of recursion is entirely absent from the retrieved course slides, making the question unsupported by the given context."
+Q098,Functions & Scope,medium,Which of the following lambda functions correctly calculates the square of a number?,"[A] ```python
+square = lambda x: x * x + 1
+``` | [B] ```python
+square = lambda x: x ** 2
+``` | [C] ```python
+square = lambda x: x * x - 1
+``` | [D] ```python
+square = lambda x: x / 2
+```","[B] ```python
+square = lambda x: x ** 2
+```","The correct lambda function is `lambda x: x ** 2`, which correctly calculates the square of a number. The distractors introduce errors: adding 1 (`x * x + 1`), subtracting 1 (`x * x - 1`), and dividing by 2 (`x / 2`) are incorrect operations for squaring a number.",5,4,5,5,5,"The question flawlessly assesses the core concept of lambda function syntax and its application for simple expressions, directly supported by the course slides. Distractors are plausible arithmetic variations, and all code is syntactically correct."
+Q099,Functions & Scope,medium,Which of the following code snippets correctly uses a lambda function with `map()` to square each number in a list?,"[A] ```python
+numbers = [1, 2, 3]
+squared_numbers = map(lambda x: x * x, numbers)
+print(list(squared_numbers))
+``` | [B] ```python
+numbers = [1, 2, 3]
+squared_numbers = map(x * x, numbers)
+print(list(squared_numbers))
+``` | [C] ```python
+numbers = [1, 2, 3]
+squared_numbers = map(lambda x: x + x, numbers)
+print(list(squared_numbers))
+``` | [D] ```python
+numbers = [1, 2, 3]
+squared_numbers = map(lambda x: x ** 2, numbers)
+print(list(squared_numbers))
+```","[A] ```python
+numbers = [1, 2, 3]
+squared_numbers = map(lambda x: x * x, numbers)
+print(list(squared_numbers))
+```","The correct choice uses a lambda function with `map()` to square each number in the list. The lambda function correctly applies the squaring operation (`x * x`). The distractors either lack the lambda keyword, use an incorrect expression for squaring, or incorrectly apply the map function.",2,2,5,5,5,"The question effectively tests a core concept (lambda with map) well-supported by the slides. However, it is fundamentally flawed as an MCQ because two options (A and D) are equally correct solutions for squaring numbers using a lambda function with `map()`."
+Q100,Functions & Scope,medium,"What will be the output of the following Python code? \n ```python \n def greet(name): \n     return f'Hello, {name}!' \n def introduce(greet_func, person): \n     return greet_func(person) \n print(introduce(greet, 'Alice')) \n ```","[A] Hello, Alice! | [B] Hello, ! | [C] greet('Alice') | [D] TypeError: greet() missing 1 required positional argument: 'name'","[A] Hello, Alice!","The code defines two functions, `greet` and `introduce`. The `greet` function takes a name as an argument and returns a greeting string. The `introduce` function takes another function (like `greet`) and a person's name as arguments, then calls the passed function with the person's name. When calling `introduce(greet, 'Alice')`, it correctly passes the `greet` function and the string `'Alice'`. Therefore, the output is 'Hello, Alice!'. The other options are incorrect because they either misinterpret the code or result from errors in function calls.",5,5,5,5,3,"The question is technically correct, highly relevant, and features plausible distractors. However, the specific concept of passing functions as arguments (higher-order functions) is not explicitly covered in the provided slide chunks, which focus on basic function syntax and calling."
