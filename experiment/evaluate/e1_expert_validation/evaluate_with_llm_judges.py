@@ -157,9 +157,9 @@ def judge_with_openai(prompt: str, api_key: str, model: str = "gpt-6-astra") -> 
 def judge_with_gemini(
     prompt: str,
     api_key: str,
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-3.7-flash"
 ) -> Optional[Dict[str, Any]]:
-    raw_models = [model, "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.8-flash"]
+    raw_models = [model, "gemini-3.7-flash", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash"]
     gemini_models = []
     for m in raw_models:
         if m and m not in gemini_models:
@@ -546,12 +546,12 @@ def main():
             sys.exit(1)
         evaluate_judge("R1", "OpenAI GPT-6 (gpt-6-astra)", lambda p: judge_with_openai(p, args.openai_key), questions, r1_csv)
 
-    # 2. Setup R2 (Google Gemini 3.8 Flash: gemini-3.8-flash)
+    # 2. Setup R2 (Google Gemini 3.7 Flash: gemini-3.7-flash)
     r2_csv = os.path.join(RATING_SHEETS_DIR, "rating_sheet_R2.csv")
     r2_complete = is_sheet_complete(r2_csv, questions)
 
     if r2_complete and args.r2_backend == "auto":
-        print(f"[INFO] R2 (Google Gemini 3.8 Flash: gemini-3.8-flash) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
+        print(f"[INFO] R2 (Google Gemini 3.7 Flash: gemini-3.7-flash) already has complete evaluations for all {len(questions)} items. Reusing existing sheet.")
     elif args.r2_backend == "ollama":
         evaluate_judge("R2", "Ollama Qwen2.5-Coder-7B", lambda p: judge_with_ollama(p, args.ollama_url), questions, r2_csv)
     elif args.r2_backend == "skip":
@@ -566,7 +566,7 @@ def main():
             sys.exit(1)
         evaluate_judge(
             "R2",
-            "Google Gemini 3.8 Flash (gemini-3.8-flash)",
+            "Google Gemini 3.7 Flash (gemini-3.7-flash)",
             lambda p: judge_with_gemini(p, args.gemini_key),
             questions,
             r2_csv,
